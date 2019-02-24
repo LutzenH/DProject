@@ -19,10 +19,7 @@ namespace DProject
         private Matrix worldMatrix;
         
         //Models
-        private Model cube;
-        
-        //Orbit
-        private bool orbit;
+        private Model factoryModel;
 
         public Game1()
         {
@@ -40,7 +37,7 @@ namespace DProject
             
             //Camera
             cameraTarget = new Vector3(0f,0f,0f);
-            cameraPosition = new Vector3(0f,0f,-5f);
+            cameraPosition = new Vector3(0f,0f,-10f);
 
             projectMatrix = Matrix.CreatePerspectiveFieldOfView(
                 MathHelper.ToRadians(45f),
@@ -55,7 +52,7 @@ namespace DProject
 
         protected override void LoadContent()
         {
-            cube = Content.Load<Model>("models/factory");
+            factoryModel = Content.Load<Model>("models/factory");
         }
 
         protected override void Update(GameTime gameTime)
@@ -98,11 +95,8 @@ namespace DProject
                 cameraPosition.Z -= 1f;
                 cameraTarget.Z -= 1f;
             }
-            
-            if (Keyboard.GetState().IsKeyDown(Keys.Space))
-                orbit = !orbit;
 
-            if (orbit)
+            if (Keyboard.GetState().IsKeyDown(Keys.Space))
             {
                 Matrix rotationMatrix = Matrix.CreateRotationY(MathHelper.ToRadians(1f));
                 cameraPosition = Vector3.Transform(cameraPosition, rotationMatrix);
@@ -119,7 +113,7 @@ namespace DProject
             GraphicsDevice.Clear(Color.DarkGray);
             GraphicsDevice.SamplerStates[0] = SamplerState.PointWrap;
             
-            foreach (ModelMesh mesh in cube.Meshes)
+            foreach (ModelMesh mesh in factoryModel.Meshes)
             {
                 foreach (BasicEffect effect in mesh.Effects)
                 {
