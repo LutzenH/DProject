@@ -17,13 +17,9 @@ namespace DProject
         private Matrix projectMatrix;
         private Matrix viewMatrix;
         private Matrix worldMatrix;
-
-        //Graphics Effects
-        private BasicEffect basicEffect;
-
-        //Geometric data
-        private VertexPositionColor[] triangleVertices;
-        private VertexBuffer vertexBuffer;
+        
+        //Models
+        private Model cube;
         
         //Orbit
         private bool orbit;
@@ -33,6 +29,9 @@ namespace DProject
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
+
+            graphics.PreferredBackBufferWidth = 1152;
+            graphics.PreferredBackBufferHeight = 768;
         }
 
         protected override void Initialize()
@@ -41,7 +40,7 @@ namespace DProject
             
             //Camera
             cameraTarget = new Vector3(0f,0f,0f);
-            cameraPosition = new Vector3(0f,0f,-100f);
+            cameraPosition = new Vector3(0f,0f,-5f);
 
             projectMatrix = Matrix.CreatePerspectiveFieldOfView(
                 MathHelper.ToRadians(45f),
@@ -52,27 +51,11 @@ namespace DProject
             viewMatrix = Matrix.CreateLookAt(cameraPosition, cameraTarget, Vector3.Up);
 
             worldMatrix = Matrix.CreateWorld(cameraTarget, Vector3.Forward, Vector3.Up);
-            
-            //Graphics Effects
-            basicEffect = new BasicEffect(GraphicsDevice);
-            basicEffect.Alpha = 1.0f;
-            basicEffect.VertexColorEnabled = true;
-            basicEffect.LightingEnabled = false;
-            
-            //Triangle Test
-            triangleVertices = new VertexPositionColor[3];
-            triangleVertices[0] = new VertexPositionColor(new Vector3(0,20,0), Color.Red);
-            triangleVertices[1] = new VertexPositionColor(new Vector3(-20,-20,0), Color.Green);
-            triangleVertices[2] = new VertexPositionColor(new Vector3(20,-20,0), Color.Blue);
-            
-            //Sends Vertex Information to the graphics-card
-            vertexBuffer = new VertexBuffer(GraphicsDevice, typeof(VertexPositionColor), 3, BufferUsage.WriteOnly);
-            vertexBuffer.SetData<VertexPositionColor>(triangleVertices);
         }
 
         protected override void LoadContent()
         {
-            // TODO: use this.Content to load your game content here
+            cube = Content.Load<Model>("models/factory");
         }
 
         protected override void Update(GameTime gameTime)
@@ -132,26 +115,19 @@ namespace DProject
 
         protected override void Draw(GameTime gameTime)
         {
-            //Setting the Matrixes
-            basicEffect.Projection = projectMatrix;
-            basicEffect.View = viewMatrix;
-            basicEffect.World = worldMatrix;
-            
             //Background color
-            GraphicsDevice.Clear(Color.CornflowerBlue);
-
-            GraphicsDevice.SetVertexBuffer(vertexBuffer);
+            GraphicsDevice.Clear(Color.DarkGray);
+            GraphicsDevice.SamplerStates[0] = SamplerState.PointWrap;
             
-            //Back face culling
-            RasterizerState rasterizerState = new RasterizerState();
-            rasterizerState.CullMode = CullMode.None;
-            GraphicsDevice.RasterizerState = rasterizerState;
-
-            //Draws all primitives in the drawpass
-            foreach (EffectPass pass in basicEffect.CurrentTechnique.Passes)
+            foreach (ModelMesh mesh in cube.Meshes)
             {
-                pass.Apply();
-                GraphicsDevice.DrawPrimitives(PrimitiveType.TriangleList, 0, 3);
+                foreach (BasicEffect effect in mesh.Effects)
+                {
+                    effect.View = viewMatrix;
+                    effect.World = worldMatrix;
+                    effect.Projection = projectMatrix;
+                }
+                mesh.Draw();
             }
             
             base.Draw(gameTime);
