@@ -1,29 +1,22 @@
-﻿using Microsoft.Xna.Framework;
+﻿using DProject.Entity;
+using DProject.Manager;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using IDrawable = DProject.Entity.IDrawable;
 
 namespace DProject
 {
     public class Game1 : Game
     {
-        //GraphicsDeviceManager
-        GraphicsDeviceManager graphics;
+        private readonly GraphicsDeviceManager graphics;
+        private readonly EntityManager EntityManager;
         
-        //Vectors
-        private Vector3 cameraTarget;
-        private Vector3 cameraPosition;
-        
-        //Matrix
-        private Matrix projectMatrix;
-        private Matrix viewMatrix;
-        private Matrix worldMatrix;
-        
-        //Models
-        private Model factoryModel;
-
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
+            EntityManager = new EntityManager();
+            
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
 
@@ -35,24 +28,15 @@ namespace DProject
         {
             base.Initialize();
             
-            //Camera
-            cameraTarget = new Vector3(0f,0f,0f);
-            cameraPosition = new Vector3(0f,0f,-10f);
-
-            projectMatrix = Matrix.CreatePerspectiveFieldOfView(
-                MathHelper.ToRadians(45f),
-                GraphicsDevice.DisplayMode.AspectRatio,
-                1f,
-                1000f);
-            
-            viewMatrix = Matrix.CreateLookAt(cameraPosition, cameraTarget, Vector3.Up);
-
-            worldMatrix = Matrix.CreateWorld(cameraTarget, Vector3.Forward, Vector3.Up);
+            EntityManager.GetActiveCamera().Initialize(GraphicsDevice);
         }
 
         protected override void LoadContent()
         {
-            factoryModel = Content.Load<Model>("models/factory");
+            foreach (AbstractEntity entity in EntityManager.GetEntities())
+            {
+                entity.LoadContent(Content);
+            }
         }
 
         protected override void Update(GameTime gameTime)
@@ -60,50 +44,11 @@ namespace DProject
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            if (Keyboard.GetState().IsKeyDown(Keys.Left))
+            foreach (AbstractEntity entity in EntityManager.GetEntities())
             {
-                cameraPosition.X -= 1f;
-                cameraTarget.X -= 1f;
-            }
-
-            if (Keyboard.GetState().IsKeyDown(Keys.Right))
-            {
-                cameraPosition.X += 1f;
-                cameraTarget.X += 1f;
-            }
-
-            if (Keyboard.GetState().IsKeyDown(Keys.Up))
-            {
-                cameraPosition.Y -= 1f;
-                cameraTarget.Y -= 1f;
+                entity.Update(gameTime);
             }
             
-            if (Keyboard.GetState().IsKeyDown(Keys.Down))
-            {
-                cameraPosition.Y += 1f;
-                cameraTarget.Y += 1f;
-            }
-            
-            if (Keyboard.GetState().IsKeyDown(Keys.OemPlus))
-            {
-                cameraPosition.Z += 1f;
-                cameraTarget.Z += 1f;
-            }
-
-            if (Keyboard.GetState().IsKeyDown(Keys.OemMinus))
-            {
-                cameraPosition.Z -= 1f;
-                cameraTarget.Z -= 1f;
-            }
-
-            if (Keyboard.GetState().IsKeyDown(Keys.Space))
-            {
-                Matrix rotationMatrix = Matrix.CreateRotationY(MathHelper.ToRadians(1f));
-                cameraPosition = Vector3.Transform(cameraPosition, rotationMatrix);
-            }
-
-            viewMatrix = Matrix.CreateLookAt(cameraPosition, cameraTarget, Vector3.Up);
-
             base.Update(gameTime);
         }
 
@@ -112,16 +57,27 @@ namespace DProject
             //Background color
             GraphicsDevice.Clear(Color.DarkGray);
             GraphicsDevice.SamplerStates[0] = SamplerState.PointWrap;
-            
-            foreach (ModelMesh mesh in factoryModel.Meshes)
+
+            foreach (AbstractEntity entity in EntityManager.GetEntities())
             {
-                foreach (BasicEffect effect in mesh.Effects)
+                if (entity is IDrawable)
                 {
-                    effect.View = viewMatrix;
-                    effect.World = worldMatrix;
-                    effect.Projection = projectMatrix;
+                    if (entity is PropEntity)
+                    {
+                        PropEntity propEntity = (PropEntity) entity;
+                        
+                        foreach (ModelMesh mesh in propEntity.getModel().Meshes)
+                        {
+                            foreach (BasicEffect effect in mesh.Effects)
+                            {
+                                effect.View = EntityManager.GetActiveCamera().ViewMatrix;
+                                effect.World = EntityManager.GetActiveCamera().WorldMatrix;
+                                effect.Projection = EntityManager.GetActiveCamera().ProjectMatrix;
+                            }
+                            mesh.Draw();
+                        }
+                    }
                 }
-                mesh.Draw();
             }
             
             base.Draw(gameTime);
