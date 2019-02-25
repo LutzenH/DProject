@@ -13,7 +13,6 @@ namespace DProject.Entity
         //Matrix
         public Matrix ProjectMatrix;
         public Matrix ViewMatrix;
-        public Matrix WorldMatrix;
 
         public CameraEntity(Vector3 position, Vector3 cameraTarget) : base(position)
         {
@@ -31,8 +30,6 @@ namespace DProject.Entity
                 1000f);
             
             ViewMatrix = Matrix.CreateLookAt(Position, cameraTarget, Vector3.Up);
-    
-            WorldMatrix = Matrix.CreateWorld(cameraTarget, Vector3.Forward, Vector3.Up);
         }
         
         public override void LoadContent(ContentManager content)

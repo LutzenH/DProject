@@ -71,7 +71,7 @@ namespace DProject
                             foreach (BasicEffect effect in mesh.Effects)
                             {
                                 effect.View = EntityManager.GetActiveCamera().ViewMatrix;
-                                effect.World = EntityManager.GetActiveCamera().WorldMatrix;
+                                effect.World = Matrix.CreateWorld(propEntity.GetPosition(), Vector3.Forward, Vector3.Up);
                                 effect.Projection = EntityManager.GetActiveCamera().ProjectMatrix;
                             }
                             mesh.Draw();

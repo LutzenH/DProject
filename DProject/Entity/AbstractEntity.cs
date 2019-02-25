@@ -14,5 +14,10 @@ namespace DProject.Entity
 
         public abstract void LoadContent(ContentManager content);
         public abstract void Update(GameTime gameTime);
+
+        public Vector3 GetPosition()
+        {
+            return Position;
+        }
     }
 }

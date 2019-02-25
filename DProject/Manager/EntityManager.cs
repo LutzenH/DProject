@@ -16,7 +16,7 @@ namespace DProject.Manager
             
             entities.Add(activeCamera);
             entities.Add(new PropEntity(Vector3.Zero, "models/factory"));
-            entities.Add(new PropEntity(Vector3.Zero, "models/cube"));
+            entities.Add(new PropEntity(new Vector3(0f, 2f, 0f), "models/cube"));
         }
 
         public List<AbstractEntity> GetEntities()
