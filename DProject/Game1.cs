@@ -27,8 +27,6 @@ namespace DProject
         protected override void Initialize()
         {
             base.Initialize();
-            
-            EntityManager.GetActiveCamera().Initialize(GraphicsDevice);
         }
 
         protected override void LoadContent()

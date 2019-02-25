@@ -11,12 +11,12 @@ namespace DProject.Manager
 
         public EntityManager()
         {
-            activeCamera = new CameraEntity(new Vector3(0f,0f,-10f), Vector3.Zero);
+            activeCamera = new CameraEntity(new Vector3(0f,0f,-10f));
             entities = new List<AbstractEntity>();
             
             entities.Add(activeCamera);
             entities.Add(new PropEntity(Vector3.Zero, "models/factory"));
-            entities.Add(new PropEntity(new Vector3(0f, 2f, 0f), "models/cube"));
+            entities.Add(new PropEntity(new Vector3(0f, 0.8f, -2.5f), "models/cube"));
         }
 
         public List<AbstractEntity> GetEntities()
