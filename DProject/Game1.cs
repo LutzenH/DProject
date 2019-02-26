@@ -1,4 +1,5 @@
-﻿using DProject.Entity;
+﻿using System;
+using DProject.Entity;
 using DProject.Manager;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -66,13 +67,18 @@ namespace DProject
                         
                         foreach (ModelMesh mesh in propEntity.getModel().Meshes)
                         {
-                            foreach (BasicEffect effect in mesh.Effects)
+                            Matrix worldMatrix = Matrix.CreateWorld(propEntity.GetPosition(), Vector3.Forward, Vector3.Up);
+                            
+                            if (EntityManager.GetActiveCamera().GetBoundingFrustum().Intersects(mesh.BoundingSphere.Transform(worldMatrix)))
                             {
-                                effect.View = EntityManager.GetActiveCamera().ViewMatrix;
-                                effect.World = Matrix.CreateWorld(propEntity.GetPosition(), Vector3.Forward, Vector3.Up);
-                                effect.Projection = EntityManager.GetActiveCamera().ProjectMatrix;
+                                foreach (BasicEffect effect in mesh.Effects)
+                                {
+                                    effect.View = EntityManager.GetActiveCamera().ViewMatrix;
+                                    effect.World = worldMatrix;
+                                    effect.Projection = EntityManager.GetActiveCamera().ProjectMatrix;
+                                }
+                                mesh.Draw();
                             }
-                            mesh.Draw();
                         }
                     }
                 }

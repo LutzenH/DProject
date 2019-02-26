@@ -1,3 +1,4 @@
+using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Input;
@@ -13,6 +14,9 @@ namespace DProject.Entity
         //Matrix
         public Matrix ProjectMatrix;
         public Matrix ViewMatrix;
+        
+        //BoundingFrustum (used for culling)
+        private BoundingFrustum boundingFrustum;
 
         private float speed = 0.5f;
 
@@ -24,7 +28,7 @@ namespace DProject.Entity
             cameraUp = Vector3.Up;
             
             ViewMatrix = Matrix.CreateLookAt(Position, Position + cameraDirection, cameraUp);
-            ProjectMatrix = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(45f), 16f/9f, 1, 1000);
+            ProjectMatrix = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(45f), 16f/9f, 1, 100);
         }
         
         public override void LoadContent(ContentManager content) {}
@@ -47,14 +51,21 @@ namespace DProject.Entity
             if (Keyboard.GetState().IsKeyDown(Keys.Right))
                 anglex += 10;
             if (Keyboard.GetState().IsKeyDown(Keys.Up))
-                Position.Y += 0.01f;
+                Position.Y += 0.1f;
             if (Keyboard.GetState().IsKeyDown(Keys.Down))
-                Position.Y -= 0.01f;
+                Position.Y -= 0.1f;
             
             cameraDirection = Vector3.Transform(cameraDirection, Matrix.CreateFromAxisAngle(cameraUp, (-MathHelper.PiOver4 / 150) * anglex));
             cameraUp = Vector3.Transform(cameraUp, Matrix.CreateFromAxisAngle(Vector3.Cross(cameraUp, cameraDirection), (MathHelper.PiOver4 / 100) * 0));
             
+            boundingFrustum = new BoundingFrustum(ViewMatrix * ProjectMatrix);
+            
             ViewMatrix = Matrix.CreateLookAt(Position, Position + cameraDirection, cameraUp);
+        }
+
+        public BoundingFrustum GetBoundingFrustum()
+        {
+            return boundingFrustum;
         }
     }
 }
