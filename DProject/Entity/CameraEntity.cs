@@ -56,11 +56,10 @@ namespace DProject.Entity
                 Position.Y -= 0.1f;
             
             cameraDirection = Vector3.Transform(cameraDirection, Matrix.CreateFromAxisAngle(cameraUp, (-MathHelper.PiOver4 / 150) * anglex));
-            cameraUp = Vector3.Transform(cameraUp, Matrix.CreateFromAxisAngle(Vector3.Cross(cameraUp, cameraDirection), (MathHelper.PiOver4 / 100) * 0));
-            
-            boundingFrustum = new BoundingFrustum(ViewMatrix * ProjectMatrix);
+            cameraUp = Vector3.Transform(cameraUp, Matrix.CreateFromAxisAngle(Vector3.Cross(cameraUp, cameraDirection), (MathHelper.PiOver4 / 100) * 0));            
             
             ViewMatrix = Matrix.CreateLookAt(Position, Position + cameraDirection, cameraUp);
+            boundingFrustum = new BoundingFrustum(ViewMatrix * ProjectMatrix);
         }
 
         public BoundingFrustum GetBoundingFrustum()
