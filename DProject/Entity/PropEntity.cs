@@ -1,3 +1,4 @@
+using DProject.List;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -12,20 +13,17 @@ namespace DProject.Entity
         private Model model;
         private readonly string modelPath;
 
-        public PropEntity(Vector3 position, Quaternion rotation, Vector3 scale, string modelPath) : base(position, rotation, scale)
+        public PropEntity(Vector3 position, Quaternion rotation, Vector3 scale, string name) : base(position, rotation, scale)
         {
-            this.modelPath = modelPath;
+            this.modelPath = Props.PropList[name].GetAssetName();
         }
         
-        public PropEntity(Vector3 position, float pitch, float yaw, float roll, Vector3 scale, string modelPath) : base(position, pitch, yaw, roll, scale)
+        public PropEntity(Vector3 position, float pitch, float yaw, float roll, Vector3 scale, string name) : base(position, pitch, yaw, roll, scale)
         {
-            this.modelPath = modelPath;
+            this.modelPath = Props.PropList[name].GetAssetName();
         }
 
-        public PropEntity(Vector3 position, string modelPath) : base(position, Quaternion.Identity, new Vector3(1, 1, 1))
-        {
-            this.modelPath = modelPath;
-        }
+        public PropEntity(Vector3 position, string name) : this(position, Quaternion.Identity, Props.PropList[name].GetDefaultScale(), name) { }
 
         public override void LoadContent(ContentManager content)
         {

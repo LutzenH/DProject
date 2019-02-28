@@ -9,7 +9,6 @@ namespace DProject.Entity
     {    
         //Vectors
         private Vector3 cameraDirection;
-        private Vector3 cameraUp;
         
         //Matrix
         public Matrix ProjectMatrix;
@@ -25,9 +24,8 @@ namespace DProject.Entity
             Position = position;
             cameraDirection = Vector3.Zero - position;
             cameraDirection.Normalize();
-            cameraUp = Vector3.Up;
             
-            ViewMatrix = Matrix.CreateLookAt(Position, Position + cameraDirection, cameraUp);
+            ViewMatrix = Matrix.CreateLookAt(Position, Position + cameraDirection, Vector3.Up);
             ProjectMatrix = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(45f), 16f/9f, 0.01f, 100);
         }
         
@@ -43,9 +41,9 @@ namespace DProject.Entity
             if (Keyboard.GetState().IsKeyDown(Keys.S))
                 Position -= cameraDirection * speed;
             if (Keyboard.GetState().IsKeyDown(Keys.A))
-                Position += Vector3.Cross(cameraUp, cameraDirection) * speed;
+                Position += Vector3.Cross(Vector3.Up, cameraDirection) * speed;
             if (Keyboard.GetState().IsKeyDown(Keys.D))
-                Position -= Vector3.Cross(cameraUp, cameraDirection) * speed;
+                Position -= Vector3.Cross(Vector3.Up, cameraDirection) * speed;
             if (Keyboard.GetState().IsKeyDown(Keys.Q))
                 Position.Y += 0.1f;
             if (Keyboard.GetState().IsKeyDown(Keys.E))
@@ -68,14 +66,8 @@ namespace DProject.Entity
             
             cameraDirection.Normalize();
             
-            Console.WriteLine(cameraDirection);
-            
             ViewMatrix = Matrix.CreateLookAt(Position, Position + cameraDirection, Vector3.Up);
             boundingFrustum = new BoundingFrustum(ViewMatrix * ProjectMatrix);
-
-            //RECHT VOORUIT KIJKEN IS 0, 0, 1
-            //OMHOOG KIJKEN IS        0, 1, 0
-            //OMLAAG KIJKEN IS        0,-1, 0
         }
 
         public BoundingFrustum GetBoundingFrustum()

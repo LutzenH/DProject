@@ -56,8 +56,6 @@ namespace DProject
             //Background color
             GraphicsDevice.Clear(Color.DarkGray);
             GraphicsDevice.SamplerStates[0] = SamplerState.PointWrap;
-
-            int vertexCount = 0;
             
             foreach (AbstractEntity entity in EntityManager.GetEntities())
             {
@@ -80,7 +78,6 @@ namespace DProject
                                     effect.Projection = EntityManager.GetActiveCamera().ProjectMatrix;
                                 }
 
-                                vertexCount += mesh.MeshParts[0].PrimitiveCount;
                                 mesh.Draw();
                             }
                         }
@@ -88,7 +85,6 @@ namespace DProject
                 }
             }
             
-            Console.WriteLine("VertexCount:" + vertexCount);
             base.Draw(gameTime);
         }
     }
