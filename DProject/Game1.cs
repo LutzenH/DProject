@@ -57,6 +57,8 @@ namespace DProject
             GraphicsDevice.Clear(Color.DarkGray);
             GraphicsDevice.SamplerStates[0] = SamplerState.PointWrap;
 
+            int vertexCount = 0;
+            
             foreach (AbstractEntity entity in EntityManager.GetEntities())
             {
                 if (entity is IDrawable)
@@ -67,7 +69,7 @@ namespace DProject
                         
                         foreach (ModelMesh mesh in propEntity.getModel().Meshes)
                         {
-                            Matrix worldMatrix = Matrix.CreateWorld(propEntity.GetPosition(), Vector3.Forward, Vector3.Up);
+                            Matrix worldMatrix = entity.getWorldMatrix();
                             
                             if (EntityManager.GetActiveCamera().GetBoundingFrustum().Intersects(mesh.BoundingSphere.Transform(worldMatrix)))
                             {
@@ -77,6 +79,8 @@ namespace DProject
                                     effect.World = worldMatrix;
                                     effect.Projection = EntityManager.GetActiveCamera().ProjectMatrix;
                                 }
+
+                                vertexCount += mesh.MeshParts[0].PrimitiveCount;
                                 mesh.Draw();
                             }
                         }
@@ -84,6 +88,7 @@ namespace DProject
                 }
             }
             
+            Console.WriteLine("VertexCount:" + vertexCount);
             base.Draw(gameTime);
         }
     }

@@ -11,7 +11,7 @@ namespace DProject.Manager
 
         public EntityManager()
         {
-            activeCamera = new CameraEntity(new Vector3(0f,0f,-10f));
+            activeCamera = new CameraEntity(new Vector3(0f,0f,-1f), new Quaternion(0,0,0,1));
             entities = new List<AbstractEntity>();
              
             entities.Add(activeCamera);
@@ -22,7 +22,7 @@ namespace DProject.Manager
             {
                 for (int y = 0; y < 100; y++)
                 {
-                    entities.Add(new PropEntity(new Vector3(1f + x, 0f, -5f + y), "models/barrel"));
+                    entities.Add(new PropEntity(new Vector3(1f + x, 0f, -5f + y), x/25f,y/25f,0f, new Vector3(1,1,1),"models/barrel"));
                 }
             }
         }
