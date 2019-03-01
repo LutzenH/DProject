@@ -1,4 +1,5 @@
 using System;
+using System.Net.Http.Headers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -6,7 +7,7 @@ namespace DProject.Type
 {
     public class HeightMap
     {       
-        private VertexPositionColor[] vertexPositions;
+        private VertexPositionNormalTexture[] vertexPositions;
 
         private VertexBuffer vertexBuffer;
         private BasicEffect basicEffect;
@@ -31,12 +32,11 @@ namespace DProject.Type
             //Graphics Effects
             basicEffect = new BasicEffect(graphicsDevice);
             basicEffect.Alpha = 1.0f;
-            basicEffect.VertexColorEnabled = true;
-            basicEffect.LightingEnabled = false;
-
+            basicEffect.EnableDefaultLighting();
+            
             //Sends Vertex Information to the graphics-card
-            vertexBuffer = new VertexBuffer(graphicsDevice, typeof(VertexPositionColor), (width-1)*(height-1)*6, BufferUsage.WriteOnly);
-            vertexBuffer.SetData<VertexPositionColor>(vertexPositions);
+            vertexBuffer = new VertexBuffer(graphicsDevice, typeof(VertexPositionNormalTexture), (width-1)*(height-1)*6, BufferUsage.WriteOnly);
+            vertexBuffer.SetData<VertexPositionNormalTexture>(vertexPositions);
         }
 
         public void Draw(Matrix projectMatrix, Matrix viewMatrix, Matrix worldMatrix)
@@ -54,12 +54,12 @@ namespace DProject.Type
             }
         }
 
-        private static VertexPositionColor[] GenerateVertexPositions(float[,] heightmap)
+        private static VertexPositionNormalTexture[] GenerateVertexPositions(float[,] heightmap)
         {
             int width = heightmap.GetLength(0) -1;
             int height = heightmap.GetLength(1) -1;
 
-            VertexPositionColor[] vertexPositions = new VertexPositionColor[(width)*(height)*6];
+            VertexPositionNormalTexture[] vertexPositions = new VertexPositionNormalTexture[(width)*(height)*6];
 
             int vertexIndex = 0;
             
@@ -67,19 +67,43 @@ namespace DProject.Type
             {
                 for (int y = 0; y < height; y++)
                 {
-                    vertexPositions[vertexIndex++] = new VertexPositionColor(new Vector3 (x-0.5f, heightmap[x,y+1], y+0.5f), Color.Red);
-                    vertexPositions[vertexIndex++] = new VertexPositionColor(new Vector3 (x-0.5f,  heightmap[x,y], y-0.5f), Color.Red);
-                    vertexPositions[vertexIndex++] = new VertexPositionColor(new Vector3 (x+0.5f, heightmap[x+1,y+1], y+0.5f), Color.Red);
+                    Vector3 normal = GenerateNormalDirection(
+                        new Vector3 (x-0.5f, heightmap[x,y+1], y+0.5f),
+                        new Vector3 (x-0.5f,  heightmap[x,y], y-0.5f),
+                        new Vector3 (x+0.5f, heightmap[x+1,y+1], y+0.5f)
+                        );
                     
-                    vertexPositions[vertexIndex++] = new VertexPositionColor(new Vector3 (x-0.5f, heightmap[x,y], y-0.5f), Color.White);
-                    vertexPositions[vertexIndex++] = new VertexPositionColor(new Vector3 (x+0.5f,  heightmap[x+1,y], y-0.5f), Color.White);
-                    vertexPositions[vertexIndex++] = new VertexPositionColor(new Vector3 (x+0.5f, heightmap[x+1,y+1], y+0.5f), Color.White);
+                    vertexPositions[vertexIndex++] = new VertexPositionNormalTexture(new Vector3 (x-0.5f, heightmap[x,y+1], y+0.5f), normal, Vector2.Zero);
+                    vertexPositions[vertexIndex++] = new VertexPositionNormalTexture(new Vector3 (x-0.5f,  heightmap[x,y], y-0.5f), normal, Vector2.Zero);
+                    vertexPositions[vertexIndex++] = new VertexPositionNormalTexture(new Vector3 (x+0.5f, heightmap[x+1,y+1], y+0.5f), normal, Vector2.Zero);
+                    
+                    normal = GenerateNormalDirection(
+                        new Vector3 (x-0.5f, heightmap[x,y], y-0.5f),
+                        new Vector3 (x+0.5f,  heightmap[x+1,y], y-0.5f),
+                        new Vector3 (x+0.5f, heightmap[x+1,y+1], y+0.5f)
+                    );
+                    
+                    vertexPositions[vertexIndex++] = new VertexPositionNormalTexture(new Vector3 (x-0.5f, heightmap[x,y], y-0.5f), normal, Vector2.Zero);
+                    vertexPositions[vertexIndex++] = new VertexPositionNormalTexture(new Vector3 (x+0.5f,  heightmap[x+1,y], y-0.5f), normal, Vector2.Zero);
+                    vertexPositions[vertexIndex++] = new VertexPositionNormalTexture(new Vector3 (x+0.5f, heightmap[x+1,y+1], y+0.5f), normal, Vector2.Zero);
                 }
             }
             
             return vertexPositions;
         }
 
-        
+        private static Vector3 GenerateNormalDirection(Vector3 vertex1, Vector3 vertex2, Vector3 vertex3)
+        {
+            Vector3 sum = Vector3.Zero;
+            
+            var n0 = (vertex2 - vertex1) * 10f;
+            var n1 = (vertex3 - vertex2) * 10f;
+
+            var cnorm = Vector3.Cross(n0, n1);
+            
+            sum += cnorm;
+
+            return sum;
+        }
     }
 }
