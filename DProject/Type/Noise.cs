@@ -4,7 +4,7 @@ namespace DProject.Type
 {
     public static class Noise
     {
-        public static float[,] GenerateNoiseMap(int mapWidth, int mapHeight)
+        public static float[,] GenerateNoiseMap(int mapWidth, int mapHeight, float noiseScale)
         {
             SimplexPerlin perlin = new SimplexPerlin();
             
@@ -14,7 +14,7 @@ namespace DProject.Type
             {
                 for (int y = 0; y < mapHeight; y++)
                 {  
-                    noiseMap[x,y] = perlin.GetValue(x, y);
+                    noiseMap[x,y] = perlin.GetValue(x/noiseScale, y/noiseScale);
                 }
             }
 

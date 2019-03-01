@@ -16,7 +16,7 @@ namespace DProject.Manager
              
             entities.Add(activeCamera);
             entities.Add(new PropEntity(Vector3.Zero, "factory"));
-            entities.Add(new TerrainEntity(new Vector3(0,-5,0), 100,100));
+            entities.Add(new TerrainEntity(new Vector3(0,0,0), 100,100, 50f));
             
             for (int x = 0; x < 100; x++)
             {

@@ -11,9 +11,9 @@ namespace DProject.Entity
     {
         private HeightMap HeightMap;
         
-        public TerrainEntity(Vector3 position, int width, int height) : base(position, Quaternion.Identity, new Vector3(1,1,1))
+        public TerrainEntity(Vector3 position, int width, int height, float noiseScale) : base(position, Quaternion.Identity, new Vector3(1,5,1))
         {
-            HeightMap = new HeightMap(width, height);
+            HeightMap = new HeightMap(width, height, noiseScale);
         }
 
         public override void LoadContent(ContentManager content) { }

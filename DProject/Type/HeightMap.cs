@@ -16,12 +16,12 @@ namespace DProject.Type
 
         private GraphicsDevice GraphicsDevice;
         
-        public HeightMap (int width, int height)
+        public HeightMap (int width, int height, float noiseScale)
         {
             this.width = width;
             this.height = height;
             
-            vertexPositions = GenerateVertexPositions(Noise.GenerateNoiseMap(width, height));
+            vertexPositions = GenerateVertexPositions(Noise.GenerateNoiseMap(width, height, noiseScale));
         }
 
         public void Initialize(GraphicsDevice graphicsDevice)
