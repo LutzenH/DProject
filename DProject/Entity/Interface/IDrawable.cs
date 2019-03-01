@@ -3,5 +3,8 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace DProject.Entity
 {
-    public interface IDrawable {}
+    public interface IDrawable
+    {
+        void Draw(CameraEntity activeCamera);
+    }
 }

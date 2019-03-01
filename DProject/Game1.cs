@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 using DProject.Entity;
 using DProject.Manager;
+using DProject.Type;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using IDrawable = DProject.Entity.IDrawable;
+using IUpdateable = DProject.Entity.IUpdateable;
 
 namespace DProject
 {
@@ -27,6 +30,12 @@ namespace DProject
 
         protected override void Initialize()
         {
+            foreach (AbstractEntity entity in EntityManager.GetEntities())
+            {
+                if (entity is IInitialize initializeEntity)
+                    initializeEntity.Initialize(GraphicsDevice);
+            }
+
             base.Initialize();
         }
 
@@ -45,7 +54,8 @@ namespace DProject
 
             foreach (AbstractEntity entity in EntityManager.GetEntities())
             {
-                entity.Update(gameTime);
+                if (entity is IUpdateable updateEntity)
+                    updateEntity.Update(gameTime);
             }
             
             base.Update(gameTime);
@@ -59,30 +69,8 @@ namespace DProject
             
             foreach (AbstractEntity entity in EntityManager.GetEntities())
             {
-                if (entity is IDrawable)
-                {
-                    if (entity is PropEntity)
-                    {
-                        PropEntity propEntity = (PropEntity) entity;
-                        
-                        foreach (ModelMesh mesh in propEntity.getModel().Meshes)
-                        {
-                            Matrix worldMatrix = entity.getWorldMatrix();
-                            
-                            if (EntityManager.GetActiveCamera().GetBoundingFrustum().Intersects(mesh.BoundingSphere.Transform(worldMatrix)))
-                            {
-                                foreach (BasicEffect effect in mesh.Effects)
-                                {
-                                    effect.View = EntityManager.GetActiveCamera().ViewMatrix;
-                                    effect.World = worldMatrix;
-                                    effect.Projection = EntityManager.GetActiveCamera().ProjectMatrix;
-                                }
-
-                                mesh.Draw();
-                            }
-                        }
-                    }
-                }
+                if (entity is IDrawable drawableEntity)
+                    drawableEntity.Draw(EntityManager.GetActiveCamera());
             }
             
             base.Draw(gameTime);

@@ -5,14 +5,14 @@ using Microsoft.Xna.Framework.Input;
 
 namespace DProject.Entity
 {
-    public class CameraEntity : AbstractEntity
+    public class CameraEntity : AbstractEntity, IUpdateable
     {    
         //Vectors
-        private Vector3 cameraDirection;
+        private Vector3 _cameraDirection;
         
         //Matrix
-        public Matrix ProjectMatrix;
-        public Matrix ViewMatrix;
+        private Matrix _projectMatrix;
+        private Matrix _viewMatrix;
         
         //BoundingFrustum (used for culling)
         private BoundingFrustum boundingFrustum;
@@ -22,28 +22,28 @@ namespace DProject.Entity
         public CameraEntity(Vector3 position, Quaternion rotation) : base(position, rotation, new Vector3(1,1,1))
         {
             Position = position;
-            cameraDirection = Vector3.Zero - position;
-            cameraDirection.Normalize();
+            _cameraDirection = Vector3.Zero - position;
+            _cameraDirection.Normalize();
             
-            ViewMatrix = Matrix.CreateLookAt(Position, Position + cameraDirection, Vector3.Up);
-            ProjectMatrix = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(45f), 16f/9f, 0.01f, 100);
+            _viewMatrix = Matrix.CreateLookAt(Position, Position + _cameraDirection, Vector3.Up);
+            _projectMatrix = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(45f), 16f/9f, 0.01f, 100);
         }
         
         public override void LoadContent(ContentManager content) {}
 
-        public override void Update(GameTime gameTime)
+        public void Update(GameTime gameTime)
         {
             int anglex = 0;
             int angley = 0;
             
             if (Keyboard.GetState().IsKeyDown(Keys.W))
-                Position += cameraDirection * speed;
+                Position += _cameraDirection * speed;
             if (Keyboard.GetState().IsKeyDown(Keys.S))
-                Position -= cameraDirection * speed;
+                Position -= _cameraDirection * speed;
             if (Keyboard.GetState().IsKeyDown(Keys.A))
-                Position += Vector3.Cross(Vector3.Up, cameraDirection) * speed;
+                Position += Vector3.Cross(Vector3.Up, _cameraDirection) * speed;
             if (Keyboard.GetState().IsKeyDown(Keys.D))
-                Position -= Vector3.Cross(Vector3.Up, cameraDirection) * speed;
+                Position -= Vector3.Cross(Vector3.Up, _cameraDirection) * speed;
             if (Keyboard.GetState().IsKeyDown(Keys.Q))
                 Position.Y += 0.1f;
             if (Keyboard.GetState().IsKeyDown(Keys.E))
@@ -58,21 +58,36 @@ namespace DProject.Entity
             if (Keyboard.GetState().IsKeyDown(Keys.Down))
                 angley -= 10;
                 
-            Vector3 cameraUpPerpendicular = Vector3.Cross(Vector3.Up, cameraDirection);
+            Vector3 cameraUpPerpendicular = Vector3.Cross(Vector3.Up, _cameraDirection);
             cameraUpPerpendicular.Normalize();
             
-            cameraDirection = Vector3.Transform(cameraDirection, Matrix.CreateFromAxisAngle(cameraUpPerpendicular, (-MathHelper.PiOver4 / 150) * angley));
-            cameraDirection = Vector3.Transform(cameraDirection, Matrix.CreateFromAxisAngle(Vector3.Up,(-MathHelper.PiOver4 / 150) * anglex));       
+            _cameraDirection = Vector3.Transform(_cameraDirection, Matrix.CreateFromAxisAngle(cameraUpPerpendicular, (-MathHelper.PiOver4 / 150) * angley));
+            _cameraDirection = Vector3.Transform(_cameraDirection, Matrix.CreateFromAxisAngle(Vector3.Up,(-MathHelper.PiOver4 / 150) * anglex));       
             
-            cameraDirection.Normalize();
+            _cameraDirection.Normalize();
             
-            ViewMatrix = Matrix.CreateLookAt(Position, Position + cameraDirection, Vector3.Up);
-            boundingFrustum = new BoundingFrustum(ViewMatrix * ProjectMatrix);
+            _viewMatrix = Matrix.CreateLookAt(Position, Position + _cameraDirection, Vector3.Up);
+            boundingFrustum = new BoundingFrustum(_viewMatrix * _projectMatrix);
         }
 
         public BoundingFrustum GetBoundingFrustum()
         {
             return boundingFrustum;
+        }
+
+        public Matrix GetProjectMatrix()
+        {
+            return _projectMatrix;
+        }
+        
+        public Matrix GetViewMatrix()
+        {
+            return _viewMatrix;
+        }
+
+        public Vector3 GetCameraDirection()
+        {
+            return _cameraDirection;
         }
     }
 }

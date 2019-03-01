@@ -30,15 +30,27 @@ namespace DProject.Entity
             model = content.Load<Model>(modelPath);
         }
 
-        public override void Update(GameTime gameTime)
-        {
-            if (Keyboard.GetState().IsKeyDown(Keys.LeftControl))
-                setRotation(0, yaw+=0.05f,0);
-        }
-
         public Model getModel()
         {
             return model;
-        } 
+        }
+        
+        public void Draw(CameraEntity activeCamera)
+        {
+            foreach (ModelMesh mesh in model.Meshes)
+            {                            
+                if (activeCamera.GetBoundingFrustum().Intersects(mesh.BoundingSphere.Transform(getWorldMatrix())))
+                {
+                    foreach (BasicEffect effect in mesh.Effects)
+                    {
+                        effect.View = activeCamera.GetViewMatrix();
+                        effect.World = getWorldMatrix();
+                        effect.Projection = activeCamera.GetProjectMatrix();
+                    }
+
+                    mesh.Draw();
+                }
+            }
+        }
     }
 }
