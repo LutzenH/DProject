@@ -14,7 +14,7 @@ namespace DProject.Type
             {
                 for (int y = 0; y < mapHeight+1; y++)
                 {  
-                    noiseMap[x,y] = perlin.GetValue((x+xOffset)/noiseScale, (y+yOffset)/noiseScale);
+                    noiseMap[x,y] = perlin.GetValue((x+xOffset)/noiseScale, (y+yOffset)/noiseScale) * 5;
                 }
             }
 

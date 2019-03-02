@@ -16,13 +16,16 @@ namespace DProject.Manager
              
             entities.Add(activeCamera);
             entities.Add(new PropEntity(Vector3.Zero, "factory"));
-            entities.Add(new TerrainEntity(new Vector3(-50,0,-50), 100,100, 50f));
+
+            TerrainEntity terrainEntity = new TerrainEntity(new Vector3(-50, 0, -50), 100, 100, 50f);
+            
+            entities.Add(terrainEntity);
             
             for (int x = 0; x < 100; x++)
             {
                 for (int y = 0; y < 100; y++)
                 {
-                    entities.Add(new PropEntity(new Vector3(-50 + x, 0f, -50 + y),"barrel"));
+                    entities.Add(new PropEntity(new Vector3(-50 + x, terrainEntity.GetHeightData()[x, y], -50 + y),"barrel"));
                 }
             }
         }

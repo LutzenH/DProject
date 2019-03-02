@@ -5,7 +5,8 @@ namespace DProject.Type
 {
     public class HeightMap
     {       
-        private VertexPositionColorNormal[] vertexPositions;
+        private VertexPositionTextureColorNormal[] vertexPositions;
+        private float[,] heightdata;
 
         private VertexBuffer vertexBuffer;
         private BasicEffect basicEffect;
@@ -25,8 +26,10 @@ namespace DProject.Type
 
             this.xOffset = xOffset;
             this.yOffset = yOffset;
+
+            this.heightdata = Noise.GenerateNoiseMap(width, height, xOffset, yOffset, noiseScale);
             
-            vertexPositions = GenerateVertexPositions(Noise.GenerateNoiseMap(width, height, xOffset, yOffset, noiseScale));
+            vertexPositions = GenerateVertexPositions(heightdata);
         }
 
         public void Initialize(GraphicsDevice graphicsDevice)
@@ -38,17 +41,21 @@ namespace DProject.Type
             basicEffect.Alpha = 1.0f;
             basicEffect.EnableDefaultLighting();
             basicEffect.VertexColorEnabled = true;
+
+            basicEffect.TextureEnabled = true;
             
             //Sends Vertex Information to the graphics-card
-            vertexBuffer = new VertexBuffer(graphicsDevice, typeof(VertexPositionColorNormal), (width)*(height)*6, BufferUsage.WriteOnly);
-            vertexBuffer.SetData<VertexPositionColorNormal>(vertexPositions);
+            vertexBuffer = new VertexBuffer(graphicsDevice, typeof(VertexPositionTextureColorNormal), (width)*(height)*6, BufferUsage.WriteOnly);
+            vertexBuffer.SetData<VertexPositionTextureColorNormal>(vertexPositions);
         }
 
-        public void Draw(Matrix projectMatrix, Matrix viewMatrix, Matrix worldMatrix)
+        public void Draw(Matrix projectMatrix, Matrix viewMatrix, Matrix worldMatrix, Texture2D texture2D)
         {
             basicEffect.Projection = projectMatrix;
             basicEffect.View = viewMatrix;
             basicEffect.World = worldMatrix;
+
+            basicEffect.Texture = texture2D;
 
             GraphicsDevice.SetVertexBuffer(vertexBuffer);
 
@@ -59,12 +66,12 @@ namespace DProject.Type
             }
         }
 
-        private static VertexPositionColorNormal[] GenerateVertexPositions(float[,] heightmap)
+        private static VertexPositionTextureColorNormal[] GenerateVertexPositions(float[,] heightmap)
         {
             int width = heightmap.GetLength(0) -1;
             int height = heightmap.GetLength(1) -1;
 
-            VertexPositionColorNormal[] vertexPositions = new VertexPositionColorNormal[(width)*(height)*6];
+            VertexPositionTextureColorNormal[] vertexPositions = new VertexPositionTextureColorNormal[(width)*(height)*6];
 
             int vertexIndex = 0;
             
@@ -73,7 +80,7 @@ namespace DProject.Type
                 for (int y = 0; y < height; y++)
                 {
                     float floatColor = (heightmap[x, y] + 1)/2;
-                    Color color = new Color(1-floatColor, floatColor, floatColor);
+                    Color color = new Color(floatColor, floatColor, floatColor);
                     
                     Vector3 normal = GenerateNormalDirection(
                         new Vector3 (x-0.5f, heightmap[x,y+1], y+0.5f),
@@ -81,9 +88,9 @@ namespace DProject.Type
                         new Vector3 (x+0.5f, heightmap[x+1,y+1], y+0.5f)
                         );
                     
-                    vertexPositions[vertexIndex++] = new VertexPositionColorNormal(new Vector3 (x-0.5f, heightmap[x,y+1], y+0.5f), normal, color);
-                    vertexPositions[vertexIndex++] = new VertexPositionColorNormal(new Vector3 (x-0.5f,  heightmap[x,y], y-0.5f), normal, color);
-                    vertexPositions[vertexIndex++] = new VertexPositionColorNormal(new Vector3 (x+0.5f, heightmap[x+1,y+1], y+0.5f), normal, color);
+                    vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(new Vector3 (x-0.5f, heightmap[x,y+1], y+0.5f), normal, color, new Vector2(0,0));
+                    vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(new Vector3 (x-0.5f,  heightmap[x,y], y-0.5f), normal, color, new Vector2(0,1));
+                    vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(new Vector3 (x+0.5f, heightmap[x+1,y+1], y+0.5f), normal, color, new Vector2(1,0));
                     
                     normal = GenerateNormalDirection(
                         new Vector3 (x-0.5f, heightmap[x,y], y-0.5f),
@@ -91,9 +98,9 @@ namespace DProject.Type
                         new Vector3 (x+0.5f, heightmap[x+1,y+1], y+0.5f)
                     );
                     
-                    vertexPositions[vertexIndex++] = new VertexPositionColorNormal(new Vector3 (x-0.5f, heightmap[x,y], y-0.5f), normal, color);
-                    vertexPositions[vertexIndex++] = new VertexPositionColorNormal(new Vector3 (x+0.5f,  heightmap[x+1,y], y-0.5f), normal, color);
-                    vertexPositions[vertexIndex++] = new VertexPositionColorNormal(new Vector3 (x+0.5f, heightmap[x+1,y+1], y+0.5f), normal, color);
+                    vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(new Vector3 (x-0.5f, heightmap[x,y], y-0.5f), normal, color, new Vector2(0,1));
+                    vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(new Vector3 (x+0.5f,  heightmap[x+1,y], y-0.5f), normal, color, new Vector2(1,1));
+                    vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(new Vector3 (x+0.5f, heightmap[x+1,y+1], y+0.5f), normal, color, new Vector2(1,0));
                 }
             }
             
@@ -117,7 +124,11 @@ namespace DProject.Type
         public void UpdateTerrain(float noiseScale)
         {
             vertexPositions = GenerateVertexPositions(Noise.GenerateNoiseMap(width, height, xOffset, yOffset, noiseScale));
-            vertexBuffer.SetData<VertexPositionColorNormal>(vertexPositions);
+            vertexBuffer.SetData<VertexPositionTextureColorNormal>(vertexPositions);
+        }
+        
+        public float[,] GetHeightData() {
+            return heightdata;
         }
     }
 }
