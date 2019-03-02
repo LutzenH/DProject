@@ -64,7 +64,7 @@ namespace DProject
         protected override void Draw(GameTime gameTime)
         {
             //Background color
-            GraphicsDevice.Clear(Color.DarkGray);
+            GraphicsDevice.Clear(Color.Black);
             GraphicsDevice.SamplerStates[0] = SamplerState.PointWrap;
             
             foreach (AbstractEntity entity in EntityManager.GetEntities())

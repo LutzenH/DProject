@@ -1,3 +1,5 @@
+using System;
+using DProject.List;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -6,7 +8,6 @@ namespace DProject.Type
     public class HeightMap
     {       
         private VertexPositionTextureColorNormal[] vertexPositions;
-        private float[,] heightdata;
 
         private VertexBuffer vertexBuffer;
         private BasicEffect basicEffect;
@@ -14,22 +15,22 @@ namespace DProject.Type
         private int width;
         private int height;
 
-        private float xOffset;
-        private float yOffset;
-
         private GraphicsDevice GraphicsDevice;
         
         public HeightMap (int width, int height, float xOffset, float yOffset, float noiseScale)
         {
             this.width = width;
             this.height = height;
-
-            this.xOffset = xOffset;
-            this.yOffset = yOffset;
-
-            this.heightdata = Noise.GenerateNoiseMap(width, height, xOffset, yOffset, noiseScale);
             
-            vertexPositions = GenerateVertexPositions(heightdata);
+            vertexPositions = GenerateVertexPositions(Noise.GenerateNoiseMap(width, height, xOffset, yOffset, noiseScale));
+        }
+
+        public HeightMap(float[,] heightmap)
+        {
+            this.width = heightmap.GetLength(0);
+            this.height = heightmap.GetLength(1);
+
+            vertexPositions = GenerateVertexPositions(heightmap);
         }
 
         public void Initialize(GraphicsDevice graphicsDevice)
@@ -62,7 +63,7 @@ namespace DProject.Type
             foreach (EffectPass pass in basicEffect.CurrentTechnique.Passes)
             {
                 pass.Apply();
-                GraphicsDevice.DrawPrimitives(PrimitiveType.TriangleList, 0, (width)*(height)*6/3);
+                GraphicsDevice.DrawPrimitives(PrimitiveType.TriangleList, 0, (width)*(height)*3);
             }
         }
 
@@ -79,28 +80,36 @@ namespace DProject.Type
             {
                 for (int y = 0; y < height; y++)
                 {
-                    float floatColor = (heightmap[x, y] + 1)/2;
-                    Color color = new Color(floatColor, floatColor, floatColor);
+                    Vector3 topLeft = new Vector3 (x-0.5f,  heightmap[x,y], y-0.5f);
+                    Vector3 topRight = new Vector3 (x+0.5f,  heightmap[x+1,y], y-0.5f);
+                    Vector3 bottomLeft = new Vector3 (x-0.5f, heightmap[x,y+1], y+0.5f);
+                    Vector3 bottomRight = new Vector3 (x+0.5f, heightmap[x+1,y+1], y+0.5f);
                     
-                    Vector3 normal = GenerateNormalDirection(
-                        new Vector3 (x-0.5f, heightmap[x,y+1], y+0.5f),
-                        new Vector3 (x-0.5f,  heightmap[x,y], y-0.5f),
-                        new Vector3 (x+0.5f, heightmap[x+1,y+1], y+0.5f)
-                        );
+                    Color color = new Color(topLeft.Y/5 +1, topLeft.Y/5 + 1, topLeft.Y/5 + 1);
                     
-                    vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(new Vector3 (x-0.5f, heightmap[x,y+1], y+0.5f), normal, color, new Vector2(0,0));
-                    vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(new Vector3 (x-0.5f,  heightmap[x,y], y-0.5f), normal, color, new Vector2(0,1));
-                    vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(new Vector3 (x+0.5f, heightmap[x+1,y+1], y+0.5f), normal, color, new Vector2(1,0));
-                    
-                    normal = GenerateNormalDirection(
-                        new Vector3 (x-0.5f, heightmap[x,y], y-0.5f),
-                        new Vector3 (x+0.5f,  heightmap[x+1,y], y-0.5f),
-                        new Vector3 (x+0.5f, heightmap[x+1,y+1], y+0.5f)
-                    );
-                    
-                    vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(new Vector3 (x-0.5f, heightmap[x,y], y-0.5f), normal, color, new Vector2(0,1));
-                    vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(new Vector3 (x+0.5f,  heightmap[x+1,y], y-0.5f), normal, color, new Vector2(1,1));
-                    vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(new Vector3 (x+0.5f, heightmap[x+1,y+1], y+0.5f), normal, color, new Vector2(1,0));
+                    Vector4 texturePosition = GetTextureCoordinate(topLeft);
+                    Vector3 normal = GenerateNormalDirection(bottomLeft, topLeft, bottomRight);
+
+                    if (isAlternativeDiagonal(topLeft, topRight, bottomRight, bottomLeft))
+                    {
+                        vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(bottomLeft, normal, color, new Vector2(texturePosition.X,texturePosition.Y));
+                        vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(topLeft, normal, color, new Vector2(texturePosition.X,texturePosition.W));
+                        vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(bottomRight, normal, color, new Vector2(texturePosition.Z,texturePosition.Y));
+                        
+                        vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(topLeft, normal, color, new Vector2(texturePosition.X,texturePosition.W));
+                        vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(topRight, normal, color, new Vector2(texturePosition.Z,texturePosition.W));
+                        vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(bottomRight, normal, color, new Vector2(texturePosition.Z,texturePosition.Y));
+                    }
+                    else
+                    {                        
+                        vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(bottomLeft, normal, color, new Vector2(texturePosition.X,texturePosition.Y));
+                        vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(topLeft, normal, color, new Vector2(texturePosition.X,texturePosition.W));
+                        vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(topRight, normal, color, new Vector2(texturePosition.Z,texturePosition.W));
+                        
+                        vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(bottomLeft, normal, color, new Vector2(texturePosition.X,texturePosition.Y));
+                        vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(topRight, normal, color, new Vector2(texturePosition.Z,texturePosition.W));
+                        vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(bottomRight, normal, color, new Vector2(texturePosition.Z,texturePosition.Y));
+                    }
                 }
             }
             
@@ -121,14 +130,29 @@ namespace DProject.Type
             return sum;
         }
 
-        public void UpdateTerrain(float noiseScale)
+        public void UpdateTerrain(float[,] heightmap)
         {
-            vertexPositions = GenerateVertexPositions(Noise.GenerateNoiseMap(width, height, xOffset, yOffset, noiseScale));
+            vertexPositions = GenerateVertexPositions(heightmap);
             vertexBuffer.SetData<VertexPositionTextureColorNormal>(vertexPositions);
         }
-        
-        public float[,] GetHeightData() {
-            return heightdata;
+
+        private static Vector4 GetTextureCoordinate(Vector3 topLeft)
+        {            
+            if (topLeft.Y < -1.2f)
+                return Textures.TextureList["tile_white"].GetAdjustedTexturePosition();
+            else if (topLeft.Y < 0f)
+                return Textures.TextureList["savanna_grass_dry"].GetAdjustedTexturePosition();
+            else
+                return Textures.TextureList["savanna_grass"].GetAdjustedTexturePosition();
+        }
+
+        private static Boolean isAlternativeDiagonal(Vector3 a, Vector3 b, Vector3 c, Vector3 d)
+        {            
+            if (Vector3.Distance(a, c) < Vector3.Distance(b, d))
+            {
+                return true;
+            }
+            else return false;
         }
     }
 }

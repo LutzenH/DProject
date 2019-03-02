@@ -35,15 +35,17 @@ namespace DProject.Entity
         {
             int anglex = 0;
             int angley = 0;
+
+            float moveSpeed = Keyboard.GetState().IsKeyDown(Keys.LeftShift) ? speed * 2 : speed;
             
             if (Keyboard.GetState().IsKeyDown(Keys.W))
-                Position += _cameraDirection * speed;
+                Position += _cameraDirection * moveSpeed;
             if (Keyboard.GetState().IsKeyDown(Keys.S))
-                Position -= _cameraDirection * speed;
+                Position -= _cameraDirection * moveSpeed;
             if (Keyboard.GetState().IsKeyDown(Keys.A))
-                Position += Vector3.Cross(Vector3.Up, _cameraDirection) * speed;
+                Position += Vector3.Cross(Vector3.Up, _cameraDirection) * moveSpeed;
             if (Keyboard.GetState().IsKeyDown(Keys.D))
-                Position -= Vector3.Cross(Vector3.Up, _cameraDirection) * speed;
+                Position -= Vector3.Cross(Vector3.Up, _cameraDirection) * moveSpeed;
             if (Keyboard.GetState().IsKeyDown(Keys.Q))
                 Position.Y += 0.1f;
             if (Keyboard.GetState().IsKeyDown(Keys.E))

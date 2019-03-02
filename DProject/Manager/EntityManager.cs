@@ -16,18 +16,18 @@ namespace DProject.Manager
              
             entities.Add(activeCamera);
             entities.Add(new PropEntity(Vector3.Zero, "factory"));
+            
+            float[,] heightmap = new float[100,100];
 
-            TerrainEntity terrainEntity = new TerrainEntity(new Vector3(-50, 0, -50), 100, 100, 50f);
-            
-            entities.Add(terrainEntity);
-            
-            for (int x = 0; x < 100; x++)
+            for (int x = 0; x < 50; x++)
             {
-                for (int y = 0; y < 100; y++)
+                for (int y = 0; y < 50; y++)
                 {
-                    entities.Add(new PropEntity(new Vector3(-50 + x, terrainEntity.GetHeightData()[x, y], -50 + y),"barrel"));
+                    entities.Add(new PropEntity(new Vector3(-25 + x, 5, -25 + y),"barrel"));
                 }
             }
+            
+            entities.Add(new TerrainEntity(new Vector3(0, 0, 0), heightmap));
         }
 
         public List<AbstractEntity> GetEntities()

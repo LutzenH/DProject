@@ -12,19 +12,21 @@ namespace DProject.Entity
     public class TerrainEntity : AbstractEntity, IDrawable, IInitialize, IUpdateable
     {
         private HeightMap HeightMap;
-        private float noiseScale;
-
         private Texture2D grassTexture;
         
         public TerrainEntity(Vector3 position, int width, int height, float noiseScale) : base(position, Quaternion.Identity, new Vector3(1,1,1))
         {
-            this.noiseScale = noiseScale;
             HeightMap = new HeightMap(width, height, position.X, position.Z, noiseScale);
+        }
+
+        public TerrainEntity(Vector3 position, float[,] heightmap): base(position, Quaternion.Identity, new Vector3(1,1,1))
+        {
+            HeightMap = new HeightMap(heightmap);
         }
 
         public override void LoadContent(ContentManager content)
         {
-            grassTexture = content.Load<Texture2D>(Textures.TextureList["savanna_grass"].GetAssetName());
+            grassTexture = content.Load<Texture2D>(Textures.texture_atlas_location);
         }
 
         public void Draw(CameraEntity activeCamera)
@@ -37,17 +39,6 @@ namespace DProject.Entity
             HeightMap.Initialize(graphicsDevice);
         }
 
-        public float[,] GetHeightData()
-        {
-            return HeightMap.GetHeightData();
-        }
-
-        public void Update(GameTime gameTime)
-        {
-            if (Keyboard.GetState().IsKeyDown(Keys.OemPlus))
-                HeightMap.UpdateTerrain(noiseScale += 1f);
-            if(Keyboard.GetState().IsKeyDown(Keys.OemMinus))
-                HeightMap.UpdateTerrain(noiseScale -= 1f);
-        }
+        public void Update(GameTime gameTime) {}
     }
 }
