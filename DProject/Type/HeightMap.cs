@@ -27,8 +27,8 @@ namespace DProject.Type
 
         public HeightMap(float[,] heightmap)
         {
-            this.width = heightmap.GetLength(0);
-            this.height = heightmap.GetLength(1);
+            this.width = heightmap.GetLength(0)-1;
+            this.height = heightmap.GetLength(1)-1;
 
             vertexPositions = GenerateVertexPositions(heightmap);
         }
@@ -139,7 +139,7 @@ namespace DProject.Type
         private static Vector4 GetTextureCoordinate(Vector3 topLeft)
         {            
             if (topLeft.Y < -1.2f)
-                return Textures.TextureList["tile_white"].GetAdjustedTexturePosition();
+                return Textures.TextureList["savanna_earth"].GetAdjustedTexturePosition();
             else if (topLeft.Y < 0f)
                 return Textures.TextureList["savanna_grass_dry"].GetAdjustedTexturePosition();
             else
