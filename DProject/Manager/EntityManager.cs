@@ -18,26 +18,13 @@ namespace DProject.Manager
         {
             //Entities Lists Initialisation
             entities = new List<AbstractEntity>();
-            cameraEntities = new List<CameraEntity>();
+            cameraEntities = new List<CameraEntity>
+            {
+                new CameraEntity(new Vector3(0f, 0f, -1f), Quaternion.Identity),
+                new CameraEntity(new Vector3(0f, 0f, -5f), Quaternion.Identity)
+            };
 
-            cameraEntities.Add(new CameraEntity(new Vector3(0f, 0f, -1f), Quaternion.Identity));
-            cameraEntities.Add(new CameraEntity(new Vector3(0f, 0f, -5f), Quaternion.Identity));
-                                    
-            int size = 64;
-            
-            float[,] heightmap = Noise.GenerateNoiseMap(size, size, 0, 0, 50f);
-
-            entities.Add(new PropEntity(new Vector3(32, heightmap[32,32],32), "barrel"));
-            
-            entities.Add(new TerrainEntity(new Vector3(-1 * size, 0, -1 * size), size,size, 50f));
-            entities.Add(new TerrainEntity(new Vector3(0 * size, 0, -1 * size), size,size, 50f));
-            entities.Add(new TerrainEntity(new Vector3(1 * size, 0, -1 * size), size,size, 50f));
-            entities.Add(new TerrainEntity(new Vector3(-1 * size, 0, 0 * size), size,size, 50f));
-            entities.Add(new TerrainEntity(new Vector3(0 * size, 0, 0 * size), heightmap));
-            entities.Add(new TerrainEntity(new Vector3(1 * size, 0, 0 * size), size,size, 50f));
-            entities.Add(new TerrainEntity(new Vector3(-1 * size, 0, 1 * size), size,size, 50f));
-            entities.Add(new TerrainEntity(new Vector3(0 * size, 0, 1 * size), size,size, 50f));
-            entities.Add(new TerrainEntity(new Vector3(1 * size, 0, 1 * size), size,size, 50f));
+            entities.Add(new PropEntity(new Vector3(32, 5,32), "barrel"));
 
             //Adds all camera's to entities list
             foreach (var cameraEntity in cameraEntities)
@@ -48,7 +35,9 @@ namespace DProject.Manager
             activeCamera = cameraEntities[0];
             activeCamera.IsActiveCamera = true;
             
-            entities.Add(new PointerEntity(this, heightmap));            
+            entities.Add(new ChunkLoaderEntity(this));
+            entities.Add(new PointerEntity(this));        
+            entities.Add(new DebugEntity(cameraEntities));
         }
 
         public List<AbstractEntity> GetEntities()

@@ -16,13 +16,16 @@ namespace DProject.Type
         private int height;
 
         private GraphicsDevice GraphicsDevice;
+
+        private float[,] heightmap;
         
         public HeightMap (int width, int height, float xOffset, float yOffset, float noiseScale)
         {
             this.width = width;
             this.height = height;
-            
-            vertexPositions = GenerateVertexPositions(Noise.GenerateNoiseMap(width, height, xOffset, yOffset, noiseScale));
+
+            heightmap = Noise.GenerateNoiseMap(width, height, xOffset, yOffset, noiseScale);
+            vertexPositions = GenerateVertexPositions(heightmap);
         }
 
         public HeightMap(float[,] heightmap)
@@ -30,7 +33,8 @@ namespace DProject.Type
             this.width = heightmap.GetLength(0)-1;
             this.height = heightmap.GetLength(1)-1;
 
-            vertexPositions = GenerateVertexPositions(heightmap);
+            this.heightmap = heightmap;
+            vertexPositions = GenerateVertexPositions(this.heightmap);
         }
 
         public void Initialize(GraphicsDevice graphicsDevice)
@@ -85,7 +89,8 @@ namespace DProject.Type
                     Vector3 bottomLeft = new Vector3 (x-0.5f, heightmap[x,y+1], y+0.5f);
                     Vector3 bottomRight = new Vector3 (x+0.5f, heightmap[x+1,y+1], y+0.5f);
                     
-                    Color color = new Color(topLeft.Y/5 +1, topLeft.Y/5 + 1, topLeft.Y/5 + 1);
+                    //Color color = new Color(topLeft.Y/5 +1, topLeft.Y/5 + 1, topLeft.Y/5 + 1);
+                    Color color = Color.White;
                     
                     Vector4 texturePosition = GetTextureCoordinate(topLeft);
                     Vector3 normal = GenerateNormalDirection(bottomLeft, topLeft, bottomRight);
@@ -132,6 +137,7 @@ namespace DProject.Type
 
         public void UpdateTerrain(float[,] heightmap)
         {
+            this.heightmap = heightmap;
             vertexPositions = GenerateVertexPositions(heightmap);
             vertexBuffer.SetData<VertexPositionTextureColorNormal>(vertexPositions);
         }
@@ -153,6 +159,11 @@ namespace DProject.Type
                 return true;
             }
             else return false;
+        }
+
+        public float[,] GetHeightMap()
+        {
+            return heightmap;
         }
     }
 }
