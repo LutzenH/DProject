@@ -12,7 +12,7 @@ namespace DProject.Entity
     public class TerrainEntity : AbstractEntity, IDrawable, IInitialize, IUpdateable
     {
         private HeightMap HeightMap;
-        private Texture2D grassTexture;
+        private Texture2D terrainTexture;
         
         public TerrainEntity(Vector3 position, int width, int height, float noiseScale) : base(position, Quaternion.Identity, new Vector3(1,1,1))
         {
@@ -26,12 +26,12 @@ namespace DProject.Entity
 
         public override void LoadContent(ContentManager content)
         {
-            grassTexture = content.Load<Texture2D>(Textures.texture_atlas_location);
+            terrainTexture = content.Load<Texture2D>(Textures.texture_atlas_location);
         }
 
         public void Draw(CameraEntity activeCamera)
         {
-            HeightMap.Draw(activeCamera.GetProjectMatrix(),activeCamera.GetViewMatrix(), getWorldMatrix(), grassTexture);
+            HeightMap.Draw(activeCamera.GetProjectMatrix(),activeCamera.GetViewMatrix(), GetWorldMatrix(), terrainTexture);
         }
 
         public void Initialize(GraphicsDevice graphicsDevice)

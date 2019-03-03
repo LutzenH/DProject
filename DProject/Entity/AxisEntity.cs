@@ -24,6 +24,8 @@ namespace DProject.Entity
             _lineEndPointY = Vector3.Forward;
             _lineEndPointZ = Vector3.Up;
         }
+        
+        public AxisEntity(Vector3 position) : this(position, Quaternion.Identity, new Vector3(1,1,1)) {}
 
         public void Initialize(GraphicsDevice graphicsDevice)
         {
@@ -49,7 +51,7 @@ namespace DProject.Entity
         public void Draw(CameraEntity activeCamera)
         {
             _basicEffect.View = activeCamera.GetViewMatrix();
-            _basicEffect.World = getWorldMatrix();
+            _basicEffect.World = GetWorldMatrix();
             _basicEffect.Projection = activeCamera.GetProjectMatrix();
             
             _graphicsDevice.SetVertexBuffer(_vertexBuffer);

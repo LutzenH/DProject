@@ -19,6 +19,7 @@ namespace DProject.List
             PropList["cube"] = new Prop("models/cube");
             PropList["factory"] = new Prop("models/factory");
             PropList["plane"] = new Prop("models/plane");
+            PropList["camera"] = new Prop("models/camera");
         }
     }
 

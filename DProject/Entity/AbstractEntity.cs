@@ -30,22 +30,37 @@ namespace DProject.Entity
             return Position;
         }
 
+        public void SetPosition(Vector3 position)
+        {
+            Position = position;
+        }
+
         public Vector3 GetScale()
         {
             return Scale;
         }
 
-        public void setRotation(float pitch, float yaw, float roll)
+        public void SetRotation(float pitch, float yaw, float roll)
         {
             Rotation = Matrix.CreateFromYawPitchRoll(yaw, pitch, roll);
         }
 
-        public void setRotation(Quaternion rotation)
+        public void SetRotation(Quaternion rotation)
         {
             Rotation = Matrix.CreateFromQuaternion(rotation);
         }
 
-        public Matrix getWorldMatrix()  
+        public void SetRotation(Matrix rotation)
+        {
+            Rotation = rotation;
+        }
+
+        public Matrix GetRotation()
+        {
+            return Rotation;
+        }
+
+        public Matrix GetWorldMatrix()  
         {   
             return Rotation * Matrix.CreateScale(Scale) *  Matrix.CreateTranslation(Position);   
         }  

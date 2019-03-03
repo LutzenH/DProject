@@ -2,13 +2,11 @@ using DProject.List;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 
 namespace DProject.Entity
 {
     public class PropEntity : AbstractEntity, IDrawable
-    {
-        private float yaw = 0;
+    {        
         //Models
         private Model model;
         private readonly string modelPath;
@@ -39,12 +37,12 @@ namespace DProject.Entity
         {
             foreach (ModelMesh mesh in model.Meshes)
             {                            
-                if (activeCamera.GetBoundingFrustum().Intersects(mesh.BoundingSphere.Transform(getWorldMatrix())))
+                if (activeCamera.GetBoundingFrustum().Intersects(mesh.BoundingSphere.Transform(GetWorldMatrix())))
                 {
                     foreach (BasicEffect effect in mesh.Effects)
                     {
                         effect.View = activeCamera.GetViewMatrix();
-                        effect.World = getWorldMatrix();
+                        effect.World = GetWorldMatrix();
                         effect.Projection = activeCamera.GetProjectMatrix();
                     }
 
