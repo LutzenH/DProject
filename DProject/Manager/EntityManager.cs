@@ -34,8 +34,10 @@ namespace DProject.Manager
             _activeCamera = _cameraEntities[0];
             _activeCamera.IsActiveCamera = true;
             
-            _entities.Add(new ChunkLoaderEntity(this));
-            _entities.Add(new PointerEntity(this));        
+            var chunkLoaderEntity = new ChunkLoaderEntity(this);
+            
+            _entities.Add(chunkLoaderEntity);
+            _entities.Add(new PointerEntity(this, chunkLoaderEntity));
             _entities.Add(new DebugEntity(_cameraEntities));
         }
 

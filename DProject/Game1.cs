@@ -122,28 +122,5 @@ namespace DProject
             }
             return false;
         }
-        
-        public static Vector3? GetTilePosition(float[,] heightmap, Vector2 mouseLocation, Matrix view, Matrix projection, Viewport viewport)
-        {
-            for (int x = 0; x < heightmap.GetLength(0)-1; x++)
-            {
-                for (int y = 0; y < heightmap.GetLength(1)-1; y++)
-                {
-                    Vector3 position = new Vector3();
-                    position.X = x;
-                                        
-                    position.Y = (heightmap[x, y] + heightmap[x+1, y] + heightmap[x, y+1] + heightmap[x+1, y+1]) / 4;
-                    position.Z = y;
-                    
-                    BoundingSphere tmp = new BoundingSphere(position, 0.5f);
-                    
-                    if (IntersectDistance(tmp, mouseLocation, view, projection, viewport) != null)
-                    {
-                        return position;
-                    }
-                }
-            }
-            return null;
-        }
     }
 }

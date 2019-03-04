@@ -60,5 +60,10 @@ namespace DProject.Entity
         {
             return _chunkPositionY;
         }
+
+        public HeightMap GetHeightMap()
+        {
+            return _heightMap;
+        }
     }
 }

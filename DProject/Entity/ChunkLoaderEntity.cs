@@ -1,3 +1,4 @@
+using System;
 using DProject.Entity.Interface;
 using DProject.Manager;
 using Microsoft.Xna.Framework;
@@ -19,7 +20,7 @@ namespace DProject.Entity
 
         private TerrainEntity[,] _loadedChunks = new TerrainEntity[5,5];
 
-        private int _chunkSize = 64;
+        public const int ChunkSize = 64;
         
         public ChunkLoaderEntity(EntityManager entityManager) : base(Vector3.Zero, Quaternion.Identity, new Vector3(1,1,1))
         {
@@ -35,15 +36,10 @@ namespace DProject.Entity
 
         public void Update(GameTime gameTime)
         {
-            _chunkPosition = new Vector2(
-                (int)(_entityManager.GetActiveCamera().GetPosition().X - (_chunkSize/2)) / _chunkSize,
-                (int)(_entityManager.GetActiveCamera().GetPosition().Z - (_chunkSize/2)) / _chunkSize
-                );
+            _chunkPosition = CalculateChunkPosition(_entityManager.GetActiveCamera().GetPosition().X, _entityManager.GetActiveCamera().GetPosition().Z);
 
             if (!_chunkPosition.Equals(_previousChunkPosition))
-            {                
                 LoadChunks(_chunkPosition);
-            }
 
             _previousChunkPosition = _chunkPosition;
         }
@@ -88,11 +84,46 @@ namespace DProject.Entity
 
         private TerrainEntity LoadChunk(int x, int y)
         {
-            TerrainEntity chunk = new TerrainEntity(x, y, _chunkSize, 50f);
+            TerrainEntity chunk = new TerrainEntity(x, y, ChunkSize, 50f);
             chunk.Initialize(_graphicsDevice);
             chunk.LoadContent(_contentManager);
 
             return chunk;
+        }
+
+        public static Vector2 CalculateChunkPosition(float x, float y)
+        {
+            return new Vector2(
+                (int)(x - (ChunkSize/2)) / ChunkSize,
+                (int)(y - (ChunkSize/2)) / ChunkSize);
+        }
+
+        public float? GetHeightFromPosition(Vector2 position)
+        {
+            int chunkPositionX = (int)Math.Floor(position.X / ChunkSize);
+            int chunkPositionY = (int)Math.Floor(position.Y / ChunkSize);
+            
+            int localChunkPositionX = (int)Math.Round(position.X) % ChunkSize;
+            int localChunkPositionY = (int)Math.Round(position.Y) % ChunkSize;
+
+            if (localChunkPositionX < 0)
+                localChunkPositionX = 64 + localChunkPositionX;
+            
+            if (localChunkPositionY < 0)
+                localChunkPositionY = 64 + localChunkPositionY;
+            
+            foreach (var chunk in _loadedChunks)
+            {
+                if (chunk.GetChunkX() == chunkPositionX && chunk.GetChunkY() == chunkPositionY)
+                {                    
+                    return (chunk.GetHeightMap().GetHeightMap()[localChunkPositionX, localChunkPositionY]
+                            + chunk.GetHeightMap().GetHeightMap()[localChunkPositionX+1, localChunkPositionY]
+                            + chunk.GetHeightMap().GetHeightMap()[localChunkPositionX, localChunkPositionY+1]
+                            + chunk.GetHeightMap().GetHeightMap()[localChunkPositionX+1, localChunkPositionY+1]) / 4;
+                }
+            }
+
+            return null;
         }
     }
 }

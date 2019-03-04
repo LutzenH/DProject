@@ -1,3 +1,4 @@
+using System;
 using DProject.Entity.Interface;
 using DProject.Manager;
 using Microsoft.Xna.Framework;
@@ -12,20 +13,29 @@ namespace DProject.Entity
     public class PointerEntity : AbstractEntity, IInitialize,IUpdateable, IDrawable
     {
         private readonly AxisEntity _axisEntity;
+        private readonly PropEntity _propEntity;
+        
         private readonly EntityManager _entityManager;
+        private readonly ChunkLoaderEntity _chunkLoaderEntity;
         private GraphicsDevice _graphicsDevice;
 
-        public PointerEntity(EntityManager entityManager) : base(Vector3.Zero, Quaternion.Identity, new Vector3(1,1,1))
+        public PointerEntity(EntityManager entityManager, ChunkLoaderEntity chunkLoaderEntity) : base(Vector3.Zero, Quaternion.Identity, new Vector3(1,1,1))
         {
             _axisEntity = new AxisEntity(Vector3.Zero);
+            _propEntity = new PropEntity(Vector3.Zero, Quaternion.Identity, new Vector3(1,1,1), "book");
             _entityManager = entityManager;
+            _chunkLoaderEntity = chunkLoaderEntity;
         }
 
-        public override void LoadContent(ContentManager content) { }
+        public override void LoadContent(ContentManager content)
+        {
+            _propEntity.LoadContent(content);
+        }
 
         public void Initialize(GraphicsDevice graphicsDevice)
         {
             _axisEntity.Initialize(graphicsDevice);
+
             _graphicsDevice = graphicsDevice;
         }
 
@@ -33,19 +43,23 @@ namespace DProject.Entity
         {
             Vector2 mouseLocation = new Vector2(Mouse.GetState().X, Mouse.GetState().Y);
             
-            Vector3? tilePosition = Game1.GetTilePosition(
-                new float[64,64],
-                mouseLocation,
-                _entityManager.GetActiveCamera().GetViewMatrix(),
-                _entityManager.GetActiveCamera().GetProjectMatrix(),
-                _graphicsDevice.Viewport
-                );
+            Ray ray = Game1.CalculateRay(mouseLocation, _entityManager.GetActiveCamera().GetViewMatrix(),
+                _entityManager.GetActiveCamera().GetProjectMatrix(), _graphicsDevice.Viewport);
 
-            if (tilePosition != null)
-                _axisEntity.SetPosition((Vector3) tilePosition);
-            else
-                _axisEntity.SetPosition(Vector3.Zero);
+            Vector3 position = Vector3.Zero;
+            if (ray.Direction.Y != 0)
+            {
+                Vector3 tempPosition = ray.Position - ray.Direction * (ray.Position.Y / ray.Direction.Y);
+                position = tempPosition;
 
+                float y = _chunkLoaderEntity.GetHeightFromPosition(new Vector2(tempPosition.X, tempPosition.Z)) ?? 0f;
+
+                position = new Vector3((int)Math.Round(position.X), y, (int)Math.Round(position.Z));
+            }
+            
+            _axisEntity.SetPosition(new Vector3(position.X, 0, position.Z));
+            _propEntity.SetPosition(position);
+            
             foreach (var entity in _entityManager.GetEntities())
             {
                 if (entity is PropEntity propEntity)
@@ -67,6 +81,7 @@ namespace DProject.Entity
         public void Draw(CameraEntity activeCamera)
         {
             _axisEntity.Draw(activeCamera);
+            _propEntity.Draw(activeCamera);
         }
     }
 }
