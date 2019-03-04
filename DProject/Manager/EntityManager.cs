@@ -1,71 +1,70 @@
 using System.Collections.Generic;
 using DProject.Entity;
-using DProject.Type;
 using Microsoft.Xna.Framework;
 
 namespace DProject.Manager
 {
     public class EntityManager
     {
-        private List<AbstractEntity> entities;
-        private List<CameraEntity> cameraEntities;
+        private readonly List<AbstractEntity> _entities;
+        private readonly List<CameraEntity> _cameraEntities;
         
-        private CameraEntity activeCamera;
+        private CameraEntity _activeCamera;
 
-        private int cameraIndex = 0;
+        private int _cameraIndex;
         
         public EntityManager()
         {
             //Entities Lists Initialisation
-            entities = new List<AbstractEntity>();
-            cameraEntities = new List<CameraEntity>
+            _entities = new List<AbstractEntity>();
+            _cameraEntities = new List<CameraEntity>
             {
                 new CameraEntity(new Vector3(0f, 0f, -1f), Quaternion.Identity),
                 new CameraEntity(new Vector3(0f, 0f, -5f), Quaternion.Identity)
             };
 
-            entities.Add(new PropEntity(new Vector3(32, 5,32), "barrel"));
+            _entities.Add(new PropEntity(new Vector3(32, 5,32), "barrel"));
 
             //Adds all camera's to entities list
-            foreach (var cameraEntity in cameraEntities)
+            foreach (var cameraEntity in _cameraEntities)
             {
-                entities.Add(cameraEntity);
+                _entities.Add(cameraEntity);
             }
 
-            activeCamera = cameraEntities[0];
-            activeCamera.IsActiveCamera = true;
+            _activeCamera = _cameraEntities[0];
+            _activeCamera.IsActiveCamera = true;
             
-            entities.Add(new ChunkLoaderEntity(this));
-            entities.Add(new PointerEntity(this));        
-            entities.Add(new DebugEntity(cameraEntities));
+            _entities.Add(new ChunkLoaderEntity(this));
+            _entities.Add(new PointerEntity(this));        
+            _entities.Add(new DebugEntity(_cameraEntities));
         }
 
         public List<AbstractEntity> GetEntities()
         {
-            return entities;
+            return _entities;
         }
 
         public CameraEntity GetActiveCamera()
         {
-            return activeCamera;
+            return _activeCamera;
         }
 
         public void SetActiveCamera(int index)
         {
-            activeCamera.IsActiveCamera = false;
-            activeCamera = cameraEntities[index];
-            activeCamera.IsActiveCamera = true;
+            _activeCamera.IsActiveCamera = false;
+            _activeCamera = _cameraEntities[index];
+            _activeCamera.IsActiveCamera = true;
         }
 
         public void SetNextCamera()
         {
-            cameraIndex++;
-            cameraIndex %= cameraEntities.Count;
+            _cameraIndex++;
+            _cameraIndex %= _cameraEntities.Count;
 
-            activeCamera.IsActiveCamera = false;
+            _activeCamera.IsActiveCamera = false;
             
-            activeCamera = cameraEntities[cameraIndex];
-            activeCamera.IsActiveCamera = true;
+            _activeCamera = _cameraEntities[_cameraIndex];
+            _activeCamera.IsActiveCamera = true;
         }
     }
 }

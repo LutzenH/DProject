@@ -7,10 +7,9 @@ namespace DProject.List
     {
         public static readonly Dictionary<string, Texture> TextureList = new Dictionary<string, Texture>();
 
-        public static readonly string texture_atlas_location = "textures/textureatlas";
+        public const string TextureAtlasLocation = "textures/textureatlas";
+        public const int TextureAtlasSize = 128;
 
-        public static readonly int texture_atlas_size = 128;
-        
         static Textures()
         {
             TextureList["tile_white"] = new Texture(0,0,16,16);

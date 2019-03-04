@@ -11,16 +11,16 @@ namespace DProject.Entity
 
         protected AbstractEntity(Vector3 position, Quaternion rotation, Vector3 scale)
         {
-            this.Position = position;
-            this.Rotation = Matrix.CreateFromQuaternion(rotation);
-            this.Scale = scale;
+            Position = position;
+            Rotation = Matrix.CreateFromQuaternion(rotation);
+            Scale = scale;
         }
         
         protected AbstractEntity(Vector3 position, float pitch, float yaw, float roll, Vector3 scale)
         {
-            this.Position = position;
-            this.Rotation = Matrix.CreateFromYawPitchRoll(yaw, pitch, roll);
-            this.Scale = scale;
+            Position = position;
+            Rotation = Matrix.CreateFromYawPitchRoll(yaw, pitch, roll);
+            Scale = scale;
         }
 
         public abstract void LoadContent(ContentManager content);

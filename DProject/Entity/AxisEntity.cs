@@ -1,6 +1,8 @@
+using DProject.Entity.Interface;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using IDrawable = DProject.Entity.Interface.IDrawable;
 
 namespace DProject.Entity
 {
@@ -38,7 +40,7 @@ namespace DProject.Entity
             
             //Sends Vertex Information to the graphics-card
             _vertexBuffer = new VertexBuffer(graphicsDevice, typeof(VertexPositionColor), 6, BufferUsage.WriteOnly);
-            _vertexBuffer.SetData<VertexPositionColor>(
+            _vertexBuffer.SetData(
                 new[]
                 {
                     new VertexPositionColor(_lineStartPoint, Color.Red),  new VertexPositionColor(_lineEndPointX, Color.Red),

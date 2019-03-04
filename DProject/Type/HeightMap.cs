@@ -1,4 +1,3 @@
-using System;
 using DProject.List;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -7,67 +6,67 @@ namespace DProject.Type
 {
     public class HeightMap
     {       
-        private VertexPositionTextureColorNormal[] vertexPositions;
+        private VertexPositionTextureColorNormal[] _vertexPositions;
 
-        private VertexBuffer vertexBuffer;
-        private BasicEffect basicEffect;
+        private VertexBuffer _vertexBuffer;
+        private BasicEffect _basicEffect;
 
-        private int width;
-        private int height;
+        private readonly int _width;
+        private readonly int _height;
 
-        private GraphicsDevice GraphicsDevice;
+        private GraphicsDevice _graphicsDevice;
 
-        private float[,] heightmap;
+        private float[,] _heightmap;
         
         public HeightMap (int width, int height, float xOffset, float yOffset, float noiseScale)
         {
-            this.width = width;
-            this.height = height;
+            _width = width;
+            _height = height;
 
-            heightmap = Noise.GenerateNoiseMap(width, height, xOffset, yOffset, noiseScale);
-            vertexPositions = GenerateVertexPositions(heightmap);
+            _heightmap = Noise.GenerateNoiseMap(width, height, xOffset, yOffset, noiseScale);
+            _vertexPositions = GenerateVertexPositions(_heightmap);
         }
 
         public HeightMap(float[,] heightmap)
         {
-            this.width = heightmap.GetLength(0)-1;
-            this.height = heightmap.GetLength(1)-1;
+            _width = heightmap.GetLength(0)-1;
+            _height = heightmap.GetLength(1)-1;
 
-            this.heightmap = heightmap;
-            vertexPositions = GenerateVertexPositions(this.heightmap);
+            _heightmap = heightmap;
+            _vertexPositions = GenerateVertexPositions(_heightmap);
         }
 
         public void Initialize(GraphicsDevice graphicsDevice)
         {
-            this.GraphicsDevice = graphicsDevice;
+            _graphicsDevice = graphicsDevice;
             
             //Graphics Effects
-            basicEffect = new BasicEffect(graphicsDevice);
-            basicEffect.Alpha = 1.0f;
-            basicEffect.EnableDefaultLighting();
-            basicEffect.VertexColorEnabled = true;
+            _basicEffect = new BasicEffect(graphicsDevice);
+            _basicEffect.Alpha = 1.0f;
+            _basicEffect.EnableDefaultLighting();
+            _basicEffect.VertexColorEnabled = true;
 
-            basicEffect.TextureEnabled = true;
+            _basicEffect.TextureEnabled = true;
             
             //Sends Vertex Information to the graphics-card
-            vertexBuffer = new VertexBuffer(graphicsDevice, typeof(VertexPositionTextureColorNormal), (width)*(height)*6, BufferUsage.WriteOnly);
-            vertexBuffer.SetData<VertexPositionTextureColorNormal>(vertexPositions);
+            _vertexBuffer = new VertexBuffer(graphicsDevice, typeof(VertexPositionTextureColorNormal), (_width)*(_height)*6, BufferUsage.WriteOnly);
+            _vertexBuffer.SetData(_vertexPositions);
         }
 
         public void Draw(Matrix projectMatrix, Matrix viewMatrix, Matrix worldMatrix, Texture2D texture2D)
         {
-            basicEffect.Projection = projectMatrix;
-            basicEffect.View = viewMatrix;
-            basicEffect.World = worldMatrix;
+            _basicEffect.Projection = projectMatrix;
+            _basicEffect.View = viewMatrix;
+            _basicEffect.World = worldMatrix;
 
-            basicEffect.Texture = texture2D;
+            _basicEffect.Texture = texture2D;
 
-            GraphicsDevice.SetVertexBuffer(vertexBuffer);
+            _graphicsDevice.SetVertexBuffer(_vertexBuffer);
 
-            foreach (EffectPass pass in basicEffect.CurrentTechnique.Passes)
+            foreach (EffectPass pass in _basicEffect.CurrentTechnique.Passes)
             {
                 pass.Apply();
-                GraphicsDevice.DrawPrimitives(PrimitiveType.TriangleList, 0, (width)*(height)*3);
+                _graphicsDevice.DrawPrimitives(PrimitiveType.TriangleList, 0, (_width)*(_height)*3);
             }
         }
 
@@ -95,7 +94,7 @@ namespace DProject.Type
                     Vector4 texturePosition = GetTextureCoordinate(topLeft);
                     Vector3 normal = GenerateNormalDirection(bottomLeft, topLeft, bottomRight);
 
-                    if (isAlternativeDiagonal(topLeft, topRight, bottomRight, bottomLeft))
+                    if (IsAlternativeDiagonal(topLeft, topRight, bottomRight, bottomLeft))
                     {
                         vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(bottomLeft, normal, color, new Vector2(texturePosition.X,texturePosition.Y));
                         vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(topLeft, normal, color, new Vector2(texturePosition.X,texturePosition.W));
@@ -137,9 +136,9 @@ namespace DProject.Type
 
         public void UpdateTerrain(float[,] heightmap)
         {
-            this.heightmap = heightmap;
-            vertexPositions = GenerateVertexPositions(heightmap);
-            vertexBuffer.SetData<VertexPositionTextureColorNormal>(vertexPositions);
+            _heightmap = heightmap;
+            _vertexPositions = GenerateVertexPositions(heightmap);
+            _vertexBuffer.SetData(_vertexPositions);
         }
 
         private static Vector4 GetTextureCoordinate(Vector3 topLeft)
@@ -152,18 +151,14 @@ namespace DProject.Type
                 return Textures.TextureList["savanna_grass"].GetAdjustedTexturePosition();
         }
 
-        private static Boolean isAlternativeDiagonal(Vector3 a, Vector3 b, Vector3 c, Vector3 d)
-        {            
-            if (Vector3.Distance(a, c) < Vector3.Distance(b, d))
-            {
-                return true;
-            }
-            else return false;
+        private static bool IsAlternativeDiagonal(Vector3 a, Vector3 b, Vector3 c, Vector3 d)
+        {
+            return Vector3.Distance(a, c) < Vector3.Distance(b, d);
         }
 
         public float[,] GetHeightMap()
         {
-            return heightmap;
+            return _heightmap;
         }
     }
 }

@@ -1,6 +1,6 @@
 using Microsoft.Xna.Framework;
 
-namespace DProject.Entity
+namespace DProject.Entity.Interface
 {
     public interface IUpdateable
     {

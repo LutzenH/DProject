@@ -2,45 +2,47 @@ using DProject.List;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using IDrawable = DProject.Entity.Interface.IDrawable;
 
 namespace DProject.Entity
 {
     public class PropEntity : AbstractEntity, IDrawable
     {        
         //Models
-        private Model model;
-        private readonly string modelPath;
+        private Model _model;
+        private readonly string _modelPath;
 
         public PropEntity(Vector3 position, Quaternion rotation, Vector3 scale, string name) : base(position, rotation, scale)
         {
-            this.modelPath = Props.PropList[name].GetAssetName();
+            _modelPath = Props.PropList[name].GetAssetName();
         }
         
         public PropEntity(Vector3 position, float pitch, float yaw, float roll, Vector3 scale, string name) : base(position, pitch, yaw, roll, scale)
         {
-            this.modelPath = Props.PropList[name].GetAssetName();
+            _modelPath = Props.PropList[name].GetAssetName();
         }
 
         public PropEntity(Vector3 position, string name) : this(position, Quaternion.Identity, Props.PropList[name].GetDefaultScale(), name) { }
 
         public override void LoadContent(ContentManager content)
         {
-            model = content.Load<Model>(modelPath);
+            _model = content.Load<Model>(_modelPath);
         }
 
-        public Model getModel()
+        public Model GetModel()
         {
-            return model;
+            return _model;
         }
         
         public void Draw(CameraEntity activeCamera)
         {
-            foreach (ModelMesh mesh in model.Meshes)
+            foreach (ModelMesh mesh in _model.Meshes)
             {                            
                 if (activeCamera.GetBoundingFrustum().Intersects(mesh.BoundingSphere.Transform(GetWorldMatrix())))
                 {
-                    foreach (BasicEffect effect in mesh.Effects)
+                    foreach (var effect1 in mesh.Effects)
                     {
+                        var effect = (BasicEffect) effect1;
                         effect.View = activeCamera.GetViewMatrix();
                         effect.World = GetWorldMatrix();
                         effect.Projection = activeCamera.GetProjectMatrix();

@@ -10,8 +10,8 @@ namespace DProject.Type
 
         public Texture(int xOffset, int yOffset, int xSize, int ySize, Color defaultColor)
         {
-            this._texturePosition = new Vector4(xOffset, yOffset, xOffset+xSize, yOffset+ySize);
-            this._defaultColor = defaultColor;
+            _texturePosition = new Vector4(xOffset, yOffset, xOffset+xSize, yOffset+ySize);
+            _defaultColor = defaultColor;
         }
 
         public Texture(int xOffset, int yOffset, int xSize, int ySize) : this(xOffset, yOffset, xSize, ySize, new Color(1f, 1f, 1f)) { }
@@ -28,7 +28,7 @@ namespace DProject.Type
 
         public Vector4 GetAdjustedTexturePosition()
         {
-            return _texturePosition / Textures.texture_atlas_size;
+            return _texturePosition / Textures.TextureAtlasSize;
         }
     }
 }

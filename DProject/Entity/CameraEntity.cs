@@ -1,7 +1,7 @@
-using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Input;
+using IUpdateable = DProject.Entity.Interface.IUpdateable;
 
 namespace DProject.Entity
 {
@@ -15,7 +15,7 @@ namespace DProject.Entity
         private Matrix _viewMatrix;
         
         //BoundingFrustum (used for culling)
-        private BoundingFrustum boundingFrustum;
+        private BoundingFrustum _boundingFrustum;
 
         private float speed = 0.5f;
 
@@ -73,13 +73,13 @@ namespace DProject.Entity
                 _cameraDirection.Normalize();
             
                 _viewMatrix = Matrix.CreateLookAt(Position, Position + _cameraDirection, Vector3.Up);
-                boundingFrustum = new BoundingFrustum(_viewMatrix * _projectMatrix);
+                _boundingFrustum = new BoundingFrustum(_viewMatrix * _projectMatrix);
             }
         }
 
         public BoundingFrustum GetBoundingFrustum()
         {
-            return boundingFrustum;
+            return _boundingFrustum;
         }
 
         public Matrix GetProjectMatrix()

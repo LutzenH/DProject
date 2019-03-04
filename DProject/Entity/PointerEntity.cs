@@ -1,8 +1,11 @@
+using DProject.Entity.Interface;
 using DProject.Manager;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using IDrawable = DProject.Entity.Interface.IDrawable;
+using IUpdateable = DProject.Entity.Interface.IUpdateable;
 
 namespace DProject.Entity
 {
@@ -49,7 +52,7 @@ namespace DProject.Entity
                 {
                     if (Game1.Intersects(
                         new Vector2(mouseLocation.X, mouseLocation.Y),
-                        propEntity.getModel(),
+                        propEntity.GetModel(),
                         propEntity.GetWorldMatrix(),
                         _entityManager.GetActiveCamera().GetViewMatrix(),
                         _entityManager.GetActiveCamera().GetProjectMatrix(),

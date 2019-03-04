@@ -1,5 +1,3 @@
-using System;
-using System.Net.Http.Headers;
 using Microsoft.Xna.Framework;
 
 namespace DProject.Type
@@ -11,8 +9,8 @@ namespace DProject.Type
 
         public Prop(string assetName, Vector3 defaultScale)
         {
-            this._assetName = assetName;
-            this._defaultScale = defaultScale;
+            _assetName = assetName;
+            _defaultScale = defaultScale;
         }
 
         public Prop(string assetName) : this(assetName, new Vector3(1, 1, 1)) { }

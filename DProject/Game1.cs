@@ -1,35 +1,36 @@
 ﻿using DProject.Entity;
+using DProject.Entity.Interface;
 using DProject.Manager;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using IDrawable = DProject.Entity.IDrawable;
-using IUpdateable = DProject.Entity.IUpdateable;
+using IDrawable = DProject.Entity.Interface.IDrawable;
+using IUpdateable = DProject.Entity.Interface.IUpdateable;
 
 namespace DProject
 {
     public class Game1 : Game
     {
-        private readonly GraphicsDeviceManager graphics;
-        private readonly EntityManager EntityManager;
+        private readonly GraphicsDeviceManager _graphics;
+        private readonly EntityManager _entityManager;
 
         private KeyboardState _previousKeyboardState;
         
         public Game1()
         {
-            graphics = new GraphicsDeviceManager(this);
-            EntityManager = new EntityManager();
+            _graphics = new GraphicsDeviceManager(this);
+            _entityManager = new EntityManager();
             
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
 
-            graphics.PreferredBackBufferWidth = 1152;
-            graphics.PreferredBackBufferHeight = 768;
+            _graphics.PreferredBackBufferWidth = 1152;
+            _graphics.PreferredBackBufferHeight = 768;
         }
 
         protected override void Initialize()
         {
-            foreach (AbstractEntity entity in EntityManager.GetEntities())
+            foreach (AbstractEntity entity in _entityManager.GetEntities())
             {
                 if (entity is IInitialize initializeEntity)
                     initializeEntity.Initialize(GraphicsDevice);
@@ -40,7 +41,7 @@ namespace DProject
 
         protected override void LoadContent()
         {
-            foreach (AbstractEntity entity in EntityManager.GetEntities())
+            foreach (AbstractEntity entity in _entityManager.GetEntities())
             {
                 entity.LoadContent(Content);
             }
@@ -52,9 +53,9 @@ namespace DProject
                 Exit();
             
             if(Keyboard.GetState().IsKeyUp(Keys.Tab) && _previousKeyboardState.IsKeyDown(Keys.Tab))
-                EntityManager.SetNextCamera();
+                _entityManager.SetNextCamera();
 
-            foreach (AbstractEntity entity in EntityManager.GetEntities())
+            foreach (AbstractEntity entity in _entityManager.GetEntities())
             {
                 if (entity is IUpdateable updateEntity)
                     updateEntity.Update(gameTime);
@@ -71,10 +72,10 @@ namespace DProject
             GraphicsDevice.Clear(Color.DarkGray);
             GraphicsDevice.SamplerStates[0] = SamplerState.PointWrap;
             
-            foreach (AbstractEntity entity in EntityManager.GetEntities())
+            foreach (AbstractEntity entity in _entityManager.GetEntities())
             {
                 if (entity is IDrawable drawableEntity)
-                    drawableEntity.Draw(EntityManager.GetActiveCamera());
+                    drawableEntity.Draw(_entityManager.GetActiveCamera());
             }
             
             base.Draw(gameTime);
@@ -136,7 +137,7 @@ namespace DProject
                     
                     BoundingSphere tmp = new BoundingSphere(position, 0.5f);
                     
-                    if (Game1.IntersectDistance(tmp, mouseLocation, view, projection, viewport) != null)
+                    if (IntersectDistance(tmp, mouseLocation, view, projection, viewport) != null)
                     {
                         return position;
                     }

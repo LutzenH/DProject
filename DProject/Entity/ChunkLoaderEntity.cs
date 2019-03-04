@@ -1,8 +1,10 @@
-using System;
+using DProject.Entity.Interface;
 using DProject.Manager;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using IDrawable = DProject.Entity.Interface.IDrawable;
+using IUpdateable = DProject.Entity.Interface.IUpdateable;
 
 namespace DProject.Entity
 {
@@ -40,7 +42,7 @@ namespace DProject.Entity
 
             if (!_chunkPosition.Equals(_previousChunkPosition))
             {                
-                LoadChunks(_chunkPosition, _previousChunkPosition);
+                LoadChunks(_chunkPosition);
             }
 
             _previousChunkPosition = _chunkPosition;
@@ -57,7 +59,7 @@ namespace DProject.Entity
             _graphicsDevice = graphicsDevice;
         }
 
-        private void LoadChunks(Vector2 chunkPosition, Vector2 previousChunkPosition)
+        private void LoadChunks(Vector2 chunkPosition)
         {   
             TerrainEntity[,] oldChunks = _loadedChunks;
             

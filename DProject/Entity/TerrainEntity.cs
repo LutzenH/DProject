@@ -1,61 +1,64 @@
+using DProject.Entity.Interface;
 using DProject.List;
 using DProject.Type;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using IDrawable = DProject.Entity.Interface.IDrawable;
+using IUpdateable = DProject.Entity.Interface.IUpdateable;
 
 namespace DProject.Entity
 {
     public class TerrainEntity : AbstractEntity, IDrawable, IInitialize, IUpdateable
     {
-        private HeightMap HeightMap;
-        private Texture2D terrainTexture;
+        private readonly HeightMap _heightMap;
+        private Texture2D _terrainTexture;
 
-        private int chunkPositionX;
-        private int chunkPositionY;
+        private readonly int _chunkPositionX;
+        private readonly int _chunkPositionY;
         
         public TerrainEntity(Vector3 position, int width, int height, float noiseScale) : base(position, Quaternion.Identity, new Vector3(1,1,1))
         {
-            HeightMap = new HeightMap(width, height, position.X, position.Z, noiseScale);
+            _heightMap = new HeightMap(width, height, position.X, position.Z, noiseScale);
         }
 
         public TerrainEntity(int x, int y, int size, float noiseScale) : base(new Vector3(x*size, 0, y*size), Quaternion.Identity, new Vector3(1,1,1))
         {
-            this.chunkPositionX = x;
-            this.chunkPositionY = y;
-            HeightMap = new HeightMap(size, size,  x*size, y*size, noiseScale);
+            _chunkPositionX = x;
+            _chunkPositionY = y;
+            _heightMap = new HeightMap(size, size,  x*size, y*size, noiseScale);
         }
 
         public TerrainEntity(Vector3 position, float[,] heightmap): base(position, Quaternion.Identity, new Vector3(1,1,1))
         {
-            HeightMap = new HeightMap(heightmap);
+            _heightMap = new HeightMap(heightmap);
         }
 
         public override void LoadContent(ContentManager content)
         {
-            terrainTexture = content.Load<Texture2D>(Textures.texture_atlas_location);
+            _terrainTexture = content.Load<Texture2D>(Textures.TextureAtlasLocation);
         }
 
         public void Draw(CameraEntity activeCamera)
         {
-            HeightMap.Draw(activeCamera.GetProjectMatrix(),activeCamera.GetViewMatrix(), GetWorldMatrix(), terrainTexture);
+            _heightMap.Draw(activeCamera.GetProjectMatrix(),activeCamera.GetViewMatrix(), GetWorldMatrix(), _terrainTexture);
         }
 
         public void Initialize(GraphicsDevice graphicsDevice)
         {
-            HeightMap.Initialize(graphicsDevice);
+            _heightMap.Initialize(graphicsDevice);
         }
 
         public void Update(GameTime gameTime) {}
 
         public int GetChunkX()
         {
-            return chunkPositionX;
+            return _chunkPositionX;
         }
 
         public int GetChunkY()
         {
-            return chunkPositionY;
+            return _chunkPositionY;
         }
     }
 }

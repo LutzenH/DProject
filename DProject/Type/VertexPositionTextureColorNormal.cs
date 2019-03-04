@@ -10,12 +10,12 @@ namespace DProject.Type
         public Vector3 Normal;
         public Vector2 TextureCoordinate;
  
-        public VertexPositionTextureColorNormal(Vector3 position, Vector3 normal, Color Color, Vector2 textureCoordinate)
+        public VertexPositionTextureColorNormal(Vector3 position, Vector3 normal, Color color, Vector2 textureCoordinate)
         {
-            this.Position = position;
-            this.Normal = normal;
-            this.Color = Color;
-            this.TextureCoordinate = textureCoordinate;
+            Position = position;
+            Normal = normal;
+            Color = color;
+            TextureCoordinate = textureCoordinate;
         }
         
         public static readonly VertexDeclaration VertexDeclaration = new VertexDeclaration
@@ -26,12 +26,6 @@ namespace DProject.Type
             new VertexElement(28, VertexElementFormat.Vector2, VertexElementUsage.TextureCoordinate, 0)
         );
 
-        VertexDeclaration IVertexType.VertexDeclaration
-        {
-            get
-            {
-                return VertexPositionTextureColorNormal.VertexDeclaration;
-            }
-        }
+        VertexDeclaration IVertexType.VertexDeclaration => VertexDeclaration;
     }
 }

@@ -1,8 +1,11 @@
 using System;
 using System.Collections.Generic;
+using DProject.Entity.Interface;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using IDrawable = DProject.Entity.Interface.IDrawable;
+using IUpdateable = DProject.Entity.Interface.IUpdateable;
 
 namespace DProject.Entity
 {
@@ -14,7 +17,7 @@ namespace DProject.Entity
         public DebugEntity(List<CameraEntity> cameraEntities) : base(Vector3.Zero, Quaternion.Identity, new Vector3(1,1,1))
         {
             cameraProps = new PropEntity[cameraEntities.Count];
-            this.CameraEntities = cameraEntities;
+            CameraEntities = cameraEntities;
 
             for (int i = 0; i < cameraProps.Length; i++)
             {
