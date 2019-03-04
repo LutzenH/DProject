@@ -1,11 +1,8 @@
-using System;
-using System.Runtime.InteropServices.ComTypes;
 using DProject.List;
 using DProject.Type;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 
 namespace DProject.Entity
 {
@@ -13,10 +10,20 @@ namespace DProject.Entity
     {
         private HeightMap HeightMap;
         private Texture2D terrainTexture;
+
+        private int chunkPositionX;
+        private int chunkPositionY;
         
         public TerrainEntity(Vector3 position, int width, int height, float noiseScale) : base(position, Quaternion.Identity, new Vector3(1,1,1))
         {
             HeightMap = new HeightMap(width, height, position.X, position.Z, noiseScale);
+        }
+
+        public TerrainEntity(int x, int y, int size, float noiseScale) : base(new Vector3(x*size, 0, y*size), Quaternion.Identity, new Vector3(1,1,1))
+        {
+            this.chunkPositionX = x;
+            this.chunkPositionY = y;
+            HeightMap = new HeightMap(size, size,  x*size, y*size, noiseScale);
         }
 
         public TerrainEntity(Vector3 position, float[,] heightmap): base(position, Quaternion.Identity, new Vector3(1,1,1))
@@ -40,5 +47,15 @@ namespace DProject.Entity
         }
 
         public void Update(GameTime gameTime) {}
+
+        public int GetChunkX()
+        {
+            return chunkPositionX;
+        }
+
+        public int GetChunkY()
+        {
+            return chunkPositionY;
+        }
     }
 }

@@ -1,5 +1,4 @@
 using System;
-using DProject.List;
 using DProject.Manager;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -16,7 +15,7 @@ namespace DProject.Entity
         private Vector2 _previousChunkPosition;
         private Vector2 _chunkPosition;
 
-        private readonly TerrainEntity[,] _loadedChunks = new TerrainEntity[3,3];
+        private TerrainEntity[,] _loadedChunks = new TerrainEntity[5,5];
 
         private int _chunkSize = 64;
         
@@ -40,10 +39,8 @@ namespace DProject.Entity
                 );
 
             if (!_chunkPosition.Equals(_previousChunkPosition))
-            {
-                Console.WriteLine("ChunkPosition changed: " + _chunkPosition);
-                
-                LoadChunks(_chunkPosition);
+            {                
+                LoadChunks(_chunkPosition, _previousChunkPosition);
             }
 
             _previousChunkPosition = _chunkPosition;
@@ -52,10 +49,7 @@ namespace DProject.Entity
         public void Draw(CameraEntity activeCamera)
         {
             foreach (var chunk in _loadedChunks)
-            {
-                if(chunk != null)
-                    chunk.Draw(activeCamera);
-            }
+                chunk?.Draw(activeCamera);
         }
 
         public void Initialize(GraphicsDevice graphicsDevice)
@@ -63,24 +57,36 @@ namespace DProject.Entity
             _graphicsDevice = graphicsDevice;
         }
 
-        private void LoadChunks(Vector2 chunkPosition)
-        {            
+        private void LoadChunks(Vector2 chunkPosition, Vector2 previousChunkPosition)
+        {   
+            TerrainEntity[,] oldChunks = _loadedChunks;
+            
+            _loadedChunks = new TerrainEntity[_loadedChunks.GetLength(0),_loadedChunks.GetLength(1)];
+            
             for (int x = 0; x < _loadedChunks.GetLength(0); x++)
             {
                 for (int y = 0; y < _loadedChunks.GetLength(1); y++)
                 {
-                    Vector2 tempPosition = chunkPosition - new Vector2(x-1, y-1);                    
-                    
-                    _loadedChunks[x, y] = LoadChunk(tempPosition);
+                    Vector2 position = chunkPosition - new Vector2(x-_loadedChunks.GetLength(0)/2, y-_loadedChunks.GetLength(1)/2);
+
+                    foreach (var chunk in oldChunks)
+                    {
+                        if (chunk != null)
+                        {
+                            if (chunk.GetChunkX() == (int) position.X && chunk.GetChunkY() == (int) position.Y)
+                                _loadedChunks[x, y] = chunk;
+                        }
+                    }
+
+                    if (_loadedChunks[x, y] == null)
+                        _loadedChunks[x, y] = LoadChunk((int)position.X, (int)position.Y);
                 }
             }
         }
 
-        private TerrainEntity LoadChunk(Vector2 position)
+        private TerrainEntity LoadChunk(int x, int y)
         {
-            Vector2 tempPosition = new Vector2(position.X * _chunkSize, position.Y*_chunkSize);
-
-            TerrainEntity chunk = new TerrainEntity(new Vector3(tempPosition.X,0,tempPosition.Y), _chunkSize, _chunkSize, 50f);
+            TerrainEntity chunk = new TerrainEntity(x, y, _chunkSize, 50f);
             chunk.Initialize(_graphicsDevice);
             chunk.LoadContent(_contentManager);
 
