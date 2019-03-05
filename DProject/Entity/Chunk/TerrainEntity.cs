@@ -42,12 +42,7 @@ namespace DProject.Entity.Chunk
                 float[,] heightmap = Noise.GenerateNoiseMap(ChunkLoaderEntity.ChunkSize, ChunkLoaderEntity.ChunkSize, x*ChunkLoaderEntity.ChunkSize, y*ChunkLoaderEntity.ChunkSize, 50f);
                 Tile[,] tiles = HeightMap.GenerateTileMap(heightmap);
             
-                _chunkData = new ChunkData(
-                    x,
-                    y,
-                    0,
-                    tiles
-                );
+                _chunkData = new ChunkData(x, y, 0, tiles);
 
                 ChunkStatus = ChunkStatus.Unserialized;
 

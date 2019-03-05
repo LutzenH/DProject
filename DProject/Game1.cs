@@ -1,25 +1,25 @@
-﻿using DProject.Entity;
-using DProject.Entity.Interface;
-using DProject.Manager;
+﻿using DProject.Manager;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using IDrawable = DProject.Entity.Interface.IDrawable;
-using IUpdateable = DProject.Entity.Interface.IUpdateable;
 
 namespace DProject
 {
     public class Game1 : Game
     {
         private readonly GraphicsDeviceManager _graphics;
+        
         private readonly EntityManager _entityManager;
+        private readonly UIManager _uiManager;
 
-        private KeyboardState _previousKeyboardState;
+        public static KeyboardState PreviousKeyboardState;
         
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
+            
             _entityManager = new EntityManager();
+            _uiManager = new UIManager();
             
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
@@ -30,54 +30,45 @@ namespace DProject
 
         protected override void Initialize()
         {
-            foreach (AbstractEntity entity in _entityManager.GetEntities())
-            {
-                if (entity is IInitialize initializeEntity)
-                    initializeEntity.Initialize(GraphicsDevice);
-            }
-
+            _entityManager.Initialize(GraphicsDevice);
+            _uiManager.Initialize(GraphicsDevice);
+                        
             base.Initialize();
         }
 
         protected override void LoadContent()
         {
-            foreach (AbstractEntity entity in _entityManager.GetEntities())
-            {
-                entity.LoadContent(Content);
-            }
+            _entityManager.LoadContent(Content);
+            _uiManager.LoadContent(Content);
+            
+            base.LoadContent();
         }
 
         protected override void Update(GameTime gameTime)
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
+
+            _entityManager.Update(gameTime);
+            _uiManager.Update(gameTime);
             
-            if(Keyboard.GetState().IsKeyUp(Keys.Tab) && _previousKeyboardState.IsKeyDown(Keys.Tab))
-                _entityManager.SetNextCamera();
-
-            foreach (AbstractEntity entity in _entityManager.GetEntities())
-            {
-                if (entity is IUpdateable updateEntity)
-                    updateEntity.Update(gameTime);
-            }
-
             base.Update(gameTime);
 
-            _previousKeyboardState = Keyboard.GetState();
+            PreviousKeyboardState = Keyboard.GetState();
         }
 
         protected override void Draw(GameTime gameTime)
-        {
+        {                
             //Background color
             GraphicsDevice.Clear(Color.DarkGray);
+            
+            GraphicsDevice.BlendState = BlendState.Opaque;
+            GraphicsDevice.DepthStencilState = DepthStencilState.Default;
             GraphicsDevice.SamplerStates[0] = SamplerState.PointWrap;
-            
-            foreach (AbstractEntity entity in _entityManager.GetEntities())
-            {
-                if (entity is IDrawable drawableEntity)
-                    drawableEntity.Draw(_entityManager.GetActiveCamera());
-            }
-            
+
+            _entityManager.Draw();
+            _uiManager.Draw();
+
             base.Draw(gameTime);
         }
         

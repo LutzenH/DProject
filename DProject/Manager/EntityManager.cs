@@ -2,7 +2,11 @@ using System.Collections.Generic;
 using DProject.Entity;
 using DProject.Entity.Chunk;
 using DProject.Entity.Debug;
+using DProject.Entity.Interface;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 
 namespace DProject.Manager
 {
@@ -41,6 +45,44 @@ namespace DProject.Manager
             _entities.Add(chunkLoaderEntity);
             _entities.Add(new PointerEntity(this, chunkLoaderEntity));
             _entities.Add(new DebugEntity(_cameraEntities, chunkLoaderEntity));
+        }
+
+        public void Initialize(GraphicsDevice graphicsDevice)
+        {
+            foreach (AbstractEntity entity in _entities)
+            {
+                if (entity is IInitialize initializeEntity)
+                    initializeEntity.Initialize(graphicsDevice);
+            }
+        }
+
+        public void LoadContent(ContentManager content)
+        {
+            foreach (AbstractEntity entity in _entities)
+            {
+                entity.LoadContent(content);
+            }
+        }
+
+        public void Update(GameTime gameTime)
+        {      
+            if(Keyboard.GetState().IsKeyUp(Keys.Tab) && Game1.PreviousKeyboardState.IsKeyDown(Keys.Tab))
+                SetNextCamera();
+            
+            foreach (AbstractEntity entity in _entities)
+            {
+                if (entity is Entity.Interface.IUpdateable updateEntity)
+                    updateEntity.Update(gameTime);
+            }
+        }
+
+        public void Draw()
+        {          
+            foreach (AbstractEntity entity in _entities)
+            {
+                if (entity is Entity.Interface.IDrawable drawableEntity)
+                    drawableEntity.Draw(GetActiveCamera());
+            }
         }
 
         public List<AbstractEntity> GetEntities()
