@@ -18,7 +18,7 @@ namespace DProject.Entity
         private Vector2 _previousChunkPosition;
         private Vector2 _chunkPosition;
 
-        private TerrainEntity[,] _loadedChunks = new TerrainEntity[5,5];
+        private TerrainEntity[,] _loadedChunks = new TerrainEntity[3,3];
 
         public const int ChunkSize = 64;
         
@@ -84,7 +84,7 @@ namespace DProject.Entity
 
         private TerrainEntity LoadChunk(int x, int y)
         {
-            TerrainEntity chunk = new TerrainEntity(x, y, ChunkSize, 50f);
+            TerrainEntity chunk = new TerrainEntity(x, y);
             chunk.Initialize(_graphicsDevice);
             chunk.LoadContent(_contentManager);
 
@@ -117,11 +117,8 @@ namespace DProject.Entity
             foreach (var chunk in _loadedChunks)
             {
                 if (chunk.GetChunkX() == chunkPositionX && chunk.GetChunkY() == chunkPositionY)
-                {                                
-                    return (chunk.GetHeightMap().GetHeightMap()[localChunkPositionX, localChunkPositionY]
-                            + chunk.GetHeightMap().GetHeightMap()[localChunkPositionX+1, localChunkPositionY]
-                            + chunk.GetHeightMap().GetHeightMap()[localChunkPositionX, localChunkPositionY+1]
-                            + chunk.GetHeightMap().GetHeightMap()[localChunkPositionX+1, localChunkPositionY+1]) / 4;
+                {
+                    return chunk.GetTileHeight(localChunkPositionX, localChunkPositionY);
                 }
             }
 

@@ -16,24 +16,12 @@ namespace DProject.Type
 
         private GraphicsDevice _graphicsDevice;
 
-        private float[,] _heightmap;
-        
-        public HeightMap (int width, int height, float xOffset, float yOffset, float noiseScale)
+        public HeightMap(ChunkData chunkData)
         {
-            _width = width;
-            _height = height;
+            _width = chunkData.Tiles.GetLength(0);
+            _height = chunkData.Tiles.GetLength(1);
 
-            _heightmap = Noise.GenerateNoiseMap(width, height, xOffset, yOffset, noiseScale);
-            _vertexPositions = GenerateVertexPositions(_heightmap);
-        }
-
-        public HeightMap(float[,] heightmap)
-        {
-            _width = heightmap.GetLength(0)-1;
-            _height = heightmap.GetLength(1)-1;
-
-            _heightmap = heightmap;
-            _vertexPositions = GenerateVertexPositions(_heightmap);
+            _vertexPositions = GenerateVertexPositions(chunkData.Tiles);
         }
 
         public void Initialize(GraphicsDevice graphicsDevice)
@@ -70,54 +58,94 @@ namespace DProject.Type
             }
         }
 
-        private static VertexPositionTextureColorNormal[] GenerateVertexPositions(float[,] heightmap)
+        private static VertexPositionTextureColorNormal[] GenerateVertexPositions(Tile[,] tiles)
         {
-            int width = heightmap.GetLength(0) -1;
-            int height = heightmap.GetLength(1) -1;
-
+            int width = tiles.GetLength(0);
+            int height = tiles.GetLength(1);
+            
             VertexPositionTextureColorNormal[] vertexPositions = new VertexPositionTextureColorNormal[(width)*(height)*6];
 
             int vertexIndex = 0;
-            
+
             for (int x = 0; x < width; x++)
             {
                 for (int y = 0; y < height; y++)
                 {
-                    Vector3 topLeft = new Vector3 (x-0.5f,  heightmap[x,y], y-0.5f);
-                    Vector3 topRight = new Vector3 (x+0.5f,  heightmap[x+1,y], y-0.5f);
-                    Vector3 bottomLeft = new Vector3 (x-0.5f, heightmap[x,y+1], y+0.5f);
-                    Vector3 bottomRight = new Vector3 (x+0.5f, heightmap[x+1,y+1], y+0.5f);
+                    Vector3 topLeft = new Vector3 (x-0.5f,  tiles[x,y].TopLeft, y-0.5f);
+                    Vector3 topRight = new Vector3 (x+0.5f,  tiles[x,y].TopRight, y-0.5f);
+                    Vector3 bottomLeft = new Vector3 (x-0.5f, tiles[x,y].BottomLeft, y+0.5f);
+                    Vector3 bottomRight = new Vector3 (x+0.5f, tiles[x,y].BottomRight, y+0.5f);
+
+                    Color color = tiles[x, y].Color;
                     
-                    //Color color = new Color(topLeft.Y/5 +1, topLeft.Y/5 + 1, topLeft.Y/5 + 1);
-                    Color color = Color.White;
-                    
-                    Vector4 texturePosition = GetTextureCoordinate(topLeft);
+                    Vector4 texturePosition = Textures.TextureList[tiles[x,y].TileTextureName].GetAdjustedTexturePosition();
                     Vector3 normal = GenerateNormalDirection(bottomLeft, topLeft, bottomRight);
 
-                    if (IsAlternativeDiagonal(topLeft, topRight, bottomRight, bottomLeft))
+                    if (tiles[x,y].IsAlternativeDiagonal)
                     {
                         vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(bottomLeft, normal, color, new Vector2(texturePosition.X,texturePosition.Y));
                         vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(topLeft, normal, color, new Vector2(texturePosition.X,texturePosition.W));
                         vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(bottomRight, normal, color, new Vector2(texturePosition.Z,texturePosition.Y));
-                        
+                                                
                         vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(topLeft, normal, color, new Vector2(texturePosition.X,texturePosition.W));
                         vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(topRight, normal, color, new Vector2(texturePosition.Z,texturePosition.W));
                         vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(bottomRight, normal, color, new Vector2(texturePosition.Z,texturePosition.Y));
                     }
                     else
-                    {                        
+                    {                                       
                         vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(bottomLeft, normal, color, new Vector2(texturePosition.X,texturePosition.Y));
                         vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(topLeft, normal, color, new Vector2(texturePosition.X,texturePosition.W));
                         vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(topRight, normal, color, new Vector2(texturePosition.Z,texturePosition.W));
-                        
+                                                
                         vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(bottomLeft, normal, color, new Vector2(texturePosition.X,texturePosition.Y));
                         vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(topRight, normal, color, new Vector2(texturePosition.Z,texturePosition.W));
                         vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(bottomRight, normal, color, new Vector2(texturePosition.Z,texturePosition.Y));
                     }
                 }
             }
-            
+
             return vertexPositions;
+        }
+
+        public static Tile[,] GenerateTileMap(float[,] heightmap)
+        {
+            int width = heightmap.GetLength(0)-1;
+            int height = heightmap.GetLength(1)-1;
+
+            Tile[,] tempTileMap = new Tile[width,height];
+            
+            for (int x = 0; x < width; x++)
+            {
+                for (int y = 0; y < height; y++)
+                {
+                    float topLeft = heightmap[x,y];
+                    float topRight = heightmap[x+1,y];
+                    float bottomLeft = heightmap[x,y+1];
+                    float bottomRight = heightmap[x+1,y+1];
+                    
+                    bool isAlternativeDiagonal = IsAlternativeDiagonal(
+                        new Vector3(x, topLeft, y),
+                        new Vector3(x+1, topRight, y),
+                        new Vector3(x+1, bottomRight, y+1),
+                        new Vector3(x, bottomLeft, y+1)
+                        );
+                    
+                    string tileTextureName;
+                    
+                    if (topLeft < -1.2f)
+                        tileTextureName = "savanna_earth";
+                    else if (topLeft < 0f)
+                        tileTextureName = "savanna_grass_dry";
+                    else
+                        tileTextureName = "savanna_grass";
+                    
+                    Color color = Color.White;
+                    
+                    tempTileMap[x,y] = new Tile(topLeft, topRight, bottomLeft, bottomRight, isAlternativeDiagonal, tileTextureName, color);
+                }
+            }
+
+            return tempTileMap;
         }
 
         private static Vector3 GenerateNormalDirection(Vector3 vertex1, Vector3 vertex2, Vector3 vertex3)
@@ -134,31 +162,9 @@ namespace DProject.Type
             return sum;
         }
 
-        public void UpdateTerrain(float[,] heightmap)
-        {
-            _heightmap = heightmap;
-            _vertexPositions = GenerateVertexPositions(heightmap);
-            _vertexBuffer.SetData(_vertexPositions);
-        }
-
-        private static Vector4 GetTextureCoordinate(Vector3 topLeft)
-        {            
-            if (topLeft.Y < -1.2f)
-                return Textures.TextureList["savanna_earth"].GetAdjustedTexturePosition();
-            else if (topLeft.Y < 0f)
-                return Textures.TextureList["savanna_grass_dry"].GetAdjustedTexturePosition();
-            else
-                return Textures.TextureList["savanna_grass"].GetAdjustedTexturePosition();
-        }
-
         private static bool IsAlternativeDiagonal(Vector3 a, Vector3 b, Vector3 c, Vector3 d)
         {
             return Vector3.Distance(a, c) < Vector3.Distance(b, d);
-        }
-
-        public float[,] GetHeightMap()
-        {
-            return _heightmap;
         }
     }
 }
