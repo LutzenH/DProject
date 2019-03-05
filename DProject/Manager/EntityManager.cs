@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using DProject.Entity;
+using DProject.Entity.Chunk;
+using DProject.Entity.Debug;
 using Microsoft.Xna.Framework;
 
 namespace DProject.Manager
@@ -38,7 +40,7 @@ namespace DProject.Manager
             
             _entities.Add(chunkLoaderEntity);
             _entities.Add(new PointerEntity(this, chunkLoaderEntity));
-            _entities.Add(new DebugEntity(_cameraEntities));
+            _entities.Add(new DebugEntity(_cameraEntities, chunkLoaderEntity));
         }
 
         public List<AbstractEntity> GetEntities()

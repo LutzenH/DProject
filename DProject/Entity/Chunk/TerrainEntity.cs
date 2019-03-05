@@ -1,3 +1,5 @@
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 using DProject.Entity.Interface;
 using DProject.List;
 using DProject.Type;
@@ -6,10 +8,8 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using IDrawable = DProject.Entity.Interface.IDrawable;
 using IUpdateable = DProject.Entity.Interface.IUpdateable;
-using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
 
-namespace DProject.Entity
+namespace DProject.Entity.Chunk
 {
     public class TerrainEntity : AbstractEntity, IDrawable, IInitialize, IUpdateable
     {
@@ -20,6 +20,8 @@ namespace DProject.Entity
         private readonly int _chunkPositionY;
 
         private readonly ChunkData _chunkData;
+
+        public ChunkStatus ChunkStatus { get; set; }
 
         public TerrainEntity(int x, int y) : base(new Vector3(x*ChunkLoaderEntity.ChunkSize, 0, y*ChunkLoaderEntity.ChunkSize), Quaternion.Identity, new Vector3(1,1,1))
         {
@@ -32,6 +34,8 @@ namespace DProject.Entity
                 
                 _chunkData = (ChunkData) bf.Deserialize(stream);
                 stream.Close();
+
+                ChunkStatus = ChunkStatus.Current;
             }
             else
             {                   
@@ -44,6 +48,8 @@ namespace DProject.Entity
                     0,
                     tiles
                 );
+
+                ChunkStatus = ChunkStatus.Unserialized;
 
                 //un-comment these to enable chunk creation to harddrive.
                 //Stream stream = File.Open("Content/Chunks/chunk_" + x + "_" + y + ".dat", FileMode.Create);

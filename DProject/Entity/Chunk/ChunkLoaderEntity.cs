@@ -7,7 +7,7 @@ using Microsoft.Xna.Framework.Graphics;
 using IDrawable = DProject.Entity.Interface.IDrawable;
 using IUpdateable = DProject.Entity.Interface.IUpdateable;
 
-namespace DProject.Entity
+namespace DProject.Entity.Chunk
 {
     public class ChunkLoaderEntity : AbstractEntity, IDrawable, IInitialize, IUpdateable
     {
@@ -123,6 +123,11 @@ namespace DProject.Entity
             }
 
             return null;
+        }
+
+        public TerrainEntity[,] GetLoadedChunks()
+        {
+            return _loadedChunks;
         }
     }
 }
