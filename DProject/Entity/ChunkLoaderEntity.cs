@@ -100,22 +100,24 @@ namespace DProject.Entity
 
         public float? GetHeightFromPosition(Vector2 position)
         {
-            int chunkPositionX = (int)Math.Floor(position.X / ChunkSize);
-            int chunkPositionY = (int)Math.Floor(position.Y / ChunkSize);
+            Vector2 tempPosition = new Vector2((float)Math.Floor(position.X+0.5f), (float)Math.Floor(position.Y+0.5f));
             
-            int localChunkPositionX = (int)Math.Round(position.X) % ChunkSize;
-            int localChunkPositionY = (int)Math.Round(position.Y) % ChunkSize;
+            int chunkPositionX = (int)Math.Floor(tempPosition.X / ChunkSize);
+            int chunkPositionY = (int)Math.Floor(tempPosition.Y / ChunkSize);
+            
+            int localChunkPositionX = (int)tempPosition.X - (chunkPositionX*ChunkSize);
+            int localChunkPositionY = (int)tempPosition.Y - (chunkPositionY*ChunkSize);
 
             if (localChunkPositionX < 0)
-                localChunkPositionX = 64 + localChunkPositionX;
+                localChunkPositionX = ChunkSize + localChunkPositionX;
             
             if (localChunkPositionY < 0)
-                localChunkPositionY = 64 + localChunkPositionY;
+                localChunkPositionY = ChunkSize + localChunkPositionY;
             
             foreach (var chunk in _loadedChunks)
             {
                 if (chunk.GetChunkX() == chunkPositionX && chunk.GetChunkY() == chunkPositionY)
-                {                    
+                {                                
                     return (chunk.GetHeightMap().GetHeightMap()[localChunkPositionX, localChunkPositionY]
                             + chunk.GetHeightMap().GetHeightMap()[localChunkPositionX+1, localChunkPositionY]
                             + chunk.GetHeightMap().GetHeightMap()[localChunkPositionX, localChunkPositionY+1]

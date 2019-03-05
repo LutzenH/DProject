@@ -22,7 +22,7 @@ namespace DProject.Entity
         public PointerEntity(EntityManager entityManager, ChunkLoaderEntity chunkLoaderEntity) : base(Vector3.Zero, Quaternion.Identity, new Vector3(1,1,1))
         {
             _axisEntity = new AxisEntity(Vector3.Zero);
-            _propEntity = new PropEntity(Vector3.Zero, Quaternion.Identity, new Vector3(1,1,1), "book");
+            _propEntity = new PropEntity(Vector3.Zero, Quaternion.Identity, new Vector3(1,1,1), "plane");
             _entityManager = entityManager;
             _chunkLoaderEntity = chunkLoaderEntity;
         }
