@@ -13,12 +13,14 @@ namespace DProject.Entity.Chunk
 {
     public class TerrainEntity : AbstractEntity, IDrawable, IInitialize, IUpdateable
     {
-        private readonly HeightMap _heightMap;
+        private HeightMap _heightMap;
         private Texture2D _terrainTexture;
 
         private readonly int _chunkPositionX;
         private readonly int _chunkPositionY;
 
+        private GraphicsDevice _graphicsDevice;
+        
         private readonly ChunkData _chunkData;
 
         public ChunkStatus ChunkStatus { get; set; }
@@ -40,6 +42,7 @@ namespace DProject.Entity.Chunk
             else
             {                   
                 float[,] heightmap = Noise.GenerateNoiseMap(ChunkLoaderEntity.ChunkSize, ChunkLoaderEntity.ChunkSize, x*ChunkLoaderEntity.ChunkSize, y*ChunkLoaderEntity.ChunkSize, 50f);
+                //float[,] heightmap = new float[ChunkLoaderEntity.ChunkSize+1,ChunkLoaderEntity.ChunkSize+1];
                 Tile[,] tiles = HeightMap.GenerateTileMap(heightmap);
             
                 _chunkData = new ChunkData(x, y, 0, tiles);
@@ -69,6 +72,8 @@ namespace DProject.Entity.Chunk
 
         public void Initialize(GraphicsDevice graphicsDevice)
         {
+            _graphicsDevice = graphicsDevice;
+            
             _heightMap.Initialize(graphicsDevice);
         }
 
@@ -87,6 +92,13 @@ namespace DProject.Entity.Chunk
         public HeightMap GetHeightMap()
         {
             return _heightMap;
+        }
+
+        public void ChangeTexture(string name, int x, int y)
+        {
+            _chunkData.Tiles[x,y].TileTextureName = name;
+            _heightMap = new HeightMap(_chunkData);
+            _heightMap.Initialize(_graphicsDevice);
         }
 
         public float GetTileHeight(int x, int y)

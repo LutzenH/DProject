@@ -25,7 +25,7 @@ namespace DProject.Entity.Debug
         {
             float difference = 0.5f;
             
-            _lineStartPoint = new Vector3(0 - difference/2,0,0 - difference/2);
+            _lineStartPoint = new Vector3(0 - difference/2,0.1f,0 - difference/2);
             _lineEndPointX = new Vector3(_lineStartPoint.X+sizeX-difference, _lineStartPoint.Y, _lineStartPoint.Z);
             _lineEndPointY = new Vector3(_lineStartPoint.X+sizeX-difference, _lineStartPoint.Y, _lineStartPoint.Z+sizeY-difference);
             _lineEndPoint = new Vector3(_lineStartPoint.X, _lineStartPoint.Y, _lineStartPoint.Z+sizeY-difference);

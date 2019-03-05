@@ -58,7 +58,18 @@ namespace DProject.Entity
 
                 position = new Vector3((int)Math.Round(position.X), y, (int)Math.Round(position.Z));
             }
-            
+
+            if (Mouse.GetState().LeftButton == ButtonState.Pressed)
+            {
+                Vector2 localChunkPosition = ChunkLoaderEntity.GetLocalChunkPosition(new Vector2(position.X, position.Z));
+
+                int x = (int)localChunkPosition.X;
+                int y = (int) localChunkPosition.Y;
+                
+                _chunkLoaderEntity.GetChunk(position).ChunkStatus = ChunkStatus.Changed;
+                _chunkLoaderEntity.GetChunk(position).ChangeTexture("metal", x, y);
+            }
+
             _axisEntity.SetPosition(new Vector3(position.X, 0, position.Z));
             _propEntity.SetPosition(position);
             

@@ -18,7 +18,7 @@ namespace DProject.Entity.Chunk
         private Vector2 _previousChunkPosition;
         private Vector2 _chunkPosition;
 
-        private TerrainEntity[,] _loadedChunks = new TerrainEntity[3,3];
+        private TerrainEntity[,] _loadedChunks = new TerrainEntity[6,6];
 
         public const int ChunkSize = 64;
         
@@ -119,6 +119,37 @@ namespace DProject.Entity.Chunk
                 if (chunk.GetChunkX() == chunkPositionX && chunk.GetChunkY() == chunkPositionY)
                 {
                     return chunk.GetTileHeight(localChunkPositionX, localChunkPositionY);
+                }
+            }
+
+            return null;
+        }
+
+        public static Vector2 GetLocalChunkPosition(Vector2 position)
+        {
+            Vector2 tempPosition = new Vector2((float)Math.Floor(position.X+0.5f), (float)Math.Floor(position.Y+0.5f));
+            
+            int chunkPositionX = (int)Math.Floor(tempPosition.X / ChunkSize);
+            int chunkPositionY = (int)Math.Floor(tempPosition.Y / ChunkSize);
+            
+            int localChunkPositionX = (int)tempPosition.X - (chunkPositionX*ChunkSize);
+            int localChunkPositionY = (int)tempPosition.Y - (chunkPositionY*ChunkSize);
+            
+            return new Vector2(localChunkPositionX, localChunkPositionY);
+        }
+
+        public TerrainEntity GetChunk(Vector3 position)
+        {
+            Vector2 tempPosition = new Vector2((float)Math.Floor(position.X+0.5f), (float)Math.Floor(position.Z+0.5f));
+            
+            int chunkPositionX = (int)Math.Floor(tempPosition.X / ChunkSize);
+            int chunkPositionY = (int)Math.Floor(tempPosition.Y / ChunkSize);
+            
+            foreach (var chunk in _loadedChunks)
+            {
+                if (chunk.GetChunkX() == chunkPositionX && chunk.GetChunkY() == chunkPositionY)
+                {
+                    return chunk;
                 }
             }
 
