@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Threading;
 using DProject.Entity.Interface;
 using DProject.Manager;
 using Microsoft.Xna.Framework;
@@ -18,7 +20,7 @@ namespace DProject.Entity.Chunk
         private Vector2 _previousChunkPosition;
         private Vector2 _chunkPosition;
 
-        private TerrainEntity[,] _loadedChunks = new TerrainEntity[6,6];
+        private TerrainEntity[,] _loadedChunks = new TerrainEntity[3,3];
 
         public const int ChunkSize = 64;
         
@@ -39,7 +41,9 @@ namespace DProject.Entity.Chunk
             _chunkPosition = CalculateChunkPosition(_entityManager.GetActiveCamera().GetPosition().X, _entityManager.GetActiveCamera().GetPosition().Z);
 
             if (!_chunkPosition.Equals(_previousChunkPosition))
+            {
                 LoadChunks(_chunkPosition);
+            }
 
             _previousChunkPosition = _chunkPosition;
         }
@@ -60,6 +64,9 @@ namespace DProject.Entity.Chunk
             TerrainEntity[,] oldChunks = _loadedChunks;
             
             _loadedChunks = new TerrainEntity[_loadedChunks.GetLength(0),_loadedChunks.GetLength(1)];
+
+            List<Vector2> newChunkPositions = new List<Vector2>();
+            List<Vector2> newChunkLocations = new List<Vector2>();
             
             for (int x = 0; x < _loadedChunks.GetLength(0); x++)
             {
@@ -75,13 +82,27 @@ namespace DProject.Entity.Chunk
                                 _loadedChunks[x, y] = chunk;
                         }
                     }
-
+                    
                     if (_loadedChunks[x, y] == null)
-                        _loadedChunks[x, y] = LoadChunk((int)position.X, (int)position.Y);
+                    {
+                        newChunkPositions.Add(new Vector2(x,y));
+                        newChunkLocations.Add(new Vector2(position.X, position.Y));
+                    }
                 }
             }
+                                    
+            Thread thread = new Thread((() => LoadNewChunks(newChunkPositions, newChunkLocations)));
+            thread.Start();
         }
 
+        private void LoadNewChunks(List<Vector2> newChunkPositions, List<Vector2> newChunkLocations)
+        {
+            for (int i = 0; i < newChunkPositions.Count; i++)
+            {
+                _loadedChunks[(int) newChunkPositions[i].X, (int) newChunkPositions[i].Y] = LoadChunk((int)newChunkLocations[i].X, (int)newChunkLocations[i].Y);
+            }
+        }
+        
         private TerrainEntity LoadChunk(int x, int y)
         {
             TerrainEntity chunk = new TerrainEntity(x, y);
@@ -116,9 +137,12 @@ namespace DProject.Entity.Chunk
             
             foreach (var chunk in _loadedChunks)
             {
-                if (chunk.GetChunkX() == chunkPositionX && chunk.GetChunkY() == chunkPositionY)
+                if (chunk != null)
                 {
-                    return chunk.GetTileHeight(localChunkPositionX, localChunkPositionY);
+                    if (chunk.GetChunkX() == chunkPositionX && chunk.GetChunkY() == chunkPositionY)
+                    {
+                        return chunk.GetTileHeight(localChunkPositionX, localChunkPositionY);
+                    }
                 }
             }
 

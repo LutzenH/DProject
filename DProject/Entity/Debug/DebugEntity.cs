@@ -73,28 +73,31 @@ namespace DProject.Entity.Debug
 
             foreach (var chunk in _chunkLoaderEntity.GetLoadedChunks())
             {
-                Color color;
-                
-                switch (chunk.ChunkStatus)
+                if (chunk != null)
                 {
-                    case ChunkStatus.Unserialized:
-                        color = Color.Blue;
-                        break;
-                    case ChunkStatus.Changed:
-                        color = Color.Red;
-                        break;
-                    case ChunkStatus.Current:
-                        color = Color.Green;
-                        break;
-                    default:
-                        color = Color.White;
-                        break;
+                    Color color;
+                
+                    switch (chunk.ChunkStatus)
+                    {
+                        case ChunkStatus.Unserialized:
+                            color = Color.Blue;
+                            break;
+                        case ChunkStatus.Changed:
+                            color = Color.Red;
+                            break;
+                        case ChunkStatus.Current:
+                            color = Color.Green;
+                            break;
+                        default:
+                            color = Color.White;
+                            break;
+                    }
+                
+                    LineFrameEntity entity = new LineFrameEntity(chunk.GetPosition(), ChunkLoaderEntity.ChunkSize, ChunkLoaderEntity.ChunkSize, color);
+                    entity.Initialize(_graphicsDevice);
+                
+                    _lineFrameEntities.Add(entity);
                 }
-                
-                LineFrameEntity entity = new LineFrameEntity(chunk.GetPosition(), ChunkLoaderEntity.ChunkSize, ChunkLoaderEntity.ChunkSize, color);
-                entity.Initialize(_graphicsDevice);
-                
-                _lineFrameEntities.Add(entity);
             }
         }
 
