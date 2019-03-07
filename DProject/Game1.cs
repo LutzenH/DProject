@@ -13,6 +13,9 @@ namespace DProject
         private readonly UIManager _uiManager;
 
         public static KeyboardState PreviousKeyboardState;
+
+        public static int ScreenResolutionX;
+        public static int ScreenResolutionY;
         
         public Game1()
         {
@@ -24,8 +27,12 @@ namespace DProject
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
 
-            _graphics.PreferredBackBufferWidth = 1152;
-            _graphics.PreferredBackBufferHeight = 768;
+            ScreenResolutionX = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
+            ScreenResolutionY = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
+
+            _graphics.PreferredBackBufferWidth = ScreenResolutionX;
+            _graphics.PreferredBackBufferHeight = ScreenResolutionY;
+            _graphics.IsFullScreen = true;
         }
 
         protected override void Initialize()

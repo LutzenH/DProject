@@ -20,7 +20,7 @@ namespace DProject.Entity.Chunk
         private Vector2 _previousChunkPosition;
         private Vector2 _chunkPosition;
 
-        private TerrainEntity[,] _loadedChunks = new TerrainEntity[3,3];
+        private TerrainEntity[,] _loadedChunks = new TerrainEntity[5,5];
 
         public const int ChunkSize = 64;
         

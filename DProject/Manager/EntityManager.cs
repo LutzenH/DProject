@@ -26,7 +26,7 @@ namespace DProject.Manager
             _cameraEntities = new List<CameraEntity>
             {
                 new CameraEntity(new Vector3(0f, 0f, -1f), Quaternion.Identity),
-                new CameraEntity(new Vector3(0f, 0f, -5f), Quaternion.Identity)
+                new CameraEntity(new Vector3(0f, 500f, -1f), Quaternion.Identity)
             };
 
             _entities.Add(new PropEntity(new Vector3(32, 5,32), "barrel"));

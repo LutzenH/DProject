@@ -100,6 +100,24 @@ namespace DProject.Entity.Chunk
             _heightMap = new HeightMap(_chunkData);
             _heightMap.Initialize(_graphicsDevice);
         }
+        
+        public void ChangeColor(Color color, int x, int y)
+        {
+            _chunkData.Tiles[x,y].Color = color;
+            _heightMap = new HeightMap(_chunkData);
+            _heightMap.Initialize(_graphicsDevice);
+        }
+        
+        public void ChangeTileHeight(float height, int x, int y)
+        {
+            _chunkData.Tiles[x,y].TopLeft = height;
+            _chunkData.Tiles[x,y].TopRight = height;
+            _chunkData.Tiles[x,y].BottomLeft = height;
+            _chunkData.Tiles[x,y].BottomRight = height;
+
+            _heightMap = new HeightMap(_chunkData);
+            _heightMap.Initialize(_graphicsDevice);
+        }
 
         public float GetTileHeight(int x, int y)
         {

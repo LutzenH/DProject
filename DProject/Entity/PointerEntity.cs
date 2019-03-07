@@ -65,7 +65,17 @@ namespace DProject.Entity
 
                 int x = (int)localChunkPosition.X;
                 int y = (int) localChunkPosition.Y;
-                
+
+                _chunkLoaderEntity.GetChunk(position).ChunkStatus = ChunkStatus.Changed;
+                _chunkLoaderEntity.GetChunk(position).ChangeTileHeight(0f, x, y);
+            }
+            if (Mouse.GetState().RightButton == ButtonState.Pressed)
+            {
+                Vector2 localChunkPosition = ChunkLoaderEntity.GetLocalChunkPosition(new Vector2(position.X, position.Z));
+
+                int x = (int)localChunkPosition.X;
+                int y = (int) localChunkPosition.Y;
+
                 _chunkLoaderEntity.GetChunk(position).ChunkStatus = ChunkStatus.Changed;
                 _chunkLoaderEntity.GetChunk(position).ChangeTexture("metal", x, y);
             }
