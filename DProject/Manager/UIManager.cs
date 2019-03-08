@@ -13,11 +13,12 @@ namespace DProject.Manager
         
         private SpriteBatch _spriteBatch;
         
-        public UIManager()
+        public UIManager(EntityManager entityManager)
         {
             _userInterfaces = new List<AbstractUI>();
             
             _userInterfaces.Add(new WorldEditorUI());
+            _userInterfaces.Add(new MessageUI(entityManager));
         }
         
         public void Initialize(GraphicsDevice graphicsDevice)

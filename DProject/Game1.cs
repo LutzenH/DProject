@@ -22,7 +22,7 @@ namespace DProject
             _graphics = new GraphicsDeviceManager(this);
             
             _entityManager = new EntityManager();
-            _uiManager = new UIManager();
+            _uiManager = new UIManager(_entityManager);
             
             Content.RootDirectory = "Content";
             IsMouseVisible = true;

@@ -1,8 +1,9 @@
 using DProject.List;
+using DProject.Type.Serializable;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace DProject.Type
+namespace DProject.Type.Rendering
 {
     public class HeightMap
     {       

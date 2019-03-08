@@ -3,6 +3,8 @@ using System.Runtime.Serialization.Formatters.Binary;
 using DProject.Entity.Interface;
 using DProject.List;
 using DProject.Type;
+using DProject.Type.Rendering;
+using DProject.Type.Serializable;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;

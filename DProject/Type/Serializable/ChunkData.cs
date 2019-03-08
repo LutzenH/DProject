@@ -1,7 +1,7 @@
 using System;
 using System.Runtime.Serialization;
 
-namespace DProject.Type
+namespace DProject.Type.Serializable
 {
     [Serializable()]
     public class ChunkData : ISerializable

@@ -3,6 +3,7 @@ using DProject.Entity;
 using DProject.Entity.Chunk;
 using DProject.Entity.Debug;
 using DProject.Entity.Interface;
+using DProject.Type;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -14,6 +15,8 @@ namespace DProject.Manager
     {
         private readonly List<AbstractEntity> _entities;
         private readonly List<CameraEntity> _cameraEntities;
+        
+        private readonly LinkedList<Message> _messages;
         
         private CameraEntity _activeCamera;
 
@@ -29,6 +32,8 @@ namespace DProject.Manager
                 new CameraEntity(new Vector3(0f, 500f, -1f), Quaternion.Identity)
             };
 
+            _messages = new LinkedList<Message>();
+            
             _entities.Add(new PropEntity(new Vector3(32, 5,32), "barrel"));
 
             //Adds all camera's to entities list
@@ -111,6 +116,33 @@ namespace DProject.Manager
             
             _activeCamera = _cameraEntities[_cameraIndex];
             _activeCamera.IsActiveCamera = true;
+        }
+
+        public void AddMessage(Message message)
+        {
+            _messages.AddLast(message);
+        }
+
+        public Message GetFirstMessage()
+        {
+            if (_messages.First != null)
+            {
+                Message message = _messages.First.Value;
+                _messages.RemoveFirst();
+                return message;
+            }
+
+            return null;
+        }
+
+        public int GetMessagesCount()
+        {
+            return _messages.Count;
+        }
+
+        public void ClearMessageList()
+        {
+            _messages.Clear();
         }
     }
 }

@@ -2,7 +2,7 @@ using System;
 using System.Runtime.Serialization;
 using Microsoft.Xna.Framework;
 
-namespace DProject.Type
+namespace DProject.Type.Serializable
 {
     [Serializable()]
     public class Tile : ISerializable

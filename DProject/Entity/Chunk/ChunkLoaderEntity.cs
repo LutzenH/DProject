@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using DProject.Entity.Interface;
 using DProject.Manager;
+using DProject.Type;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -60,7 +61,10 @@ namespace DProject.Entity.Chunk
         }
 
         private void LoadChunks(Vector2 chunkPosition)
-        {   
+        {
+            int oldChunksCount = 0;
+            int newChunksCount = 0;
+            
             TerrainEntity[,] oldChunks = _loadedChunks;
             
             _loadedChunks = new TerrainEntity[_loadedChunks.GetLength(0),_loadedChunks.GetLength(1)];
@@ -79,18 +83,24 @@ namespace DProject.Entity.Chunk
                         if (chunk != null)
                         {
                             if (chunk.GetChunkX() == (int) position.X && chunk.GetChunkY() == (int) position.Y)
+                            {
                                 _loadedChunks[x, y] = chunk;
+                                oldChunksCount++;
+                            }
                         }
                     }
                     
                     if (_loadedChunks[x, y] == null)
                     {
+                        newChunksCount++;
                         newChunkPositions.Add(new Vector2(x,y));
                         newChunkLocations.Add(new Vector2(position.X, position.Y));
                     }
                 }
             }
-                                    
+                        
+            _entityManager.AddMessage(new Message("Loading new chunks: " + oldChunksCount + " chunks reused and " + newChunksCount + " new chunks."));
+            
             Thread thread = new Thread((() => LoadNewChunks(newChunkPositions, newChunkLocations)));
             thread.Start();
         }
@@ -101,6 +111,8 @@ namespace DProject.Entity.Chunk
             {
                 _loadedChunks[(int) newChunkPositions[i].X, (int) newChunkPositions[i].Y] = LoadChunk((int)newChunkLocations[i].X, (int)newChunkLocations[i].Y);
             }
+            
+            _entityManager.AddMessage(new Message("Done loading new chunks."));
         }
         
         private TerrainEntity LoadChunk(int x, int y)

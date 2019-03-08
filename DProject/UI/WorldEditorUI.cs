@@ -1,4 +1,3 @@
-using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -10,7 +9,6 @@ namespace DProject.UI
     public class WorldEditorUI : AbstractUI, IUpdateable
     {
         private Texture2D _spritesheet;
-        private SpriteFont _spriteFont;
 
         private enum Tools { Flatten, Raise, Paint, ObjectPlacer }
 
@@ -21,7 +19,6 @@ namespace DProject.UI
         public override void LoadContent(ContentManager content)
         {
             _spritesheet = content.Load<Texture2D>("textures/ui/editor");
-            _spriteFont = content.Load<SpriteFont>("default");
         }
 
         public void Update(GameTime gameTime)
@@ -95,7 +92,6 @@ namespace DProject.UI
                     break;
             }
             
-            spriteBatch.DrawString(_spriteFont, "WorldEditorUI", new Vector2(2, 34), Color.White);
             
             spriteBatch.Draw(
                 _spritesheet,

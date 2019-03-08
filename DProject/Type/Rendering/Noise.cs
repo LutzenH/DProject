@@ -1,6 +1,6 @@
 using LibNoise.Primitive;
 
-namespace DProject.Type
+namespace DProject.Type.Rendering
 {
     public static class Noise
     {
