@@ -17,7 +17,7 @@ namespace DProject.Manager
         {
             _userInterfaces = new List<AbstractUI>();
             
-            _userInterfaces.Add(new WorldEditorUI());
+            _userInterfaces.Add(new WorldEditorUI(entityManager.GetWorldEditorEntity()));
             _userInterfaces.Add(new MessageUI(entityManager));
         }
         

@@ -21,10 +21,14 @@ namespace DProject.Entity.Chunk
         private Vector2 _previousChunkPosition;
         private Vector2 _chunkPosition;
 
-        private TerrainEntity[,] _loadedChunks = new TerrainEntity[5,5];
+        private TerrainEntity[,] _loadedChunks = new TerrainEntity[6,6];
 
         public const int ChunkSize = 64;
-        
+
+        public enum ChunkLoadingStatus { Busy, Done }
+
+        private ChunkLoadingStatus _loadingStatus;
+
         public ChunkLoaderEntity(EntityManager entityManager) : base(Vector3.Zero, Quaternion.Identity, new Vector3(1,1,1))
         {
             _entityManager = entityManager;
@@ -42,9 +46,7 @@ namespace DProject.Entity.Chunk
             _chunkPosition = CalculateChunkPosition(_entityManager.GetActiveCamera().GetPosition().X, _entityManager.GetActiveCamera().GetPosition().Z);
 
             if (!_chunkPosition.Equals(_previousChunkPosition))
-            {
                 LoadChunks(_chunkPosition);
-            }
 
             _previousChunkPosition = _chunkPosition;
         }
@@ -103,6 +105,7 @@ namespace DProject.Entity.Chunk
             
             Thread thread = new Thread((() => LoadNewChunks(newChunkPositions, newChunkLocations)));
             thread.Start();
+            _loadingStatus = ChunkLoadingStatus.Busy;
         }
 
         private void LoadNewChunks(List<Vector2> newChunkPositions, List<Vector2> newChunkLocations)
@@ -113,6 +116,7 @@ namespace DProject.Entity.Chunk
             }
             
             _entityManager.AddMessage(new Message("Done loading new chunks."));
+            _loadingStatus = ChunkLoadingStatus.Done;
         }
         
         private TerrainEntity LoadChunk(int x, int y)
@@ -195,6 +199,11 @@ namespace DProject.Entity.Chunk
         public TerrainEntity[,] GetLoadedChunks()
         {
             return _loadedChunks;
+        }
+
+        public bool IsLoadingChunks()
+        {
+            return (_loadingStatus == ChunkLoadingStatus.Busy);
         }
     }
 }

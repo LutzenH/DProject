@@ -1,9 +1,7 @@
-using System;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using DProject.Entity.Interface;
 using DProject.List;
-using DProject.Type;
 using DProject.Type.Rendering;
 using DProject.Type.Serializable;
 using Microsoft.Xna.Framework;
@@ -29,6 +27,8 @@ namespace DProject.Entity.Chunk
         private readonly BoundingSphere _boundingSphere;
         
         public ChunkStatus ChunkStatus { get; set; }
+
+        public enum Corner { TopLeft, TopRight, BottomLeft, BottomRight }
 
         public TerrainEntity(int x, int y) : base(new Vector3(x*ChunkLoaderEntity.ChunkSize, 0, y*ChunkLoaderEntity.ChunkSize), Quaternion.Identity, new Vector3(1,1,1))
         {
@@ -109,6 +109,8 @@ namespace DProject.Entity.Chunk
             _chunkData.Tiles[x,y].TileTextureName = name;
             _heightMap = new HeightMap(_chunkData);
             _heightMap.Initialize(_graphicsDevice);
+            
+            ChunkStatus = ChunkStatus.Changed;
         }
         
         public void ChangeColor(Color color, int x, int y)
@@ -116,17 +118,21 @@ namespace DProject.Entity.Chunk
             _chunkData.Tiles[x,y].Color = color;
             _heightMap = new HeightMap(_chunkData);
             _heightMap.Initialize(_graphicsDevice);
+            
+            ChunkStatus = ChunkStatus.Changed;
         }
         
         public void ChangeTileHeight(float height, int x, int y)
         {
             _chunkData.Tiles[x,y].TopLeft = height;
-            _chunkData.Tiles[x,y].TopRight = height;
-            _chunkData.Tiles[x,y].BottomLeft = height;
-            _chunkData.Tiles[x,y].BottomRight = height;
+            _chunkData.Tiles[x-1,y].TopRight = height;
+            _chunkData.Tiles[x,y-1].BottomLeft = height;
+            _chunkData.Tiles[x-1,y-1].BottomRight = height;
 
             _heightMap = new HeightMap(_chunkData);
             _heightMap.Initialize(_graphicsDevice);
+
+            ChunkStatus = ChunkStatus.Changed;
         }
 
         public float GetTileHeight(int x, int y)
@@ -136,6 +142,23 @@ namespace DProject.Entity.Chunk
             +_chunkData.Tiles[x, y].BottomLeft
             +_chunkData.Tiles[x, y].BottomRight
                    )/4;
+        }
+
+        public float GetVertexHeight(int x, int y, Corner corner)
+        {
+            switch (corner)
+            {
+                case Corner.TopLeft:
+                    return _chunkData.Tiles[x, y].TopLeft;
+                case Corner.TopRight:
+                    return _chunkData.Tiles[x, y].TopRight;
+                case Corner.BottomLeft:
+                    return _chunkData.Tiles[x, y].BottomLeft;
+                case Corner.BottomRight:
+                    return _chunkData.Tiles[x, y].BottomRight;
+                default:
+                    return 0f;
+            }
         }
     }
 }

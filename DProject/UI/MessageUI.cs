@@ -16,7 +16,7 @@ namespace DProject.UI
         private SpriteFont _spriteFont;
         private string _textString;
 
-        private int lineCount = 0;
+        private int _lineCount;
         
         private const int FontPixelSize = 19;
 
@@ -36,13 +36,13 @@ namespace DProject.UI
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.DrawString(_spriteFont, _textString, new Vector2(2, Game1.ScreenResolutionY - FontPixelSize * lineCount), Color.White);
+            spriteBatch.DrawString(_spriteFont, _textString, new Vector2(2, Game1.ScreenResolutionY - FontPixelSize * _lineCount), Color.White);
         }
 
         public void Update(GameTime gameTime)
         {
             _textString = "";
-            lineCount = 0;
+            _lineCount = 0;
 
             if (_entityManager.GetMessagesCount() > 0)
                 _messages.AddLast(_entityManager.GetFirstMessage());
@@ -52,7 +52,7 @@ namespace DProject.UI
                 if (message.GetLifeTime() > 0)
                 {
                     _textString += "[" + message.GetDateTime().ToString("HH:mm:ss") + "] " + message.GetMessage() + "\n";
-                    lineCount++;
+                    _lineCount++;
                     message.TickLifeTime();
                 }
                 else

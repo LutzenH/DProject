@@ -20,6 +20,8 @@ namespace DProject.Manager
         
         private CameraEntity _activeCamera;
 
+        private WorldEditorEntity _worldEditorEntity;
+
         private int _cameraIndex;
         
         public EntityManager()
@@ -48,7 +50,11 @@ namespace DProject.Manager
             var chunkLoaderEntity = new ChunkLoaderEntity(this);
             
             _entities.Add(chunkLoaderEntity);
-            _entities.Add(new PointerEntity(this, chunkLoaderEntity));
+
+            _worldEditorEntity = new WorldEditorEntity(this, chunkLoaderEntity);
+            
+            _entities.Add(_worldEditorEntity);
+            
             _entities.Add(new DebugEntity(_cameraEntities, chunkLoaderEntity));
         }
 
@@ -138,6 +144,11 @@ namespace DProject.Manager
         public int GetMessagesCount()
         {
             return _messages.Count;
+        }
+
+        public WorldEditorEntity GetWorldEditorEntity()
+        {
+            return _worldEditorEntity;
         }
 
         public void ClearMessageList()

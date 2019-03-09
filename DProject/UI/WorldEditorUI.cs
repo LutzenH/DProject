@@ -1,48 +1,30 @@
+using DProject.Entity;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
-using IUpdateable = DProject.Entity.Interface.IUpdateable;
 
 namespace DProject.UI
 {
-    public class WorldEditorUI : AbstractUI, IUpdateable
+    public class WorldEditorUI : AbstractUI
     {
         private Texture2D _spritesheet;
-
-        private enum Tools { Flatten, Raise, Paint, ObjectPlacer }
-
-        private Tools _tools;
+        private SpriteFont _spriteFont;
         
-        public WorldEditorUI() { }
+        private readonly WorldEditorEntity _worldEditorEntity;
+        
+        public WorldEditorUI(WorldEditorEntity worldEditorEntity)
+        {
+            _worldEditorEntity = worldEditorEntity;
+        }
 
         public override void LoadContent(ContentManager content)
         {
             _spritesheet = content.Load<Texture2D>("textures/ui/editor");
-        }
-
-        public void Update(GameTime gameTime)
-        {
-            if (Keyboard.GetState().IsKeyUp(Keys.D1) && Game1.PreviousKeyboardState.IsKeyDown(Keys.D1))
-            {
-                _tools = Tools.Flatten;
-            }
-            if (Keyboard.GetState().IsKeyUp(Keys.D2) && Game1.PreviousKeyboardState.IsKeyDown(Keys.D2))
-            {
-                _tools = Tools.Raise;
-            }
-            if (Keyboard.GetState().IsKeyUp(Keys.D3) && Game1.PreviousKeyboardState.IsKeyDown(Keys.D3))
-            {
-                _tools = Tools.Paint;
-            }
-            if (Keyboard.GetState().IsKeyUp(Keys.D4) && Game1.PreviousKeyboardState.IsKeyDown(Keys.D4))
-            {
-                _tools = Tools.ObjectPlacer;
-            }
+            _spriteFont = content.Load<SpriteFont>("default");
         }
         
         public override void Draw(SpriteBatch spriteBatch)
-        {            
+        {
             spriteBatch.Draw(
                 _spritesheet,
                 new Rectangle(2,2,32,32),
@@ -70,35 +52,54 @@ namespace DProject.UI
                 new Rectangle(48,0, 16,16),
                 Color.White
             );
+            
+            spriteBatch.Draw(
+                _spritesheet,
+                new Rectangle(136,2,32,32),
+                new Rectangle(64,0, 16,16),
+                Color.White
+            );
 
             Rectangle destinationRectangle;
             
-            switch (_tools)
+            switch (_worldEditorEntity.GetCurrentTool())
             {
-                case Tools.Flatten:
+                case WorldEditorEntity.Tools.Select:
                     destinationRectangle = new Rectangle(2, 2, 32, 32);
                     break;
-                case Tools.Raise:
+                case WorldEditorEntity.Tools.Flatten:
                     destinationRectangle = new Rectangle(36, 2, 32, 32);
                     break;
-                case Tools.Paint:
+                case WorldEditorEntity.Tools.Raise:
                     destinationRectangle = new Rectangle(70, 2, 32, 32);
                     break;
-                case Tools.ObjectPlacer:
+                case WorldEditorEntity.Tools.Paint:
                     destinationRectangle = new Rectangle(104, 2, 32, 32);
+                    break;
+                case WorldEditorEntity.Tools.ObjectPlacer:
+                    destinationRectangle = new Rectangle(136, 2, 32, 32);
                     break;
                 default:
                     destinationRectangle = new Rectangle(0, 0, 0, 0);
                     break;
             }
-            
+
+            if(_worldEditorEntity.GetCurrentTool() != WorldEditorEntity.Tools.ObjectPlacer && _worldEditorEntity.GetCurrentTool() != WorldEditorEntity.Tools.Select)
+                spriteBatch.Draw(
+                    _spritesheet,
+                    new Rectangle(2,Game1.ScreenResolutionY/2,32,32),
+                    new Rectangle(_worldEditorEntity.GetBrushSize()*16, 16, 16, 16),
+                    Color.White
+                    );
             
             spriteBatch.Draw(
                 _spritesheet,
                 destinationRectangle,
-                new Rectangle(64,0,16,16),
+                new Rectangle(80,0,16,16),
                 Color.White
             );
+            
+            spriteBatch.DrawString(_spriteFont, "FlattenHeight: " + _worldEditorEntity.GetFlattenHeight(), new Vector2(2, 19 * 2), Color.White);
         }
     }
 }
