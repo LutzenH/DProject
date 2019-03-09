@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using DProject.Entity.Interface;
@@ -25,6 +26,8 @@ namespace DProject.Entity.Chunk
         
         private readonly ChunkData _chunkData;
 
+        private readonly BoundingSphere _boundingSphere;
+        
         public ChunkStatus ChunkStatus { get; set; }
 
         public TerrainEntity(int x, int y) : base(new Vector3(x*ChunkLoaderEntity.ChunkSize, 0, y*ChunkLoaderEntity.ChunkSize), Quaternion.Identity, new Vector3(1,1,1))
@@ -60,6 +63,8 @@ namespace DProject.Entity.Chunk
             _chunkPositionY = y;
             
             _heightMap = new HeightMap(_chunkData);
+            
+            _boundingSphere = new BoundingSphere(new Vector3(x + ChunkLoaderEntity.ChunkSize/2, 0, y + ChunkLoaderEntity.ChunkSize/2), ChunkLoaderEntity.ChunkSize/1.6f);
         }
 
         public override void LoadContent(ContentManager content)
@@ -69,7 +74,10 @@ namespace DProject.Entity.Chunk
 
         public void Draw(CameraEntity activeCamera)
         {
-            _heightMap.Draw(activeCamera.GetProjectMatrix(),activeCamera.GetViewMatrix(), GetWorldMatrix(), _terrainTexture);
+            if (activeCamera.GetBoundingFrustum().Intersects(_boundingSphere.Transform(GetWorldMatrix())))
+            {
+                _heightMap.Draw(activeCamera.GetProjectMatrix(),activeCamera.GetViewMatrix(), GetWorldMatrix(), _terrainTexture);
+            }
         }
 
         public void Initialize(GraphicsDevice graphicsDevice)
