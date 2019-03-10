@@ -1,5 +1,7 @@
 using System;
 using System.Runtime.Serialization;
+using DProject.Entity.Chunk;
+using DProject.Type.Rendering;
 using Microsoft.Xna.Framework;
 
 namespace DProject.Type.Serializable
@@ -68,6 +70,37 @@ namespace DProject.Type.Serializable
             info.AddValue("ColorR", Color.R);
             info.AddValue("ColorG", Color.G);
             info.AddValue("ColorB", Color.B);
+        }
+
+        public void CalculateAlternativeDiagonal()
+        {
+            IsAlternativeDiagonal = HeightMap.IsAlternativeDiagonal(
+                new Vector3(-0.5f, TopLeft, -0.5f),
+                new Vector3(0.5f, TopRight, -0.5f),
+                new Vector3(0.5f, BottomRight, 0.5f),
+                new Vector3(-0.5f, BottomLeft, 0.5f)
+            );
+        }
+
+        public void SetCornerHeight(float height, TerrainEntity.TileCorner corner)
+        {
+            switch (corner)
+            {
+                case TerrainEntity.TileCorner.TopLeft:
+                    TopLeft = height;
+                    break;
+                case TerrainEntity.TileCorner.TopRight:
+                    TopRight = height;
+                    break;
+                case TerrainEntity.TileCorner.BottomLeft:
+                    BottomLeft = height;
+                    break;
+                case TerrainEntity.TileCorner.BottomRight:
+                    BottomRight = height;
+                    break;
+            }
+
+            CalculateAlternativeDiagonal();
         }
     }
 }

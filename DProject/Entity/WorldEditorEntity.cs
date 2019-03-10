@@ -61,20 +61,33 @@ namespace DProject.Entity
             SetBrushSize();
 
             if (!_chunkLoaderEntity.IsLoadingChunks())
-            {
-                var mouseLocation = new Vector2(Mouse.GetState().X, Mouse.GetState().Y);
-                var position = CalculatePosition(mouseLocation);
+                UseTool();
+        }
+
+        private void SetBrushSize()
+        {
+            _brushSize = Math.Abs(Mouse.GetState().ScrollWheelValue / 120);
+            _brushSize %= 8;
+        }
+
+        private void UseTool()
+        {
+            var mouseLocation = new Vector2(Mouse.GetState().X, Mouse.GetState().Y);
+            var position = CalculatePosition(mouseLocation);
+            var precisePosition = CalculatePrecisePosition(mouseLocation);
                 
+            if (_chunkLoaderEntity.GetChunk(position) != null)
+            {
                 switch (_tools)
                 {
                     case Tools.Select:
                         
                         break;
                     case Tools.Flatten:
-                        Flatten(position);
+                        Flatten(precisePosition, position);
                         break;
                     case Tools.Raise:
-                        Raise(position);
+                        Raise(position, precisePosition);
                         break;
                     case Tools.Paint:
                         Paint(position);
@@ -85,38 +98,55 @@ namespace DProject.Entity
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
-
-                _axisEntity.SetPosition(new Vector3(position.X, 0, position.Z));
-                _pointerEntity.SetPosition(position);
             }
         }
 
-        private void SetBrushSize()
+        private void ChangeHeight(Vector3 position, Vector3 precisePosition, float height)
         {
-            _brushSize = Math.Abs(Mouse.GetState().ScrollWheelValue / 120);
-            _brushSize %= 8;
+            if (_brushSize > 0)
+            {
+                _chunkLoaderEntity.ChangeTileHeight(height, position, _brushSize); 
+            }
+            else
+            {
+                var tileCorner = CalculateCorner(precisePosition);
+                _chunkLoaderEntity.ChangeCornerHeight(height, position, tileCorner);
+            }
         }
 
-        private void Raise(Vector3 position)
+        private void Raise(Vector3 position, Vector3 precisePosition)
         {
-            Vector2 localChunkPosition = ChunkLoaderEntity.GetLocalChunkPosition(new Vector2(position.X, position.Z));
-
-            int x = (int)localChunkPosition.X;
-            int y = (int) localChunkPosition.Y;
-
-            float vertexHeight = _chunkLoaderEntity.GetChunk(position).GetVertexHeight(x, y, TerrainEntity.Corner.TopLeft);
+            var tileCorner = CalculateCorner(precisePosition);
+            float? height = _chunkLoaderEntity.GetVertexHeight(new Vector2(position.X, position.Z), tileCorner);
             
-            if (Mouse.GetState().LeftButton == ButtonState.Pressed)
+            _axisEntity.SetPosition(precisePosition);
+            
+            if (height != null)
             {
-                _chunkLoaderEntity.GetChunk(position).ChangeTileHeight(vertexHeight + 0.01f, x, y);
-            }
+                if (Mouse.GetState().LeftButton == ButtonState.Pressed)
+                    height += 0.1f;
+                else if (Mouse.GetState().RightButton == ButtonState.Pressed)
+                    height -= 0.1f;
+                else
+                    return;
 
-            if (Mouse.GetState().RightButton == ButtonState.Pressed)
-            {
-                _chunkLoaderEntity.GetChunk(position).ChangeTileHeight(vertexHeight - 0.01f, x, y);
+                ChangeHeight(position, precisePosition, (float)height);
             }
         }
 
+        private void Flatten(Vector3 precisePosition, Vector3 position)
+        {        
+            var (xFloat, yFloat) = ChunkLoaderEntity.GetLocalChunkPosition(new Vector2(position.X, position.Z));
+            
+            var x = (int) xFloat;
+            var y = (int) yFloat;
+
+            if (Mouse.GetState().LeftButton == ButtonState.Pressed)
+                ChangeHeight(position, precisePosition, _flattenHeight);
+            else if (Mouse.GetState().RightButton == ButtonState.Pressed)
+                _flattenHeight = _chunkLoaderEntity.GetChunk(position).GetTileHeight(x, y);
+        }
+        
         private void PlaceObject(Vector3 position, Vector2 mouseLocation)
         {        
             foreach (var entity in _entityManager.GetEntities())
@@ -137,18 +167,15 @@ namespace DProject.Entity
             }
         }
 
-        private void Flatten(Vector3 position)
+        private TerrainEntity.TileCorner CalculateCorner(Vector3 precisePosition)
         {
-            Vector2 localChunkPosition = ChunkLoaderEntity.GetLocalChunkPosition(new Vector2(position.X, position.Z));
+            var restX = precisePosition.X % 1f;
+            var restY = precisePosition.Z % 1f;
             
-            int x = (int)localChunkPosition.X;
-            int y = (int) localChunkPosition.Y;
-            
-            if (Mouse.GetState().LeftButton == ButtonState.Pressed)
-                _chunkLoaderEntity.GetChunk(position).ChangeTileHeight(_flattenHeight, x, y);
-
-            if (Mouse.GetState().RightButton == ButtonState.Pressed)
-                _flattenHeight = _chunkLoaderEntity.GetChunk(position).GetTileHeight(x, y);
+            if (restX > 0.5f)
+                return restY > 0.5f ? TerrainEntity.TileCorner.TopLeft : TerrainEntity.TileCorner.BottomLeft;
+            else
+                return restY > 0.5f ? TerrainEntity.TileCorner.TopRight : TerrainEntity.TileCorner.BottomRight;
         }
 
         private void Paint(Vector3 position)
@@ -165,9 +192,16 @@ namespace DProject.Entity
         }
 
         private Vector3 CalculatePosition(Vector2 mouseLocation)
-        {            
+        {
+            var position = CalculatePrecisePosition(mouseLocation);
+
+            return new Vector3((int)Math.Round(position.X), position.Y, (int)Math.Round(position.Z));
+        }
+
+        private Vector3 CalculatePrecisePosition(Vector2 mouseLocation)
+        {
             Ray ray = Game1.CalculateRay(mouseLocation, _entityManager.GetActiveCamera().GetViewMatrix(),
-            _entityManager.GetActiveCamera().GetProjectMatrix(), _graphicsDevice.Viewport);
+                _entityManager.GetActiveCamera().GetProjectMatrix(), _graphicsDevice.Viewport);
             
             Vector3 position = Vector3.Zero;
             
@@ -176,14 +210,14 @@ namespace DProject.Entity
                 Vector3 tempPosition = ray.Position - ray.Direction * (ray.Position.Y / ray.Direction.Y);
                 position = tempPosition;
                 
-                float y = _chunkLoaderEntity.GetHeightFromPosition(new Vector2(tempPosition.X, tempPosition.Z)) ?? 0f;
+                var y = _chunkLoaderEntity.GetHeightFromPosition(new Vector2(tempPosition.X, tempPosition.Z)) ?? 0f;
                 
-                position = new Vector3((int)Math.Round(position.X), y, (int)Math.Round(position.Z));
+                position = new Vector3(position.X, y, position.Z);
             }
             
             return position;
         }
-        
+
         public void Draw(CameraEntity activeCamera)
         {
             _axisEntity.Draw(activeCamera);

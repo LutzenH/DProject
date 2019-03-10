@@ -8,11 +8,10 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using IDrawable = DProject.Entity.Interface.IDrawable;
-using IUpdateable = DProject.Entity.Interface.IUpdateable;
 
 namespace DProject.Entity.Chunk
 {
-    public class TerrainEntity : AbstractEntity, IDrawable, IInitialize, IUpdateable
+    public class TerrainEntity : AbstractEntity, IDrawable, IInitialize
     {
         private HeightMap _heightMap;
         private Texture2D _terrainTexture;
@@ -25,10 +24,12 @@ namespace DProject.Entity.Chunk
         private readonly ChunkData _chunkData;
 
         private readonly BoundingSphere _boundingSphere;
+
+        private bool _updatedHeightmap;
         
         public ChunkStatus ChunkStatus { get; set; }
 
-        public enum Corner { TopLeft, TopRight, BottomLeft, BottomRight }
+        public enum TileCorner { TopLeft, TopRight, BottomLeft, BottomRight }
 
         public TerrainEntity(int x, int y) : base(new Vector3(x*ChunkLoaderEntity.ChunkSize, 0, y*ChunkLoaderEntity.ChunkSize), Quaternion.Identity, new Vector3(1,1,1))
         {
@@ -87,8 +88,6 @@ namespace DProject.Entity.Chunk
             _heightMap.Initialize(graphicsDevice);
         }
 
-        public void Update(GameTime gameTime) {}
-
         public int GetChunkX()
         {
             return _chunkPositionX;
@@ -121,18 +120,84 @@ namespace DProject.Entity.Chunk
             
             ChunkStatus = ChunkStatus.Changed;
         }
-        
-        public void ChangeTileHeight(float height, int x, int y)
+
+        public void ChangeVertexHeight(float height, int x, int y, TileCorner corner)
         {
-            _chunkData.Tiles[x,y].TopLeft = height;
-            _chunkData.Tiles[x-1,y].TopRight = height;
-            _chunkData.Tiles[x,y-1].BottomLeft = height;
-            _chunkData.Tiles[x-1,y-1].BottomRight = height;
+            switch (corner)
+            {
+                case TileCorner.TopLeft:
+                {
+                    _chunkData.Tiles[x, y].SetCornerHeight(height, TileCorner.TopLeft);
+            
+                    if(x > 0)
+                        _chunkData.Tiles[x-1,y].SetCornerHeight(height, TileCorner.TopRight);
+            
+                    if(y > 0)
+                        _chunkData.Tiles[x,y-1].SetCornerHeight(height, TileCorner.BottomLeft);
+            
+                    if(x > 0 && y > 0)
+                        _chunkData.Tiles[x-1,y-1].SetCornerHeight(height, TileCorner.BottomRight);
+                    break;
+                }
+                
+                case TileCorner.TopRight:
+                {
+                    _chunkData.Tiles[x,y].SetCornerHeight(height, TileCorner.TopRight);
+                
+                    if(y > 0)
+                        _chunkData.Tiles[x,y-1].SetCornerHeight(height, TileCorner.BottomRight);
+                
+                    if(x < ChunkLoaderEntity.ChunkSize-1 && y > 0)
+                        _chunkData.Tiles[x+1,y-1].SetCornerHeight(height, TileCorner.BottomLeft);
+                
+                    if(x < ChunkLoaderEntity.ChunkSize-1)
+                        _chunkData.Tiles[x+1,y].SetCornerHeight(height, TileCorner.TopLeft);
+                    break;
+                }
+                
+                case TileCorner.BottomLeft:
+                {
+                    _chunkData.Tiles[x,y].SetCornerHeight(height, TileCorner.BottomLeft);
+                
+                    if(y < ChunkLoaderEntity.ChunkSize-1)
+                        _chunkData.Tiles[x,y+1].SetCornerHeight(height, TileCorner.TopLeft);
+                
+                    if(y < ChunkLoaderEntity.ChunkSize-1 && x > 0)
+                        _chunkData.Tiles[x-1,y+1].SetCornerHeight(height, TileCorner.TopRight);
+                
+                    if(x > 0)
+                        _chunkData.Tiles[x-1,y].SetCornerHeight(height, TileCorner.BottomRight);
+                    break;
+                }
+                
+                case TileCorner.BottomRight:
+                {
+                    _chunkData.Tiles[x,y].SetCornerHeight(height, TileCorner.BottomRight);
+                
+                    if(y < ChunkLoaderEntity.ChunkSize-1)
+                        _chunkData.Tiles[x,y+1].SetCornerHeight(height, TileCorner.TopRight);
+                
+                    if(x < ChunkLoaderEntity.ChunkSize-1 && y < ChunkLoaderEntity.ChunkSize-1)
+                        _chunkData.Tiles[x+1,y+1].SetCornerHeight(height, TileCorner.TopLeft);
+                
+                    if(x < ChunkLoaderEntity.ChunkSize-1)
+                        _chunkData.Tiles[x+1,y].SetCornerHeight(height, TileCorner.BottomLeft);
+                    break;
+                }
+            }
 
-            _heightMap = new HeightMap(_chunkData);
-            _heightMap.Initialize(_graphicsDevice);
-
+            _updatedHeightmap = true;
             ChunkStatus = ChunkStatus.Changed;
+        }
+
+        public void UpdateHeightMap()
+        {
+            if (_updatedHeightmap)
+            {
+                _heightMap = new HeightMap(_chunkData);
+                _heightMap.Initialize(_graphicsDevice);
+                _updatedHeightmap = false;
+            }
         }
 
         public float GetTileHeight(int x, int y)
@@ -144,17 +209,17 @@ namespace DProject.Entity.Chunk
                    )/4;
         }
 
-        public float GetVertexHeight(int x, int y, Corner corner)
+        public float GetVertexHeight(int x, int y, TileCorner corner)
         {
             switch (corner)
             {
-                case Corner.TopLeft:
+                case TileCorner.TopLeft:
                     return _chunkData.Tiles[x, y].TopLeft;
-                case Corner.TopRight:
+                case TileCorner.TopRight:
                     return _chunkData.Tiles[x, y].TopRight;
-                case Corner.BottomLeft:
+                case TileCorner.BottomLeft:
                     return _chunkData.Tiles[x, y].BottomLeft;
-                case Corner.BottomRight:
+                case TileCorner.BottomRight:
                     return _chunkData.Tiles[x, y].BottomRight;
                 default:
                     return 0f;

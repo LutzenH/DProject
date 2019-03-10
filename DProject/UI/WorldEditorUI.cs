@@ -99,7 +99,8 @@ namespace DProject.UI
                 Color.White
             );
             
-            spriteBatch.DrawString(_spriteFont, "FlattenHeight: " + _worldEditorEntity.GetFlattenHeight(), new Vector2(2, 19 * 2), Color.White);
+            if(_worldEditorEntity.GetCurrentTool() == WorldEditorEntity.Tools.Flatten)
+                spriteBatch.DrawString(_spriteFont, "FlattenHeight: " + _worldEditorEntity.GetFlattenHeight(), new Vector2(2, 19 * 2), Color.White);
         }
     }
 }
