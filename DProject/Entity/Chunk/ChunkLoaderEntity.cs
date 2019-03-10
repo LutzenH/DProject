@@ -328,6 +328,75 @@ namespace DProject.Entity.Chunk
             }
         }
 
+        public void ChangeTileTexture(string textureName, Vector3 position, int brushSize)
+        {
+            if (brushSize > 0)
+            {
+                ChangeTileTexture(textureName, position);
+            }
+            if (brushSize == 2)
+            {
+                ChangeTileTexture(textureName, new Vector3(position.X+1, position.Y, position.Z));
+                ChangeTileTexture(textureName, new Vector3(position.X, position.Y, position.Z+1));
+                ChangeTileTexture(textureName, new Vector3(position.X+1, position.Y, position.Z+1));
+            }
+            else
+            {
+                if (brushSize > 2)
+                {
+                    ChangeTileTexture(textureName, new Vector3(position.X-1, position.Y, position.Z));
+                    ChangeTileTexture(textureName, new Vector3(position.X+1, position.Y, position.Z));
+                    ChangeTileTexture(textureName, new Vector3(position.X, position.Y, position.Z-1));
+                    ChangeTileTexture(textureName, new Vector3(position.X, position.Y, position.Z+1));
+                }
+                if (brushSize > 3)
+                {
+                    ChangeTileTexture(textureName, new Vector3(position.X-1, position.Y, position.Z-1));
+                    ChangeTileTexture(textureName, new Vector3(position.X+1, position.Y, position.Z-1));
+                    ChangeTileTexture(textureName, new Vector3(position.X-1, position.Y, position.Z+1));
+                    ChangeTileTexture(textureName, new Vector3(position.X+1, position.Y, position.Z+1));
+                }
+                if (brushSize > 4)
+                {
+                    ChangeTileTexture(textureName, new Vector3(position.X-2, position.Y, position.Z));
+                    ChangeTileTexture(textureName, new Vector3(position.X+2, position.Y, position.Z));
+                    ChangeTileTexture(textureName, new Vector3(position.X, position.Y, position.Z+2));
+                    ChangeTileTexture(textureName, new Vector3(position.X, position.Y, position.Z-2));
+                }
+                if (brushSize > 5)
+                {
+                    ChangeTileTexture(textureName, new Vector3(position.X-2, position.Y, position.Z-1));
+                    ChangeTileTexture(textureName, new Vector3(position.X-2, position.Y, position.Z+1));
+
+                    ChangeTileTexture(textureName, new Vector3(position.X+2, position.Y, position.Z-1));
+                    ChangeTileTexture(textureName, new Vector3(position.X+2, position.Y, position.Z+1));
+                    
+                    ChangeTileTexture(textureName, new Vector3(position.X-1, position.Y, position.Z-2));
+                    ChangeTileTexture(textureName, new Vector3(position.X+1, position.Y, position.Z-2));
+                    
+                    ChangeTileTexture(textureName, new Vector3(position.X-1, position.Y, position.Z+2));
+                    ChangeTileTexture(textureName, new Vector3(position.X+1, position.Y, position.Z+2));
+                }
+                if (brushSize > 6)
+                {
+                    ChangeTileTexture(textureName, new Vector3(position.X-2, position.Y, position.Z-2));
+                    ChangeTileTexture(textureName, new Vector3(position.X-2, position.Y, position.Z+2));
+                    ChangeTileTexture(textureName, new Vector3(position.X+2, position.Y, position.Z-2));
+                    ChangeTileTexture(textureName, new Vector3(position.X+2, position.Y, position.Z+2));
+                }
+            }
+        }
+
+        public void ChangeTileTexture(string textureName, Vector3 position)
+        {
+            Vector2 localChunkPosition = GetLocalChunkPosition(new Vector2(position.X, position.Z));
+
+            int x = (int)localChunkPosition.X;
+            int y = (int) localChunkPosition.Y;
+            
+            GetChunk(position).ChangeTexture(textureName, x, y);
+        }
+
         public void ChangeCornerHeight(float height, Vector3 position, TerrainEntity.TileCorner tileCorner)
         {            
             var localPosition = GetLocalChunkPosition(new Vector2(position.X, position.Z));

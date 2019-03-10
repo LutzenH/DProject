@@ -106,9 +106,7 @@ namespace DProject.Entity.Chunk
         public void ChangeTexture(string name, int x, int y)
         {
             _chunkData.Tiles[x,y].TileTextureName = name;
-            _heightMap = new HeightMap(_chunkData);
-            _heightMap.Initialize(_graphicsDevice);
-            
+            _updatedHeightmap = true;
             ChunkStatus = ChunkStatus.Changed;
         }
         

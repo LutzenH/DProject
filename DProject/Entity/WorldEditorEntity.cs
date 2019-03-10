@@ -140,6 +140,8 @@ namespace DProject.Entity
             
             var x = (int) xFloat;
             var y = (int) yFloat;
+            
+            _axisEntity.SetPosition(precisePosition);
 
             if (Mouse.GetState().LeftButton == ButtonState.Pressed)
                 ChangeHeight(position, precisePosition, _flattenHeight);
@@ -180,14 +182,11 @@ namespace DProject.Entity
 
         private void Paint(Vector3 position)
         {
+            _axisEntity.SetPosition(position);
+
             if (Mouse.GetState().LeftButton == ButtonState.Pressed)
             {
-                Vector2 localChunkPosition = ChunkLoaderEntity.GetLocalChunkPosition(new Vector2(position.X, position.Z));
-
-                int x = (int)localChunkPosition.X;
-                int y = (int) localChunkPosition.Y;
-
-                _chunkLoaderEntity.GetChunk(position).ChangeTexture("metal", x, y);
+                _chunkLoaderEntity.ChangeTileTexture("metal", position, _brushSize);
             }
         }
 
