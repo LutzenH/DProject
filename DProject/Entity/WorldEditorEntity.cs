@@ -90,7 +90,7 @@ namespace DProject.Entity
                         Raise(position, precisePosition);
                         break;
                     case Tools.Paint:
-                        Paint(position);
+                        Paint(position, precisePosition);
                         break;
                     case Tools.ObjectPlacer:
                         PlaceObject(position, mouseLocation);
@@ -180,13 +180,16 @@ namespace DProject.Entity
                 return restY > 0.5f ? TerrainEntity.TileCorner.TopRight : TerrainEntity.TileCorner.BottomRight;
         }
 
-        private void Paint(Vector3 position)
+        private void Paint(Vector3 position, Vector3 precisePosition)
         {
-            _axisEntity.SetPosition(position);
+            _axisEntity.SetPosition(precisePosition);
 
             if (Mouse.GetState().LeftButton == ButtonState.Pressed)
             {
-                _chunkLoaderEntity.ChangeTileTexture("metal", position, _brushSize);
+                var corner = CalculateCorner(precisePosition);
+                var alternativeTriangle = (corner == TerrainEntity.TileCorner.BottomLeft || corner == TerrainEntity.TileCorner.BottomRight);
+                
+                _chunkLoaderEntity.ChangeTileTexture("metal", position, _brushSize, alternativeTriangle);
             }
         }
 

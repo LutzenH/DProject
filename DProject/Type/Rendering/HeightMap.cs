@@ -79,32 +79,34 @@ namespace DProject.Type.Rendering
 
                     Color color = tiles[x, y].Color;
                     
-                    Vector4 texturePosition = Textures.TextureList[tiles[x,y].TileTextureName].GetAdjustedTexturePosition();
+                    Vector4 texturePositionTexture0 = Textures.TextureList[tiles[x,y].TileTextureNameTriangleOne].GetAdjustedTexturePosition();
+                    Vector4 texturePositionTexture1 = Textures.TextureList[tiles[x,y].TileTextureNameTriangleTwo].GetAdjustedTexturePosition();
+                    
                     Vector3 normal;
 
                     if (tiles[x,y].IsAlternativeDiagonal)
                     {
                         normal = GenerateNormalDirection(bottomLeft, topLeft, bottomRight);
-                        vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(bottomLeft, normal, color, new Vector2(texturePosition.X,texturePosition.Y));
-                        vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(topLeft, normal, color, new Vector2(texturePosition.X,texturePosition.W));
-                        vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(bottomRight, normal, color, new Vector2(texturePosition.Z,texturePosition.Y));
+                        vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(bottomLeft, normal, color, new Vector2(texturePositionTexture0.X,texturePositionTexture0.Y));
+                        vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(topLeft, normal, color, new Vector2(texturePositionTexture0.X,texturePositionTexture0.W));
+                        vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(bottomRight, normal, color, new Vector2(texturePositionTexture0.Z,texturePositionTexture0.Y));
                            
                         normal = GenerateNormalDirection(topLeft, topRight, bottomRight);
-                        vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(topLeft, normal, color, new Vector2(texturePosition.X,texturePosition.W));
-                        vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(topRight, normal, color, new Vector2(texturePosition.Z,texturePosition.W));
-                        vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(bottomRight, normal, color, new Vector2(texturePosition.Z,texturePosition.Y));
+                        vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(topLeft, normal, color, new Vector2(texturePositionTexture1.X,texturePositionTexture1.W));
+                        vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(topRight, normal, color, new Vector2(texturePositionTexture1.Z,texturePositionTexture1.W));
+                        vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(bottomRight, normal, color, new Vector2(texturePositionTexture1.Z,texturePositionTexture1.Y));
                     }
                     else
                     {     
                         normal = GenerateNormalDirection(bottomLeft, topLeft, topRight);
-                        vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(bottomLeft, normal, color, new Vector2(texturePosition.X,texturePosition.Y));
-                        vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(topLeft, normal, color, new Vector2(texturePosition.X,texturePosition.W));
-                        vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(topRight, normal, color, new Vector2(texturePosition.Z,texturePosition.W));
+                        vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(bottomLeft, normal, color, new Vector2(texturePositionTexture0.X,texturePositionTexture0.Y));
+                        vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(topLeft, normal, color, new Vector2(texturePositionTexture0.X,texturePositionTexture0.W));
+                        vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(topRight, normal, color, new Vector2(texturePositionTexture0.Z,texturePositionTexture0.W));
                             
                         normal = GenerateNormalDirection(topRight, bottomRight, bottomLeft);
-                        vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(topRight, normal, color, new Vector2(texturePosition.Z,texturePosition.W));
-                        vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(bottomRight, normal, color, new Vector2(texturePosition.Z,texturePosition.Y));
-                        vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(bottomLeft, normal, color, new Vector2(texturePosition.X,texturePosition.Y));
+                        vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(topRight, normal, color, new Vector2(texturePositionTexture1.Z,texturePositionTexture1.W));
+                        vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(bottomRight, normal, color, new Vector2(texturePositionTexture1.Z,texturePositionTexture1.Y));
+                        vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(bottomLeft, normal, color, new Vector2(texturePositionTexture1.X,texturePositionTexture1.Y));
                     }
                 }
             }
@@ -146,7 +148,7 @@ namespace DProject.Type.Rendering
                     
                     Color color = Color.White;
                     
-                    tempTileMap[x,y] = new Tile(topLeft, topRight, bottomLeft, bottomRight, isAlternativeDiagonal, tileTextureName, color);
+                    tempTileMap[x,y] = new Tile(topLeft, topRight, bottomLeft, bottomRight, isAlternativeDiagonal, tileTextureName, tileTextureName, color);
                 }
             }
 

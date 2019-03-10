@@ -19,12 +19,13 @@ namespace DProject.Type.Serializable
         public bool IsAlternativeDiagonal { get; set; }
         
         //Texture of Tile
-        public string TileTextureName { get; set; }
+        public string TileTextureNameTriangleOne { get; set; }
+        public string TileTextureNameTriangleTwo { get; set; }
         
         //Tile Color
         public Color Color { get; set; }
 
-        public Tile(float topLeft, float topRight, float bottomLeft, float bottomRight, bool isAlternativeDiagonal, string tileTextureName, Color color)
+        public Tile(float topLeft, float topRight, float bottomLeft, float bottomRight, bool isAlternativeDiagonal, string tileTextureNameTriangleOne, string tileTextureNameTriangleTwo, Color color)
         {             
             //Vertex Heights
             TopLeft = topLeft;
@@ -36,7 +37,8 @@ namespace DProject.Type.Serializable
             IsAlternativeDiagonal = isAlternativeDiagonal;
             
             //Texture of Tile
-            TileTextureName = tileTextureName;
+            TileTextureNameTriangleOne = tileTextureNameTriangleOne;
+            TileTextureNameTriangleTwo = tileTextureNameTriangleTwo;
             
             //Tile Color
             Color = color;
@@ -51,7 +53,8 @@ namespace DProject.Type.Serializable
             
             IsAlternativeDiagonal = info.GetBoolean("IsAlternativeDiagonal");
             
-            TileTextureName = info.GetString("TileTextureName");
+            TileTextureNameTriangleOne = info.GetString("TileTextureNameTriangleOne");
+            TileTextureNameTriangleTwo = info.GetString("TileTextureNameTriangleTwo");
             
             Color = new Color(info.GetByte("ColorR"), info.GetByte("ColorG"),info.GetByte("ColorB"));
         }
@@ -65,7 +68,8 @@ namespace DProject.Type.Serializable
             
             info.AddValue("IsAlternativeDiagonal", IsAlternativeDiagonal);
             
-            info.AddValue("TileTextureName", TileTextureName);
+            info.AddValue("TileTextureNameTriangleOne", TileTextureNameTriangleOne);
+            info.AddValue("TileTextureNameTriangleTwo", TileTextureNameTriangleTwo);
             
             info.AddValue("ColorR", Color.R);
             info.AddValue("ColorG", Color.G);

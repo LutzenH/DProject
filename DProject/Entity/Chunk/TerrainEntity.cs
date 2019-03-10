@@ -103,9 +103,22 @@ namespace DProject.Entity.Chunk
             return _heightMap;
         }
 
-        public void ChangeTexture(string name, int x, int y)
+        public void ChangeTileTexture(string name, int x, int y)
         {
-            _chunkData.Tiles[x,y].TileTextureName = name;
+            _chunkData.Tiles[x,y].TileTextureNameTriangleOne = name;
+            _chunkData.Tiles[x,y].TileTextureNameTriangleTwo = name;
+
+            _updatedHeightmap = true;
+            ChunkStatus = ChunkStatus.Changed;
+        }
+        
+        public void ChangeTriangleTexture(string name, int x, int y, bool alternativeTriangle)
+        {
+            if(alternativeTriangle)
+                _chunkData.Tiles[x,y].TileTextureNameTriangleOne = name;
+            else
+                _chunkData.Tiles[x,y].TileTextureNameTriangleTwo = name;
+
             _updatedHeightmap = true;
             ChunkStatus = ChunkStatus.Changed;
         }
