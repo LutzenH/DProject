@@ -27,6 +27,8 @@ namespace DProject.Entity
 
         private float _flattenHeight;
         private int _brushSize;
+
+        private string activeTexture;
         
         public WorldEditorEntity(EntityManager entityManager, ChunkLoaderEntity chunkLoaderEntity) : base(Vector3.Zero, Quaternion.Identity, new Vector3(1,1,1))
         {
@@ -34,6 +36,8 @@ namespace DProject.Entity
             _pointerEntity = new AxisEntity(Vector3.Zero);
             _entityManager = entityManager;
             _chunkLoaderEntity = chunkLoaderEntity;
+
+            activeTexture = "metal";
         }
 
         public override void LoadContent(ContentManager content) { }
@@ -58,6 +62,11 @@ namespace DProject.Entity
                 _tools = Tools.Paint;
             if (Keyboard.GetState().IsKeyUp(Keys.D5) && Game1.PreviousKeyboardState.IsKeyDown(Keys.D5))
                 _tools = Tools.ObjectPlacer;
+
+            if (Keyboard.GetState().IsKeyUp(Keys.OemPlus) && Game1.PreviousKeyboardState.IsKeyDown(Keys.OemPlus))
+            {
+                
+            }
 
             SetBrushSize();
 
@@ -206,7 +215,7 @@ namespace DProject.Entity
                 var corner = CalculateCorner(precisePosition);
                 var alternativeTriangle = (corner == TerrainEntity.TileCorner.BottomLeft || corner == TerrainEntity.TileCorner.BottomRight);
                 
-                _chunkLoaderEntity.ChangeTileTexture("metal", position, _brushSize, alternativeTriangle);
+                _chunkLoaderEntity.ChangeTileTexture(activeTexture, position, _brushSize, alternativeTriangle);
             }
         }
 
@@ -256,6 +265,11 @@ namespace DProject.Entity
         public int GetBrushSize()
         {
             return _brushSize;
+        }
+
+        public void SetActiveTexture(string textureName)
+        {
+            activeTexture = textureName;
         }
     }
 }
