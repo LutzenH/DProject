@@ -3,6 +3,7 @@ using DProject.Entity.Chunk;
 using DProject.Entity.Debug;
 using DProject.Entity.Interface;
 using DProject.Manager;
+using DProject.Type;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -116,22 +117,22 @@ namespace DProject.Entity
 
         private void Raise(Vector3 position, Vector3 precisePosition)
         {
-            var tileCorner = CalculateCorner(precisePosition);
-            float? height = _chunkLoaderEntity.GetVertexHeight(new Vector2(position.X, position.Z), tileCorner);
-            
-            _axisEntity.SetPosition(precisePosition);
-            
-            if (height != null)
+            if (Mouse.GetState().LeftButton == ButtonState.Pressed)
             {
-                if (Mouse.GetState().LeftButton == ButtonState.Pressed)
-                    height += 0.1f;
-                else if (Mouse.GetState().RightButton == ButtonState.Pressed)
-                    height -= 0.1f;
-                else
-                    return;
-
+                var tileCorner = CalculateCorner(precisePosition);
+                float? height = _chunkLoaderEntity.GetVertexHeight(new Vector2(position.X, position.Z), tileCorner);
+                height += 0.1f;
+                ChangeHeight(position, precisePosition, (float)height);
+            } 
+            else if (Mouse.GetState().RightButton == ButtonState.Pressed)
+            {
+                var tileCorner = CalculateCorner(precisePosition);
+                float? height = _chunkLoaderEntity.GetVertexHeight(new Vector2(position.X, position.Z), tileCorner);
+                height -= 0.1f;
                 ChangeHeight(position, precisePosition, (float)height);
             }
+
+            _axisEntity.SetPosition(precisePosition);
         }
 
         private void Flatten(Vector3 precisePosition, Vector3 position)
@@ -146,7 +147,17 @@ namespace DProject.Entity
             if (Mouse.GetState().LeftButton == ButtonState.Pressed)
                 ChangeHeight(position, precisePosition, _flattenHeight);
             else if (Mouse.GetState().RightButton == ButtonState.Pressed)
-                _flattenHeight = _chunkLoaderEntity.GetChunk(position).GetTileHeight(x, y);
+            {
+                if (_brushSize > 0)
+                {
+                    _flattenHeight = _chunkLoaderEntity.GetChunk(position).GetTileHeight(x, y);
+                }
+                else
+                {
+                    var tileCorner = CalculateCorner(precisePosition);
+                    _flattenHeight = _chunkLoaderEntity.GetChunk(position).GetVertexHeight(x, y, tileCorner);
+                }
+            }
         }
         
         private void PlaceObject(Vector3 position, Vector2 mouseLocation)
@@ -170,10 +181,16 @@ namespace DProject.Entity
         }
 
         private TerrainEntity.TileCorner CalculateCorner(Vector3 precisePosition)
-        {
-            var restX = precisePosition.X % 1f;
-            var restY = precisePosition.Z % 1f;
-            
+        {            
+            var restX = Math.Abs(precisePosition.X % 1f);
+            var restY = Math.Abs(precisePosition.Z % 1f);
+
+            if (precisePosition.X < 0f)
+                restX = 1-restX;
+
+            if (precisePosition.Z < 0f)
+                restY = 1-restY;
+
             if (restX > 0.5f)
                 return restY > 0.5f ? TerrainEntity.TileCorner.TopLeft : TerrainEntity.TileCorner.BottomLeft;
             else

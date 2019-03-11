@@ -99,14 +99,14 @@ namespace DProject.Type.Rendering
                     else
                     {     
                         normal = GenerateNormalDirection(bottomLeft, topLeft, topRight);
-                        vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(bottomLeft, normal, color, new Vector2(texturePositionTexture0.X,texturePositionTexture0.Y));
-                        vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(topLeft, normal, color, new Vector2(texturePositionTexture0.X,texturePositionTexture0.W));
-                        vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(topRight, normal, color, new Vector2(texturePositionTexture0.Z,texturePositionTexture0.W));
+                        vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(bottomLeft, normal, color, new Vector2(texturePositionTexture1.X,texturePositionTexture1.Y));
+                        vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(topLeft, normal, color, new Vector2(texturePositionTexture1.X,texturePositionTexture1.W));
+                        vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(topRight, normal, color, new Vector2(texturePositionTexture1.Z,texturePositionTexture1.W));
                             
                         normal = GenerateNormalDirection(topRight, bottomRight, bottomLeft);
-                        vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(topRight, normal, color, new Vector2(texturePositionTexture1.Z,texturePositionTexture1.W));
-                        vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(bottomRight, normal, color, new Vector2(texturePositionTexture1.Z,texturePositionTexture1.Y));
-                        vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(bottomLeft, normal, color, new Vector2(texturePositionTexture1.X,texturePositionTexture1.Y));
+                        vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(topRight, normal, color, new Vector2(texturePositionTexture0.Z,texturePositionTexture0.W));
+                        vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(bottomRight, normal, color, new Vector2(texturePositionTexture0.Z,texturePositionTexture0.Y));
+                        vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(bottomLeft, normal, color, new Vector2(texturePositionTexture0.X,texturePositionTexture0.Y));
                     }
                 }
             }
