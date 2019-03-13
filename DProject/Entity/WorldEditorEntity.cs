@@ -3,7 +3,6 @@ using DProject.Entity.Chunk;
 using DProject.Entity.Debug;
 using DProject.Entity.Interface;
 using DProject.Manager;
-using DProject.Type;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -17,6 +16,7 @@ namespace DProject.Entity
     {
         private readonly AxisEntity _axisEntity;
         private readonly AxisEntity _pointerEntity;
+        private readonly CornerIndicatorEntity _cornerIndicatorEntity;
         
         private readonly EntityManager _entityManager;
         private readonly ChunkLoaderEntity _chunkLoaderEntity;
@@ -34,6 +34,8 @@ namespace DProject.Entity
         {
             _axisEntity = new AxisEntity(Vector3.Zero);
             _pointerEntity = new AxisEntity(Vector3.Zero);
+            _cornerIndicatorEntity = new CornerIndicatorEntity(Vector3.Zero, TerrainEntity.TileCorner.BottomRight, Color.Cyan);
+            
             _entityManager = entityManager;
             _chunkLoaderEntity = chunkLoaderEntity;
 
@@ -46,6 +48,7 @@ namespace DProject.Entity
         {
             _axisEntity.Initialize(graphicsDevice);
             _pointerEntity.Initialize(graphicsDevice);
+            _cornerIndicatorEntity.Initialize(graphicsDevice);
 
             _graphicsDevice = graphicsDevice;
         }
@@ -120,28 +123,31 @@ namespace DProject.Entity
             else
             {
                 var tileCorner = CalculateCorner(precisePosition);
+                
                 _chunkLoaderEntity.ChangeCornerHeight(height, position, tileCorner);
             }
         }
 
         private void Raise(Vector3 position, Vector3 precisePosition)
         {
+            var tileCorner = CalculateCorner(precisePosition);
+
             if (Mouse.GetState().LeftButton == ButtonState.Pressed)
             {
-                var tileCorner = CalculateCorner(precisePosition);
                 float? height = _chunkLoaderEntity.GetVertexHeight(new Vector2(position.X, position.Z), tileCorner);
                 height += 0.1f;
                 ChangeHeight(position, precisePosition, (float)height);
             } 
             else if (Mouse.GetState().RightButton == ButtonState.Pressed)
             {
-                var tileCorner = CalculateCorner(precisePosition);
                 float? height = _chunkLoaderEntity.GetVertexHeight(new Vector2(position.X, position.Z), tileCorner);
                 height -= 0.1f;
                 ChangeHeight(position, precisePosition, (float)height);
             }
 
             _axisEntity.SetPosition(precisePosition);
+            _cornerIndicatorEntity.SetPosition(position);
+            _cornerIndicatorEntity.SetRotation(tileCorner);
         }
 
         private void Flatten(Vector3 precisePosition, Vector3 position)
@@ -151,8 +157,8 @@ namespace DProject.Entity
             var x = (int) xFloat;
             var y = (int) yFloat;
             
-            _axisEntity.SetPosition(precisePosition);
-
+            var tileCorner = CalculateCorner(precisePosition);
+            
             if (Mouse.GetState().LeftButton == ButtonState.Pressed)
                 ChangeHeight(position, precisePosition, _flattenHeight);
             else if (Mouse.GetState().RightButton == ButtonState.Pressed)
@@ -163,10 +169,13 @@ namespace DProject.Entity
                 }
                 else
                 {
-                    var tileCorner = CalculateCorner(precisePosition);
                     _flattenHeight = _chunkLoaderEntity.GetChunk(position).GetVertexHeight(x, y, tileCorner);
                 }
             }
+            
+            _axisEntity.SetPosition(precisePosition);
+            _cornerIndicatorEntity.SetPosition(position);
+            _cornerIndicatorEntity.SetRotation(tileCorner);
         }
         
         private void PlaceObject(Vector3 position, Vector2 mouseLocation)
@@ -250,6 +259,7 @@ namespace DProject.Entity
         {
             _axisEntity.Draw(activeCamera);
             _pointerEntity.Draw(activeCamera);
+            _cornerIndicatorEntity.Draw(activeCamera);
         }
         
         public Tools GetCurrentTool()
