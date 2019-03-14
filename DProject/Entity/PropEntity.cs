@@ -46,6 +46,14 @@ namespace DProject.Entity
                         effect.View = activeCamera.GetViewMatrix();
                         effect.World = GetWorldMatrix();
                         effect.Projection = activeCamera.GetProjectMatrix();
+                        effect.VertexColorEnabled = true;
+
+                        effect.FogEnabled = true;
+                        effect.FogColor = Color.DarkGray.ToVector3();
+                        effect.FogStart = 100f;
+                        effect.FogEnd = 200f;
+
+                        effect.TextureEnabled = true;
                     }
 
                     mesh.Draw();

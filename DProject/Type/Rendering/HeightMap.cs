@@ -32,8 +32,18 @@ namespace DProject.Type.Rendering
             //Graphics Effects
             _basicEffect = new BasicEffect(graphicsDevice);
             _basicEffect.Alpha = 1.0f;
-            _basicEffect.EnableDefaultLighting();
+            
+            _basicEffect.LightingEnabled = true;
+            _basicEffect.AmbientLightColor = new Vector3(0.15f,0.15f,0.15f);
+            _basicEffect.DirectionalLight0.DiffuseColor = new Vector3(0.6f, 0.6f, 0.6f);
+            _basicEffect.DirectionalLight0.Direction = new Vector3(1, 0.5f, 0);
+
             _basicEffect.VertexColorEnabled = true;
+
+            _basicEffect.FogEnabled = true;
+            _basicEffect.FogColor = Color.DarkGray.ToVector3();
+            _basicEffect.FogStart = 100f;
+            _basicEffect.FogEnd = 200f;
 
             _basicEffect.TextureEnabled = true;
             
