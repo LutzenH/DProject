@@ -28,7 +28,7 @@ namespace DProject.Entity
             _cameraDirection.Normalize();
             
             _viewMatrix = Matrix.CreateLookAt(Position, Position + _cameraDirection, Vector3.Up);
-            _projectMatrix = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(80f), 16f/9f, 0.01f, 1000);
+            _projectMatrix = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(80f), 16f/9f, 0.01f, 300f);
         }
         
         public override void LoadContent(ContentManager content) {}

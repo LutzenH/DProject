@@ -112,8 +112,7 @@ namespace DProject.Entity.Chunk
                 }
             }
 
-            _entityManager.AddMessage(new Message("Loading new chunks: " + oldChunksCount + " chunks reused and " +
-                                                  newChunksCount + " new chunks."));
+            _entityManager.AddMessage(new Message("Loading new chunks: " + oldChunksCount + " chunks reused and " + newChunksCount + " new chunks."));
 
             Thread thread = new Thread((() => LoadNewChunks(newChunkPositions, newChunkLocations)));
             thread.Start();

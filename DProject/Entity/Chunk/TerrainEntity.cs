@@ -126,9 +126,8 @@ namespace DProject.Entity.Chunk
         public void ChangeColor(Color color, int x, int y)
         {
             _chunkData.Tiles[x,y].Color = color;
-            _heightMap = new HeightMap(_chunkData);
-            _heightMap.Initialize(_graphicsDevice);
-            
+
+            _updatedHeightmap = true;
             ChunkStatus = ChunkStatus.Changed;
         }
 
