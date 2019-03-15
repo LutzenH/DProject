@@ -20,15 +20,19 @@ namespace DProject.Type.Rendering
 
         private int _primitiveCount;
 
-        public HeightMap(ChunkData chunkData)
+        private bool _hasUpdated;
+
+        private const int DefaultDistanceBetweenFloors = 8;
+
+        public HeightMap(Tile[,] tiles)
         {
-            _width = chunkData.Tiles.GetLength(0);
-            _height = chunkData.Tiles.GetLength(1);
+            _width = tiles.GetLength(0);
+            _height = tiles.GetLength(1);
 
             //Amount of tiles times 2 (two triangles per tile)
             _primitiveCount = _width * _height * 2;
             
-            _vertexPositions = GenerateVertexPositions(chunkData.Tiles);
+            _vertexPositions = GenerateVertexPositions(tiles);
         }
 
         public void Initialize(GraphicsDevice graphicsDevice)
@@ -55,7 +59,9 @@ namespace DProject.Type.Rendering
             
             //Sends Vertex Information to the graphics-card
             _vertexBuffer = new VertexBuffer(graphicsDevice, typeof(VertexPositionTextureColorNormal), GetVertexCount(), BufferUsage.WriteOnly);
-            _vertexBuffer.SetData(_vertexPositions);
+            
+            if(GetVertexCount() != 0)
+                _vertexBuffer.SetData(_vertexPositions);
         }
 
         public void Draw(Matrix projectMatrix, Matrix viewMatrix, Matrix worldMatrix, Texture2D texture2D)
@@ -71,7 +77,9 @@ namespace DProject.Type.Rendering
             foreach (EffectPass pass in _basicEffect.CurrentTechnique.Passes)
             {
                 pass.Apply();
-                _graphicsDevice.DrawPrimitives(PrimitiveType.TriangleList, 0, _primitiveCount);
+                
+                if(GetVertexCount() != 0)
+                    _graphicsDevice.DrawPrimitives(PrimitiveType.TriangleList, 0, _primitiveCount);
             }
         }
 
@@ -159,7 +167,7 @@ namespace DProject.Type.Rendering
         {
             int width = heightmap.GetLength(0)-1;
             int height = heightmap.GetLength(1)-1;
-
+            
             Tile[,] tempTileMap = new Tile[width,height];
             
             for (int x = 0; x < width; x++)
@@ -179,8 +187,10 @@ namespace DProject.Type.Rendering
                         );
                     
                     string tileTextureName;
-                    
-                    if (topLeft < -1.2f)
+
+                    if (topLeft > 7f)
+                        tileTextureName = null;
+                    else if (topLeft < -1.2f)
                         tileTextureName = "savanna_earth";
                     else if (topLeft < 0f)
                         tileTextureName = "savanna_grass_dry";
@@ -194,6 +204,21 @@ namespace DProject.Type.Rendering
             }
 
             return tempTileMap;
+        }
+
+        public static Tile[,] GenerateTileMap(int ChunkSize, int floor)
+        {
+            var heightmap = new float[ChunkSize+1,ChunkSize+1];
+
+            for (var x = 0; x < heightmap.GetLength(0); x++)
+            {
+                for (var y = 0; y < heightmap.GetLength(1); y++)
+                {
+                    heightmap[x, y] = floor * DefaultDistanceBetweenFloors;
+                }
+            }
+            
+            return GenerateTileMap(heightmap);
         }
 
         private static Vector3 GenerateNormalDirection(Vector3 vertex1, Vector3 vertex2, Vector3 vertex3)
@@ -213,6 +238,16 @@ namespace DProject.Type.Rendering
         public static bool IsAlternativeDiagonal(Vector3 a, Vector3 b, Vector3 c, Vector3 d)
         {
             return Vector3.Distance(a, c) < Vector3.Distance(b, d);
+        }
+
+        public bool GetHasUpdated()
+        {
+            return _hasUpdated;
+        }
+
+        public void SetHasUpdated(bool hasUpdated)
+        {
+            _hasUpdated = hasUpdated;
         }
     }
 }
