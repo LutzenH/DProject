@@ -1,9 +1,9 @@
 using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
 using DProject.Entity.Interface;
 using DProject.List;
 using DProject.Type.Rendering;
 using DProject.Type.Serializable;
+using MessagePack;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -33,14 +33,14 @@ namespace DProject.Entity.Chunk
         
         public TerrainEntity(int x, int y) : base(new Vector3(x*ChunkLoaderEntity.ChunkSize, 0, y*ChunkLoaderEntity.ChunkSize), Quaternion.Identity, new Vector3(1,1,1))
         {
-            BinaryFormatter bf = new BinaryFormatter();
             string path = "Content/Chunks/chunk_" + x + "_" + y + ".dat";
 
             if (File.Exists(path))
             {
                 Stream stream = File.Open("Content/Chunks/chunk_" + x + "_" + y + ".dat", FileMode.Open);
+                var bytes = stream;
                 
-                _chunkData = (ChunkData) bf.Deserialize(stream);
+                _chunkData = MessagePackSerializer.Deserialize<ChunkData>(bytes);
                 stream.Close();
 
                 ChunkStatus = ChunkStatus.Current;
@@ -48,20 +48,25 @@ namespace DProject.Entity.Chunk
             else
             {                   
                 float[,] heightmap = Noise.GenerateNoiseMap(ChunkLoaderEntity.ChunkSize, ChunkLoaderEntity.ChunkSize, x*ChunkLoaderEntity.ChunkSize, y*ChunkLoaderEntity.ChunkSize, 50f);
-                //float[,] heightmap = new float[ChunkLoaderEntity.ChunkSize+1,ChunkLoaderEntity.ChunkSize+1];
                 
                 Tile[][,] tiles = new Tile[DefaultFloorCount][,];
                 
                 tiles[0] = HeightMap.GenerateTileMap(heightmap);
                 tiles[1] = HeightMap.GenerateTileMap(ChunkLoaderEntity.ChunkSize, 1);
             
-                _chunkData = new ChunkData(x, y, tiles);
+                _chunkData = new ChunkData()
+                {
+                    ChunkPositionX = x,
+                    ChunkPositionY = y,
+                    Tiles = tiles
+                };
 
                 ChunkStatus = ChunkStatus.Unserialized;
 
                 //un-comment these to enable chunk creation to harddrive.
                 //Stream stream = File.Open("Content/Chunks/chunk_" + x + "_" + y + ".dat", FileMode.Create);
-                //bf.Serialize(stream, _chunkData);
+                //var bytes = MessagePackSerializer.Serialize(_chunkData);
+                //stream.Write(bytes, 0, bytes.Length);
             }
 
             _chunkPositionX = x;
@@ -138,7 +143,9 @@ namespace DProject.Entity.Chunk
         
         public void ChangeColor(Color color, int x, int y, int floor)
         {
-            _chunkData.Tiles[floor][x,y].Color = color;
+            _chunkData.Tiles[floor][x,y].ColorR = color.R;
+            _chunkData.Tiles[floor][x,y].ColorG = color.G;
+            _chunkData.Tiles[floor][x,y].ColorB = color.B;
 
             _heightMaps[floor].SetHasUpdated(true);
             ChunkStatus = ChunkStatus.Changed;

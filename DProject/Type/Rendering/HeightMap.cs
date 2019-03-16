@@ -52,8 +52,8 @@ namespace DProject.Type.Rendering
 
             _basicEffect.FogEnabled = true;
             _basicEffect.FogColor = Color.DarkGray.ToVector3();
-            _basicEffect.FogStart = 100f;
-            _basicEffect.FogEnd = 200f;
+            _basicEffect.FogStart = 80f;
+            _basicEffect.FogEnd = 120f;
 
             _basicEffect.TextureEnabled = true;
             
@@ -199,16 +199,28 @@ namespace DProject.Type.Rendering
                     
                     Color color = Color.White;
                     
-                    tempTileMap[x,y] = new Tile(topLeft, topRight, bottomLeft, bottomRight, isAlternativeDiagonal, tileTextureName, tileTextureName, color);
+                    tempTileMap[x,y] = new Tile()
+                    {
+                        TopLeft =  topLeft,
+                        TopRight = topRight,
+                        BottomLeft = bottomLeft,
+                        BottomRight = bottomRight,
+                        IsAlternativeDiagonal = isAlternativeDiagonal,
+                        TileTextureNameTriangleOne = tileTextureName,
+                        TileTextureNameTriangleTwo = tileTextureName,
+                        ColorR = color.R,
+                        ColorG = color.G,
+                        ColorB = color.B
+                    };
                 }
             }
 
             return tempTileMap;
         }
 
-        public static Tile[,] GenerateTileMap(int ChunkSize, int floor)
+        public static Tile[,] GenerateTileMap(int chunkSize, int floor)
         {
-            var heightmap = new float[ChunkSize+1,ChunkSize+1];
+            var heightmap = new float[chunkSize+1,chunkSize+1];
 
             for (var x = 0; x < heightmap.GetLength(0); x++)
             {

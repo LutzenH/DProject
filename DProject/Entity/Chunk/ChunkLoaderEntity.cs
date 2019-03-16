@@ -21,7 +21,7 @@ namespace DProject.Entity.Chunk
         private Vector2 _previousChunkPosition;
         private Vector2 _chunkPosition;
 
-        private TerrainEntity[,] _loadedChunks = new TerrainEntity[6, 6];
+        private TerrainEntity[,] _loadedChunks = new TerrainEntity[5, 5];
 
         public const int ChunkSize = 64;
 
@@ -39,7 +39,7 @@ namespace DProject.Entity.Chunk
             _entityManager = entityManager;
             _chunkPosition = new Vector2(0, 0);
             _previousChunkPosition = new Vector2(-1, 0);
-            _loadingStatus = ChunkLoadingStatus.Busy;
+            _loadingStatus = ChunkLoadingStatus.Done;
         }
 
         public override void LoadContent(ContentManager content)
@@ -74,49 +74,52 @@ namespace DProject.Entity.Chunk
 
         private void LoadChunks(Vector2 chunkPosition)
         {
-            int oldChunksCount = 0;
-            int newChunksCount = 0;
-
-            TerrainEntity[,] oldChunks = _loadedChunks;
-
-            _loadedChunks = new TerrainEntity[_loadedChunks.GetLength(0), _loadedChunks.GetLength(1)];
-
-            List<Vector2> newChunkPositions = new List<Vector2>();
-            List<Vector2> newChunkLocations = new List<Vector2>();
-
-            for (int x = 0; x < _loadedChunks.GetLength(0); x++)
+            if (_loadingStatus == ChunkLoadingStatus.Done)
             {
-                for (int y = 0; y < _loadedChunks.GetLength(1); y++)
-                {
-                    Vector2 position = chunkPosition - new Vector2(x - _loadedChunks.GetLength(0) / 2,
-                                           y - _loadedChunks.GetLength(1) / 2);
+                int oldChunksCount = 0;
+                int newChunksCount = 0;
 
-                    foreach (var chunk in oldChunks)
+                TerrainEntity[,] oldChunks = _loadedChunks;
+
+                _loadedChunks = new TerrainEntity[_loadedChunks.GetLength(0), _loadedChunks.GetLength(1)];
+
+                List<Vector2> newChunkPositions = new List<Vector2>();
+                List<Vector2> newChunkLocations = new List<Vector2>();
+
+                for (int x = 0; x < _loadedChunks.GetLength(0); x++)
+                {
+                    for (int y = 0; y < _loadedChunks.GetLength(1); y++)
                     {
-                        if (chunk != null)
+                        Vector2 position = chunkPosition - new Vector2(x - _loadedChunks.GetLength(0) / 2,
+                                               y - _loadedChunks.GetLength(1) / 2);
+
+                        foreach (var chunk in oldChunks)
                         {
-                            if (chunk.GetChunkX() == (int) position.X && chunk.GetChunkY() == (int) position.Y)
+                            if (chunk != null)
                             {
-                                _loadedChunks[x, y] = chunk;
-                                oldChunksCount++;
+                                if (chunk.GetChunkX() == (int) position.X && chunk.GetChunkY() == (int) position.Y)
+                                {
+                                    _loadedChunks[x, y] = chunk;
+                                    oldChunksCount++;
+                                }
                             }
                         }
-                    }
 
-                    if (_loadedChunks[x, y] == null)
-                    {
-                        newChunksCount++;
-                        newChunkPositions.Add(new Vector2(x, y));
-                        newChunkLocations.Add(new Vector2(position.X, position.Y));
+                        if (_loadedChunks[x, y] == null)
+                        {
+                            newChunksCount++;
+                            newChunkPositions.Add(new Vector2(x, y));
+                            newChunkLocations.Add(new Vector2(position.X, position.Y));
+                        }
                     }
                 }
+
+                _entityManager.AddMessage(new Message("Loading new chunks: " + oldChunksCount + " chunks reused and " + newChunksCount + " new chunks."));
+
+                Thread thread = new Thread((() => LoadNewChunks(newChunkPositions, newChunkLocations)));
+                thread.Start();
+                _loadingStatus = ChunkLoadingStatus.Busy;
             }
-
-            _entityManager.AddMessage(new Message("Loading new chunks: " + oldChunksCount + " chunks reused and " + newChunksCount + " new chunks."));
-
-            Thread thread = new Thread((() => LoadNewChunks(newChunkPositions, newChunkLocations)));
-            thread.Start();
-            _loadingStatus = ChunkLoadingStatus.Busy;
         }
 
         private void LoadNewChunks(List<Vector2> newChunkPositions, List<Vector2> newChunkLocations)

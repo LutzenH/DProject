@@ -1,31 +1,47 @@
-using System;
-using System.Runtime.Serialization;
 using DProject.Entity.Chunk;
 using DProject.Type.Rendering;
+using MessagePack;
 using Microsoft.Xna.Framework;
 
 namespace DProject.Type.Serializable
 {
-    [Serializable()]
-    public class Tile : ISerializable
+    [MessagePackObject]
+    public class Tile
     {
         //Vertex Heights
-        public float TopLeft { get; set; }
-        public float TopRight { get; set; }
-        public float BottomLeft { get; set; }
-        public float BottomRight { get; set; }
+        [Key(0)]
+        public virtual float TopLeft { get; set; }
+        [Key(1)]
+        public virtual float TopRight { get; set; }
+        [Key(2)]
+        public virtual float BottomLeft { get; set; }
+        [Key(3)]
+        public virtual float BottomRight { get; set; }
         
         //If the tile uses the other cross-diagonal triangles
-        public bool IsAlternativeDiagonal { get; set; }
+        [Key(4)]
+        public virtual bool IsAlternativeDiagonal { get; set; }
         
         //Texture of Tile
-        public string TileTextureNameTriangleOne { get; set; }
-        public string TileTextureNameTriangleTwo { get; set; }
-        
-        //Tile Color
-        public Color Color { get; set; }
+        [Key(5)]
+        public virtual string TileTextureNameTriangleOne { get; set; }
+        [Key(6)]
+        public virtual string TileTextureNameTriangleTwo { get; set; }
 
-        public Tile(float topLeft, float topRight, float bottomLeft, float bottomRight, bool isAlternativeDiagonal, string tileTextureNameTriangleOne, string tileTextureNameTriangleTwo, Color color)
+        [Key(7)]
+        public virtual byte ColorR { get; set; }
+        
+        [Key(8)]
+        public virtual byte ColorG { get; set; }
+        
+        [Key(9)]
+        public virtual byte ColorB { get; set; }
+
+        //Tile Color
+        [IgnoreMember]
+        public Color Color => new Color(ColorR, ColorG, ColorB);
+
+        /*public Tile(float topLeft, float topRight, float bottomLeft, float bottomRight, bool isAlternativeDiagonal, string tileTextureNameTriangleOne, string tileTextureNameTriangleTwo, Color color)
         {             
             //Vertex Heights
             TopLeft = topLeft;
@@ -41,10 +57,12 @@ namespace DProject.Type.Serializable
             TileTextureNameTriangleTwo = tileTextureNameTriangleTwo;
             
             //Tile Color
-            Color = color;
-        }
+            ColorR = color.R;
+            ColorG = color.G;
+            ColorB = ColorB;
+        }*/
 
-        public Tile(SerializationInfo info, StreamingContext context)
+        /*public Tile(SerializationInfo info, StreamingContext context)
         {
             TopLeft = (float) info.GetValue("TopLeft", typeof(float));
             TopRight = (float) info.GetValue("TopRight", typeof(float));
@@ -74,7 +92,7 @@ namespace DProject.Type.Serializable
             info.AddValue("ColorR", Color.R);
             info.AddValue("ColorG", Color.G);
             info.AddValue("ColorB", Color.B);
-        }
+        }*/
 
         public void CalculateAlternativeDiagonal()
         {

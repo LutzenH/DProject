@@ -1,8 +1,5 @@
-using System;
-using System.Collections.Generic;
 using DProject.Entity;
 using DProject.List;
-using DProject.Manager;
 using DProject.UI.Element;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;

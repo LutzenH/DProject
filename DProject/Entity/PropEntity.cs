@@ -50,8 +50,8 @@ namespace DProject.Entity
 
                         effect.FogEnabled = true;
                         effect.FogColor = Color.DarkGray.ToVector3();
-                        effect.FogStart = 100f;
-                        effect.FogEnd = 200f;
+                        effect.FogStart = 80f;
+                        effect.FogEnd = 120f;
 
                         effect.TextureEnabled = true;
                     }

@@ -28,7 +28,7 @@ namespace DProject.Entity
         private float _flattenHeight;
         private int _brushSize;
 
-        private string activeTexture;
+        private string _activeTexture;
 
         private int currentFloor = 1;
         
@@ -41,7 +41,7 @@ namespace DProject.Entity
             _entityManager = entityManager;
             _chunkLoaderEntity = chunkLoaderEntity;
 
-            activeTexture = "metal";
+            _activeTexture = "metal";
         }
 
         public override void LoadContent(ContentManager content) { }
@@ -226,7 +226,7 @@ namespace DProject.Entity
                 var corner = CalculateCorner(precisePosition);
                 var alternativeTriangle = (corner == TerrainEntity.TileCorner.BottomLeft || corner == TerrainEntity.TileCorner.BottomRight);
                 
-                _chunkLoaderEntity.ChangeTileTexture(activeTexture, position, currentFloor, _brushSize, alternativeTriangle);
+                _chunkLoaderEntity.ChangeTileTexture(_activeTexture, position, currentFloor, _brushSize, alternativeTriangle);
             }
         }
 
@@ -281,7 +281,7 @@ namespace DProject.Entity
 
         public void SetActiveTexture(string textureName)
         {
-            activeTexture = textureName;
+            _activeTexture = textureName;
         }
     }
 }

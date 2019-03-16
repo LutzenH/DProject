@@ -74,10 +74,8 @@ namespace DProject.Entity.Debug
                     return Quaternion.CreateFromYawPitchRoll(0f,0f,0f);
                 case TerrainEntity.TileCorner.TopRight:
                     return Quaternion.CreateFromYawPitchRoll(4.68f,0f,0f);
-                    break;
                 case TerrainEntity.TileCorner.BottomLeft:
                     return Quaternion.CreateFromYawPitchRoll(1.56f,0,0);
-                    break;
                 case TerrainEntity.TileCorner.BottomRight:
                     return Quaternion.CreateFromYawPitchRoll(3.12f,0f,0f);
             }
