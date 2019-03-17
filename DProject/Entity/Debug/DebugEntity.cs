@@ -33,7 +33,7 @@ namespace DProject.Entity.Debug
             
             for (int i = 0; i < cameraProps.Length; i++)
             {
-                cameraProps[i] = new PropEntity(_cameraEntities[i].GetPosition(), Quaternion.Identity, cameraEntities[i].GetScale(), "camera");
+                cameraProps[i] = new PropEntity(_cameraEntities[i].GetPosition(), Quaternion.Identity, cameraEntities[i].GetScale(), 5); //camera
             }
         }
 

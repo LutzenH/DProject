@@ -7,14 +7,16 @@ namespace DProject.Type
     {
         private readonly Vector4 _texturePosition;
         private readonly Color _defaultColor;
+        private readonly string _textureName;
 
-        public Texture(int xOffset, int yOffset, int xSize, int ySize, Color defaultColor)
+        public Texture(int xOffset, int yOffset, int xSize, int ySize, string textureName, Color defaultColor)
         {
             _texturePosition = new Vector4(xOffset, yOffset, xOffset+xSize, yOffset+ySize);
             _defaultColor = defaultColor;
+            _textureName = textureName;
         }
 
-        public Texture(int xOffset, int yOffset, int xSize, int ySize) : this(xOffset, yOffset, xSize, ySize, new Color(1f, 1f, 1f)) { }
+        public Texture(int xOffset, int yOffset, int xSize, int ySize, string textureName) : this(xOffset, yOffset, xSize, ySize, textureName, new Color(1f, 1f, 1f)) { }
 
         public Vector4 GetTexturePosition()
         {
@@ -24,6 +26,11 @@ namespace DProject.Type
         public Color GetDefaultColor()
         {
             return _defaultColor;
+        }
+
+        public string GetTextureName()
+        {
+            return _textureName;
         }
 
         public Vector4 GetAdjustedTexturePosition()

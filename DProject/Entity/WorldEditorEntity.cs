@@ -2,6 +2,7 @@ using System;
 using DProject.Entity.Chunk;
 using DProject.Entity.Debug;
 using DProject.Entity.Interface;
+using DProject.List;
 using DProject.Manager;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -9,6 +10,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using IDrawable = DProject.Entity.Interface.IDrawable;
 using IUpdateable = DProject.Entity.Interface.IUpdateable;
+using Texture = DProject.Type.Texture;
 
 namespace DProject.Entity
 {
@@ -28,9 +30,9 @@ namespace DProject.Entity
         private float _flattenHeight;
         private int _brushSize;
 
-        private string _activeTexture;
+        private ushort _activeTexture;
 
-        private int currentFloor = 1;
+        private int currentFloor = 0;
         
         public WorldEditorEntity(EntityManager entityManager, ChunkLoaderEntity chunkLoaderEntity) : base(Vector3.Zero, Quaternion.Identity, new Vector3(1,1,1))
         {
@@ -41,7 +43,7 @@ namespace DProject.Entity
             _entityManager = entityManager;
             _chunkLoaderEntity = chunkLoaderEntity;
 
-            _activeTexture = "metal";
+            _activeTexture = Textures.GetDefaultTextureId();
         }
 
         public override void LoadContent(ContentManager content) { }
@@ -261,7 +263,9 @@ namespace DProject.Entity
         {
             _axisEntity.Draw(activeCamera);
             _pointerEntity.Draw(activeCamera);
-            _cornerIndicatorEntity.Draw(activeCamera);
+            
+            if(_brushSize < 1)
+                _cornerIndicatorEntity.Draw(activeCamera);
         }
         
         public Tools GetCurrentTool()
@@ -279,9 +283,9 @@ namespace DProject.Entity
             return _brushSize;
         }
 
-        public void SetActiveTexture(string textureName)
+        public void SetActiveTexture(ushort textureId)
         {
-            _activeTexture = textureName;
+            _activeTexture = textureId;
         }
     }
 }

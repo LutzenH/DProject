@@ -8,6 +8,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using IDrawable = DProject.Entity.Interface.IDrawable;
+using Texture = DProject.Type.Texture;
 
 namespace DProject.Entity.Chunk
 {
@@ -121,21 +122,21 @@ namespace DProject.Entity.Chunk
             return _heightMaps[floor];
         }
 
-        public void ChangeTileTexture(string name, int x, int y, int floor)
+        public void ChangeTileTexture(ushort textureId, int x, int y, int floor)
         {
-            _chunkData.Tiles[floor][x,y].TileTextureNameTriangleOne = name;
-            _chunkData.Tiles[floor][x,y].TileTextureNameTriangleTwo = name;
+            _chunkData.Tiles[floor][x,y].TileTextureIdTriangleOne = textureId;
+            _chunkData.Tiles[floor][x,y].TileTextureIdTriangleTwo = textureId;
 
             _heightMaps[floor].SetHasUpdated(true);
             ChunkStatus = ChunkStatus.Changed;
         }
         
-        public void ChangeTriangleTexture(string name, int x, int y, int floor, bool alternativeTriangle)
+        public void ChangeTriangleTexture(ushort textureId, int x, int y, int floor, bool alternativeTriangle)
         {
             if(alternativeTriangle)
-                _chunkData.Tiles[floor][x,y].TileTextureNameTriangleOne = name;
+                _chunkData.Tiles[floor][x,y].TileTextureIdTriangleOne = textureId;
             else
-                _chunkData.Tiles[floor][x,y].TileTextureNameTriangleTwo = name;
+                _chunkData.Tiles[floor][x,y].TileTextureIdTriangleTwo = textureId;
 
             _heightMaps[floor].SetHasUpdated(true);
             ChunkStatus = ChunkStatus.Changed;

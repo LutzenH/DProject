@@ -112,11 +112,11 @@ namespace DProject.Type.Rendering
                     Vector3 normal;
                     
                     //Allow tiletextures to be null so they wont be drawn.
-                    if (tiles[x, y].TileTextureNameTriangleOne == null)
+                    if (tiles[x, y].TileTextureIdTriangleOne == null)
                         _primitiveCount--;
                     else
                     {
-                        var texturePositionTexture0 = Textures.TextureList[tiles[x,y].TileTextureNameTriangleOne].GetAdjustedTexturePosition();
+                        var texturePositionTexture0 = Textures.TextureList[(ushort) tiles[x,y].TileTextureIdTriangleOne].GetAdjustedTexturePosition();
 
                         if (tiles[x, y].IsAlternativeDiagonal)
                         {
@@ -134,11 +134,11 @@ namespace DProject.Type.Rendering
                         }
                     }
 
-                    if (tiles[x, y].TileTextureNameTriangleTwo == null)
+                    if (tiles[x, y].TileTextureIdTriangleTwo == null)
                         _primitiveCount--;
                     else
                     {
-                        var texturePositionTexture1 = Textures.TextureList[tiles[x,y].TileTextureNameTriangleTwo].GetAdjustedTexturePosition();
+                        var texturePositionTexture1 = Textures.TextureList[(ushort) tiles[x,y].TileTextureIdTriangleTwo].GetAdjustedTexturePosition();
                         
                         if (tiles[x,y].IsAlternativeDiagonal)
                         {                          
@@ -186,16 +186,16 @@ namespace DProject.Type.Rendering
                         new Vector3(x, bottomLeft, y+1)
                         );
                     
-                    string tileTextureName;
+                    ushort? textureId;
 
                     if (topLeft > 7f)
-                        tileTextureName = null;
+                        textureId = null;
                     else if (topLeft < -1.2f)
-                        tileTextureName = "savanna_earth";
+                        textureId = 7;
                     else if (topLeft < 0f)
-                        tileTextureName = "savanna_grass_dry";
+                        textureId = 6;
                     else
-                        tileTextureName = "savanna_grass";
+                        textureId = 5;
                     
                     Color color = Color.White;
                     
@@ -206,8 +206,8 @@ namespace DProject.Type.Rendering
                         BottomLeft = bottomLeft,
                         BottomRight = bottomRight,
                         IsAlternativeDiagonal = isAlternativeDiagonal,
-                        TileTextureNameTriangleOne = tileTextureName,
-                        TileTextureNameTriangleTwo = tileTextureName,
+                        TileTextureIdTriangleOne = textureId,
+                        TileTextureIdTriangleTwo = textureId,
                         ColorR = color.R,
                         ColorG = color.G,
                         ColorB = color.B

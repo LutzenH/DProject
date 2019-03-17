@@ -9,6 +9,7 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using IDrawable = DProject.Entity.Interface.IDrawable;
 using IUpdateable = DProject.Entity.Interface.IUpdateable;
+using Texture = DProject.Type.Texture;
 
 namespace DProject.Entity.Chunk
 {
@@ -330,7 +331,7 @@ namespace DProject.Entity.Chunk
             }
         }
 
-        public void ChangeTileTexture(string textureName, Vector3 position, int floor, int brushSize, bool alternativeTriangle)
+        public void ChangeTileTexture(ushort textureId, Vector3 position, int floor, int brushSize, bool alternativeTriangle)
         {
             if (brushSize == 0)
             {
@@ -338,73 +339,73 @@ namespace DProject.Entity.Chunk
                 var x = (int)localChunkPosition.X;
                 var y = (int) localChunkPosition.Y;
             
-                GetChunk(position).ChangeTriangleTexture(textureName, x, y, floor, alternativeTriangle);
+                GetChunk(position).ChangeTriangleTexture(textureId, x, y, floor, alternativeTriangle);
             }
             else
             {
-                ChangeTileTexture(textureName, position, floor);
+                ChangeTileTexture(textureId, position, floor);
                 if (brushSize == 2)
                 {
-                    ChangeTileTexture(textureName, new Vector3(position.X+1, position.Y, position.Z), floor);
-                    ChangeTileTexture(textureName, new Vector3(position.X, position.Y, position.Z+1), floor);
-                    ChangeTileTexture(textureName, new Vector3(position.X+1, position.Y, position.Z+1), floor);
+                    ChangeTileTexture(textureId, new Vector3(position.X+1, position.Y, position.Z), floor);
+                    ChangeTileTexture(textureId, new Vector3(position.X, position.Y, position.Z+1), floor);
+                    ChangeTileTexture(textureId, new Vector3(position.X+1, position.Y, position.Z+1), floor);
                 }
                 else
                 {
                     if (brushSize > 2)
                     {
-                        ChangeTileTexture(textureName, new Vector3(position.X-1, position.Y, position.Z), floor);
-                        ChangeTileTexture(textureName, new Vector3(position.X+1, position.Y, position.Z), floor);
-                        ChangeTileTexture(textureName, new Vector3(position.X, position.Y, position.Z-1), floor);
-                        ChangeTileTexture(textureName, new Vector3(position.X, position.Y, position.Z+1), floor);
+                        ChangeTileTexture(textureId, new Vector3(position.X-1, position.Y, position.Z), floor);
+                        ChangeTileTexture(textureId, new Vector3(position.X+1, position.Y, position.Z), floor);
+                        ChangeTileTexture(textureId, new Vector3(position.X, position.Y, position.Z-1), floor);
+                        ChangeTileTexture(textureId, new Vector3(position.X, position.Y, position.Z+1), floor);
                     }
                     if (brushSize > 3)
                     {
-                        ChangeTileTexture(textureName, new Vector3(position.X-1, position.Y, position.Z-1), floor);
-                        ChangeTileTexture(textureName, new Vector3(position.X+1, position.Y, position.Z-1), floor);
-                        ChangeTileTexture(textureName, new Vector3(position.X-1, position.Y, position.Z+1), floor);
-                        ChangeTileTexture(textureName, new Vector3(position.X+1, position.Y, position.Z+1), floor);
+                        ChangeTileTexture(textureId, new Vector3(position.X-1, position.Y, position.Z-1), floor);
+                        ChangeTileTexture(textureId, new Vector3(position.X+1, position.Y, position.Z-1), floor);
+                        ChangeTileTexture(textureId, new Vector3(position.X-1, position.Y, position.Z+1), floor);
+                        ChangeTileTexture(textureId, new Vector3(position.X+1, position.Y, position.Z+1), floor);
                     }
                     if (brushSize > 4)
                     {
-                        ChangeTileTexture(textureName, new Vector3(position.X-2, position.Y, position.Z), floor);
-                        ChangeTileTexture(textureName, new Vector3(position.X+2, position.Y, position.Z), floor);
-                        ChangeTileTexture(textureName, new Vector3(position.X, position.Y, position.Z+2), floor);
-                        ChangeTileTexture(textureName, new Vector3(position.X, position.Y, position.Z-2), floor);
+                        ChangeTileTexture(textureId, new Vector3(position.X-2, position.Y, position.Z), floor);
+                        ChangeTileTexture(textureId, new Vector3(position.X+2, position.Y, position.Z), floor);
+                        ChangeTileTexture(textureId, new Vector3(position.X, position.Y, position.Z+2), floor);
+                        ChangeTileTexture(textureId, new Vector3(position.X, position.Y, position.Z-2), floor);
                     }
                     if (brushSize > 5)
                     {
-                        ChangeTileTexture(textureName, new Vector3(position.X-2, position.Y, position.Z-1), floor);
-                        ChangeTileTexture(textureName, new Vector3(position.X-2, position.Y, position.Z+1), floor);
+                        ChangeTileTexture(textureId, new Vector3(position.X-2, position.Y, position.Z-1), floor);
+                        ChangeTileTexture(textureId, new Vector3(position.X-2, position.Y, position.Z+1), floor);
     
-                        ChangeTileTexture(textureName, new Vector3(position.X+2, position.Y, position.Z-1), floor);
-                        ChangeTileTexture(textureName, new Vector3(position.X+2, position.Y, position.Z+1), floor);
+                        ChangeTileTexture(textureId, new Vector3(position.X+2, position.Y, position.Z-1), floor);
+                        ChangeTileTexture(textureId, new Vector3(position.X+2, position.Y, position.Z+1), floor);
                         
-                        ChangeTileTexture(textureName, new Vector3(position.X-1, position.Y, position.Z-2), floor);
-                        ChangeTileTexture(textureName, new Vector3(position.X+1, position.Y, position.Z-2), floor);
+                        ChangeTileTexture(textureId, new Vector3(position.X-1, position.Y, position.Z-2), floor);
+                        ChangeTileTexture(textureId, new Vector3(position.X+1, position.Y, position.Z-2), floor);
                         
-                        ChangeTileTexture(textureName, new Vector3(position.X-1, position.Y, position.Z+2), floor);
-                        ChangeTileTexture(textureName, new Vector3(position.X+1, position.Y, position.Z+2), floor);
+                        ChangeTileTexture(textureId, new Vector3(position.X-1, position.Y, position.Z+2), floor);
+                        ChangeTileTexture(textureId, new Vector3(position.X+1, position.Y, position.Z+2), floor);
                     }
                     if (brushSize > 6)
                     {
-                        ChangeTileTexture(textureName, new Vector3(position.X-2, position.Y, position.Z-2), floor);
-                        ChangeTileTexture(textureName, new Vector3(position.X-2, position.Y, position.Z+2), floor);
-                        ChangeTileTexture(textureName, new Vector3(position.X+2, position.Y, position.Z-2), floor);
-                        ChangeTileTexture(textureName, new Vector3(position.X+2, position.Y, position.Z+2), floor);
+                        ChangeTileTexture(textureId, new Vector3(position.X-2, position.Y, position.Z-2), floor);
+                        ChangeTileTexture(textureId, new Vector3(position.X-2, position.Y, position.Z+2), floor);
+                        ChangeTileTexture(textureId, new Vector3(position.X+2, position.Y, position.Z-2), floor);
+                        ChangeTileTexture(textureId, new Vector3(position.X+2, position.Y, position.Z+2), floor);
                     }
                 }
             }
         }
 
-        public void ChangeTileTexture(string textureName, Vector3 position, int floor)
+        public void ChangeTileTexture(ushort textureId, Vector3 position, int floor)
         {
             Vector2 localChunkPosition = GetLocalChunkPosition(new Vector2(position.X, position.Z));
 
             int x = (int)localChunkPosition.X;
             int y = (int) localChunkPosition.Y;
             
-            GetChunk(position).ChangeTileTexture(textureName, x, y, floor);
+            GetChunk(position).ChangeTileTexture(textureId, x, y, floor);
         }
 
         public void ChangeCornerHeight(float height, Vector3 position, int floor, TerrainEntity.TileCorner tileCorner)

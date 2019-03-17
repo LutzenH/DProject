@@ -12,17 +12,17 @@ namespace DProject.Entity
         private Model _model;
         private readonly string _modelPath;
 
-        public PropEntity(Vector3 position, Quaternion rotation, Vector3 scale, string name) : base(position, rotation, scale)
+        public PropEntity(Vector3 position, Quaternion rotation, Vector3 scale, ushort id) : base(position, rotation, scale)
         {
-            _modelPath = Props.PropList[name].GetAssetName();
+            _modelPath = Props.PropList[id].GetAssetName();
         }
         
-        public PropEntity(Vector3 position, float pitch, float yaw, float roll, Vector3 scale, string name) : base(position, pitch, yaw, roll, scale)
+        public PropEntity(Vector3 position, float pitch, float yaw, float roll, Vector3 scale, ushort id) : base(position, pitch, yaw, roll, scale)
         {
-            _modelPath = Props.PropList[name].GetAssetName();
+            _modelPath = Props.PropList[id].GetAssetName();
         }
 
-        public PropEntity(Vector3 position, string name) : this(position, Quaternion.Identity, Props.PropList[name].GetDefaultScale(), name) { }
+        public PropEntity(Vector3 position, ushort id) : this(position, Quaternion.Identity, Props.PropList[id].GetDefaultScale(), id) { }
 
         public override void LoadContent(ContentManager content)
         {
