@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using DProject.Entity.Interface;
 using DProject.List;
@@ -8,7 +9,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using IDrawable = DProject.Entity.Interface.IDrawable;
-using Texture = DProject.Type.Texture;
+using Object = DProject.Type.Serializable.Object;
 
 namespace DProject.Entity.Chunk
 {
@@ -24,6 +25,8 @@ namespace DProject.Entity.Chunk
         
         private readonly ChunkData _chunkData;
 
+        private PropEntity[][] _props;
+
         private readonly BoundingSphere _boundingSphere;
         
         public ChunkStatus ChunkStatus { get; set; }
@@ -34,16 +37,21 @@ namespace DProject.Entity.Chunk
         
         public TerrainEntity(int x, int y) : base(new Vector3(x*ChunkLoaderEntity.ChunkSize, 0, y*ChunkLoaderEntity.ChunkSize), Quaternion.Identity, new Vector3(1,1,1))
         {
-            string path = "Content/Chunks/chunk_" + x + "_" + y + ".dat";
-
+            string path = "Content/chunks/chunk_" + x + "_" + y + ".dat";
+            
+            _chunkPositionX = x;
+            _chunkPositionY = y;
+            
             if (File.Exists(path))
             {
-                Stream stream = File.Open("Content/Chunks/chunk_" + x + "_" + y + ".dat", FileMode.Open);
+                Stream stream = File.Open("Content/chunks/chunk_" + x + "_" + y + ".dat", FileMode.Open);
                 var bytes = stream;
                 
                 _chunkData = MessagePackSerializer.Deserialize<ChunkData>(bytes);
                 stream.Close();
 
+                SetProps();
+                
                 ChunkStatus = ChunkStatus.Current;
             }
             else
@@ -54,24 +62,25 @@ namespace DProject.Entity.Chunk
                 
                 tiles[0] = HeightMap.GenerateTileMap(heightmap);
                 tiles[1] = HeightMap.GenerateTileMap(ChunkLoaderEntity.ChunkSize, 1);
-            
+                
                 _chunkData = new ChunkData()
                 {
                     ChunkPositionX = x,
                     ChunkPositionY = y,
-                    Tiles = tiles
+                    Tiles = tiles,
+                    
+                    Objects = Object.GenerateObjects(x * ChunkLoaderEntity.ChunkSize, y * ChunkLoaderEntity.ChunkSize, DefaultFloorCount, ChunkLoaderEntity.ChunkSize*ChunkLoaderEntity.ChunkSize/4)
                 };
 
+                SetProps();
+                
                 ChunkStatus = ChunkStatus.Unserialized;
 
                 //un-comment these to enable chunk creation to harddrive.
-                //Stream stream = File.Open("Content/Chunks/chunk_" + x + "_" + y + ".dat", FileMode.Create);
+                //Stream stream = File.Open("Content/chunks/chunk_" + x + "_" + y + ".dat", FileMode.Create);
                 //var bytes = MessagePackSerializer.Serialize(_chunkData);
                 //stream.Write(bytes, 0, bytes.Length);
             }
-
-            _chunkPositionX = x;
-            _chunkPositionY = y;
 
             _heightMaps = new HeightMap[DefaultFloorCount];
             
@@ -84,6 +93,12 @@ namespace DProject.Entity.Chunk
         public override void LoadContent(ContentManager content)
         {
             _terrainTexture = content.Load<Texture2D>(Textures.TextureAtlasLocation);
+
+            foreach (var floor in _props)
+            {
+                foreach (var prop in floor)
+                    prop.LoadContent(content);
+            }
         }
 
         public void Draw(CameraEntity activeCamera)
@@ -94,6 +109,12 @@ namespace DProject.Entity.Chunk
                 {
                     heightMap.Draw(activeCamera.GetProjectMatrix(),activeCamera.GetViewMatrix(), GetWorldMatrix(), _terrainTexture);
                 }
+                
+                foreach (var floor in _props)
+                {
+                    foreach (var prop in floor)
+                        prop.Draw(activeCamera);
+                }
             }
         }
 
@@ -102,9 +123,7 @@ namespace DProject.Entity.Chunk
             _graphicsDevice = graphicsDevice;
 
             foreach (var heightMap in _heightMaps)
-            {
                 heightMap.Initialize(graphicsDevice);
-            }
         }
 
         public int GetChunkX()
@@ -120,6 +139,27 @@ namespace DProject.Entity.Chunk
         public HeightMap GetHeightMap(int floor)
         {
             return _heightMaps[floor];
+        }
+
+        private void SetProps()
+        {
+            _props = new PropEntity[_chunkData.Objects.Length][];
+                
+            for(var i = 0; i < _props.Length; i++)
+                _props[i] = new PropEntity[_chunkData.Objects[i].Length];
+            
+            for (var floor = 0; floor < _props.Length; floor++)
+            {                
+                for (var i = 0; i < _props[floor].Length; i++)
+                {
+                    _props[floor][i] = new PropEntity(
+                        new Vector3(_chunkData.Objects[floor][i].PositionX, floor*8, _chunkData.Objects[floor][i].PositionY),
+                        Quaternion.Identity,
+                        _chunkData.Objects[floor][i].Scale,
+                        _chunkData.Objects[floor][i].Id
+                    );
+                }
+            }
         }
 
         public void ChangeTileTexture(ushort textureId, int x, int y, int floor)

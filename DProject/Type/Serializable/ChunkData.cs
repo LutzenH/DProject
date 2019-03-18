@@ -12,5 +12,8 @@ namespace DProject.Type.Serializable
         public virtual int ChunkPositionY { get; set; }
         [Key(2)]
         public virtual Tile[][,] Tiles { get; set; }
+
+        [Key(3)]
+        public virtual Object[][] Objects { get; set; }
     }
 }
