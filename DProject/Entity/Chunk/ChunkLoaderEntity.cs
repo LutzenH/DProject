@@ -9,7 +9,6 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using IDrawable = DProject.Entity.Interface.IDrawable;
 using IUpdateable = DProject.Entity.Interface.IUpdateable;
-using Texture = DProject.Type.Texture;
 
 namespace DProject.Entity.Chunk
 {
@@ -475,6 +474,11 @@ namespace DProject.Entity.Chunk
             }
 
             GetChunk(position).ChangeVertexHeight(height, (int)localPosition.X, (int)localPosition.Y, floor, tileCorner);
+        }
+
+        public void PlaceProp(Vector3 position, int floor, ushort objectId)
+        {
+            GetChunk(position).PlaceProp(position, floor, objectId);
         }
 
         public TerrainEntity[,] GetLoadedChunks()

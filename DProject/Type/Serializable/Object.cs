@@ -1,4 +1,3 @@
-using DProject.Entity.Chunk;
 using MessagePack;
 using Microsoft.Xna.Framework;
 
@@ -42,8 +41,8 @@ namespace DProject.Type.Serializable
                     objects[floor][i] = new Object()
                     {
                         Id = 0,
-                        PositionX = startPositionX + (i % ChunkLoaderEntity.ChunkSize),
-                        PositionY = startPositionY + i/ChunkLoaderEntity.ChunkSize,
+                        PositionX = startPositionX + i,
+                        PositionY = startPositionY + i,
                         Rotation = 0,
                         ScaleX = 1f,
                         ScaleY = 1f,

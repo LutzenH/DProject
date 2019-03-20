@@ -16,6 +16,11 @@ namespace DProject.List
             PropList[4] = new Prop("models/plane");
             PropList[5] = new Prop("models/camera");
         }
+        
+        public static ushort GetDefaultPropId()
+        {
+            return 0;
+        }
     }
 
 }

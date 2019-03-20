@@ -1,5 +1,6 @@
 using DProject.Entity;
 using DProject.List;
+using DProject.Manager;
 using DProject.UI.Element;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -147,6 +148,7 @@ namespace DProject.UI
                 {
                     if (_destinationRectangles[i].Contains(Mouse.GetState().Position))
                     {
+                        UIManager.ClickedUI = true;
                         _worldEditorEntity.SetActiveTexture(texture.Key);
                     }
 

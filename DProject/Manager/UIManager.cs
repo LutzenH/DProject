@@ -10,6 +10,8 @@ namespace DProject.Manager
     public class UIManager
     {
         private readonly List<AbstractUI> _userInterfaces;
+
+        public static bool ClickedUI;
         
         private SpriteBatch _spriteBatch;
         

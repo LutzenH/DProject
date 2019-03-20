@@ -22,6 +22,7 @@ namespace DProject.Entity.Chunk
         private readonly int _chunkPositionY;
 
         private GraphicsDevice _graphicsDevice;
+        private ContentManager _contentManager;
         
         private readonly ChunkData _chunkData;
 
@@ -47,7 +48,7 @@ namespace DProject.Entity.Chunk
                 Stream stream = File.Open("Content/chunks/chunk_" + x + "_" + y + ".dat", FileMode.Open);
                 var bytes = stream;
                 
-                _chunkData = MessagePackSerializer.Deserialize<ChunkData>(bytes);
+                _chunkData = LZ4MessagePackSerializer.Deserialize<ChunkData>(bytes);
                 stream.Close();
 
                 SetProps();
@@ -69,7 +70,7 @@ namespace DProject.Entity.Chunk
                     ChunkPositionY = y,
                     Tiles = tiles,
                     
-                    Objects = Object.GenerateObjects(x * ChunkLoaderEntity.ChunkSize, y * ChunkLoaderEntity.ChunkSize, DefaultFloorCount, ChunkLoaderEntity.ChunkSize*ChunkLoaderEntity.ChunkSize/4)
+                    Objects = Object.GenerateObjects(x * ChunkLoaderEntity.ChunkSize, y * ChunkLoaderEntity.ChunkSize, DefaultFloorCount, 10)
                 };
 
                 SetProps();
@@ -78,7 +79,7 @@ namespace DProject.Entity.Chunk
 
                 //un-comment these to enable chunk creation to harddrive.
                 //Stream stream = File.Open("Content/chunks/chunk_" + x + "_" + y + ".dat", FileMode.Create);
-                //var bytes = MessagePackSerializer.Serialize(_chunkData);
+                //var bytes = LZ4MessagePackSerializer.Serialize(_chunkData);
                 //stream.Write(bytes, 0, bytes.Length);
             }
 
@@ -92,6 +93,8 @@ namespace DProject.Entity.Chunk
 
         public override void LoadContent(ContentManager content)
         {
+            _contentManager = content;
+            
             _terrainTexture = content.Load<Texture2D>(Textures.TextureAtlasLocation);
 
             foreach (var floor in _props)
@@ -102,7 +105,7 @@ namespace DProject.Entity.Chunk
         }
 
         public void Draw(CameraEntity activeCamera)
-        {
+        {           
             if (activeCamera.GetBoundingFrustum().Intersects(_boundingSphere.Transform(GetWorldMatrix())))
             {
                 foreach (var heightMap in _heightMaps)
@@ -159,6 +162,33 @@ namespace DProject.Entity.Chunk
                         _chunkData.Objects[floor][i].Id
                     );
                 }
+            }
+        }
+
+        public void PlaceProp(Vector3 position, int floor, ushort ObjectId)
+        {
+            var existingProp = false;
+            
+            for (var i = 0; i < _props[floor].Length; i++)
+            {
+                if (position.Equals(_props[floor][i].GetPosition()))
+                {
+                    _props[floor][i] = new PropEntity(position, ObjectId);
+                    _props[floor][i].LoadContent(_contentManager);
+                    
+                    existingProp = true;
+
+                    ChunkStatus = ChunkStatus.Changed;
+                }
+            }
+
+            if (!existingProp)
+            {
+                Array.Resize(ref _props[floor], _props[floor].Length+1);
+                _props[floor][_props[floor].Length-1] = new PropEntity(position, ObjectId);
+                _props[floor][_props[floor].Length-1].LoadContent(_contentManager);
+                
+                ChunkStatus = ChunkStatus.Changed;
             }
         }
 
@@ -298,6 +328,16 @@ namespace DProject.Entity.Chunk
                 default:
                     return 0f;
             }
+        }
+
+        public PropEntity[][] GetProps()
+        {
+            return _props;
+        }
+
+        public PropEntity[] GetProps(int floor)
+        {
+            return _props[floor];
         }
     }
 }

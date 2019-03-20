@@ -10,7 +10,6 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using IDrawable = DProject.Entity.Interface.IDrawable;
 using IUpdateable = DProject.Entity.Interface.IUpdateable;
-using Texture = DProject.Type.Texture;
 
 namespace DProject.Entity
 {
@@ -31,6 +30,7 @@ namespace DProject.Entity
         private int _brushSize;
 
         private ushort _activeTexture;
+        private ushort _selectedObject;
 
         private int currentFloor = 0;
         
@@ -44,6 +44,7 @@ namespace DProject.Entity
             _chunkLoaderEntity = chunkLoaderEntity;
 
             _activeTexture = Textures.GetDefaultTextureId();
+            _selectedObject = Props.GetDefaultPropId();
         }
 
         public override void LoadContent(ContentManager content) { }
@@ -183,22 +184,38 @@ namespace DProject.Entity
         }
         
         private void PlaceObject(Vector3 position, Vector2 mouseLocation)
-        {        
-            foreach (var entity in _entityManager.GetEntities())
+        {
+            _axisEntity.SetPosition(position);
+
+            foreach (var chunk in _chunkLoaderEntity.GetLoadedChunks())
             {
-                if (entity is PropEntity propEntity)
+                foreach (var prop in chunk.GetProps(currentFloor))
                 {
-                    if (Game1.Intersects(
-                        new Vector2(mouseLocation.X, mouseLocation.Y),
-                        propEntity.GetModel(),
-                        propEntity.GetWorldMatrix(),
-                        _entityManager.GetActiveCamera().GetViewMatrix(),
-                        _entityManager.GetActiveCamera().GetProjectMatrix(),
-                        _graphicsDevice.Viewport))
+                    if (prop is PropEntity propEntity)
                     {
-                        _axisEntity.SetPosition(propEntity.GetPosition());
+                        if (Game1.Intersects(
+                            new Vector2(mouseLocation.X, mouseLocation.Y),
+                            propEntity.GetModel(),
+                            propEntity.GetWorldMatrix(),
+                            _entityManager.GetActiveCamera().GetViewMatrix(),
+                            _entityManager.GetActiveCamera().GetProjectMatrix(),
+                            _graphicsDevice.Viewport))
+                        {
+                            _axisEntity.SetPosition(propEntity.GetPosition());
+
+                            if (Mouse.GetState().LeftButton == ButtonState.Pressed && Game1.PreviousMouseState.LeftButton == ButtonState.Released)
+                            {
+                                _chunkLoaderEntity.PlaceProp(propEntity.GetPosition(), currentFloor, _selectedObject);
+                                return;
+                            }
+                        }
                     }
                 }
+            }
+
+            if (Mouse.GetState().LeftButton == ButtonState.Pressed && Game1.PreviousMouseState.LeftButton == ButtonState.Released)
+            {
+                _chunkLoaderEntity.PlaceProp(position, currentFloor, _selectedObject);
             }
         }
 
@@ -223,8 +240,8 @@ namespace DProject.Entity
         {
             _axisEntity.SetPosition(precisePosition);
 
-            if (Mouse.GetState().LeftButton == ButtonState.Pressed)
-            {
+            if (Mouse.GetState().LeftButton == ButtonState.Pressed && !UIManager.ClickedUI)
+            {                
                 var corner = CalculateCorner(precisePosition);
                 var alternativeTriangle = (corner == TerrainEntity.TileCorner.BottomLeft || corner == TerrainEntity.TileCorner.BottomRight);
                 

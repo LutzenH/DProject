@@ -37,7 +37,7 @@ namespace DProject.Entity
         public void Draw(CameraEntity activeCamera)
         {
             foreach (ModelMesh mesh in _model.Meshes)
-            {                            
+            {                
                 if (activeCamera.GetBoundingFrustum().Intersects(mesh.BoundingSphere.Transform(GetWorldMatrix())))
                 {
                     foreach (var effect1 in mesh.Effects)
@@ -46,14 +46,11 @@ namespace DProject.Entity
                         effect.View = activeCamera.GetViewMatrix();
                         effect.World = GetWorldMatrix();
                         effect.Projection = activeCamera.GetProjectMatrix();
-                        effect.VertexColorEnabled = true;
 
                         effect.FogEnabled = true;
                         effect.FogColor = Color.DarkGray.ToVector3();
                         effect.FogStart = 80f;
                         effect.FogEnd = 120f;
-
-                        effect.TextureEnabled = true;
                     }
 
                     mesh.Draw();

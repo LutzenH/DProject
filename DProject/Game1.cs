@@ -13,6 +13,7 @@ namespace DProject
         private readonly UIManager _uiManager;
 
         public static KeyboardState PreviousKeyboardState;
+        public static MouseState PreviousMouseState;
 
         public static int ScreenResolutionX;
         public static int ScreenResolutionY;
@@ -56,19 +57,21 @@ namespace DProject
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            _entityManager.Update(gameTime);
             _uiManager.Update(gameTime);
+            _entityManager.Update(gameTime);
+            
+            PreviousKeyboardState = Keyboard.GetState();
+            PreviousMouseState = Mouse.GetState();
+            UIManager.ClickedUI = false;
             
             base.Update(gameTime);
-
-            PreviousKeyboardState = Keyboard.GetState();
         }
 
         protected override void Draw(GameTime gameTime)
         {                
             //Background color
             GraphicsDevice.Clear(Color.DarkGray);
-            
+
             GraphicsDevice.BlendState = BlendState.Opaque;
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
             GraphicsDevice.SamplerStates[0] = SamplerState.PointWrap;
