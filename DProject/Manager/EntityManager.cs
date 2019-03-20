@@ -36,8 +36,6 @@ namespace DProject.Manager
 
             _messages = new LinkedList<Message>();
             
-            _entities.Add(new PropEntity(new Vector3(32, 5,32), 2)); //Barrel
-
             //Adds all camera's to entities list
             foreach (var cameraEntity in _cameraEntities)
             {

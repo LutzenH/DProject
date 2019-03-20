@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using DProject.Entity.Interface;
 using DProject.List;
@@ -26,8 +27,8 @@ namespace DProject.Entity.Chunk
         
         private readonly ChunkData _chunkData;
 
-        private PropEntity[][] _props;
-
+        private List<PropEntity>[] _props;
+        
         private readonly BoundingSphere _boundingSphere;
         
         public ChunkStatus ChunkStatus { get; set; }
@@ -146,21 +147,22 @@ namespace DProject.Entity.Chunk
 
         private void SetProps()
         {
-            _props = new PropEntity[_chunkData.Objects.Length][];
+            _props = new List<PropEntity>[_chunkData.Objects.Length];
                 
             for(var i = 0; i < _props.Length; i++)
-                _props[i] = new PropEntity[_chunkData.Objects[i].Length];
+                _props[i] = new List<PropEntity>();
             
             for (var floor = 0; floor < _props.Length; floor++)
             {                
-                for (var i = 0; i < _props[floor].Length; i++)
+                for (var i = 0; i < _chunkData.Objects[floor].Length; i++)
                 {
-                    _props[floor][i] = new PropEntity(
-                        new Vector3(_chunkData.Objects[floor][i].PositionX, floor*8, _chunkData.Objects[floor][i].PositionY),
+                    _props[floor].Add(new PropEntity(
+                        new Vector3(_chunkData.Objects[floor][i].PositionX, floor * 8,
+                            _chunkData.Objects[floor][i].PositionY),
                         Quaternion.Identity,
                         _chunkData.Objects[floor][i].Scale,
                         _chunkData.Objects[floor][i].Id
-                    );
+                    ));
                 }
             }
         }
@@ -169,7 +171,7 @@ namespace DProject.Entity.Chunk
         {
             var existingProp = false;
             
-            for (var i = 0; i < _props[floor].Length; i++)
+            for (var i = 0; i < _props[floor].Count; i++)
             {
                 if (position.Equals(_props[floor][i].GetPosition()))
                 {
@@ -177,18 +179,32 @@ namespace DProject.Entity.Chunk
                     _props[floor][i].LoadContent(_contentManager);
                     
                     existingProp = true;
-
                     ChunkStatus = ChunkStatus.Changed;
+                    return;
                 }
             }
 
             if (!existingProp)
             {
-                Array.Resize(ref _props[floor], _props[floor].Length+1);
-                _props[floor][_props[floor].Length-1] = new PropEntity(position, ObjectId);
-                _props[floor][_props[floor].Length-1].LoadContent(_contentManager);
+                var prop = new PropEntity(position, ObjectId);
+                
+                _props[floor].Add(prop);
+                prop.LoadContent(_contentManager);
                 
                 ChunkStatus = ChunkStatus.Changed;
+            }
+        }
+
+        public void RemoveProp(Vector3 position, int floor)
+        {
+            for (var i = 0; i < _props[floor].Count; i++)
+            {
+                if (position.Equals(_props[floor][i].GetPosition()))
+                {
+                    _props[floor].RemoveAt(i);
+                    ChunkStatus = ChunkStatus.Changed;
+                    return;
+                }
             }
         }
 
@@ -330,12 +346,12 @@ namespace DProject.Entity.Chunk
             }
         }
 
-        public PropEntity[][] GetProps()
+        public List<PropEntity>[] GetProps()
         {
             return _props;
         }
 
-        public PropEntity[] GetProps(int floor)
+        public List<PropEntity> GetProps(int floor)
         {
             return _props[floor];
         }

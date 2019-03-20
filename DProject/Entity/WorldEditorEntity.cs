@@ -208,6 +208,10 @@ namespace DProject.Entity
                                 _chunkLoaderEntity.PlaceProp(propEntity.GetPosition(), currentFloor, _selectedObject);
                                 return;
                             }
+                            if (Mouse.GetState().RightButton == ButtonState.Pressed && Game1.PreviousMouseState.RightButton == ButtonState.Released)
+                            {
+                                _chunkLoaderEntity.RemoveProp(position, currentFloor);
+                            }
                         }
                     }
                 }
@@ -216,6 +220,10 @@ namespace DProject.Entity
             if (Mouse.GetState().LeftButton == ButtonState.Pressed && Game1.PreviousMouseState.LeftButton == ButtonState.Released)
             {
                 _chunkLoaderEntity.PlaceProp(position, currentFloor, _selectedObject);
+            }
+            if (Mouse.GetState().RightButton == ButtonState.Pressed && Game1.PreviousMouseState.RightButton == ButtonState.Released)
+            {
+                _chunkLoaderEntity.RemoveProp(position, currentFloor);
             }
         }
 

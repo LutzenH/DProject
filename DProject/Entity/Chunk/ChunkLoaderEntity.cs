@@ -481,6 +481,11 @@ namespace DProject.Entity.Chunk
             GetChunk(position).PlaceProp(position, floor, objectId);
         }
 
+        public void RemoveProp(Vector3 position, int floor)
+        {
+            GetChunk(position).RemoveProp(position, floor);
+        }
+
         public TerrainEntity[,] GetLoadedChunks()
         {
             return _loadedChunks;
