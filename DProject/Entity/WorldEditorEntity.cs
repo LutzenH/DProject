@@ -91,6 +91,17 @@ namespace DProject.Entity
 
             if (!_chunkLoaderEntity.IsLoadingChunks())
                 UseTool();
+
+            if (Keyboard.GetState().IsKeyDown(Keys.S) && Keyboard.GetState().IsKeyDown(Keys.LeftControl) &&
+                Game1.PreviousKeyboardState.IsKeyDown(Keys.LeftControl) && Game1.PreviousKeyboardState.IsKeyUp(Keys.S))
+            {
+                _chunkLoaderEntity.SerializeChangedChunks();
+            }
+            if (Keyboard.GetState().IsKeyDown(Keys.R) && Keyboard.GetState().IsKeyDown(Keys.LeftControl) &&
+                Game1.PreviousKeyboardState.IsKeyDown(Keys.LeftControl) && Game1.PreviousKeyboardState.IsKeyUp(Keys.R))
+            {
+                _chunkLoaderEntity.ReloadChangedChunks();
+            }
         }
 
         private void SetBrushSize()

@@ -10,7 +10,6 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using IDrawable = DProject.Entity.Interface.IDrawable;
 using IUpdateable = DProject.Entity.Interface.IUpdateable;
-using Object = DProject.Type.Serializable.Object;
 
 namespace DProject.Entity.Chunk
 {
@@ -143,6 +142,49 @@ namespace DProject.Entity.Chunk
             chunk.LoadContent(_contentManager);
 
             return chunk;
+        }
+
+        public void SerializeChangedChunks()
+        {
+            _entityManager.AddMessage(new Message("Starting serialization of changed chunks.."));
+
+            int count = 0;
+            
+            if (_loadingStatus == ChunkLoadingStatus.Done)
+            {
+                foreach (var chunk in _loadedChunks)
+                {
+                    if (chunk.ChunkStatus == ChunkStatus.Changed)
+                    {
+                        chunk.Serialize();
+                        count++;
+                    }
+                }
+            }
+            
+            _entityManager.AddMessage(new Message("Serialized " + count + " changed chunks."));
+        }
+
+        public void ReloadChangedChunks()
+        {
+            _entityManager.AddMessage(new Message("Reloading changed chunks.."));
+
+            int count = 0;
+            
+            if (_loadingStatus == ChunkLoadingStatus.Done)
+            {
+                for (int x = 0; x < _loadedChunks.GetLength(0); x++) {
+                    for (int y = 0; y < _loadedChunks.GetLength(1); y++) {
+                        if (_loadedChunks[x,y].ChunkStatus == ChunkStatus.Changed)
+                        {
+                            _loadedChunks[x,y] = LoadChunk(_loadedChunks[x,y].GetChunkX(), _loadedChunks[x,y].GetChunkY());
+                            count++;
+                        }
+                    }
+                }
+            }
+            
+            _entityManager.AddMessage(new Message("Reloaded " + count + " changed chunks."));
         }
 
         public static Vector2 CalculateChunkPosition(float x, float y)

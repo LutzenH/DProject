@@ -34,6 +34,9 @@ namespace DProject
             _graphics.PreferredBackBufferWidth = ScreenResolutionX;
             _graphics.PreferredBackBufferHeight = ScreenResolutionY;
             _graphics.IsFullScreen = true;
+
+            //VSYNC
+            _graphics.SynchronizeWithVerticalRetrace = false;
         }
 
         protected override void Initialize()

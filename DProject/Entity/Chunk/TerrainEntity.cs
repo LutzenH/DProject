@@ -72,17 +72,12 @@ namespace DProject.Entity.Chunk
                     ChunkPositionY = y,
                     Tiles = tiles,
                     
-                    Objects = Object.GenerateObjects(0, 0, DefaultFloorCount, 10)
+                    Objects = Object.GenerateObjects(0, 0, DefaultFloorCount, 1)
                 };
 
                 SetProps();
                 
                 ChunkStatus = ChunkStatus.Unserialized;
-
-                //un-comment these to enable chunk creation to harddrive.
-                //Stream stream = File.Open("Content/chunks/chunk_" + x + "_" + y + ".dat", FileMode.Create);
-                //var bytes = LZ4MessagePackSerializer.Serialize(_chunkData);
-                //stream.Write(bytes, 0, bytes.Length);
             }
 
             _heightMaps = new HeightMap[DefaultFloorCount];
@@ -104,6 +99,15 @@ namespace DProject.Entity.Chunk
                 foreach (var prop in floor)
                     prop.LoadContent(content);
             }
+        }
+
+        public void Serialize()
+        {
+            ChunkStatus = ChunkStatus.Current;
+
+            Stream stream = File.Open("Content/chunks/chunk_" + _chunkPositionX + "_" + _chunkPositionY + ".dat", FileMode.Create);
+            var bytes = LZ4MessagePackSerializer.Serialize(_chunkData);
+            stream.Write(bytes, 0, bytes.Length);
         }
 
         public void Draw(CameraEntity activeCamera)

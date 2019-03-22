@@ -43,8 +43,8 @@ namespace DProject.Type.Serializable
                     objects[floor].Add(new Object()
                     {
                         Id = 0,
-                        PositionX = startPositionX + i,
-                        PositionY = startPositionY + i,
+                        PositionX = startPositionX + i%32,
+                        PositionY = startPositionY + i/32,
                         ObjectRotation = Rotation.North,
                         ScaleX = 1f,
                         ScaleY = 1f,
