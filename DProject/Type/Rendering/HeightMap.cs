@@ -22,7 +22,7 @@ namespace DProject.Type.Rendering
 
         private bool _hasUpdated;
 
-        private const int DefaultDistanceBetweenFloors = 8;
+        private const byte DefaultDistanceBetweenFloors = 32;
 
         public HeightMap(Tile[,] tiles)
         {
@@ -102,10 +102,10 @@ namespace DProject.Type.Rendering
             {
                 for (int y = 0; y < height; y++)
                 {
-                    Vector3 topLeft = new Vector3 (x-0.5f,  tiles[x,y].TopLeft, y-0.5f);
-                    Vector3 topRight = new Vector3 (x+0.5f,  tiles[x,y].TopRight, y-0.5f);
-                    Vector3 bottomLeft = new Vector3 (x-0.5f, tiles[x,y].BottomLeft, y+0.5f);
-                    Vector3 bottomRight = new Vector3 (x+0.5f, tiles[x,y].BottomRight, y+0.5f);
+                    Vector3 topLeft = new Vector3 (x-0.5f,  tiles[x,y].TopLeft / 4f, y-0.5f);
+                    Vector3 topRight = new Vector3 (x+0.5f,  tiles[x,y].TopRight/ 4f, y-0.5f);
+                    Vector3 bottomLeft = new Vector3 (x-0.5f, tiles[x,y].BottomLeft/ 4f, y+0.5f);
+                    Vector3 bottomRight = new Vector3 (x+0.5f, tiles[x,y].BottomRight/ 4f, y+0.5f);
 
                     Color color = tiles[x, y].Color;
                             
@@ -163,7 +163,7 @@ namespace DProject.Type.Rendering
             return vertexPositions;
         }
 
-        public static Tile[,] GenerateTileMap(float[,] heightmap)
+        public static Tile[,] GenerateTileMap(byte[,] heightmap)
         {
             int width = heightmap.GetLength(0)-1;
             int height = heightmap.GetLength(1)-1;
@@ -174,10 +174,10 @@ namespace DProject.Type.Rendering
             {
                 for (int y = 0; y < height; y++)
                 {
-                    float topLeft = heightmap[x,y];
-                    float topRight = heightmap[x+1,y];
-                    float bottomLeft = heightmap[x,y+1];
-                    float bottomRight = heightmap[x+1,y+1];
+                    byte topLeft = heightmap[x,y];
+                    byte topRight = heightmap[x+1,y];
+                    byte bottomLeft = heightmap[x,y+1];
+                    byte bottomRight = heightmap[x+1,y+1];
                     
                     bool isAlternativeDiagonal = IsAlternativeDiagonal(
                         new Vector3(x, topLeft, y),
@@ -188,11 +188,11 @@ namespace DProject.Type.Rendering
                     
                     ushort? textureId;
 
-                    if (topLeft > 7f)
+                    if (topLeft > 31)
                         textureId = null;
-                    else if (topLeft < -1.2f)
+                    else if (topLeft < 2)
                         textureId = 7;
-                    else if (topLeft < 0f)
+                    else if (topLeft < 1)
                         textureId = 6;
                     else
                         textureId = 5;
@@ -218,15 +218,15 @@ namespace DProject.Type.Rendering
             return tempTileMap;
         }
 
-        public static Tile[,] GenerateTileMap(int chunkSize, int floor)
+        public static Tile[,] GenerateTileMap(int chunkSize, byte floor)
         {
-            var heightmap = new float[chunkSize+1,chunkSize+1];
+            var heightmap = new byte[chunkSize+1,chunkSize+1];
 
             for (var x = 0; x < heightmap.GetLength(0); x++)
             {
                 for (var y = 0; y < heightmap.GetLength(1); y++)
                 {
-                    heightmap[x, y] = floor * DefaultDistanceBetweenFloors;
+                    heightmap[x, y] = (byte) (floor * DefaultDistanceBetweenFloors);
                 }
             }
             

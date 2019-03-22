@@ -10,13 +10,13 @@ namespace DProject.Type.Serializable
     {
         //Vertex Heights
         [Key(0)]
-        public virtual float TopLeft { get; set; }
+        public virtual byte TopLeft { get; set; }
         [Key(1)]
-        public virtual float TopRight { get; set; }
+        public virtual byte TopRight { get; set; }
         [Key(2)]
-        public virtual float BottomLeft { get; set; }
+        public virtual byte BottomLeft { get; set; }
         [Key(3)]
-        public virtual float BottomRight { get; set; }
+        public virtual byte BottomRight { get; set; }
         
         //If the tile uses the other cross-diagonal triangles
         [Key(4)]
@@ -51,7 +51,7 @@ namespace DProject.Type.Serializable
             );
         }
 
-        public void SetCornerHeight(float height, TerrainEntity.TileCorner corner)
+        public void SetCornerHeight(byte height, TerrainEntity.TileCorner corner)
         {
             switch (corner)
             {

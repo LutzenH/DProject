@@ -9,15 +9,21 @@ namespace DProject.UI.Element
         private Point _position;
         private Point _size;
 
+        public bool Visible { get; set; }
+
         public SideBoxUIElement(Point position, Point size, Texture2D spritesheet)
         {
             _position = position;
             _size = size;
             _spritesheet = spritesheet;
+            Visible = true;
         }
 
         public void Draw(SpriteBatch spriteBatch)
-        {    
+        {
+            if (!Visible)
+                return;
+            
             //TopLeft
             spriteBatch.Draw(_spritesheet, new Rectangle(_position.X, _position.Y, 4, 36), new Rectangle(41,33,2,18), Color.White);
             

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using MessagePack;
 using Microsoft.Xna.Framework;
 
@@ -28,17 +29,17 @@ namespace DProject.Type.Serializable
         [IgnoreMember]
         public Vector3 Scale => new Vector3(ScaleX, ScaleY, ScaleZ);
 
-        public static Object[][] GenerateObjects(int startPositionX, int startPositionY, int floorCount, int objectCountPerFloor)
+        public static List<Object>[] GenerateObjects(int startPositionX, int startPositionY, int floorCount, int objectCountPerFloor)
         {
-            var objects = new Object[floorCount][];
+            var objects = new List<Object>[floorCount];
 
             for (var floor = 0; floor < floorCount; floor++)
             {
-                objects[floor] = new Object[objectCountPerFloor];
+                objects[floor] = new List<Object>();
                 
-                for (var i = 0; i < objects[floor].Length; i++)
+                for (var i = 0; i < objectCountPerFloor; i++)
                 {
-                    objects[floor][i] = new Object()
+                    objects[floor].Add(new Object()
                     {
                         Id = 0,
                         PositionX = startPositionX + i,
@@ -47,7 +48,7 @@ namespace DProject.Type.Serializable
                         ScaleX = 1f,
                         ScaleY = 1f,
                         ScaleZ = 1f
-                    };
+                    });
                 }
             }
 

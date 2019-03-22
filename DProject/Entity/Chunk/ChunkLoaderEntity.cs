@@ -179,7 +179,7 @@ namespace DProject.Entity.Chunk
             return null;
         }
 
-        public float? GetVertexHeight(Vector2 position, TerrainEntity.TileCorner corner, int floor)
+        public byte? GetVertexHeight(Vector2 position, TerrainEntity.TileCorner corner, int floor)
         {
             Vector2 tempPosition =
                 new Vector2((float) Math.Floor(position.X + 0.5f), (float) Math.Floor(position.Y + 0.5f));
@@ -255,7 +255,7 @@ namespace DProject.Entity.Chunk
             return null;
         }
 
-        public void ChangeTileHeight(float height, Vector3 position, int floor, int brushSize)
+        public void ChangeTileHeight(byte height, Vector3 position, int floor, int brushSize)
         {
             if (brushSize > 0)
             {
@@ -330,7 +330,7 @@ namespace DProject.Entity.Chunk
             }
         }
 
-        public void ChangeTileTexture(ushort textureId, Vector3 position, int floor, int brushSize, bool alternativeTriangle)
+        public void ChangeTileTexture(ushort? textureId, Vector3 position, int floor, int brushSize, bool alternativeTriangle)
         {
             if (brushSize == 0)
             {
@@ -397,7 +397,7 @@ namespace DProject.Entity.Chunk
             }
         }
 
-        public void ChangeTileTexture(ushort textureId, Vector3 position, int floor)
+        public void ChangeTileTexture(ushort? textureId, Vector3 position, int floor)
         {
             Vector2 localChunkPosition = GetLocalChunkPosition(new Vector2(position.X, position.Z));
 
@@ -407,7 +407,7 @@ namespace DProject.Entity.Chunk
             GetChunk(position).ChangeTileTexture(textureId, x, y, floor);
         }
 
-        public void ChangeCornerHeight(float height, Vector3 position, int floor, TerrainEntity.TileCorner tileCorner)
+        public void ChangeCornerHeight(byte height, Vector3 position, int floor, TerrainEntity.TileCorner tileCorner)
         {            
             var localPosition = GetLocalChunkPosition(new Vector2(position.X, position.Z));
             
@@ -478,12 +478,16 @@ namespace DProject.Entity.Chunk
 
         public void PlaceProp(Vector3 position, int floor, ushort objectId)
         {
-            GetChunk(position).PlaceProp(position, floor, objectId);
+            var localPosition = GetLocalChunkPosition(new Vector2(position.X, position.Z));
+            
+            GetChunk(position).PlaceProp((int)localPosition.X, (int)localPosition.Y, floor, objectId);
         }
 
         public void RemoveProp(Vector3 position, int floor)
         {
-            GetChunk(position).RemoveProp(position, floor);
+            var localPosition = GetLocalChunkPosition(new Vector2(position.X, position.Z));            
+            
+            GetChunk(position).RemoveProp((int)localPosition.X, (int)localPosition.Y, floor);
         }
 
         public TerrainEntity[,] GetLoadedChunks()

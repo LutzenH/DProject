@@ -53,6 +53,8 @@ namespace DProject.UI
         
         public override void Draw(SpriteBatch spriteBatch)
         {
+            _sideBoxUIElement.Visible = false;
+            
             spriteBatch.Draw(
                 _spritesheet,
                 new Rectangle(2,2,32,32),
@@ -122,8 +124,8 @@ namespace DProject.UI
 
             if (_worldEditorEntity.GetCurrentTool() == WorldEditorEntity.Tools.Paint)
             {
-                _sideBoxUIElement.Draw(spriteBatch);
-
+                _sideBoxUIElement.Visible = true;
+                
                 for (int i = 0; i < _sourceRectangles.Length; i++)
                     spriteBatch.Draw(_textureSpritesheet, _destinationRectangles[i], _sourceRectangles[i], Color.White);
             }
@@ -137,11 +139,13 @@ namespace DProject.UI
             
             if(_worldEditorEntity.GetCurrentTool() == WorldEditorEntity.Tools.Flatten)
                 spriteBatch.DrawString(_spriteFont, "FlattenHeight: " + _worldEditorEntity.GetFlattenHeight(), new Vector2(2, 19 * 2), Color.White);
+            
+            _sideBoxUIElement.Draw(spriteBatch);
         }
 
         public void Update(GameTime gameTime)
         {
-            if (Mouse.GetState().LeftButton == ButtonState.Pressed)
+            if (Mouse.GetState().LeftButton == ButtonState.Pressed || Mouse.GetState().RightButton == ButtonState.Pressed)
             {
                 int i = 0;
                 foreach (var texture in Textures.TextureList)

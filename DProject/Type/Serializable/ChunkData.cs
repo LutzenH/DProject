@@ -1,4 +1,4 @@
-
+using System.Collections.Generic;
 using MessagePack;
 
 namespace DProject.Type.Serializable
@@ -14,6 +14,6 @@ namespace DProject.Type.Serializable
         public virtual Tile[][,] Tiles { get; set; }
 
         [Key(3)]
-        public virtual Object[][] Objects { get; set; }
+        public virtual List<Object>[] Objects { get; set; }
     }
 }

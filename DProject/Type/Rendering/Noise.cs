@@ -1,20 +1,21 @@
+using System;
 using LibNoise.Primitive;
 
 namespace DProject.Type.Rendering
 {
     public static class Noise
     {
-        public static float[,] GenerateNoiseMap(int mapWidth, int mapHeight, float xOffset, float yOffset, float noiseScale)
+        public static byte[,] GenerateNoiseMap(int mapWidth, int mapHeight, float xOffset, float yOffset, float noiseScale)
         {
             SimplexPerlin perlin = new SimplexPerlin();
             
-            float[,] noiseMap = new float[mapWidth+1,mapHeight+1];
+            byte[,] noiseMap = new byte[mapWidth+1,mapHeight+1];
 
             for (int x = 0; x < mapWidth+1; x++)
             {
                 for (int y = 0; y < mapHeight+1; y++)
                 {  
-                    noiseMap[x,y] = perlin.GetValue((x+xOffset)/noiseScale, (y+yOffset)/noiseScale) * 5;
+                    noiseMap[x,y] = (byte) (10+ perlin.GetValue((x+xOffset)/noiseScale, (y+yOffset)/noiseScale) * 10);
                 }
             }
 
