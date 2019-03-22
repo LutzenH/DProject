@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using DProject.Entity.Interface;
 using DProject.List;
+using DProject.Type.Enum;
 using DProject.Type.Rendering;
 using DProject.Type.Serializable;
 using MessagePack;
@@ -171,7 +172,7 @@ namespace DProject.Entity.Chunk
                         _chunkData.Objects[floor][index].PositionY,
                         floor)/4f,
                     _chunkData.Objects[floor][index].PositionY + _chunkPositionY *ChunkLoaderEntity.ChunkSize),
-                Quaternion.Identity,
+                CalculateRotation(_chunkData.Objects[floor][index].ObjectRotation),
                 _chunkData.Objects[floor][index].Scale,
                 _chunkData.Objects[floor][index].Id
             );
@@ -187,13 +188,30 @@ namespace DProject.Entity.Chunk
                         propObject.PositionY,
                         floor)/4f,
                     propObject.PositionY + _chunkPositionY *ChunkLoaderEntity.ChunkSize),
-                Quaternion.Identity,
+                CalculateRotation(propObject.ObjectRotation),
                 propObject.Scale,
                 propObject.Id
             ); 
         }
 
-        public void PlaceProp(int x, int y, int floor, ushort objectId)
+        private static Quaternion CalculateRotation(Rotation rotation)
+        {
+            switch (rotation)
+            {
+                case Type.Enum.Rotation.North:
+                    return Quaternion.Identity;
+                case Type.Enum.Rotation.East:
+                    return new Quaternion(0f, -0.707107f, 0f, 0.707107f);
+                case Type.Enum.Rotation.South:
+                    return new Quaternion(0f, 1f, 0f, 0f);
+                case Type.Enum.Rotation.West:
+                    return new Quaternion(0f, 0.707107f, 0f, 0.707107f);
+                default:
+                    return Quaternion.Identity;
+            }
+        }
+
+        public void PlaceProp(int x, int y, int floor, Rotation rotation, ushort objectId)
         {
             var existingProp = false;
             
@@ -207,7 +225,7 @@ namespace DProject.Entity.Chunk
                         PositionX = x,
                         PositionY = y,
                         
-                        Rotation = 0,
+                        ObjectRotation = rotation,
                         ScaleX = 1f,
                         ScaleY = 1f,
                         ScaleZ = 1f
@@ -230,7 +248,7 @@ namespace DProject.Entity.Chunk
                     PositionX = x,
                     PositionY = y,
 
-                    Rotation = 0,
+                    ObjectRotation = rotation,
                     ScaleX = 1f,
                     ScaleY = 1f,
                     ScaleZ = 1f

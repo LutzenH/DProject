@@ -1,4 +1,4 @@
-namespace DProject.Entity.Chunk
+namespace DProject.Type.Enum
 {
     public enum ChunkStatus
     {

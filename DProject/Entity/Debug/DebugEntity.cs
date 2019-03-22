@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using DProject.Entity.Chunk;
 using DProject.Entity.Interface;
+using DProject.Type.Enum;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;

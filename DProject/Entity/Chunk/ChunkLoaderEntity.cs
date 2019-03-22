@@ -4,11 +4,13 @@ using System.Threading;
 using DProject.Entity.Interface;
 using DProject.Manager;
 using DProject.Type;
+using DProject.Type.Enum;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using IDrawable = DProject.Entity.Interface.IDrawable;
 using IUpdateable = DProject.Entity.Interface.IUpdateable;
+using Object = DProject.Type.Serializable.Object;
 
 namespace DProject.Entity.Chunk
 {
@@ -476,11 +478,11 @@ namespace DProject.Entity.Chunk
             GetChunk(position).ChangeVertexHeight(height, (int)localPosition.X, (int)localPosition.Y, floor, tileCorner);
         }
 
-        public void PlaceProp(Vector3 position, int floor, ushort objectId)
+        public void PlaceProp(Vector3 position, int floor, Rotation rotation, ushort objectId)
         {
             var localPosition = GetLocalChunkPosition(new Vector2(position.X, position.Z));
             
-            GetChunk(position).PlaceProp((int)localPosition.X, (int)localPosition.Y, floor, objectId);
+            GetChunk(position).PlaceProp((int)localPosition.X, (int)localPosition.Y, floor, rotation, objectId);
         }
 
         public void RemoveProp(Vector3 position, int floor)

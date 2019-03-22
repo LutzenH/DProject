@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using DProject.Type.Enum;
 using MessagePack;
 using Microsoft.Xna.Framework;
 
@@ -17,7 +18,7 @@ namespace DProject.Type.Serializable
         public virtual int PositionY { get; set; }
 
         [Key(3)]
-        public virtual byte Rotation { get; set; }
+        public virtual Rotation ObjectRotation { get; set; }
         
         [Key(4)]
         public virtual float ScaleX { get; set; }
@@ -44,7 +45,7 @@ namespace DProject.Type.Serializable
                         Id = 0,
                         PositionX = startPositionX + i,
                         PositionY = startPositionY + i,
-                        Rotation = 0,
+                        ObjectRotation = Rotation.North,
                         ScaleX = 1f,
                         ScaleY = 1f,
                         ScaleZ = 1f

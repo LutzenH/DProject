@@ -4,12 +4,14 @@ using DProject.Entity.Debug;
 using DProject.Entity.Interface;
 using DProject.List;
 using DProject.Manager;
+using DProject.Type.Enum;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using IDrawable = DProject.Entity.Interface.IDrawable;
 using IUpdateable = DProject.Entity.Interface.IUpdateable;
+using Object = DProject.Type.Serializable.Object;
 
 namespace DProject.Entity
 {
@@ -30,8 +32,10 @@ namespace DProject.Entity
         private int _brushSize;
 
         private ushort _activeTexture;
+        
         private ushort _selectedObject;
-
+        private Rotation _selectedRotation;
+                
         private byte _currentFloor;
         
         public WorldEditorEntity(EntityManager entityManager, ChunkLoaderEntity chunkLoaderEntity) : base(Vector3.Zero, Quaternion.Identity, new Vector3(1,1,1))
@@ -45,6 +49,7 @@ namespace DProject.Entity
 
             _activeTexture = Textures.GetDefaultTextureId();
             _selectedObject = Props.GetDefaultPropId();
+            _selectedRotation = Type.Enum.Rotation.North;
         }
 
         public override void LoadContent(ContentManager content) { }
@@ -92,6 +97,12 @@ namespace DProject.Entity
         {
             _brushSize = Math.Abs(Mouse.GetState().ScrollWheelValue / 120);
             _brushSize %= 8;
+        }
+
+        private void SetSelectedObject()
+        {
+            _selectedObject = (ushort)Math.Abs(Mouse.GetState().ScrollWheelValue / 120);
+            _selectedObject %= (ushort)Props.PropList.Count;
         }
 
         private void UseTool()
@@ -197,48 +208,37 @@ namespace DProject.Entity
         
         private void PlaceObject(Vector3 position, Vector2 mouseLocation)
         {
+            SetSelectedObject();
+            
             _axisEntity.SetPosition(position);
-
-            foreach (var chunk in _chunkLoaderEntity.GetLoadedChunks())
-            {
-                foreach (var prop in chunk.GetProps(_currentFloor))
-                {
-                    if (prop is PropEntity propEntity)
-                    {
-                        if (Game1.Intersects(
-                            new Vector2(mouseLocation.X, mouseLocation.Y),
-                            propEntity.GetModel(),
-                            propEntity.GetWorldMatrix(),
-                            _entityManager.GetActiveCamera().GetViewMatrix(),
-                            _entityManager.GetActiveCamera().GetProjectMatrix(),
-                            _graphicsDevice.Viewport))
-                        {
-                            _axisEntity.SetPosition(propEntity.GetPosition());
-
-                            if (Mouse.GetState().LeftButton == ButtonState.Pressed && Game1.PreviousMouseState.LeftButton == ButtonState.Released)
-                            {
-                                _chunkLoaderEntity.PlaceProp(propEntity.GetPosition(), _currentFloor, _selectedObject);
-                                return;
-                            }
-                            if (Mouse.GetState().RightButton == ButtonState.Pressed && Game1.PreviousMouseState.RightButton == ButtonState.Released)
-                            {
-                                _chunkLoaderEntity.RemoveProp(propEntity.GetPosition(), _currentFloor);
-                                return;
-                            }
-                        }
-                    }
-                }
-            }
 
             if (Mouse.GetState().LeftButton == ButtonState.Pressed && Game1.PreviousMouseState.LeftButton == ButtonState.Released)
             {
-                _chunkLoaderEntity.PlaceProp(position, _currentFloor, _selectedObject);
+                _chunkLoaderEntity.PlaceProp(position, _currentFloor, _selectedRotation, _selectedObject);
                 return;
             }
             if (Mouse.GetState().RightButton == ButtonState.Pressed && Game1.PreviousMouseState.RightButton == ButtonState.Released)
             {
                 _chunkLoaderEntity.RemoveProp(position, _currentFloor);
                 return;
+            }
+            if (Mouse.GetState().MiddleButton == ButtonState.Pressed && Game1.PreviousMouseState.MiddleButton == ButtonState.Released)
+            {
+                switch (_selectedRotation)
+                {
+                    case Type.Enum.Rotation.North:
+                        _selectedRotation = Type.Enum.Rotation.East;
+                        break;
+                    case Type.Enum.Rotation.East:
+                        _selectedRotation = Type.Enum.Rotation.South;
+                        break;
+                    case Type.Enum.Rotation.South:
+                        _selectedRotation = Type.Enum.Rotation.West;
+                        break;
+                    case Type.Enum.Rotation.West:
+                        _selectedRotation = Type.Enum.Rotation.North;
+                        break;
+                }
             }
         }
 
@@ -323,6 +323,16 @@ namespace DProject.Entity
         public int GetCurrentFloor()
         {
             return _currentFloor;
+        }
+
+        public ushort GetSelectedObject()
+        {
+            return _selectedObject;
+        }
+
+        public Rotation GetSelectedRotation()
+        {
+            return _selectedRotation;
         }
 
         public float GetFlattenHeight()
