@@ -85,7 +85,7 @@ namespace DProject.Entity.Chunk
             for (var floor = 0; floor < _heightMaps.Length; floor++)
                 _heightMaps[floor] = new HeightMap(_chunkData.Tiles[floor]);
             
-            _boundingSphere = new BoundingSphere(new Vector3(x + ChunkLoaderEntity.ChunkSize/2, 0, y + ChunkLoaderEntity.ChunkSize/2), ChunkLoaderEntity.ChunkSize/1.6f);
+            _boundingSphere = new BoundingSphere(new Vector3(ChunkLoaderEntity.ChunkSize/2, 0, ChunkLoaderEntity.ChunkSize/2), ChunkLoaderEntity.ChunkSize/1.6f);
         }
 
         public override void LoadContent(ContentManager content)
