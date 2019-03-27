@@ -102,12 +102,15 @@ namespace DProject.Type.Rendering
             {
                 for (int y = 0; y < height; y++)
                 {
-                    Vector3 topLeft = new Vector3 (x-0.5f,  tiles[x,y].TopLeft / 4f, y-0.5f);
-                    Vector3 topRight = new Vector3 (x+0.5f,  tiles[x,y].TopRight/ 4f, y-0.5f);
-                    Vector3 bottomLeft = new Vector3 (x-0.5f, tiles[x,y].BottomLeft/ 4f, y+0.5f);
-                    Vector3 bottomRight = new Vector3 (x+0.5f, tiles[x,y].BottomRight/ 4f, y+0.5f);
+                    var topLeft = new Vector3 (x-0.5f,  tiles[x,y].TopLeft / 4f, y-0.5f);
+                    var topRight = new Vector3 (x+0.5f,  tiles[x,y].TopRight/ 4f, y-0.5f);
+                    var bottomLeft = new Vector3 (x-0.5f, tiles[x,y].BottomLeft/ 4f, y+0.5f);
+                    var bottomRight = new Vector3 (x+0.5f, tiles[x,y].BottomRight/ 4f, y+0.5f);
 
-                    Color color = tiles[x, y].Color;
+                    var ColorTopLeft = Colors.ColorList[tiles[x, y].ColorTopLeft];
+                    var ColorTopRight = Colors.ColorList[tiles[x, y].ColorTopRight];
+                    var ColorBottomLeft = Colors.ColorList[tiles[x, y].ColorBottomLeft];
+                    var ColorBottomRight = Colors.ColorList[tiles[x, y].ColorBottomRight];
                             
                     Vector3 normal;
                     
@@ -121,16 +124,16 @@ namespace DProject.Type.Rendering
                         if (tiles[x, y].IsAlternativeDiagonal)
                         {
                             normal = GenerateNormalDirection(bottomLeft, topLeft, bottomRight);
-                            vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(bottomLeft, normal, color, new Vector2(texturePositionTexture0.X,texturePositionTexture0.Y));
-                            vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(topLeft, normal, color, new Vector2(texturePositionTexture0.X,texturePositionTexture0.W));
-                            vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(bottomRight, normal, color, new Vector2(texturePositionTexture0.Z,texturePositionTexture0.Y));
+                            vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(bottomLeft, normal, ColorBottomLeft, new Vector2(texturePositionTexture0.X,texturePositionTexture0.Y));
+                            vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(topLeft, normal, ColorTopLeft, new Vector2(texturePositionTexture0.X,texturePositionTexture0.W));
+                            vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(bottomRight, normal, ColorBottomRight, new Vector2(texturePositionTexture0.Z,texturePositionTexture0.Y));
                         }
                         else
                         {
                             normal = GenerateNormalDirection(topRight, bottomRight, bottomLeft);
-                            vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(topRight, normal, color, new Vector2(texturePositionTexture0.Z,texturePositionTexture0.W));
-                            vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(bottomRight, normal, color, new Vector2(texturePositionTexture0.Z,texturePositionTexture0.Y));
-                            vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(bottomLeft, normal, color, new Vector2(texturePositionTexture0.X,texturePositionTexture0.Y));
+                            vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(topRight, normal, ColorTopRight, new Vector2(texturePositionTexture0.Z,texturePositionTexture0.W));
+                            vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(bottomRight, normal, ColorBottomRight, new Vector2(texturePositionTexture0.Z,texturePositionTexture0.Y));
+                            vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(bottomLeft, normal, ColorBottomLeft, new Vector2(texturePositionTexture0.X,texturePositionTexture0.Y));
                         }
                     }
 
@@ -143,16 +146,16 @@ namespace DProject.Type.Rendering
                         if (tiles[x,y].IsAlternativeDiagonal)
                         {                          
                             normal = GenerateNormalDirection(topLeft, topRight, bottomRight);
-                            vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(topLeft, normal, color, new Vector2(texturePositionTexture1.X,texturePositionTexture1.W));
-                            vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(topRight, normal, color, new Vector2(texturePositionTexture1.Z,texturePositionTexture1.W));
-                            vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(bottomRight, normal, color, new Vector2(texturePositionTexture1.Z,texturePositionTexture1.Y));
+                            vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(topLeft, normal, ColorTopLeft, new Vector2(texturePositionTexture1.X,texturePositionTexture1.W));
+                            vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(topRight, normal, ColorTopRight, new Vector2(texturePositionTexture1.Z,texturePositionTexture1.W));
+                            vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(bottomRight, normal, ColorBottomRight, new Vector2(texturePositionTexture1.Z,texturePositionTexture1.Y));
                         }
                         else
                         {     
                             normal = GenerateNormalDirection(bottomLeft, topLeft, topRight);
-                            vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(bottomLeft, normal, color, new Vector2(texturePositionTexture1.X,texturePositionTexture1.Y));
-                            vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(topLeft, normal, color, new Vector2(texturePositionTexture1.X,texturePositionTexture1.W));
-                            vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(topRight, normal, color, new Vector2(texturePositionTexture1.Z,texturePositionTexture1.W));
+                            vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(bottomLeft, normal, ColorBottomLeft, new Vector2(texturePositionTexture1.X,texturePositionTexture1.Y));
+                            vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(topLeft, normal, ColorTopLeft, new Vector2(texturePositionTexture1.X,texturePositionTexture1.W));
+                            vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(topRight, normal, ColorTopRight, new Vector2(texturePositionTexture1.Z,texturePositionTexture1.W));
                         }
                     }
                 }
@@ -174,30 +177,55 @@ namespace DProject.Type.Rendering
             {
                 for (int y = 0; y < height; y++)
                 {
-                    byte topLeft = heightmap[x,y];
-                    byte topRight = heightmap[x+1,y];
-                    byte bottomLeft = heightmap[x,y+1];
-                    byte bottomRight = heightmap[x+1,y+1];
+                    var topLeft = heightmap[x,y];
+                    var topRight = heightmap[x+1,y];
+                    var bottomLeft = heightmap[x,y+1];
+                    var bottomRight = heightmap[x+1,y+1];
                     
-                    bool isAlternativeDiagonal = IsAlternativeDiagonal(
+                    var isAlternativeDiagonal = IsAlternativeDiagonal(
                         new Vector3(x, topLeft, y),
                         new Vector3(x+1, topRight, y),
                         new Vector3(x+1, bottomRight, y+1),
                         new Vector3(x, bottomLeft, y+1)
                         );
                     
-                    ushort? textureId;
+                    ushort? textureId = Textures.GetDefaultTextureId();
 
                     if (topLeft > 31)
                         textureId = null;
-                    else if (topLeft < 2)
-                        textureId = 7;
-                    else if (topLeft < 1)
-                        textureId = 6;
-                    else
-                        textureId = 5;
+
+                    var colortl = Colors.GetDefaultColorId();
+                    var colortr = colortl;
+                    var colorbl = colortl;
+                    var colorbr = colortl;
                     
-                    Color color = Color.White;
+                    if (topLeft < 2)
+                        colortl = 6;
+                    else if (topLeft < 8)
+                        colortl = 7;
+                    else
+                        colortl = 8;
+                    
+                    if (topRight < 2)
+                        colortr = 6;
+                    else if (topRight < 8)
+                        colortr = 7;
+                    else
+                        colortr = 8;
+                    
+                    if (bottomLeft < 2)
+                        colorbl = 6;
+                    else if (bottomLeft < 8)
+                        colorbl = 7;
+                    else
+                        colorbl = 8;
+                    
+                    if (bottomRight < 2)
+                        colorbr = 6;
+                    else if (bottomRight < 8)
+                        colorbr = 7;
+                    else
+                        colorbr = 8;
                     
                     tempTileMap[x,y] = new Tile()
                     {
@@ -208,9 +236,10 @@ namespace DProject.Type.Rendering
                         IsAlternativeDiagonal = isAlternativeDiagonal,
                         TileTextureIdTriangleOne = textureId,
                         TileTextureIdTriangleTwo = textureId,
-                        ColorR = color.R,
-                        ColorG = color.G,
-                        ColorB = color.B
+                        ColorBottomLeft = colorbl,
+                        ColorTopLeft = colortl,
+                        ColorBottomRight = colorbr,
+                        ColorTopRight = colortr,
                     };
                 }
             }
@@ -244,7 +273,7 @@ namespace DProject.Type.Rendering
             
             sum += cnorm;
 
-            return sum;
+            return Vector3.Normalize(sum);
         }
 
         public static bool IsAlternativeDiagonal(Vector3 a, Vector3 b, Vector3 c, Vector3 d)

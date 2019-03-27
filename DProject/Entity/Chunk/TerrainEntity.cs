@@ -303,11 +303,36 @@ namespace DProject.Entity.Chunk
             ChunkStatus = ChunkStatus.Changed;
         }
         
-        public void ChangeColor(Color color, int x, int y, int floor)
+        public void ChangeColor(ushort colorId, TileCorner corner, int x, int y, int floor)
         {
-            _chunkData.Tiles[floor][x,y].ColorR = color.R;
-            _chunkData.Tiles[floor][x,y].ColorG = color.G;
-            _chunkData.Tiles[floor][x,y].ColorB = color.B;
+            switch (corner)
+            {
+                case TileCorner.TopLeft:
+                    _chunkData.Tiles[floor][x, y].ColorTopLeft = colorId;
+                    break;
+                case TileCorner.TopRight:
+                    _chunkData.Tiles[floor][x, y].ColorTopRight = colorId;
+                    break;
+                case TileCorner.BottomLeft:
+                    _chunkData.Tiles[floor][x, y].ColorBottomLeft = colorId;
+                    break;
+                case TileCorner.BottomRight:
+                    _chunkData.Tiles[floor][x, y].ColorBottomRight = colorId;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(corner), corner, null);
+            }
+
+            _heightMaps[floor].SetHasUpdated(true);
+            ChunkStatus = ChunkStatus.Changed;
+        }
+        
+        public void ChangeColor(ushort colorId, int x, int y, int floor)
+        {
+            _chunkData.Tiles[floor][x, y].ColorTopLeft = colorId;
+            _chunkData.Tiles[floor][x, y].ColorTopRight = colorId;
+            _chunkData.Tiles[floor][x, y].ColorBottomLeft = colorId;
+            _chunkData.Tiles[floor][x, y].ColorBottomRight = colorId;
 
             _heightMaps[floor].SetHasUpdated(true);
             ChunkStatus = ChunkStatus.Changed;

@@ -29,17 +29,17 @@ namespace DProject.Type.Serializable
         public virtual ushort? TileTextureIdTriangleTwo { get; set; }
 
         [Key(7)]
-        public virtual byte ColorR { get; set; }
+        public virtual ushort ColorTopLeft { get; set; }
         
         [Key(8)]
-        public virtual byte ColorG { get; set; }
+        public virtual ushort ColorTopRight { get; set; }
         
         [Key(9)]
-        public virtual byte ColorB { get; set; }
+        public virtual ushort ColorBottomLeft { get; set; }
+        
+        [Key(10)]
+        public virtual ushort ColorBottomRight { get; set; }
 
-        //Tile Color
-        [IgnoreMember]
-        public Color Color => new Color(ColorR, ColorG, ColorB);
 
         public void CalculateAlternativeDiagonal()
         {
