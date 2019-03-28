@@ -15,5 +15,10 @@ namespace DProject.Type.Serializable
 
         [Key(3)]
         public virtual List<Object>[] Objects { get; set; }
+
+        public int GetFloorCount()
+        {
+            return Tiles.Length;
+        }
     }
 }

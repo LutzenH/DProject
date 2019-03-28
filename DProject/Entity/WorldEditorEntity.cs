@@ -11,7 +11,6 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using IDrawable = DProject.Entity.Interface.IDrawable;
 using IUpdateable = DProject.Entity.Interface.IUpdateable;
-using Object = DProject.Type.Serializable.Object;
 
 namespace DProject.Entity
 {
@@ -139,7 +138,7 @@ namespace DProject.Entity
                         Paint(position, precisePosition);
                         break;
                     case Tools.ObjectPlacer:
-                        PlaceObject(position, mouseLocation);
+                        PlaceObject(position);
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();
@@ -217,7 +216,7 @@ namespace DProject.Entity
             _cornerIndicatorEntity.SetRotation(tileCorner);
         }
         
-        private void PlaceObject(Vector3 position, Vector2 mouseLocation)
+        private void PlaceObject(Vector3 position)
         {
             SetSelectedObject();
             
@@ -306,12 +305,24 @@ namespace DProject.Entity
             
             if (ray.Direction.Y != 0)
             {
-                Vector3 tempPosition = ray.Position - ray.Direction * (ray.Position.Y / ray.Direction.Y);
-                position = tempPosition;
-                
-                var y = _chunkLoaderEntity.GetHeightFromPosition(new Vector2(tempPosition.X, tempPosition.Z), _currentFloor)/4f ?? 0f;
-                
-                position = new Vector3(position.X, y, position.Z);
+                Vector3 tempPosition = ray.Position - ray.Direction * (ray.Position.Y / ray.Direction.Y);        
+                position = new Vector3(tempPosition.X, 0, tempPosition.Z);
+            }
+
+            var chunk = _chunkLoaderEntity.GetChunk(position);
+
+            if (chunk != null)
+            {
+                for (var x = 0; x < chunk.GetTileBoundingBoxes(_currentFloor).GetLength(0); x++) {
+                    for (var y = 0; y < chunk.GetTileBoundingBoxes(_currentFloor).GetLength(1); y++) {
+                        var intersects = ray.Intersects(_chunkLoaderEntity.GetChunk(position).GetTileBoundingBoxes(_currentFloor)[x, y]);
+                                                
+                        if (intersects != null)
+                        {
+                            position = ray.Position + ray.Direction * (float) intersects;        
+                        }
+                    }
+                }
             }
             
             return position;

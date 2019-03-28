@@ -1,4 +1,3 @@
-using System;
 using LibNoise.Primitive;
 
 namespace DProject.Type.Rendering

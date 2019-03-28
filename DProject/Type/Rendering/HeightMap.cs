@@ -23,6 +23,8 @@ namespace DProject.Type.Rendering
         private bool _hasUpdated;
 
         private const byte DefaultDistanceBetweenFloors = 32;
+        
+        public const float IncrementsPerHeightUnit = 4f;
 
         public HeightMap(Tile[,] tiles)
         {
@@ -102,15 +104,15 @@ namespace DProject.Type.Rendering
             {
                 for (int y = 0; y < height; y++)
                 {
-                    var topLeft = new Vector3 (x-0.5f,  tiles[x,y].TopLeft / 4f, y-0.5f);
-                    var topRight = new Vector3 (x+0.5f,  tiles[x,y].TopRight/ 4f, y-0.5f);
-                    var bottomLeft = new Vector3 (x-0.5f, tiles[x,y].BottomLeft/ 4f, y+0.5f);
-                    var bottomRight = new Vector3 (x+0.5f, tiles[x,y].BottomRight/ 4f, y+0.5f);
+                    var topLeft = new Vector3 (x-0.5f,  tiles[x,y].TopLeft / IncrementsPerHeightUnit, y-0.5f);
+                    var topRight = new Vector3 (x+0.5f,  tiles[x,y].TopRight/ IncrementsPerHeightUnit, y-0.5f);
+                    var bottomLeft = new Vector3 (x-0.5f, tiles[x,y].BottomLeft/ IncrementsPerHeightUnit, y+0.5f);
+                    var bottomRight = new Vector3 (x+0.5f, tiles[x,y].BottomRight/ IncrementsPerHeightUnit, y+0.5f);
 
-                    var ColorTopLeft = Colors.ColorList[tiles[x, y].ColorTopLeft];
-                    var ColorTopRight = Colors.ColorList[tiles[x, y].ColorTopRight];
-                    var ColorBottomLeft = Colors.ColorList[tiles[x, y].ColorBottomLeft];
-                    var ColorBottomRight = Colors.ColorList[tiles[x, y].ColorBottomRight];
+                    var colorTopLeft = Colors.ColorList[tiles[x, y].ColorTopLeft];
+                    var colorTopRight = Colors.ColorList[tiles[x, y].ColorTopRight];
+                    var colorBottomLeft = Colors.ColorList[tiles[x, y].ColorBottomLeft];
+                    var colorBottomRight = Colors.ColorList[tiles[x, y].ColorBottomRight];
                             
                     Vector3 normal;
                     
@@ -124,16 +126,16 @@ namespace DProject.Type.Rendering
                         if (tiles[x, y].IsAlternativeDiagonal)
                         {
                             normal = GenerateNormalDirection(bottomLeft, topLeft, bottomRight);
-                            vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(bottomLeft, normal, ColorBottomLeft, new Vector2(texturePositionTexture0.X,texturePositionTexture0.Y));
-                            vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(topLeft, normal, ColorTopLeft, new Vector2(texturePositionTexture0.X,texturePositionTexture0.W));
-                            vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(bottomRight, normal, ColorBottomRight, new Vector2(texturePositionTexture0.Z,texturePositionTexture0.Y));
+                            vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(bottomLeft, normal, colorBottomLeft, new Vector2(texturePositionTexture0.X,texturePositionTexture0.Y));
+                            vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(topLeft, normal, colorTopLeft, new Vector2(texturePositionTexture0.X,texturePositionTexture0.W));
+                            vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(bottomRight, normal, colorBottomRight, new Vector2(texturePositionTexture0.Z,texturePositionTexture0.Y));
                         }
                         else
                         {
                             normal = GenerateNormalDirection(topRight, bottomRight, bottomLeft);
-                            vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(topRight, normal, ColorTopRight, new Vector2(texturePositionTexture0.Z,texturePositionTexture0.W));
-                            vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(bottomRight, normal, ColorBottomRight, new Vector2(texturePositionTexture0.Z,texturePositionTexture0.Y));
-                            vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(bottomLeft, normal, ColorBottomLeft, new Vector2(texturePositionTexture0.X,texturePositionTexture0.Y));
+                            vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(topRight, normal, colorTopRight, new Vector2(texturePositionTexture0.Z,texturePositionTexture0.W));
+                            vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(bottomRight, normal, colorBottomRight, new Vector2(texturePositionTexture0.Z,texturePositionTexture0.Y));
+                            vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(bottomLeft, normal, colorBottomLeft, new Vector2(texturePositionTexture0.X,texturePositionTexture0.Y));
                         }
                     }
 
@@ -146,16 +148,16 @@ namespace DProject.Type.Rendering
                         if (tiles[x,y].IsAlternativeDiagonal)
                         {                          
                             normal = GenerateNormalDirection(topLeft, topRight, bottomRight);
-                            vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(topLeft, normal, ColorTopLeft, new Vector2(texturePositionTexture1.X,texturePositionTexture1.W));
-                            vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(topRight, normal, ColorTopRight, new Vector2(texturePositionTexture1.Z,texturePositionTexture1.W));
-                            vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(bottomRight, normal, ColorBottomRight, new Vector2(texturePositionTexture1.Z,texturePositionTexture1.Y));
+                            vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(topLeft, normal, colorTopLeft, new Vector2(texturePositionTexture1.X,texturePositionTexture1.W));
+                            vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(topRight, normal, colorTopRight, new Vector2(texturePositionTexture1.Z,texturePositionTexture1.W));
+                            vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(bottomRight, normal, colorBottomRight, new Vector2(texturePositionTexture1.Z,texturePositionTexture1.Y));
                         }
                         else
                         {     
                             normal = GenerateNormalDirection(bottomLeft, topLeft, topRight);
-                            vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(bottomLeft, normal, ColorBottomLeft, new Vector2(texturePositionTexture1.X,texturePositionTexture1.Y));
-                            vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(topLeft, normal, ColorTopLeft, new Vector2(texturePositionTexture1.X,texturePositionTexture1.W));
-                            vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(topRight, normal, ColorTopRight, new Vector2(texturePositionTexture1.Z,texturePositionTexture1.W));
+                            vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(bottomLeft, normal, colorBottomLeft, new Vector2(texturePositionTexture1.X,texturePositionTexture1.Y));
+                            vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(topLeft, normal, colorTopLeft, new Vector2(texturePositionTexture1.X,texturePositionTexture1.W));
+                            vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(topRight, normal, colorTopRight, new Vector2(texturePositionTexture1.Z,texturePositionTexture1.W));
                         }
                     }
                 }

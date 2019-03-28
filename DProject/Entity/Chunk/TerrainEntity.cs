@@ -29,6 +29,7 @@ namespace DProject.Entity.Chunk
         private readonly ChunkData _chunkData;
 
         private List<PropEntity>[] _props;
+        private BoundingBox[][,] _tileBoundingBoxes;
         
         private readonly BoundingSphere _boundingSphere;
         
@@ -88,6 +89,37 @@ namespace DProject.Entity.Chunk
             _boundingSphere = new BoundingSphere(new Vector3(ChunkLoaderEntity.ChunkSize/2, 0, ChunkLoaderEntity.ChunkSize/2), ChunkLoaderEntity.ChunkSize/1.6f);
         }
 
+        private BoundingBox[][,] GenerateBoundingBoxes()
+        {
+            var floorCount = _chunkData.GetFloorCount();
+            var xSize = _chunkData.Tiles[0].GetLength(0);
+            var ySize = _chunkData.Tiles[0].GetLength(1);
+            
+            BoundingBox[][,] boundingBoxes = new BoundingBox[floorCount][,];
+
+            for (int i = 0; i < boundingBoxes.Length; i++)
+                boundingBoxes[i] = new BoundingBox[xSize,ySize];
+            
+            for (int floor = 0; floor < floorCount; floor++)
+            {
+                for (int x = 0; x < xSize; x++)
+                {
+                    for (int y = 0; y < ySize; y++)
+                    {
+                        boundingBoxes[floor][x,y] = BoundingBox.CreateFromPoints
+                        (new []{
+                            new Vector3(x-0.5f, _chunkData.Tiles[floor][x,y].TopLeft/HeightMap.IncrementsPerHeightUnit, y-0.5f) + GetPosition(),
+                            new Vector3(x+0.5f, _chunkData.Tiles[floor][x,y].TopRight/HeightMap.IncrementsPerHeightUnit, y-0.5f) + GetPosition(),
+                            new Vector3(x-0.5f, _chunkData.Tiles[floor][x,y].BottomLeft/HeightMap.IncrementsPerHeightUnit, y+0.5f) + GetPosition(),
+                            new Vector3(x+0.5f, _chunkData.Tiles[floor][x,y].BottomRight/HeightMap.IncrementsPerHeightUnit, y+0.5f) + GetPosition(),
+                        });
+                    }
+                }
+            }
+
+            return boundingBoxes;
+        }
+
         public override void LoadContent(ContentManager content)
         {
             _contentManager = content;
@@ -133,6 +165,8 @@ namespace DProject.Entity.Chunk
 
             foreach (var heightMap in _heightMaps)
                 heightMap.Initialize(graphicsDevice);
+            
+            _tileBoundingBoxes = GenerateBoundingBoxes();
         }
 
         public int GetChunkX()
@@ -454,6 +488,16 @@ namespace DProject.Entity.Chunk
         public List<PropEntity> GetProps(int floor)
         {
             return _props[floor];
+        }
+
+        public BoundingBox[,] GetTileBoundingBoxes(int floor)
+        {
+            return _tileBoundingBoxes[floor];
+        }
+
+        public BoundingBox GetTileBoundingBox(int x, int y, int floor)
+        {
+            return _tileBoundingBoxes[floor][x,y];
         }
     }
 }
