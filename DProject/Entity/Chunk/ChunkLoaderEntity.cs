@@ -22,10 +22,11 @@ namespace DProject.Entity.Chunk
         private Vector2 _previousChunkPosition;
         private Vector2 _chunkPosition;
 
-        private TerrainEntity[,] _loadedChunks = new TerrainEntity[5, 5];
-
+        public const int LoadDistance = 8;
         public const int ChunkSize = 64;
-
+        
+        private TerrainEntity[,] _loadedChunks = new TerrainEntity[LoadDistance, LoadDistance];
+        
         public enum ChunkLoadingStatus
         {
             Busy,
@@ -86,13 +87,20 @@ namespace DProject.Entity.Chunk
 
                 List<Vector2> newChunkPositions = new List<Vector2>();
                 List<Vector2> newChunkLocations = new List<Vector2>();
-
-                for (int x = 0; x < _loadedChunks.GetLength(0); x++)
-                {
-                    for (int y = 0; y < _loadedChunks.GetLength(1); y++)
+                
+                int x,y,dx,dy;
+                x = y = dx =0;
+                dy = -1;
+                int t = Math.Max(LoadDistance, LoadDistance);
+                int maxI = t*t;
+                for(int i =0; i < maxI; i++){
+                    if ((-LoadDistance/2 <= x) && (x <= LoadDistance/2) && (-LoadDistance/2 <= y) && (y <= LoadDistance/2))
                     {
-                        Vector2 position = chunkPosition - new Vector2(x - _loadedChunks.GetLength(0) / 2,
-                                               y - _loadedChunks.GetLength(1) / 2);
+                        var localx = x + 3;
+                        var localy = y + 3;
+                                                
+                        Vector2 position = chunkPosition - new Vector2(localx - _loadedChunks.GetLength(0) / 2,
+                                               localy - _loadedChunks.GetLength(1) / 2);
 
                         foreach (var chunk in oldChunks)
                         {
@@ -100,19 +108,26 @@ namespace DProject.Entity.Chunk
                             {
                                 if (chunk.GetChunkX() == (int) position.X && chunk.GetChunkY() == (int) position.Y)
                                 {
-                                    _loadedChunks[x, y] = chunk;
+                                    _loadedChunks[localx, localy] = chunk;
                                     oldChunksCount++;
                                 }
                             }
                         }
 
-                        if (_loadedChunks[x, y] == null)
+                        if (_loadedChunks[localx, localy] == null)
                         {
                             newChunksCount++;
-                            newChunkPositions.Add(new Vector2(x, y));
+                            newChunkPositions.Add(new Vector2(localx, localy));
                             newChunkLocations.Add(new Vector2(position.X, position.Y));
                         }
                     }
+                    if( (x == y) || ((x < 0) && (x == -y)) || ((x > 0) && (x == 1-y))){
+                        t = dx;
+                        dx = -dy;
+                        dy = t;
+                    }
+                    x += dx;
+                    y += dy;
                 }
 
                 _entityManager.AddMessage(new Message("Loading new chunks: " + oldChunksCount + " chunks reused and " + newChunksCount + " new chunks."));

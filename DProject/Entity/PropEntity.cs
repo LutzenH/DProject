@@ -49,8 +49,8 @@ namespace DProject.Entity
 
                         effect.FogEnabled = true;
                         effect.FogColor = Color.DarkGray.ToVector3();
-                        effect.FogStart = 80f;
-                        effect.FogEnd = 120f;
+                        effect.FogStart = 120f;
+                        effect.FogEnd = 160f;
                     }
 
                     mesh.Draw();

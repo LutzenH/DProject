@@ -54,8 +54,8 @@ namespace DProject.Type.Rendering
 
             _basicEffect.FogEnabled = true;
             _basicEffect.FogColor = Color.DarkGray.ToVector3();
-            _basicEffect.FogStart = 80f;
-            _basicEffect.FogEnd = 120f;
+            _basicEffect.FogStart = 120f;
+            _basicEffect.FogEnd = 160f;
 
             _basicEffect.TextureEnabled = true;
             
