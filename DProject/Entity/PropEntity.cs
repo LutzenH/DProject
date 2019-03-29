@@ -14,12 +14,12 @@ namespace DProject.Entity
 
         public PropEntity(Vector3 position, Quaternion rotation, Vector3 scale, ushort id) : base(position, rotation, scale)
         {
-            _modelPath = Props.PropList[id].GetAssetName();
+            _modelPath = Props.PropList[id].GetAssetPath();
         }
         
         public PropEntity(Vector3 position, float pitch, float yaw, float roll, Vector3 scale, ushort id) : base(position, pitch, yaw, roll, scale)
         {
-            _modelPath = Props.PropList[id].GetAssetName();
+            _modelPath = Props.PropList[id].GetAssetPath();
         }
 
         public PropEntity(Vector3 position, ushort id) : this(position, Quaternion.Identity, Props.PropList[id].GetDefaultScale(), id) { }

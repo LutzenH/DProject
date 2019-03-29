@@ -109,10 +109,10 @@ namespace DProject.Type.Rendering
                     var bottomLeft = new Vector3 (x-0.5f, tiles[x,y].BottomLeft/ IncrementsPerHeightUnit, y+0.5f);
                     var bottomRight = new Vector3 (x+0.5f, tiles[x,y].BottomRight/ IncrementsPerHeightUnit, y+0.5f);
 
-                    var colorTopLeft = Colors.ColorList[tiles[x, y].ColorTopLeft];
-                    var colorTopRight = Colors.ColorList[tiles[x, y].ColorTopRight];
-                    var colorBottomLeft = Colors.ColorList[tiles[x, y].ColorBottomLeft];
-                    var colorBottomRight = Colors.ColorList[tiles[x, y].ColorBottomRight];
+                    var colorTopLeft = Colors.ColorList[tiles[x, y].ColorTopLeft].Color;
+                    var colorTopRight = Colors.ColorList[tiles[x, y].ColorTopRight].Color;
+                    var colorBottomLeft = Colors.ColorList[tiles[x, y].ColorBottomLeft].Color;
+                    var colorBottomRight = Colors.ColorList[tiles[x, y].ColorBottomRight].Color;
                             
                     Vector3 normal;
                     

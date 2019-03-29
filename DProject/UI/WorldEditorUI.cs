@@ -142,7 +142,7 @@ namespace DProject.UI
 
             if (_worldEditorEntity.GetCurrentTool() == WorldEditorEntity.Tools.ObjectPlacer)
             {
-                spriteBatch.DrawString(_spriteFont, "SelectedProp: " + Props.PropList[_worldEditorEntity.GetSelectedObject()].GetAssetName() , new Vector2(2, 19 * 2), Color.White);
+                spriteBatch.DrawString(_spriteFont, "SelectedProp: " + Props.PropList[_worldEditorEntity.GetSelectedObject()].GetAssetPath() , new Vector2(2, 19 * 2), Color.White);
                 spriteBatch.DrawString(_spriteFont, "Rotation: " + _worldEditorEntity.GetSelectedRotation().ToString() , new Vector2(2, 19 * 3), Color.White);
             }
 
