@@ -44,8 +44,8 @@ namespace DProject.UI
             _textString = "";
             _lineCount = 0;
 
-            if (_entityManager.GetMessagesCount() > 0)
-                _messages.AddLast(_entityManager.GetFirstMessage());
+            if (EntityManager.GetMessagesCount() > 0)
+                _messages.AddLast(EntityManager.GetFirstMessage());
 
             foreach (var message in _messages.ToList())
             {

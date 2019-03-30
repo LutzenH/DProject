@@ -130,7 +130,7 @@ namespace DProject.Entity.Chunk
                     y += dy;
                 }
 
-                _entityManager.AddMessage(new Message("Loading new chunks: " + oldChunksCount + " chunks reused and " + newChunksCount + " new chunks."));
+                EntityManager.AddMessage(new Message("Loading new chunks: " + oldChunksCount + " chunks reused and " + newChunksCount + " new chunks."));
 
                 Thread thread = new Thread((() => LoadNewChunks(newChunkPositions, newChunkLocations)));
                 thread.Start();
@@ -146,7 +146,7 @@ namespace DProject.Entity.Chunk
                     LoadChunk((int) newChunkLocations[i].X, (int) newChunkLocations[i].Y);
             }
 
-            _entityManager.AddMessage(new Message("Done loading new chunks."));
+            EntityManager.AddMessage(new Message("Done loading new chunks."));
             _loadingStatus = ChunkLoadingStatus.Done;
         }
 
@@ -161,7 +161,7 @@ namespace DProject.Entity.Chunk
 
         public void SerializeChangedChunks()
         {
-            _entityManager.AddMessage(new Message("Starting serialization of changed chunks.."));
+            EntityManager.AddMessage(new Message("Starting serialization of changed chunks.."));
 
             int count = 0;
             
@@ -177,12 +177,12 @@ namespace DProject.Entity.Chunk
                 }
             }
             
-            _entityManager.AddMessage(new Message("Serialized " + count + " changed chunks."));
+            EntityManager.AddMessage(new Message("Serialized " + count + " changed chunks."));
         }
 
         public void ReloadChangedChunks()
         {
-            _entityManager.AddMessage(new Message("Reloading changed chunks.."));
+            EntityManager.AddMessage(new Message("Reloading changed chunks.."));
 
             int count = 0;
             
@@ -199,7 +199,7 @@ namespace DProject.Entity.Chunk
                 }
             }
             
-            _entityManager.AddMessage(new Message("Reloaded " + count + " changed chunks."));
+            EntityManager.AddMessage(new Message("Reloaded " + count + " changed chunks."));
         }
 
         public static Vector2 CalculateChunkPosition(float x, float y)

@@ -16,7 +16,7 @@ namespace DProject.Manager
         private readonly List<AbstractEntity> _entities;
         private readonly List<CameraEntity> _cameraEntities;
         
-        private readonly LinkedList<Message> _messages;
+        public static readonly LinkedList<Message> Messages = new LinkedList<Message>();
         
         private CameraEntity _activeCamera;
 
@@ -32,10 +32,7 @@ namespace DProject.Manager
             {
                 new CameraEntity(new Vector3(0f, 0f, -1f), Quaternion.Identity),
                 new CameraEntity(new Vector3(0f, 500f, -1f), Quaternion.Identity)
-            };
-
-            _messages = new LinkedList<Message>();
-            
+            };            
             //Adds all camera's to entities list
             foreach (var cameraEntity in _cameraEntities)
             {
@@ -122,26 +119,26 @@ namespace DProject.Manager
             _activeCamera.IsActiveCamera = true;
         }
 
-        public void AddMessage(Message message)
+        public static void AddMessage(Message message)
         {
-            _messages.AddLast(message);
+            Messages.AddLast(message);
         }
 
-        public Message GetFirstMessage()
+        public static Message GetFirstMessage()
         {
-            if (_messages.First != null)
+            if (Messages.First != null)
             {
-                Message message = _messages.First.Value;
-                _messages.RemoveFirst();
+                Message message = Messages.First.Value;
+                Messages.RemoveFirst();
                 return message;
             }
 
             return null;
         }
 
-        public int GetMessagesCount()
+        public static int GetMessagesCount()
         {
-            return _messages.Count;
+            return Messages.Count;
         }
 
         public WorldEditorEntity GetWorldEditorEntity()
@@ -149,9 +146,9 @@ namespace DProject.Manager
             return _worldEditorEntity;
         }
 
-        public void ClearMessageList()
+        public static void ClearMessageList()
         {
-            _messages.Clear();
+            Messages.Clear();
         }
     }
 }
