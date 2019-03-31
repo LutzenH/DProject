@@ -1,14 +1,16 @@
 ﻿using System;
+using System.Threading;
+using Cairo;
+using Gtk;
 
 namespace DProject
 {
-    public static class Program
-    {
+    public class Program
+    {   
         [STAThread]
-        static void Main()
+        public static void Main(string[] args)
         {
-            using (var game = new Game1())
-                game.Run();
+            var window = new EditorWindow();
         }
     }
 }

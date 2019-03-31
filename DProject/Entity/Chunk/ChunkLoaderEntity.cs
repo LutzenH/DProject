@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using DProject.Entity.Camera;
 using DProject.Entity.Interface;
 using DProject.Manager;
 using DProject.Type;
 using DProject.Type.Enum;
+using Gtk;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -132,14 +134,17 @@ namespace DProject.Entity.Chunk
 
                 EntityManager.AddMessage(new Message("Loading new chunks: " + oldChunksCount + " chunks reused and " + newChunksCount + " new chunks."));
 
-                Thread thread = new Thread((() => LoadNewChunks(newChunkPositions, newChunkLocations)));
-                thread.Start();
+                //Use this instead of Application.Invoke when not using the GTK editor
+                //Thread thread = new Thread((() => LoadNewChunks(newChunkPositions, newChunkLocations)));
+                //thread.Start();
+
                 _loadingStatus = ChunkLoadingStatus.Busy;
+                Application.Invoke((sender, args) => LoadNewChunks(newChunkPositions, newChunkLocations));
             }
         }
 
         private void LoadNewChunks(List<Vector2> newChunkPositions, List<Vector2> newChunkLocations)
-        {
+        {            
             for (int i = 0; i < newChunkPositions.Count; i++)
             {
                 _loadedChunks[(int) newChunkPositions[i].X, (int) newChunkPositions[i].Y] =

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using DProject.Entity;
+using DProject.Entity.Camera;
 using DProject.Entity.Chunk;
 using DProject.Entity.Debug;
 using DProject.Entity.Interface;
@@ -25,13 +26,13 @@ namespace DProject.Manager
         private int _cameraIndex;
         
         public EntityManager()
-        {
+        {            
             //Entities Lists Initialisation
             _entities = new List<AbstractEntity>();
             _cameraEntities = new List<CameraEntity>
             {
-                new CameraEntity(new Vector3(0f, 0f, -1f), Quaternion.Identity),
-                new CameraEntity(new Vector3(0f, 500f, -1f), Quaternion.Identity)
+                new FlyCameraEntity(new Vector3(0f, 10f, 0f), Quaternion.Identity),
+                new FlyCameraEntity(new Vector3(0f, 0f, 0f), Quaternion.Identity)
             };            
             //Adds all camera's to entities list
             foreach (var cameraEntity in _cameraEntities)
@@ -45,7 +46,6 @@ namespace DProject.Manager
             var chunkLoaderEntity = new ChunkLoaderEntity(this);
             
             _entities.Add(chunkLoaderEntity);
-
             _worldEditorEntity = new WorldEditorEntity(this, chunkLoaderEntity);
             
             _entities.Add(_worldEditorEntity);
