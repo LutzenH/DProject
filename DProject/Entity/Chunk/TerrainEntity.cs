@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using DProject.Entity.Camera;
 using DProject.Entity.Interface;
 using DProject.List;
 using DProject.Type.Enum;
