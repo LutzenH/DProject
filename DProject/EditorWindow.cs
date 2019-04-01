@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using DProject.List;
 using Gtk;
 
@@ -19,6 +20,14 @@ namespace DProject
         [Builder.Object]
         private Label label_bottom_info;
         
+        [Builder.Object]
+        private Box left_pane;
+
+        [Builder.Object]
+        private Box top_bar;
+        
+        private Widget _gameWidget;
+        
         public EditorWindow()
         {
             Application.Init();
@@ -29,16 +38,23 @@ namespace DProject
             
             _game = new Game1();
 
-            var gameWidget = _game.Services.GetService<Widget>();
             
-            _gameBox.PackStart(gameWidget, true, true, 5);
-
-            gameWidget.Shown += (o, e) => _game.Run();
+            
+            _gameWidget = _game.Services.GetService<Widget>();
+            
+            _gameBox.PackStart(_gameWidget, true, true, 5);
+            
+            _gameWidget.Shown += (o, e) => _game.Run();
             _gameBox.Destroyed += MainWindow_Destroyed;
                          
             FillPropList();
             
             _gameBox.ShowAll();
+
+            _gameWidget.SizeAllocated += (o, args) => UpdateGameResolution();
+            _gameBox.ButtonPressEvent += (o, args) => _gameBox.GrabFocus();
+            
+            _game.SetScreenResolution(_gameWidget.AllocatedWidth, _gameWidget.AllocatedHeight);
             
             Application.Run();
         }
@@ -70,6 +86,13 @@ namespace DProject
         private void FillColorList()
         {
             
+        }
+
+        private void UpdateGameResolution()
+        {
+            _game.SetWidgetOffset(left_pane.AllocatedWidth+5, top_bar.AllocatedHeight);
+            
+            _game.SetScreenResolution(_gameWidget.AllocatedWidth, _gameWidget.AllocatedHeight);
         }
     }
 }

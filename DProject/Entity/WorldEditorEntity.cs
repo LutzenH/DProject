@@ -118,7 +118,7 @@ namespace DProject.Entity
 
         private void UseTool()
         {
-            var mouseLocation = new Vector2(Mouse.GetState().X, Mouse.GetState().Y);
+            var mouseLocation = Game1.GetAdjustedMousePosition();
             var position = CalculatePosition(mouseLocation);
             var precisePosition = CalculatePrecisePosition(mouseLocation);
                 

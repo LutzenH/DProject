@@ -1,5 +1,6 @@
 ﻿using System;
 using DProject.Manager;
+using DProject.Type;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -18,6 +19,9 @@ namespace DProject
 
         public static int ScreenResolutionX;
         public static int ScreenResolutionY;
+
+        public static int WidgetOffsetX;
+        public static int WidgetOffsetY;
         
         public Game1()
         {
@@ -30,7 +34,7 @@ namespace DProject
 
             ScreenResolutionX = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
             ScreenResolutionY = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
-
+            
             _graphics.PreferredBackBufferWidth = ScreenResolutionX;
             _graphics.PreferredBackBufferHeight = ScreenResolutionY;
 
@@ -99,6 +103,26 @@ namespace DProject
             direction.Normalize();
  
             return new Ray(nearPoint, direction);
+        }
+
+        public void SetScreenResolution(int x, int y)
+        {           
+            ScreenResolutionX = x;
+            ScreenResolutionY = y;
+            
+            _graphics.PreferredBackBufferWidth = ScreenResolutionX;
+            _graphics.PreferredBackBufferHeight = ScreenResolutionY;
+        }
+
+        public static Vector2 GetAdjustedMousePosition()
+        {
+            return new Vector2(Mouse.GetState().X + WidgetOffsetX, Mouse.GetState().Y + WidgetOffsetY);
+        }
+
+        public void SetWidgetOffset(int x, int y)
+        {
+            WidgetOffsetX = x;
+            WidgetOffsetY = y;
         }
     }
 }

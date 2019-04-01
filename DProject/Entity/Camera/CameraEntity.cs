@@ -25,7 +25,7 @@ namespace DProject.Entity.Camera
             CameraDirection.Normalize();
             
             ViewMatrix = Matrix.CreateLookAt(Position, Position + CameraDirection, Vector3.Up);
-            ProjectMatrix = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(80f), 16f/9f, 0.01f, 300f);
+            ProjectMatrix = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(80f), (float)Game1.ScreenResolutionX/(float)Game1.ScreenResolutionY, 0.01f, 300f);
         }
 
         public abstract override void LoadContent(ContentManager content);
@@ -33,6 +33,7 @@ namespace DProject.Entity.Camera
         public virtual void Update(GameTime gameTime)
         {
             ViewMatrix = Matrix.CreateLookAt(Position, Position + CameraDirection, Vector3.Up);
+            ProjectMatrix = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(80f), (float)Game1.ScreenResolutionX/(float)Game1.ScreenResolutionY, 0.01f, 300f);
             BoundingFrustum = new BoundingFrustum(ViewMatrix * ProjectMatrix);
         }
 

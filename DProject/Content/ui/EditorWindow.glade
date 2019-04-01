@@ -17,8 +17,8 @@
     <property name="can_focus">False</property>
     <property name="title" translatable="yes">DProject WorldEditor</property>
     <property name="window_position">center</property>
-    <property name="default_width">800</property>
-    <property name="default_height">600</property>
+    <property name="default_width">1280</property>
+    <property name="default_height">720</property>
     <property name="icon_name">applications-development</property>
     <property name="startup_id">editor_window</property>
     <child>
@@ -30,7 +30,7 @@
         <property name="can_focus">False</property>
         <property name="orientation">vertical</property>
         <child>
-          <object class="GtkBox">
+          <object class="GtkBox" id="top_bar">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="orientation">vertical</property>
@@ -279,12 +279,12 @@
           </packing>
         </child>
         <child>
-          <object class="GtkPaned">
+          <object class="GtkPaned" id="editor_pane_0">
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="wide_handle">True</property>
             <child>
-              <object class="GtkBox">
+              <object class="GtkBox" id="left_pane">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="orientation">vertical</property>
@@ -671,10 +671,9 @@
               </packing>
             </child>
             <child>
-              <object class="GtkPaned">
+              <object class="GtkPaned" id="editor_pane_1">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
-                <property name="position">515</property>
                 <property name="wide_handle">True</property>
                 <child>
                   <object class="GtkBox">
@@ -720,7 +719,7 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkBox">
+                  <object class="GtkBox" id="right_pane">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="orientation">vertical</property>
