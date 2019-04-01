@@ -124,5 +124,10 @@ namespace DProject
             WidgetOffsetX = x;
             WidgetOffsetY = y;
         }
+
+        public EntityManager GetEntityManager()
+        {
+            return _entityManager;
+        }
     }
 }

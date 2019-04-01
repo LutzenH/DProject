@@ -21,6 +21,7 @@ namespace DProject.Manager
         
         private CameraEntity _activeCamera;
 
+        private ChunkLoaderEntity _chunkLoaderEntity;
         private WorldEditorEntity _worldEditorEntity;
 
         private int _cameraIndex;
@@ -43,14 +44,14 @@ namespace DProject.Manager
             _activeCamera = _cameraEntities[0];
             _activeCamera.IsActiveCamera = true;
             
-            var chunkLoaderEntity = new ChunkLoaderEntity(this);
+            _chunkLoaderEntity = new ChunkLoaderEntity(this);
             
-            _entities.Add(chunkLoaderEntity);
-            _worldEditorEntity = new WorldEditorEntity(this, chunkLoaderEntity);
+            _entities.Add(_chunkLoaderEntity);
+            _worldEditorEntity = new WorldEditorEntity(this, _chunkLoaderEntity);
             
             _entities.Add(_worldEditorEntity);
             
-            _entities.Add(new DebugEntity(_cameraEntities, chunkLoaderEntity));
+            _entities.Add(new DebugEntity(_cameraEntities, _chunkLoaderEntity));
         }
 
         public void Initialize(GraphicsDevice graphicsDevice)
@@ -144,6 +145,11 @@ namespace DProject.Manager
         public WorldEditorEntity GetWorldEditorEntity()
         {
             return _worldEditorEntity;
+        }
+
+        public ChunkLoaderEntity GetChunkLoaderEntity()
+        {
+            return _chunkLoaderEntity;
         }
 
         public static void ClearMessageList()

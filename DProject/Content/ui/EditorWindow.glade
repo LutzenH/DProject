@@ -12,6 +12,28 @@
     <property name="can_focus">False</property>
     <property name="stock">gtk-add</property>
   </object>
+  <object class="GtkListStore" id="list_camera_info">
+    <columns>
+      <!-- column-name item -->
+      <column type="gchararray"/>
+      <!-- column-name value -->
+      <column type="gfloat"/>
+    </columns>
+    <data>
+      <row>
+        <col id="0">position_x</col>
+        <col id="1">15</col>
+      </row>
+      <row>
+        <col id="0">position_y</col>
+        <col id="1">0</col>
+      </row>
+      <row>
+        <col id="0">position_z</col>
+        <col id="1">0</col>
+      </row>
+    </data>
+  </object>
   <object class="GtkWindow" id="editor_window">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
@@ -49,8 +71,17 @@
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <child>
-                          <object class="GtkImageMenuItem">
+                          <object class="GtkImageMenuItem" id="menu_file_save">
                             <property name="label">gtk-save</property>
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="use_underline">True</property>
+                            <property name="use_stock">True</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkImageMenuItem" id="menu_file_revert">
+                            <property name="label">gtk-revert-to-saved</property>
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="use_underline">True</property>
@@ -64,7 +95,7 @@
                           </object>
                         </child>
                         <child>
-                          <object class="GtkImageMenuItem">
+                          <object class="GtkImageMenuItem" id="menu_file_quit">
                             <property name="label">gtk-quit</property>
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
@@ -80,8 +111,23 @@
                   <object class="GtkMenuItem">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="label" translatable="yes">_View</property>
+                    <property name="label" translatable="yes">_Edit</property>
                     <property name="use_underline">True</property>
+                    <child type="submenu">
+                      <object class="GtkMenu">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="reserve_toggle_size">False</property>
+                        <child>
+                          <object class="GtkMenuItem" id="menu_edit_resetcameraposition">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="label" translatable="yes">Reset ActiveCamera Position</property>
+                            <property name="use_underline">True</property>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
                   </object>
                 </child>
                 <child>
@@ -142,7 +188,7 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkRadioButton">
+                  <object class="GtkRadioButton" id="button_tool_flatten">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
@@ -165,7 +211,7 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkRadioButton">
+                  <object class="GtkRadioButton" id="button_tool_raise">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
@@ -188,7 +234,7 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkRadioButton">
+                  <object class="GtkRadioButton" id="button_tool_paint">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
@@ -211,7 +257,7 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkRadioButton">
+                  <object class="GtkRadioButton" id="button_tool_objectplacer">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
@@ -719,74 +765,161 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkBox" id="right_pane">
+                  <object class="GtkNotebook">
                     <property name="visible">True</property>
-                    <property name="can_focus">False</property>
-                    <property name="orientation">vertical</property>
+                    <property name="can_focus">True</property>
                     <child>
-                      <object class="GtkSearchEntry" id="search_prop">
+                      <object class="GtkBox" id="right_pane">
                         <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="primary_icon_name">edit-find-symbolic</property>
-                        <property name="primary_icon_activatable">False</property>
-                        <property name="primary_icon_sensitive">False</property>
-                        <property name="placeholder_text" translatable="yes">Props</property>
-                      </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">True</property>
-                        <property name="position">0</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkScrolledWindow">
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="shadow_type">in</property>
+                        <property name="can_focus">False</property>
+                        <property name="orientation">vertical</property>
                         <child>
-                          <object class="GtkViewport">
+                          <object class="GtkSearchEntry" id="search_prop">
                             <property name="visible">True</property>
-                            <property name="can_focus">False</property>
+                            <property name="can_focus">True</property>
+                            <property name="primary_icon_name">edit-find-symbolic</property>
+                            <property name="primary_icon_activatable">False</property>
+                            <property name="primary_icon_sensitive">False</property>
+                            <property name="placeholder_text" translatable="yes">Props</property>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">0</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkScrolledWindow">
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="shadow_type">in</property>
                             <child>
-                              <object class="GtkListBox" id="box_prop_list">
+                              <object class="GtkViewport">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
+                                <child>
+                                  <object class="GtkListBox" id="box_prop_list">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">False</property>
+                                  </object>
+                                </child>
                               </object>
                             </child>
                           </object>
+                          <packing>
+                            <property name="expand">True</property>
+                            <property name="fill">True</property>
+                            <property name="position">1</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkExpander">
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <child>
+                              <object class="GtkTextView">
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="wrap_mode">word</property>
+                                <property name="monospace">True</property>
+                              </object>
+                            </child>
+                            <child type="label">
+                              <object class="GtkLabel">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="label" translatable="yes">properties</property>
+                              </object>
+                            </child>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">5</property>
+                          </packing>
                         </child>
                       </object>
+                    </child>
+                    <child type="tab">
+                      <object class="GtkLabel">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">Props</property>
+                      </object>
                       <packing>
-                        <property name="expand">True</property>
-                        <property name="fill">True</property>
-                        <property name="position">1</property>
+                        <property name="tab_fill">False</property>
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkExpander">
+                      <object class="GtkBox">
                         <property name="visible">True</property>
-                        <property name="can_focus">True</property>
+                        <property name="can_focus">False</property>
                         <child>
-                          <object class="GtkTextView">
+                          <object class="GtkTreeView">
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
-                            <property name="wrap_mode">word</property>
-                            <property name="monospace">True</property>
+                            <property name="model">list_camera_info</property>
+                            <property name="enable_search">False</property>
+                            <property name="enable_grid_lines">both</property>
+                            <child internal-child="selection">
+                              <object class="GtkTreeSelection"/>
+                            </child>
+                            <child>
+                              <object class="GtkTreeViewColumn" id="item">
+                                <property name="min_width">50</property>
+                                <property name="title" translatable="yes">item</property>
+                                <property name="expand">True</property>
+                                <property name="clickable">True</property>
+                                <child>
+                                  <object class="GtkCellRendererText" id="item_value"/>
+                                  <attributes>
+                                    <attribute name="text">0</attribute>
+                                  </attributes>
+                                </child>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkTreeViewColumn" id="value">
+                                <property name="min_width">50</property>
+                                <property name="title" translatable="yes">value</property>
+                                <property name="expand">True</property>
+                                <property name="clickable">True</property>
+                                <child>
+                                  <object class="GtkCellRendererText" id="tree_camera_value"/>
+                                  <attributes>
+                                    <attribute name="text">1</attribute>
+                                  </attributes>
+                                </child>
+                              </object>
+                            </child>
                           </object>
-                        </child>
-                        <child type="label">
-                          <object class="GtkLabel">
-                            <property name="visible">True</property>
-                            <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">properties</property>
-                          </object>
+                          <packing>
+                            <property name="expand">True</property>
+                            <property name="fill">True</property>
+                            <property name="position">0</property>
+                          </packing>
                         </child>
                       </object>
                       <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">True</property>
-                        <property name="position">5</property>
+                        <property name="position">1</property>
                       </packing>
+                    </child>
+                    <child type="tab">
+                      <object class="GtkLabel">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">Camera</property>
+                      </object>
+                      <packing>
+                        <property name="position">1</property>
+                        <property name="tab_fill">False</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <placeholder/>
+                    </child>
+                    <child type="tab">
+                      <placeholder/>
                     </child>
                   </object>
                   <packing>

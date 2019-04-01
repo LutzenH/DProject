@@ -65,17 +65,6 @@ namespace DProject.Entity
 
         public void Update(GameTime gameTime)
         {
-            if (Keyboard.GetState().IsKeyUp(Keys.D1) && Game1.PreviousKeyboardState.IsKeyDown(Keys.D1))
-                _tools = Tools.Select;
-            if (Keyboard.GetState().IsKeyUp(Keys.D2) && Game1.PreviousKeyboardState.IsKeyDown(Keys.D2))
-                _tools = Tools.Flatten;
-            if (Keyboard.GetState().IsKeyUp(Keys.D3) && Game1.PreviousKeyboardState.IsKeyDown(Keys.D3))
-                _tools = Tools.Raise;
-            if (Keyboard.GetState().IsKeyUp(Keys.D4) && Game1.PreviousKeyboardState.IsKeyDown(Keys.D4))
-                _tools = Tools.Paint;
-            if (Keyboard.GetState().IsKeyUp(Keys.D5) && Game1.PreviousKeyboardState.IsKeyDown(Keys.D5))
-                _tools = Tools.ObjectPlacer;
-
             if (Keyboard.GetState().IsKeyUp(Keys.OemPlus) && Game1.PreviousKeyboardState.IsKeyDown(Keys.OemPlus))
             {
                 _currentFloor++;
@@ -341,6 +330,11 @@ namespace DProject.Entity
         public Tools GetCurrentTool()
         {
             return _tools;
+        }
+        
+        public void SetCurrentTool(Tools tool)
+        {
+            _tools = tool;
         }
 
         public int GetCurrentFloor()
