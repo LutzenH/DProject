@@ -1,7 +1,5 @@
 using System;
-using System.Threading;
 using DProject.Entity;
-using DProject.Entity.Chunk;
 using DProject.List;
 using Gtk;
 using Microsoft.Xna.Framework;
@@ -105,8 +103,14 @@ namespace DProject
             TreeIter iter;
             list_camera_info.GetIter (out iter, new TreePath (args.Path));
                         
-            var changedValue = list_camera_info.GetValue(iter, 1);
-            list_camera_info.SetValue(iter, 1, Convert.ToSingle(args.NewText));
+            try
+            {
+                list_camera_info.SetValue(iter, 1, Convert.ToSingle(args.NewText));
+            }
+            catch (FormatException e)
+            {
+                return;
+            }
 
             Single newValue = (float) list_camera_info.GetValue(iter, 1);
 
