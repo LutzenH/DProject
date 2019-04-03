@@ -1,6 +1,7 @@
 using System;
 using DProject.Entity;
 using DProject.List;
+using Gdk;
 using Gtk;
 using Microsoft.Xna.Framework;
 using Color = Gdk.Color;
@@ -52,6 +53,9 @@ namespace DProject
         //Colors
         [Builder.Object] private FlowBox box_flow_colors;
         
+        //Textures
+        [Builder.Object] private FlowBox box_flow_textures;
+        
         public EditorWindow()
         {
             Application.Init();
@@ -70,6 +74,7 @@ namespace DProject
             
             FillPropList();
             FillColorList();
+            FillTextureList();
             _gameBox.ShowAll();
                         
             Application.Run();
@@ -103,6 +108,12 @@ namespace DProject
             
             //Terrain Brush Settings
             adjustment_brush_size.ValueChanged += (o, args) => _game.GetEntityManager().GetWorldEditorEntity().SetBrushSize((int)adjustment_brush_size.Value - 1);
+            
+            //Colors List
+            box_flow_colors.SelectedChildrenChanged += UpdateSelectedColor;
+            
+            //Texture List
+            box_flow_textures.SelectedChildrenChanged += UpdateSelectedTexture;
         }
 
         private void SetSelectedTool(WorldEditorEntity.Tools tool)
@@ -140,6 +151,20 @@ namespace DProject
                     _game.GetEntityManager().GetActiveCamera().SetPosition(new Vector3(currentPosition.X, currentPosition.Y, newValue));
                     break;
             }
+        }
+
+        private void UpdateSelectedColor(object obj, EventArgs args)
+        {
+            var box = (FlowBox) obj;
+            var selectedChild = (FlowBoxChild) box.SelectedChildren[0];                   
+            _game.GetEntityManager().GetWorldEditorEntity().SetSelectedColor(Colors.GetColorIdFromName(selectedChild.TooltipText));
+        }
+        
+        private void UpdateSelectedTexture(object obj, EventArgs args)
+        {
+            var box = (FlowBox) obj;
+            var selectedChild = (FlowBoxChild) box.SelectedChildren[0];                   
+            _game.GetEntityManager().GetWorldEditorEntity().SetActiveTexture(Textures.GetTextureIdFromName(selectedChild.TooltipText));
         }
 
         private void MainWindow_Destroyed(object sender, EventArgs e)
@@ -182,6 +207,24 @@ namespace DProject
             
             box_flow_colors.ShowAll();
         }
+        
+        private void FillTextureList()
+        {
+            foreach (var texture in Textures.TextureList)
+            {
+                box_flow_textures.Add(
+                    CreateFlowBoxTexture(
+                        texture.Value.TextureName,
+                        texture.Value.XSize,
+                        texture.Value.YSize,
+                        texture.Value.XOffset,
+                        texture.Value.YOffset,
+                        2
+                ));
+            }
+            
+            box_flow_textures.ShowAll();
+        }
 
         private FlowBoxChild CreateFlowBoxColor(string name, byte r, byte g, byte b)
         {
@@ -199,9 +242,24 @@ namespace DProject
             return child;
         }
 
-        private void FillTextureList()
+        private FlowBoxChild CreateFlowBoxTexture(string name, int xsize, int ysize, int xoffset, int yoffset, int scale)
         {
+            FlowBoxChild child = new FlowBoxChild();
+            child.HasTooltip = true;
+            child.TooltipText = name;
             
+            var buf = new Pixbuf("Content/textures/textureatlas.png");
+            
+            buf = new Pixbuf(buf, xoffset, yoffset, xsize, ysize);
+            buf = buf.ScaleSimple(xsize * scale, ysize * scale, InterpType.Nearest);
+            
+            Image image = new Image(buf);
+            image.WidthRequest = xsize*scale;
+            image.HeightRequest = ysize*scale;
+            
+            child.Add(image);
+
+            return child;
         }
 
         private void UpdateGameResolution()

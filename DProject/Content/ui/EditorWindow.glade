@@ -28,7 +28,7 @@
     <data>
       <row>
         <col id="0">position_x</col>
-        <col id="1">15</col>
+        <col id="1">0</col>
       </row>
       <row>
         <col id="0">position_y</col>
@@ -451,67 +451,17 @@
                             <property name="can_focus">True</property>
                             <property name="hscrollbar_policy">never</property>
                             <property name="shadow_type">in</property>
+                            <property name="propagate_natural_height">True</property>
                             <child>
                               <object class="GtkViewport">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <child>
-                                  <object class="GtkFlowBox">
+                                  <object class="GtkFlowBox" id="box_flow_textures">
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
                                     <property name="valign">start</property>
-                                    <child>
-                                      <object class="GtkFlowBoxChild">
-                                        <property name="visible">True</property>
-                                        <property name="can_focus">True</property>
-                                        <child>
-                                          <object class="GtkImage">
-                                            <property name="visible">True</property>
-                                            <property name="can_focus">False</property>
-                                            <property name="stock">gtk-missing-image</property>
-                                          </object>
-                                        </child>
-                                      </object>
-                                    </child>
-                                    <child>
-                                      <object class="GtkFlowBoxChild">
-                                        <property name="visible">True</property>
-                                        <property name="can_focus">True</property>
-                                        <child>
-                                          <object class="GtkImage">
-                                            <property name="visible">True</property>
-                                            <property name="can_focus">False</property>
-                                            <property name="stock">gtk-missing-image</property>
-                                          </object>
-                                        </child>
-                                      </object>
-                                    </child>
-                                    <child>
-                                      <object class="GtkFlowBoxChild">
-                                        <property name="visible">True</property>
-                                        <property name="can_focus">True</property>
-                                        <child>
-                                          <object class="GtkImage">
-                                            <property name="visible">True</property>
-                                            <property name="can_focus">False</property>
-                                            <property name="stock">gtk-missing-image</property>
-                                          </object>
-                                        </child>
-                                      </object>
-                                    </child>
-                                    <child>
-                                      <object class="GtkFlowBoxChild">
-                                        <property name="visible">True</property>
-                                        <property name="can_focus">True</property>
-                                        <child>
-                                          <object class="GtkImage">
-                                            <property name="visible">True</property>
-                                            <property name="can_focus">False</property>
-                                            <property name="stock">gtk-missing-image</property>
-                                          </object>
-                                        </child>
-                                      </object>
-                                    </child>
+                                    <property name="max_children_per_line">200</property>
                                   </object>
                                 </child>
                               </object>
@@ -548,7 +498,6 @@
                       <object class="GtkBox">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="vexpand">True</property>
                         <property name="orientation">vertical</property>
                         <child>
                           <object class="GtkSearchEntry">
@@ -571,6 +520,7 @@
                             <property name="can_focus">True</property>
                             <property name="hscrollbar_policy">never</property>
                             <property name="shadow_type">in</property>
+                            <property name="propagate_natural_height">True</property>
                             <child>
                               <object class="GtkViewport">
                                 <property name="visible">True</property>
@@ -580,8 +530,6 @@
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
                                     <property name="valign">start</property>
-                                    <property name="column_spacing">2</property>
-                                    <property name="row_spacing">2</property>
                                     <property name="max_children_per_line">200</property>
                                   </object>
                                 </child>
@@ -589,7 +537,7 @@
                             </child>
                           </object>
                           <packing>
-                            <property name="expand">True</property>
+                            <property name="expand">False</property>
                             <property name="fill">True</property>
                             <property name="position">1</property>
                           </packing>
@@ -642,8 +590,8 @@
                     </child>
                   </object>
                   <packing>
-                    <property name="expand">True</property>
-                    <property name="fill">True</property>
+                    <property name="expand">False</property>
+                    <property name="fill">False</property>
                     <property name="position">3</property>
                   </packing>
                 </child>

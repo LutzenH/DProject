@@ -35,6 +35,7 @@ namespace DProject.Entity
         
         private ushort _selectedObject;
         private Rotation _selectedRotation;
+        private ushort _selectedColor;
                 
         private byte _currentFloor;
         
@@ -337,6 +338,16 @@ namespace DProject.Entity
         public ushort GetSelectedObject()
         {
             return _selectedObject;
+        }
+
+        public ushort GetSelectedColor()
+        {
+            return _selectedColor;
+        }
+
+        public void SetSelectedColor(ushort colorId)
+        {
+            _selectedColor = colorId;
         }
 
         public Rotation GetSelectedRotation()
