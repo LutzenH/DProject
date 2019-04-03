@@ -76,8 +76,6 @@ namespace DProject.Entity
                     _currentFloor--;
             }
 
-            SetBrushSize();
-
             if (!_chunkLoaderEntity.IsLoadingChunks())
                 UseTool();
 
@@ -91,12 +89,6 @@ namespace DProject.Entity
             {
                 _chunkLoaderEntity.ReloadChangedChunks();
             }
-        }
-
-        private void SetBrushSize()
-        {
-            _brushSize = Math.Abs(Mouse.GetState().ScrollWheelValue / 120);
-            _brushSize %= 8;
         }
 
         private void SetSelectedObject()
@@ -360,6 +352,11 @@ namespace DProject.Entity
         public int GetBrushSize()
         {
             return _brushSize;
+        }
+
+        public void SetBrushSize(int size)
+        {            
+            _brushSize = size;
         }
 
         public void SetActiveTexture(ushort textureId)

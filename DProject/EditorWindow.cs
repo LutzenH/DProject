@@ -3,6 +3,7 @@ using DProject.Entity;
 using DProject.List;
 using Gtk;
 using Microsoft.Xna.Framework;
+using Color = Gdk.Color;
 
 #pragma warning disable 649
 
@@ -44,6 +45,13 @@ namespace DProject
         [Builder.Object] private Box left_pane;
         [Builder.Object] private Box top_bar;
         
+        //Terrain Brush Settings
+        [Builder.Object] private Adjustment adjustment_brush_size;
+        [Builder.Object] private Adjustment adjustment_height;
+        
+        //Colors
+        [Builder.Object] private FlowBox box_flow_colors;
+        
         public EditorWindow()
         {
             Application.Init();
@@ -61,6 +69,7 @@ namespace DProject
             SetupEvents();
             
             FillPropList();
+            FillColorList();
             _gameBox.ShowAll();
                         
             Application.Run();
@@ -91,6 +100,9 @@ namespace DProject
             
             //Camera Info Tree
             tree_camera_value.Edited += UpdateCamera;
+            
+            //Terrain Brush Settings
+            adjustment_brush_size.ValueChanged += (o, args) => _game.GetEntityManager().GetWorldEditorEntity().SetBrushSize((int)adjustment_brush_size.Value - 1);
         }
 
         private void SetSelectedTool(WorldEditorEntity.Tools tool)
@@ -155,6 +167,39 @@ namespace DProject
         }
 
         private void FillColorList()
+        {
+            foreach (var color in Colors.ColorList)
+            {
+                box_flow_colors.Add(
+                    CreateFlowBoxColor(
+                        color.Value.Name,
+                        (byte) color.Value.Red,
+                        (byte) color.Value.Green,
+                        (byte) color.Value.Blue)
+                    );
+                
+            }
+            
+            box_flow_colors.ShowAll();
+        }
+
+        private FlowBoxChild CreateFlowBoxColor(string name, byte r, byte g, byte b)
+        {
+            FlowBoxChild child = new FlowBoxChild();
+            child.HasTooltip = true;
+            child.TooltipText = name;
+
+            Image image = new Image();
+                
+            image.ModifyBg(StateType.Normal, new Color(r, g, b));
+            image.WidthRequest = 25;
+            image.HeightRequest = 25;
+            child.Add(image);
+
+            return child;
+        }
+
+        private void FillTextureList()
         {
             
         }
