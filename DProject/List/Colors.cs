@@ -32,10 +32,10 @@ namespace DProject.List
         
         public static ushort GetColorIdFromName(string name)
         {
-            foreach (var (key, value) in ColorList)
+            foreach (var color in ColorList)
             {
-                if (value.GetColorName() == name)
-                    return key;
+                if (color.Value.GetColorName() == name)
+                    return color.Key;
             }
 
             throw new ArgumentException();

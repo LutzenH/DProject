@@ -36,10 +36,10 @@ namespace DProject.List
 
         public static ushort GetTextureIdFromName(string name)
         {
-            foreach (var (key, value) in TextureList)
+            foreach (var texture in TextureList)
             {
-                if (value.GetTextureName() == name)
-                    return key;
+                if (texture.Value.GetTextureName() == name)
+                    return texture.Key;
             }
 
             throw new ArgumentException();

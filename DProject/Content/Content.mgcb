@@ -13,6 +13,18 @@
 
 #---------------------------------- Content ---------------------------------#
 
+#begin chunks/herebechunks.txt
+/copy:chunks/herebechunks.txt
+
+#begin collections/colors.json
+/copy:collections/colors.json
+
+#begin collections/props.json
+/copy:collections/props.json
+
+#begin collections/textures.json
+/copy:collections/textures.json
+
 #begin default.spritefont
 /importer:FontDescriptionImporter
 /processor:LocalizedFontProcessor
@@ -355,6 +367,9 @@
 /processorParam:TextureFormat=Color
 /build:textures/textureatlas.png
 
+#begin textures/textureatlas.png
+/copy:textures/textureatlas.png
+
 #begin textures/ui/editor.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -366,4 +381,7 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:textures/ui/editor.png
+
+#begin ui/EditorWindow.glade
+/copy:ui/EditorWindow.glade
 
