@@ -233,9 +233,7 @@ namespace DProject.Entity
         }
         
         private void PlaceObject(Vector3 position)
-        {
-            SetSelectedObject();
-            
+        {            
             _axisEntity.SetPosition(position);
 
             if (Mouse.GetState().LeftButton == ButtonState.Pressed && Game1.PreviousMouseState.LeftButton == ButtonState.Released)
@@ -367,17 +365,6 @@ namespace DProject.Entity
             return _currentFloor;
         }
 
-        public ushort GetSelectedObject()
-        {
-            return _selectedObject;
-        }
-        
-        private void SetSelectedObject()
-        {
-            _selectedObject = (ushort)Math.Abs(Mouse.GetState().ScrollWheelValue / 120);
-            _selectedObject %= (ushort)Props.PropList.Count;
-        }
-
         public ushort GetSelectedColor()
         {
             return _selectedColor;
@@ -388,6 +375,16 @@ namespace DProject.Entity
             _selectedColor = colorId;
         }
 
+        public ushort GetSelectedObject()
+        {
+            return _selectedObject;
+        }
+
+        public void SetSelectedObject(ushort objectId)
+        {
+            _selectedObject = objectId;
+        }
+        
         public Rotation GetSelectedRotation()
         {
             return _selectedRotation;

@@ -1,6 +1,6 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
-using DProject.Type;
 using DProject.Type.Serializable;
 using MessagePack;
 
@@ -28,6 +28,17 @@ namespace DProject.List
         public static ushort GetDefaultPropId()
         {
             return 0;
+        }
+        
+        public static ushort GetPropIdFromName(string name)
+        {
+            foreach (var texture in PropList)
+            {
+                if (texture.Value.Name == name)
+                    return texture.Key;
+            }
+
+            throw new ArgumentException();
         }
     }
 

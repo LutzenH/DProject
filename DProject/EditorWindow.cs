@@ -114,6 +114,9 @@ namespace DProject
             
             //Texture List
             box_flow_textures.SelectedChildrenChanged += UpdateSelectedTexture;
+            
+            //Box Prop List
+            box_prop_list.SelectedRowsChanged += UpdateSelectedProp;
         }
 
         private void SetSelectedTool(WorldEditorEntity.Tools tool)
@@ -160,6 +163,13 @@ namespace DProject
             _game.GetEntityManager().GetWorldEditorEntity().SetSelectedColor(Colors.GetColorIdFromName(selectedChild.TooltipText));
         }
         
+        private void UpdateSelectedProp(object obj, EventArgs args)
+        {
+            var box = (ListBox) obj;
+            var selectedChild = (ListBoxRow) box.SelectedRows[0];                   
+            _game.GetEntityManager().GetWorldEditorEntity().SetSelectedObject((ushort) (Props.GetPropIdFromName(selectedChild.TooltipText)));
+        }
+        
         private void UpdateSelectedTexture(object obj, EventArgs args)
         {
             var box = (FlowBox) obj;
@@ -180,11 +190,12 @@ namespace DProject
             foreach (var prop in Props.PropList)
             {
                 var prop_list_row = new ListBoxRow();
-                var text_label = new Label(prop.Key + " " + prop.Value.GetAssetPath());
+                var text_label = new Label(prop.Value.GetAssetPath());
 
                 text_label.Halign = Align.Start;
                 prop_list_row.Child = text_label;
-            
+                prop_list_row.TooltipText = prop.Value.Name;
+                
                 box_prop_list.Add(prop_list_row);
             }
             
