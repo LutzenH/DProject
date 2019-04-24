@@ -182,7 +182,7 @@
                       <object class="GtkImage">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="stock">gtk-print-preview</property>
+                        <property name="pixbuf">../textures/ui/select.png</property>
                         <property name="icon_size">3</property>
                       </object>
                     </child>
@@ -206,7 +206,7 @@
                       <object class="GtkImage">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="stock">gtk-apply</property>
+                        <property name="pixbuf">../textures/ui/flatten.png</property>
                       </object>
                     </child>
                   </object>
@@ -229,7 +229,7 @@
                       <object class="GtkImage">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="stock">gtk-cdrom</property>
+                        <property name="pixbuf">../textures/ui/raise.png</property>
                       </object>
                     </child>
                   </object>
@@ -252,7 +252,7 @@
                       <object class="GtkImage">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="stock">gtk-execute</property>
+                        <property name="pixbuf">../textures/ui/paint.png</property>
                       </object>
                     </child>
                   </object>
@@ -274,7 +274,7 @@
                       <object class="GtkImage">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="stock">gtk-select-font</property>
+                        <property name="pixbuf">../textures/ui/objectplacer.png</property>
                       </object>
                     </child>
                   </object>
@@ -297,7 +297,7 @@
                     <property name="expand">False</property>
                     <property name="fill">True</property>
                     <property name="pack_type">end</property>
-                    <property name="position">5</property>
+                    <property name="position">4</property>
                   </packing>
                 </child>
                 <child>

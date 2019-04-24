@@ -40,7 +40,6 @@ namespace DProject.Type.Serializable
         [Key(10)]
         public virtual ushort ColorBottomRight { get; set; }
 
-
         public void CalculateAlternativeDiagonal()
         {
             IsAlternativeDiagonal = HeightMap.IsAlternativeDiagonal(
@@ -70,6 +69,25 @@ namespace DProject.Type.Serializable
             }
 
             CalculateAlternativeDiagonal();
+        }
+        
+        public void SetCornerColor(ushort color, TerrainEntity.TileCorner corner)
+        {
+            switch (corner)
+            {
+                case TerrainEntity.TileCorner.TopLeft:
+                    ColorTopLeft = color;
+                    break;
+                case TerrainEntity.TileCorner.TopRight:
+                    ColorTopRight = color;
+                    break;
+                case TerrainEntity.TileCorner.BottomLeft:
+                    ColorBottomLeft = color;
+                    break;
+                case TerrainEntity.TileCorner.BottomRight:
+                    ColorBottomRight = color;
+                    break;
+            }
         }
     }
 }

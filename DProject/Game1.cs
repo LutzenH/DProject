@@ -1,4 +1,5 @@
 ﻿using System;
+using DProject.List;
 using DProject.Manager;
 using DProject.Type;
 using Microsoft.Xna.Framework;
@@ -52,6 +53,8 @@ namespace DProject
 
         protected override void LoadContent()
         {
+            Textures.LoadContent(Content);
+            
             _entityManager.LoadContent(Content);
             _uiManager.LoadContent(Content);
             

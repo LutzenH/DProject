@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using DProject.Entity.Camera;
 using DProject.Entity.Interface;
 using DProject.Manager;
@@ -75,6 +77,8 @@ namespace DProject.Entity.Chunk
             _graphicsDevice = graphicsDevice;
         }
 
+        #region Saving and loading
+        
         private void LoadChunks(Vector2 chunkPosition)
         {
             if (_loadingStatus == ChunkLoadingStatus.Done)
@@ -133,11 +137,12 @@ namespace DProject.Entity.Chunk
 
                 EntityManager.AddMessage(new Message("Loading new chunks: " + oldChunksCount + " chunks reused and " + newChunksCount + " new chunks."));
 
+                _loadingStatus = ChunkLoadingStatus.Busy;
+                
                 //Use this instead of Application.Invoke when not using the GTK editor
                 //Thread thread = new Thread((() => LoadNewChunks(newChunkPositions, newChunkLocations)));
                 //thread.Start();
-
-                _loadingStatus = ChunkLoadingStatus.Busy;
+                                
                 Application.Invoke((sender, args) => LoadNewChunks(newChunkPositions, newChunkLocations));
             }
         }
@@ -206,13 +211,78 @@ namespace DProject.Entity.Chunk
             EntityManager.AddMessage(new Message("Reloaded " + count + " changed chunks."));
         }
 
+        #endregion
+        
+        #region Chunk Information
+        
         public static Vector2 CalculateChunkPosition(float x, float y)
         {
             return new Vector2(
                 (int) (x - (ChunkSize / 2)) / ChunkSize,
                 (int) (y - (ChunkSize / 2)) / ChunkSize);
         }
+        
+        public static Vector2 GetLocalChunkPosition(Vector2 position)
+        {
+            Vector2 tempPosition =
+                new Vector2((float) Math.Floor(position.X + 0.5f), (float) Math.Floor(position.Y + 0.5f));
 
+            int chunkPositionX = (int) Math.Floor(tempPosition.X / ChunkSize);
+            int chunkPositionY = (int) Math.Floor(tempPosition.Y / ChunkSize);
+
+            int localChunkPositionX = (int) tempPosition.X - (chunkPositionX * ChunkSize);
+            int localChunkPositionY = (int) tempPosition.Y - (chunkPositionY * ChunkSize);
+
+            return new Vector2(localChunkPositionX, localChunkPositionY);
+        }
+
+        public TerrainEntity GetChunk(Vector3 position)
+        {
+            Vector2 tempPosition =
+                new Vector2((float) Math.Floor(position.X + 0.5f), (float) Math.Floor(position.Z + 0.5f));
+
+            int chunkPositionX = (int) Math.Floor(tempPosition.X / ChunkSize);
+            int chunkPositionY = (int) Math.Floor(tempPosition.Y / ChunkSize);
+
+            foreach (var chunk in _loadedChunks)
+            {
+                if (chunk != null)
+                {
+                    if (chunk.GetChunkX() == chunkPositionX && chunk.GetChunkY() == chunkPositionY)
+                    {
+                        return chunk;
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        public TerrainEntity GetChunk(int chunkX, int chunkY)
+        {
+            foreach (var chunk in _loadedChunks)
+            {
+                if (chunk.GetChunkX() == chunkX && chunk.GetChunkY() == chunkY)
+                    return chunk;
+            }
+
+            return null;
+        }
+        
+        public TerrainEntity[,] GetLoadedChunks()
+        {
+            return _loadedChunks;
+        }
+
+        public bool IsLoadingChunks()
+        {
+            return (_loadingStatus == ChunkLoadingStatus.Busy);
+        }
+        
+        #endregion
+
+        #region Chunk Editing
+        
         public float? GetHeightFromPosition(Vector2 position, int floor)
         {
             Vector2 tempPosition =
@@ -266,53 +336,6 @@ namespace DProject.Entity.Chunk
                     if (chunk.GetChunkX() == chunkPositionX && chunk.GetChunkY() == chunkPositionY)
                         return chunk.GetVertexHeight(localChunkPositionX, localChunkPositionY, floor, corner);
                 }
-            }
-
-            return null;
-        }
-
-        public static Vector2 GetLocalChunkPosition(Vector2 position)
-        {
-            Vector2 tempPosition =
-                new Vector2((float) Math.Floor(position.X + 0.5f), (float) Math.Floor(position.Y + 0.5f));
-
-            int chunkPositionX = (int) Math.Floor(tempPosition.X / ChunkSize);
-            int chunkPositionY = (int) Math.Floor(tempPosition.Y / ChunkSize);
-
-            int localChunkPositionX = (int) tempPosition.X - (chunkPositionX * ChunkSize);
-            int localChunkPositionY = (int) tempPosition.Y - (chunkPositionY * ChunkSize);
-
-            return new Vector2(localChunkPositionX, localChunkPositionY);
-        }
-
-        public TerrainEntity GetChunk(Vector3 position)
-        {
-            Vector2 tempPosition =
-                new Vector2((float) Math.Floor(position.X + 0.5f), (float) Math.Floor(position.Z + 0.5f));
-
-            int chunkPositionX = (int) Math.Floor(tempPosition.X / ChunkSize);
-            int chunkPositionY = (int) Math.Floor(tempPosition.Y / ChunkSize);
-
-            foreach (var chunk in _loadedChunks)
-            {
-                if (chunk != null)
-                {
-                    if (chunk.GetChunkX() == chunkPositionX && chunk.GetChunkY() == chunkPositionY)
-                    {
-                        return chunk;
-                    }
-                }
-            }
-
-            return null;
-        }
-
-        public TerrainEntity GetChunk(int chunkX, int chunkY)
-        {
-            foreach (var chunk in _loadedChunks)
-            {
-                if (chunk.GetChunkX() == chunkX && chunk.GetChunkY() == chunkY)
-                    return chunk;
             }
 
             return null;
@@ -392,6 +415,81 @@ namespace DProject.Entity.Chunk
                 }
             }
         }
+        
+        public void ChangeTileColor(ushort color, Vector3 position, int floor, int brushSize)
+        {
+            if (brushSize > 0)
+            {
+                ChangeCornerColor(color, position, floor, TerrainEntity.TileCorner.TopLeft);
+                ChangeCornerColor(color, position, floor, TerrainEntity.TileCorner.TopRight);
+                ChangeCornerColor(color, position, floor, TerrainEntity.TileCorner.BottomLeft);
+                ChangeCornerColor(color, position, floor, TerrainEntity.TileCorner.BottomRight);
+            }
+
+            if (brushSize == 2)
+            {
+                ChangeCornerColor(color, new Vector3(position.X + 1, position.Y, position.Z), floor, TerrainEntity.TileCorner.TopRight);
+                ChangeCornerColor(color, new Vector3(position.X + 1, position.Y, position.Z), floor, TerrainEntity.TileCorner.BottomRight);
+                
+                ChangeCornerColor(color, new Vector3(position.X, position.Y, position.Z + 1), floor, TerrainEntity.TileCorner.BottomLeft);
+                ChangeCornerColor(color, new Vector3(position.X + 1, position.Y, position.Z + 1), floor, TerrainEntity.TileCorner.BottomLeft);
+                ChangeCornerColor(color, new Vector3(position.X + 1, position.Y, position.Z + 1), floor, TerrainEntity.TileCorner.BottomRight);
+            }
+            else
+            {
+                if (brushSize > 2)
+                {
+                    ChangeCornerColor(color, new Vector3(position.X, position.Y, position.Z-1), floor, TerrainEntity.TileCorner.TopLeft);
+                    ChangeCornerColor(color, new Vector3(position.X, position.Y, position.Z-1), floor, TerrainEntity.TileCorner.TopRight);
+                    ChangeCornerColor(color, new Vector3(position.X, position.Y, position.Z+1), floor, TerrainEntity.TileCorner.BottomLeft);
+                    ChangeCornerColor(color, new Vector3(position.X, position.Y, position.Z+1), floor, TerrainEntity.TileCorner.BottomRight);
+                    ChangeCornerColor(color, new Vector3(position.X-1, position.Y, position.Z), floor, TerrainEntity.TileCorner.TopLeft);
+                    ChangeCornerColor(color, new Vector3(position.X-1, position.Y, position.Z), floor, TerrainEntity.TileCorner.BottomLeft);
+                    ChangeCornerColor(color, new Vector3(position.X+1, position.Y, position.Z), floor, TerrainEntity.TileCorner.TopRight);
+                    ChangeCornerColor(color, new Vector3(position.X+1, position.Y, position.Z), floor, TerrainEntity.TileCorner.BottomRight);
+                }
+                if (brushSize > 3)
+                {
+                    ChangeCornerColor(color, new Vector3(position.X-1, position.Y, position.Z-1), floor, TerrainEntity.TileCorner.TopLeft);
+                    ChangeCornerColor(color, new Vector3(position.X+1, position.Y, position.Z-1), floor,  TerrainEntity.TileCorner.TopRight);
+                    ChangeCornerColor(color, new Vector3(position.X-1, position.Y, position.Z+1), floor, TerrainEntity.TileCorner.BottomLeft);
+                    ChangeCornerColor(color, new Vector3(position.X+1, position.Y, position.Z+1), floor, TerrainEntity.TileCorner.BottomRight);
+                }
+                if (brushSize > 4)
+                {
+                    ChangeCornerColor(color, new Vector3(position.X-2, position.Y, position.Z), floor, TerrainEntity.TileCorner.TopLeft);
+                    ChangeCornerColor(color, new Vector3(position.X-2, position.Y, position.Z), floor, TerrainEntity.TileCorner.BottomLeft);
+                    ChangeCornerColor(color, new Vector3(position.X+2, position.Y, position.Z), floor, TerrainEntity.TileCorner.TopRight);
+                    ChangeCornerColor(color, new Vector3(position.X+2, position.Y, position.Z), floor, TerrainEntity.TileCorner.BottomRight);
+                    
+                    ChangeCornerColor(color, new Vector3(position.X, position.Y, position.Z+3), floor, TerrainEntity.TileCorner.TopLeft);
+                    ChangeCornerColor(color, new Vector3(position.X, position.Y, position.Z+3), floor, TerrainEntity.TileCorner.TopRight);
+                    ChangeCornerColor(color, new Vector3(position.X, position.Y, position.Z-3), floor, TerrainEntity.TileCorner.BottomLeft);
+                    ChangeCornerColor(color, new Vector3(position.X, position.Y, position.Z-3), floor, TerrainEntity.TileCorner.BottomRight);
+                }
+                if (brushSize > 5)
+                {
+                    ChangeCornerColor(color, new Vector3(position.X-2, position.Y, position.Z-1), floor, TerrainEntity.TileCorner.TopLeft);
+                    ChangeCornerColor(color, new Vector3(position.X-1, position.Y, position.Z-2), floor, TerrainEntity.TileCorner.TopLeft);
+                    
+                    ChangeCornerColor(color, new Vector3(position.X+2, position.Y, position.Z-1), floor, TerrainEntity.TileCorner.TopRight);
+                    ChangeCornerColor(color, new Vector3(position.X+1, position.Y, position.Z-2), floor, TerrainEntity.TileCorner.TopRight);
+       
+                    ChangeCornerColor(color, new Vector3(position.X-2, position.Y, position.Z+1), floor, TerrainEntity.TileCorner.BottomLeft);
+                    ChangeCornerColor(color, new Vector3(position.X-1, position.Y, position.Z+2), floor, TerrainEntity.TileCorner.BottomLeft);
+                    
+                    ChangeCornerColor(color, new Vector3(position.X+2, position.Y, position.Z+1), floor, TerrainEntity.TileCorner.BottomRight);
+                    ChangeCornerColor(color, new Vector3(position.X+1, position.Y, position.Z+2), floor, TerrainEntity.TileCorner.BottomRight);
+                }
+                if (brushSize > 6)
+                {
+                    ChangeCornerColor(color, new Vector3(position.X-2, position.Y, position.Z-2), floor, TerrainEntity.TileCorner.TopLeft);
+                    ChangeCornerColor(color, new Vector3(position.X+2, position.Y, position.Z-2), floor, TerrainEntity.TileCorner.TopRight);
+                    ChangeCornerColor(color, new Vector3(position.X-2, position.Y, position.Z+2), floor, TerrainEntity.TileCorner.BottomLeft);
+                    ChangeCornerColor(color, new Vector3(position.X+2, position.Y, position.Z+2), floor, TerrainEntity.TileCorner.BottomRight);
+                }
+            }
+        }
 
         public void ChangeTileTexture(ushort? textureId, Vector3 position, int floor, int brushSize, bool alternativeTriangle)
         {
@@ -468,6 +566,75 @@ namespace DProject.Entity.Chunk
             int y = (int) localChunkPosition.Y;
             
             GetChunk(position).ChangeTileTexture(textureId, x, y, floor);
+        }
+
+        public void ChangeCornerColor(ushort color, Vector3 position, int floor, TerrainEntity.TileCorner tileCorner)
+        {
+            var localPosition = GetLocalChunkPosition(new Vector2(position.X, position.Z));
+            
+            Vector2 tempPosition = new Vector2((float)Math.Floor(position.X + 0.5f), (float)Math.Floor(position.Z+0.5f));
+            
+            int chunkPositionX = (int)Math.Floor(tempPosition.X / ChunkSize);
+            int chunkPositionY = (int)Math.Floor(tempPosition.Y / ChunkSize);
+            
+            switch (tileCorner)
+            {
+                case TerrainEntity.TileCorner.TopLeft:
+                {
+                    if ((int) localPosition.X == 0 && (int) localPosition.Y == 0)
+                        GetChunk(chunkPositionX-1, chunkPositionY-1).ChangeVertexColor(color, ChunkSize-1, ChunkSize-1, floor, TerrainEntity.TileCorner.BottomRight);
+                
+                    if ((int) localPosition.X == 0)
+                        GetChunk(chunkPositionX-1, chunkPositionY).ChangeVertexColor(color, ChunkSize-1, (int)localPosition.Y, floor, TerrainEntity.TileCorner.TopRight);
+
+                    if ((int) localPosition.Y == 0)
+                        GetChunk(chunkPositionX, chunkPositionY-1).ChangeVertexColor(color, (int)localPosition.X, ChunkSize-1, floor, TerrainEntity.TileCorner.BottomLeft);
+                    break;
+                }
+                
+                case TerrainEntity.TileCorner.TopRight:
+                {
+                    if ((int) localPosition.X == ChunkSize-1 && (int) localPosition.Y == 0)
+                        GetChunk(chunkPositionX+1, chunkPositionY-1).ChangeVertexColor(color, 0, ChunkSize-1, floor, TerrainEntity.TileCorner.BottomLeft);
+                
+                    if ((int) localPosition.X == ChunkSize-1)
+                        GetChunk(chunkPositionX+1, chunkPositionY).ChangeVertexColor(color, 0, (int)localPosition.Y, floor, TerrainEntity.TileCorner.TopLeft);
+                
+                    if ((int) localPosition.Y == 0)
+                        GetChunk(chunkPositionX, chunkPositionY-1).ChangeVertexColor(color, (int)localPosition.X, ChunkSize-1, floor, TerrainEntity.TileCorner.BottomRight);
+                    break;
+                }
+
+                case TerrainEntity.TileCorner.BottomLeft:
+                {
+                    if ((int) localPosition.X == 0 && (int) localPosition.Y == ChunkSize-1)
+                        GetChunk(chunkPositionX-1, chunkPositionY+1).ChangeVertexColor(color, ChunkSize-1, 0, floor, TerrainEntity.TileCorner.TopRight);
+                    
+                    if((int) localPosition.X == 0)
+                        GetChunk(chunkPositionX-1, chunkPositionY).ChangeVertexColor(color, ChunkSize-1, (int)localPosition.Y, floor, TerrainEntity.TileCorner.BottomRight);
+                    
+                    if((int) localPosition.Y == ChunkSize-1)
+                        GetChunk(chunkPositionX, chunkPositionY+1).ChangeVertexColor(color, (int)localPosition.X, 0, floor, TerrainEntity.TileCorner.TopLeft);
+                    
+                    break;
+                }
+
+                case TerrainEntity.TileCorner.BottomRight:
+                {
+                    if ((int) localPosition.X == ChunkSize-1 && (int) localPosition.Y == ChunkSize-1)
+                        GetChunk(chunkPositionX+1, chunkPositionY+1).ChangeVertexColor(color, 0, 0, floor, TerrainEntity.TileCorner.TopLeft);
+                    
+                    if ((int) localPosition.X == ChunkSize-1)
+                        GetChunk(chunkPositionX+1, chunkPositionY).ChangeVertexColor(color, 0, (int)localPosition.Y, floor, TerrainEntity.TileCorner.BottomLeft);
+                    
+                    if((int) localPosition.Y == ChunkSize-1)
+                        GetChunk(chunkPositionX, chunkPositionY+1).ChangeVertexColor(color, (int)localPosition.X, 0, floor, TerrainEntity.TileCorner.TopRight);
+                    
+                    break;
+                }
+            }
+
+            GetChunk(position).ChangeVertexColor(color, (int)localPosition.X, (int)localPosition.Y, floor, tileCorner);
         }
 
         public void ChangeCornerHeight(byte height, Vector3 position, int floor, TerrainEntity.TileCorner tileCorner)
@@ -552,15 +719,7 @@ namespace DProject.Entity.Chunk
             
             GetChunk(position).RemoveProp((int)localPosition.X, (int)localPosition.Y, floor);
         }
-
-        public TerrainEntity[,] GetLoadedChunks()
-        {
-            return _loadedChunks;
-        }
-
-        public bool IsLoadingChunks()
-        {
-            return (_loadingStatus == ChunkLoadingStatus.Busy);
-        }
+        
+        #endregion
     }
 }

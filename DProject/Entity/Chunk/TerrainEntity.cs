@@ -19,7 +19,6 @@ namespace DProject.Entity.Chunk
     public class TerrainEntity : AbstractEntity, IDrawable, IInitialize
     {
         private HeightMap[] _heightMaps;
-        private Texture2D _terrainTexture;
 
         private readonly int _chunkPositionX;
         private readonly int _chunkPositionY;
@@ -49,13 +48,13 @@ namespace DProject.Entity.Chunk
             
             if (File.Exists(path))
             {
-                Stream stream = File.Open("Content/chunks/chunk_" + x + "_" + y + ".dat", FileMode.Open);
+                Stream stream = File.Open(path, FileMode.Open);
                 var bytes = stream;
                 
                 _chunkData = LZ4MessagePackSerializer.Deserialize<ChunkData>(bytes);
                 stream.Close();
 
-                SetProps();
+                LoadProps();
                 
                 ChunkStatus = ChunkStatus.Current;
             }
@@ -77,7 +76,7 @@ namespace DProject.Entity.Chunk
                     Objects = Object.GenerateObjects(0, 0, DefaultFloorCount, 1)
                 };
 
-                SetProps();
+                LoadProps();
                 
                 ChunkStatus = ChunkStatus.Unserialized;
             }
@@ -125,8 +124,6 @@ namespace DProject.Entity.Chunk
         {
             _contentManager = content;
             
-            _terrainTexture = content.Load<Texture2D>(Textures.TextureAtlasLocation);
-
             foreach (var floor in _props)
             {
                 foreach (var prop in floor)
@@ -149,7 +146,7 @@ namespace DProject.Entity.Chunk
             {
                 foreach (var heightMap in _heightMaps)
                 {
-                    heightMap.Draw(activeCamera.GetProjectMatrix(),activeCamera.GetViewMatrix(), GetWorldMatrix(), _terrainTexture);
+                    heightMap.Draw(activeCamera.GetProjectMatrix(),activeCamera.GetViewMatrix(), GetWorldMatrix(), Textures._terrainTexture);
                 }
                 
                 foreach (var floor in _props)
@@ -165,27 +162,14 @@ namespace DProject.Entity.Chunk
             _graphicsDevice = graphicsDevice;
 
             foreach (var heightMap in _heightMaps)
+            {
                 heightMap.Initialize(graphicsDevice);
+            }
             
             _tileBoundingBoxes = GenerateBoundingBoxes();
         }
 
-        public int GetChunkX()
-        {
-            return _chunkPositionX;
-        }
-
-        public int GetChunkY()
-        {
-            return _chunkPositionY;
-        }
-
-        public HeightMap GetHeightMap(int floor)
-        {
-            return _heightMaps[floor];
-        }
-
-        private void SetProps()
+        private void LoadProps()
         {
             _props = new List<PropEntity>[_chunkData.Objects.Length];
                 
@@ -250,6 +234,21 @@ namespace DProject.Entity.Chunk
             }
         }
 
+        public void UpdateHeightMap()
+        {
+            for (int floor = 0; floor < _heightMaps.Length; floor++)
+            {
+                if (_heightMaps[floor].GetHasUpdated())
+                {
+                    _heightMaps[floor] = new HeightMap(_chunkData.Tiles[floor]);
+                    _heightMaps[floor].Initialize(_graphicsDevice);
+                    _heightMaps[floor].SetHasUpdated(false);
+                }
+            }
+        }
+        
+        #region Editing
+        
         public void PlaceProp(int x, int y, int floor, Rotation rotation, ushort objectId)
         {
             var existingProp = false;
@@ -338,7 +337,7 @@ namespace DProject.Entity.Chunk
             ChunkStatus = ChunkStatus.Changed;
         }
         
-        public void ChangeColor(ushort colorId, TileCorner corner, int x, int y, int floor)
+        public void ChangeCornerColor(ushort colorId, TileCorner corner, int x, int y, int floor)
         {
             switch (corner)
             {
@@ -362,7 +361,76 @@ namespace DProject.Entity.Chunk
             ChunkStatus = ChunkStatus.Changed;
         }
         
-        public void ChangeColor(ushort colorId, int x, int y, int floor)
+        public void ChangeVertexColor(ushort color, int x, int y, int floor, TileCorner corner)
+        {
+            switch (corner)
+            {
+                case TileCorner.TopLeft:
+                {
+                    _chunkData.Tiles[floor][x, y].SetCornerColor(color, TileCorner.TopLeft);
+            
+                    if(x > 0)
+                        _chunkData.Tiles[floor][x-1,y].SetCornerColor(color, TileCorner.TopRight);
+            
+                    if(y > 0)
+                        _chunkData.Tiles[floor][x,y-1].SetCornerColor(color, TileCorner.BottomLeft);
+            
+                    if(x > 0 && y > 0)
+                        _chunkData.Tiles[floor][x-1,y-1].SetCornerColor(color, TileCorner.BottomRight);
+                    break;
+                }
+                
+                case TileCorner.TopRight:
+                {
+                    _chunkData.Tiles[floor][x,y].SetCornerColor(color, TileCorner.TopRight);
+                
+                    if(y > 0)
+                        _chunkData.Tiles[floor][x,y-1].SetCornerColor(color, TileCorner.BottomRight);
+                
+                    if(x < ChunkLoaderEntity.ChunkSize-1 && y > 0)
+                        _chunkData.Tiles[floor][x+1,y-1].SetCornerColor(color, TileCorner.BottomLeft);
+                
+                    if(x < ChunkLoaderEntity.ChunkSize-1)
+                        _chunkData.Tiles[floor][x+1,y].SetCornerColor(color, TileCorner.TopLeft);
+                    break;
+                }
+                
+                case TileCorner.BottomLeft:
+                {
+                    _chunkData.Tiles[floor][x,y].SetCornerColor(color, TileCorner.BottomLeft);
+                
+                    if(y < ChunkLoaderEntity.ChunkSize-1)
+                        _chunkData.Tiles[floor][x,y+1].SetCornerColor(color, TileCorner.TopLeft);
+                
+                    if(y < ChunkLoaderEntity.ChunkSize-1 && x > 0)
+                        _chunkData.Tiles[floor][x-1,y+1].SetCornerColor(color, TileCorner.TopRight);
+                
+                    if(x > 0)
+                        _chunkData.Tiles[floor][x-1,y].SetCornerColor(color, TileCorner.BottomRight);
+                    break;
+                }
+                
+                case TileCorner.BottomRight:
+                {
+                    _chunkData.Tiles[floor][x,y].SetCornerColor(color, TileCorner.BottomRight);
+                
+                    if(y < ChunkLoaderEntity.ChunkSize-1)
+                        _chunkData.Tiles[floor][x,y+1].SetCornerColor(color, TileCorner.TopRight);
+                
+                    if(x < ChunkLoaderEntity.ChunkSize-1 && y < ChunkLoaderEntity.ChunkSize-1)
+                        _chunkData.Tiles[floor][x+1,y+1].SetCornerColor(color, TileCorner.TopLeft);
+                
+                    if(x < ChunkLoaderEntity.ChunkSize-1)
+                        _chunkData.Tiles[floor][x+1,y].SetCornerColor(color, TileCorner.BottomLeft);
+                    break;
+                }
+            }
+
+            _heightMaps[floor].SetHasUpdated(true);
+            ChunkStatus = ChunkStatus.Changed;
+        }
+        
+        public void ChangeTileColor(ushort colorId, int x, int y, int floor)
         {
             _chunkData.Tiles[floor][x, y].ColorTopLeft = colorId;
             _chunkData.Tiles[floor][x, y].ColorTopRight = colorId;
@@ -442,19 +510,10 @@ namespace DProject.Entity.Chunk
             ChunkStatus = ChunkStatus.Changed;
         }
 
-        public void UpdateHeightMap()
-        {
-            for (int floor = 0; floor < _heightMaps.Length; floor++)
-            {
-                if (_heightMaps[floor].GetHasUpdated())
-                {
-                    _heightMaps[floor] = new HeightMap(_chunkData.Tiles[floor]);
-                    _heightMaps[floor].Initialize(_graphicsDevice);
-                    _heightMaps[floor].SetHasUpdated(false);
-                }
-            }
-        }
+        #endregion
 
+        #region Getters and Setters
+        
         public byte GetTileHeight(int x, int y, int floor)
         {
             return (byte) Math.Round((_chunkData.Tiles[floor][x, y].TopLeft
@@ -500,5 +559,22 @@ namespace DProject.Entity.Chunk
         {
             return _tileBoundingBoxes[floor][x,y];
         }
+        
+        public int GetChunkX()
+        {
+            return _chunkPositionX;
+        }
+
+        public int GetChunkY()
+        {
+            return _chunkPositionY;
+        }
+
+        public HeightMap GetHeightMap(int floor)
+        {
+            return _heightMaps[floor];
+        }
+        
+        #endregion
     }
 }

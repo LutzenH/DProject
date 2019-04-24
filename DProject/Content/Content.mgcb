@@ -10,6 +10,7 @@
 
 #-------------------------------- References --------------------------------#
 
+/reference:../../../../.nuget/packages/infinitespacestudios.pipeline/1.0.9/tools/InfinitespaceStudios.Pipeline.dll
 
 #---------------------------------- Content ---------------------------------#
 
@@ -354,6 +355,24 @@
 /processorParam:SwapWindingOrder=False
 /processorParam:TextureFormat=Compressed
 /build:models/structures/walls/plaster_wall_inside_corner.fbx
+
+#begin shaders/BasicEffect.fx
+/importer:EffectImporter
+/processor:RemoteEffectProcessor
+/processorParam:RemoteAddress=192.168.1.143
+/processorParam:RemotePort=8001
+/processorParam:Protocol=http
+/processorParam:DebugMode=Auto
+/build:shaders/BasicEffect.fx
+
+#begin shaders/Diffuse.fx
+/importer:EffectImporter
+/processor:RemoteEffectProcessor
+/processorParam:RemoteAddress=192.168.1.143
+/processorParam:RemotePort=8001
+/processorParam:Protocol=http
+/processorParam:DebugMode=Auto
+/build:shaders/Diffuse.fx
 
 #begin textures/textureatlas.png
 /importer:TextureImporter

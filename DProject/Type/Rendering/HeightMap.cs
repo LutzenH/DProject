@@ -1,5 +1,6 @@
 using System;
 using DProject.List;
+using DProject.Type.Rendering.Shaders;
 using DProject.Type.Serializable;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -10,8 +11,9 @@ namespace DProject.Type.Rendering
     {       
         private VertexPositionTextureColorNormal[] _vertexPositions;
 
-        private VertexBuffer _vertexBuffer;
-        private BasicEffect _basicEffect;
+        private DynamicVertexBuffer _vertexBuffer;
+        
+        private static TerrainEffect _terrainEffect;
 
         private readonly int _width;
         private readonly int _height;
@@ -30,9 +32,6 @@ namespace DProject.Type.Rendering
         {
             _width = tiles.GetLength(0);
             _height = tiles.GetLength(1);
-
-            //Amount of tiles times 2 (two triangles per tile)
-            _primitiveCount = _width * _height * 2;
             
             _vertexPositions = GenerateVertexPositions(tiles);
         }
@@ -40,43 +39,46 @@ namespace DProject.Type.Rendering
         public void Initialize(GraphicsDevice graphicsDevice)
         {
             _graphicsDevice = graphicsDevice;
-            
-            //Graphics Effects
-            _basicEffect = new BasicEffect(graphicsDevice);
-            _basicEffect.Alpha = 1.0f;
-            
-            _basicEffect.LightingEnabled = true;
-            _basicEffect.AmbientLightColor = new Vector3(0.15f,0.15f,0.15f);
-            _basicEffect.DirectionalLight0.DiffuseColor = new Vector3(0.6f, 0.6f, 0.6f);
-            _basicEffect.DirectionalLight0.Direction = new Vector3(1, 0.5f, 0);
 
-            _basicEffect.VertexColorEnabled = true;
-
-            _basicEffect.FogEnabled = true;
-            _basicEffect.FogColor = Color.DarkGray.ToVector3();
-            _basicEffect.FogStart = 120f;
-            _basicEffect.FogEnd = 160f;
-
-            _basicEffect.TextureEnabled = true;
+            if (_terrainEffect == null)
+            {
+                //Graphics Effects
+                _terrainEffect = new TerrainEffect(graphicsDevice);
+                _terrainEffect.Alpha = 1.0f;
             
+                _terrainEffect.LightingEnabled = true;
+                _terrainEffect.AmbientLightColor = new Vector3(0.15f,0.15f,0.15f);
+                _terrainEffect.DirectionalLight0.DiffuseColor = new Vector3(0.6f, 0.6f, 0.6f);
+                _terrainEffect.DirectionalLight0.Direction = new Vector3(1, 0.5f, 0);
+
+                _terrainEffect.VertexColorEnabled = true;
+
+                _terrainEffect.FogEnabled = true;
+                _terrainEffect.FogColor = Color.DarkGray.ToVector3();
+                _terrainEffect.FogStart = 120f;
+                _terrainEffect.FogEnd = 160f;
+
+                _terrainEffect.TextureEnabled = true;
+            }
+
             //Sends Vertex Information to the graphics-card
-            _vertexBuffer = new VertexBuffer(graphicsDevice, typeof(VertexPositionTextureColorNormal), GetVertexCount(), BufferUsage.WriteOnly);
-            
-            if(GetVertexCount() != 0)
+            _vertexBuffer = new DynamicVertexBuffer(graphicsDevice, typeof(VertexPositionTextureColorNormal), GetVertexCount(), BufferUsage.WriteOnly);
+                                    
+            if(GetVertexCount() != 0) //Expensive Computation
                 _vertexBuffer.SetData(_vertexPositions);
         }
 
         public void Draw(Matrix projectMatrix, Matrix viewMatrix, Matrix worldMatrix, Texture2D texture2D)
         {
-            _basicEffect.Projection = projectMatrix;
-            _basicEffect.View = viewMatrix;
-            _basicEffect.World = worldMatrix;
+            _terrainEffect.Projection = projectMatrix;
+            _terrainEffect.View = viewMatrix;
+            _terrainEffect.World = worldMatrix;
 
-            _basicEffect.Texture = texture2D;
+            _terrainEffect.Texture = texture2D;
 
             _graphicsDevice.SetVertexBuffer(_vertexBuffer);
 
-            foreach (EffectPass pass in _basicEffect.CurrentTechnique.Passes)
+            foreach (EffectPass pass in _terrainEffect.CurrentTechnique.Passes)
             {
                 pass.Apply();
                 
@@ -93,17 +95,19 @@ namespace DProject.Type.Rendering
 
         private VertexPositionTextureColorNormal[] GenerateVertexPositions(Tile[,] tiles)
         {
+            _primitiveCount = _width * _height * 2;
+            
             int width = tiles.GetLength(0);
             int height = tiles.GetLength(1);
             
             VertexPositionTextureColorNormal[] vertexPositions = new VertexPositionTextureColorNormal[GetVertexCount()];
 
             int vertexIndex = 0;
-
+            
             for (int x = 0; x < width; x++)
             {
                 for (int y = 0; y < height; y++)
-                {
+                {                    
                     var topLeft = new Vector3 (x-0.5f,  tiles[x,y].TopLeft / IncrementsPerHeightUnit, y-0.5f);
                     var topRight = new Vector3 (x+0.5f,  tiles[x,y].TopRight/ IncrementsPerHeightUnit, y-0.5f);
                     var bottomLeft = new Vector3 (x-0.5f, tiles[x,y].BottomLeft/ IncrementsPerHeightUnit, y+0.5f);
@@ -162,10 +166,46 @@ namespace DProject.Type.Rendering
                     }
                 }
             }
-
+            
             Array.Resize(ref vertexPositions, GetVertexCount());
 
             return vertexPositions;
+        }
+
+        public static byte[,] GenerateHeightMapFromTileMap(Tile[,] tilemap)
+        {
+            byte[,] heightmap = new byte[tilemap.GetLength(0)+1,tilemap.GetLength(1)+1];
+            
+            for (var x = 0; x < heightmap.GetLength(0); x++)
+            {
+                for (var y = 0; y < heightmap.GetLength(1); y++)
+                {
+                    var right = x == tilemap.GetLength(0);
+                    var bottom = y == tilemap.GetLength(1);
+
+                    if (right || bottom)
+                    {
+                        if (right && !bottom)
+                        {
+                            heightmap[x, y] = tilemap[x-1, y].TopRight;
+                        }
+                        if (!right && bottom)
+                        {
+                            heightmap[x, y] = tilemap[x, y-1].BottomLeft;
+                        }
+                        if (right && bottom)
+                        {
+                            heightmap[x, y] = tilemap[x-1, y-1].BottomRight;
+                        }
+                    }
+                    else
+                    {
+                        heightmap[x, y] = tilemap[x, y].TopLeft;
+                    }
+                }
+            }
+
+            return heightmap;
         }
 
         public static Tile[,] GenerateTileMap(byte[,] heightmap)

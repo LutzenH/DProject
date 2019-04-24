@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using DProject.Type;
-using DProject.Type.Serializable;
 using MessagePack;
+using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Graphics;
+using Texture = DProject.Type.Serializable.Texture;
 
 namespace DProject.List
 {
@@ -14,6 +15,8 @@ namespace DProject.List
         public const string TextureAtlasLocation = "textures/textureatlas";
         public const int TextureAtlasSize = 128;
 
+        public static Texture2D _terrainTexture;
+        
         static Textures()
         {            
             using (TextReader reader = new StreamReader("Content/collections/textures.json"))
@@ -32,6 +35,11 @@ namespace DProject.List
         public static ushort GetDefaultTextureId()
         {
             return 0;
+        }
+
+        public static void LoadContent(ContentManager content)
+        {
+            _terrainTexture = content.Load<Texture2D>(TextureAtlasLocation);
         }
 
         public static ushort GetTextureIdFromName(string name)

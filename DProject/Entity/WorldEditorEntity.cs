@@ -92,12 +92,17 @@ namespace DProject.Entity
             }
         }
 
-        private void SetSelectedObject()
+        public void Draw(CameraEntity activeCamera)
         {
-            _selectedObject = (ushort)Math.Abs(Mouse.GetState().ScrollWheelValue / 120);
-            _selectedObject %= (ushort)Props.PropList.Count;
+            _axisEntity.Draw(activeCamera);
+            _pointerEntity.Draw(activeCamera);
+            
+            if(_brushSize < 1)
+                _cornerIndicatorEntity.Draw(activeCamera);
         }
 
+        #region Tools
+        
         private void UseTool()
         {
             var mouseLocation = Game1.GetAdjustedMousePosition();
@@ -109,7 +114,7 @@ namespace DProject.Entity
                 switch (_tools)
                 {
                     case Tools.Select:
-                        
+                        ColorPainter(position, precisePosition);
                         break;
                     case Tools.Flatten:
                         Flatten(precisePosition, position);
@@ -141,6 +146,34 @@ namespace DProject.Entity
                 
                 _chunkLoaderEntity.ChangeCornerHeight(height, position, _currentFloor, tileCorner);
             }
+        }
+        
+        private void ChangeColor(Vector3 position, Vector3 precisePosition, ushort color)
+        {
+            if (_brushSize > 0)
+            {
+                _chunkLoaderEntity.ChangeTileColor(color, position, _currentFloor, _brushSize); 
+            }
+            else
+            {
+                var tileCorner = CalculateCorner(precisePosition);
+                
+                _chunkLoaderEntity.ChangeCornerColor(color, position, _currentFloor, tileCorner);
+            }
+        }
+
+        private void ColorPainter(Vector3 position, Vector3 precisePosition)
+        {
+            var tileCorner = CalculateCorner(precisePosition);
+
+            if (Mouse.GetState().LeftButton == ButtonState.Pressed)
+            {
+                ChangeColor(position, precisePosition, _selectedColor);
+            }
+
+            _axisEntity.SetPosition(precisePosition);
+            _cornerIndicatorEntity.SetPosition(position);
+            _cornerIndicatorEntity.SetRotation(tileCorner);
         }
 
         private void Raise(Vector3 position, Vector3 precisePosition)
@@ -235,23 +268,6 @@ namespace DProject.Entity
             }
         }
 
-        private TerrainEntity.TileCorner CalculateCorner(Vector3 precisePosition)
-        {            
-            var restX = Math.Abs(precisePosition.X % 1f);
-            var restY = Math.Abs(precisePosition.Z % 1f);
-
-            if (precisePosition.X < 0f)
-                restX = 1-restX;
-
-            if (precisePosition.Z < 0f)
-                restY = 1-restY;
-
-            if (restX > 0.5f)
-                return restY > 0.5f ? TerrainEntity.TileCorner.TopLeft : TerrainEntity.TileCorner.BottomLeft;
-            else
-                return restY > 0.5f ? TerrainEntity.TileCorner.TopRight : TerrainEntity.TileCorner.BottomRight;
-        }
-
         private void Paint(Vector3 position, Vector3 precisePosition)
         {
             _axisEntity.SetPosition(precisePosition);
@@ -270,6 +286,27 @@ namespace DProject.Entity
                 
                 _chunkLoaderEntity.ChangeTileTexture(null, position, _currentFloor, _brushSize, alternativeTriangle);
             }
+        }
+        
+        #endregion
+
+        #region Calculations
+        
+        private TerrainEntity.TileCorner CalculateCorner(Vector3 precisePosition)
+        {            
+            var restX = Math.Abs(precisePosition.X % 1f);
+            var restY = Math.Abs(precisePosition.Z % 1f);
+
+            if (precisePosition.X < 0f)
+                restX = 1-restX;
+
+            if (precisePosition.Z < 0f)
+                restY = 1-restY;
+
+            if (restX > 0.5f)
+                return restY > 0.5f ? TerrainEntity.TileCorner.TopLeft : TerrainEntity.TileCorner.BottomLeft;
+            else
+                return restY > 0.5f ? TerrainEntity.TileCorner.TopRight : TerrainEntity.TileCorner.BottomRight;
         }
 
         private Vector3 CalculatePosition(Vector2 mouseLocation)
@@ -311,14 +348,9 @@ namespace DProject.Entity
             return position;
         }
 
-        public void Draw(CameraEntity activeCamera)
-        {
-            _axisEntity.Draw(activeCamera);
-            _pointerEntity.Draw(activeCamera);
-            
-            if(_brushSize < 1)
-                _cornerIndicatorEntity.Draw(activeCamera);
-        }
+        #endregion
+        
+        #region Getters and Setters
         
         public Tools GetCurrentTool()
         {
@@ -338,6 +370,12 @@ namespace DProject.Entity
         public ushort GetSelectedObject()
         {
             return _selectedObject;
+        }
+        
+        private void SetSelectedObject()
+        {
+            _selectedObject = (ushort)Math.Abs(Mouse.GetState().ScrollWheelValue / 120);
+            _selectedObject %= (ushort)Props.PropList.Count;
         }
 
         public ushort GetSelectedColor()
@@ -374,5 +412,7 @@ namespace DProject.Entity
         {
             _activeTexture = textureId;
         }
+
+        #endregion
     }
 }
