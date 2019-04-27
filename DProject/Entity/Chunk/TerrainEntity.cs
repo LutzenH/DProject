@@ -574,7 +574,12 @@ namespace DProject.Entity.Chunk
         {
             return _heightMaps[floor];
         }
-        
+
+        public ChunkData GetChunkData()
+        {
+            return _chunkData;
+        }
+
         #endregion
     }
 }

@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using DProject.Entity.Camera;
 using DProject.Entity.Interface;
 using DProject.Manager;
@@ -29,6 +27,8 @@ namespace DProject.Entity.Chunk
         public const int ChunkSize = 64;
         
         private TerrainEntity[,] _loadedChunks = new TerrainEntity[LoadDistance, LoadDistance];
+
+        private bool _loadedChunksLastFrame;
         
         public enum ChunkLoadingStatus
         {
@@ -58,7 +58,14 @@ namespace DProject.Entity.Chunk
                 _entityManager.GetActiveCamera().GetPosition().Z);
 
             if (!_chunkPosition.Equals(_previousChunkPosition))
+            {
                 LoadChunks(_chunkPosition);
+            }
+            else
+            {
+                if (_loadedChunksLastFrame)
+                    _loadedChunksLastFrame = false;
+            }
 
             _previousChunkPosition = _chunkPosition;
 
@@ -144,6 +151,8 @@ namespace DProject.Entity.Chunk
                 //thread.Start();
                                 
                 Application.Invoke((sender, args) => LoadNewChunks(newChunkPositions, newChunkLocations));
+                
+                _loadedChunksLastFrame = true;
             }
         }
 
@@ -278,7 +287,12 @@ namespace DProject.Entity.Chunk
         {
             return (_loadingStatus == ChunkLoadingStatus.Busy);
         }
-        
+
+        public bool LoadedChunksLastFrame()
+        {
+            return _loadedChunksLastFrame;
+        }
+
         #endregion
 
         #region Chunk Editing

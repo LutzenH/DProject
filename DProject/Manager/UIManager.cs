@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using DProject.Entity.Interface;
 using DProject.UI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -21,11 +22,18 @@ namespace DProject.Manager
             
             _userInterfaces.Add(new WorldEditorUI(entityManager.GetWorldEditorEntity()));
             _userInterfaces.Add(new MessageUI(entityManager));
+            _userInterfaces.Add(new WorldMapUI(entityManager.GetChunkLoaderEntity()));
         }
         
         public void Initialize(GraphicsDevice graphicsDevice)
         {    
             _spriteBatch = new SpriteBatch(graphicsDevice);
+            
+            foreach (var ui in _userInterfaces)
+            {
+                if(ui is IInitialize initializedUi)
+                    initializedUi.Initialize(graphicsDevice);
+            }
         }
         
         public void LoadContent(ContentManager content)
