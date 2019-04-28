@@ -1,7 +1,5 @@
-﻿using System;
-using DProject.List;
+﻿using DProject.List;
 using DProject.Manager;
-using DProject.Type;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;

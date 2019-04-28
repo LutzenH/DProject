@@ -56,9 +56,9 @@ namespace DProject
         //Textures
         [Builder.Object] private FlowBox box_flow_textures;
         
-        public EditorWindow()
+        public EditorWindow(string[] args)
         {
-            Application.Init();
+            Application.Init("Program1", ref args);
             
             _builder = new Builder();
             _builder.AddFromFile("Content/ui/EditorWindow.glade");

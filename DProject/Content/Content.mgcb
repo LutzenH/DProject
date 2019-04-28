@@ -1,7 +1,7 @@
 
 #----------------------------- Global Properties ----------------------------#
 
-/outputDir:bin/$(Platform)
+/outputDir:../bin/$(Platform)
 /intermediateDir:obj/$(Platform)
 /platform:DesktopGL
 /config:
@@ -10,7 +10,7 @@
 
 #-------------------------------- References --------------------------------#
 
-/reference:../../../../.nuget/packages/infinitespacestudios.pipeline/1.0.9/tools/InfinitespaceStudios.Pipeline.dll
+/reference:../../../../../.nuget/packages/infinitespacestudios.pipeline/1.0.9/tools/InfinitespaceStudios.Pipeline.dll
 
 #---------------------------------- Content ---------------------------------#
 

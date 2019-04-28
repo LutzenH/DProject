@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Threading;
-using Cairo;
-using Gtk;
 
 namespace DProject
 {
@@ -10,7 +7,12 @@ namespace DProject
         [STAThread]
         public static void Main(string[] args)
         {
-            var window = new EditorWindow();
+#if EDITOR
+            var window = new EditorWindow(args);
+#else
+            using (var game = new Game1())
+                game.Run();
+#endif
         }
     }
 }

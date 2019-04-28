@@ -6,11 +6,13 @@
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-    <OutputPath>bin\Game\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;NETFRAMEWORK;NET471;EDITOR</DefineConstants>
+    <OutputPath>bin\Editor\Debug\</OutputPath>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-    <OutputPath>bin\Game\Release\</OutputPath>
+    <DefineConstants>TRACE;RELEASE;NETFRAMEWORK;NET471;EDITOR</DefineConstants>
+    <OutputPath>bin\Editor\Release\</OutputPath>
   </PropertyGroup>
 
   <ItemGroup>
@@ -18,14 +20,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="GtkSharp" Version="3.22.24.37" />
     <PackageReference Include="LibNoise" Version="0.2.0" />
     <PackageReference Include="MessagePack" Version="1.7.3.4" />
     <PackageReference Include="MonoGame.Content.Builder" Version="3.7.0.9" />
-    <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.7.1.189" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Remove="EditorWindow.cs" />
+    <PackageReference Include="MonoGame.Framework.Gtk" Version="3.8.0.1" />
   </ItemGroup>
 
 </Project>
