@@ -33,30 +33,41 @@ namespace DProject.Entity.Chunk
         
         private readonly BoundingSphere _boundingSphere;
         
-        public ChunkStatus ChunkStatus { get; set; }
-
         public enum TileCorner { TopLeft, TopRight, BottomLeft, BottomRight }
 
         private const int DefaultFloorCount = 2;
         
         public TerrainEntity(int x, int y) : base(new Vector3(x*ChunkLoaderEntity.ChunkSize, 0, y*ChunkLoaderEntity.ChunkSize), Quaternion.Identity, new Vector3(1,1,1))
         {
-            string path = "Content/chunks/chunk_" + x + "_" + y + ".dat";
-            
             _chunkPositionX = x;
             _chunkPositionY = y;
+
+            _chunkData = GenerateChunkData(_chunkPositionX, _chunkPositionY);
+            
+            LoadProps();
+            
+            _heightMaps = new HeightMap[DefaultFloorCount];
+            
+            for (var floor = 0; floor < _heightMaps.Length; floor++)
+                _heightMaps[floor] = new HeightMap(_chunkData.Tiles[floor]);
+            
+            _boundingSphere = new BoundingSphere(new Vector3(ChunkLoaderEntity.ChunkSize/2, 0, ChunkLoaderEntity.ChunkSize/2), ChunkLoaderEntity.ChunkSize/1.6f);
+        }
+
+        public static ChunkData GenerateChunkData(int x, int y)
+        {
+            string path = "Content/chunks/chunk_" + x + "_" + y + ".dat";
+            ChunkData chunkdata;
             
             if (File.Exists(path))
             {
                 Stream stream = File.Open(path, FileMode.Open);
                 var bytes = stream;
                 
-                _chunkData = LZ4MessagePackSerializer.Deserialize<ChunkData>(bytes);
+                chunkdata = LZ4MessagePackSerializer.Deserialize<ChunkData>(bytes);
                 stream.Close();
-
-                LoadProps();
                 
-                ChunkStatus = ChunkStatus.Current;
+                chunkdata.ChunkStatus = ChunkStatus.Current;
             }
             else
             {                   
@@ -67,26 +78,19 @@ namespace DProject.Entity.Chunk
                 tiles[0] = HeightMap.GenerateTileMap(heightmap);
                 tiles[1] = HeightMap.GenerateTileMap(ChunkLoaderEntity.ChunkSize, 1);
                 
-                _chunkData = new ChunkData()
+                chunkdata = new ChunkData()
                 {
                     ChunkPositionX = x,
                     ChunkPositionY = y,
                     Tiles = tiles,
                     
-                    Objects = Object.GenerateObjects(0, 0, DefaultFloorCount, 1)
+                    Objects = Object.GenerateObjects(0, 0, DefaultFloorCount, 1),
+                    
+                    ChunkStatus = ChunkStatus.Unserialized
                 };
-
-                LoadProps();
-                
-                ChunkStatus = ChunkStatus.Unserialized;
             }
 
-            _heightMaps = new HeightMap[DefaultFloorCount];
-            
-            for (var floor = 0; floor < _heightMaps.Length; floor++)
-                _heightMaps[floor] = new HeightMap(_chunkData.Tiles[floor]);
-            
-            _boundingSphere = new BoundingSphere(new Vector3(ChunkLoaderEntity.ChunkSize/2, 0, ChunkLoaderEntity.ChunkSize/2), ChunkLoaderEntity.ChunkSize/1.6f);
+            return chunkdata;
         }
 
         private BoundingBox[][,] GenerateBoundingBoxes()
@@ -133,7 +137,7 @@ namespace DProject.Entity.Chunk
 
         public void Serialize()
         {
-            ChunkStatus = ChunkStatus.Current;
+            _chunkData.ChunkStatus = ChunkStatus.Current;
 
             Stream stream = File.Open("Content/chunks/chunk_" + _chunkPositionX + "_" + _chunkPositionY + ".dat", FileMode.Create);
             var bytes = LZ4MessagePackSerializer.Serialize(_chunkData);
@@ -273,7 +277,7 @@ namespace DProject.Entity.Chunk
                     _props[floor][i].LoadContent(_contentManager);
                     
                     existingProp = true;
-                    ChunkStatus = ChunkStatus.Changed;
+                    _chunkData.ChunkStatus = ChunkStatus.Changed;
                     return;
                 }
             }
@@ -299,7 +303,7 @@ namespace DProject.Entity.Chunk
                 _props[floor].Add(prop);
                 prop.LoadContent(_contentManager);
                 
-                ChunkStatus = ChunkStatus.Changed;
+                _chunkData.ChunkStatus = ChunkStatus.Changed;
             }
         }
 
@@ -311,7 +315,7 @@ namespace DProject.Entity.Chunk
                 {
                     _chunkData.Objects[floor].RemoveAt(i);
                     _props[floor].RemoveAt(i);
-                    ChunkStatus = ChunkStatus.Changed;
+                    _chunkData.ChunkStatus = ChunkStatus.Changed;
                     return;
                 }
             }
@@ -323,7 +327,7 @@ namespace DProject.Entity.Chunk
             _chunkData.Tiles[floor][x,y].TileTextureIdTriangleTwo = textureId;
 
             _heightMaps[floor].SetHasUpdated(true);
-            ChunkStatus = ChunkStatus.Changed;
+            _chunkData.ChunkStatus = ChunkStatus.Changed;
         }
         
         public void ChangeTriangleTexture(ushort? textureId, int x, int y, int floor, bool alternativeTriangle)
@@ -334,7 +338,7 @@ namespace DProject.Entity.Chunk
                 _chunkData.Tiles[floor][x,y].TileTextureIdTriangleTwo = textureId;
 
             _heightMaps[floor].SetHasUpdated(true);
-            ChunkStatus = ChunkStatus.Changed;
+            _chunkData.ChunkStatus = ChunkStatus.Changed;
         }
         
         public void ChangeCornerColor(ushort colorId, TileCorner corner, int x, int y, int floor)
@@ -358,7 +362,7 @@ namespace DProject.Entity.Chunk
             }
 
             _heightMaps[floor].SetHasUpdated(true);
-            ChunkStatus = ChunkStatus.Changed;
+            _chunkData.ChunkStatus = ChunkStatus.Changed;
         }
         
         public void ChangeVertexColor(ushort color, int x, int y, int floor, TileCorner corner)
@@ -427,7 +431,7 @@ namespace DProject.Entity.Chunk
             }
 
             _heightMaps[floor].SetHasUpdated(true);
-            ChunkStatus = ChunkStatus.Changed;
+            _chunkData.ChunkStatus = ChunkStatus.Changed;
         }
         
         public void ChangeTileColor(ushort colorId, int x, int y, int floor)
@@ -438,7 +442,7 @@ namespace DProject.Entity.Chunk
             _chunkData.Tiles[floor][x, y].ColorBottomRight = colorId;
 
             _heightMaps[floor].SetHasUpdated(true);
-            ChunkStatus = ChunkStatus.Changed;
+            _chunkData.ChunkStatus = ChunkStatus.Changed;
         }
 
         public void ChangeVertexHeight(byte height, int x, int y, int floor, TileCorner corner)
@@ -507,7 +511,7 @@ namespace DProject.Entity.Chunk
             }
 
             _heightMaps[floor].SetHasUpdated(true);
-            ChunkStatus = ChunkStatus.Changed;
+            _chunkData.ChunkStatus = ChunkStatus.Changed;
         }
 
         #endregion

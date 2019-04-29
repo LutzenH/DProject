@@ -114,8 +114,8 @@ namespace DProject.Entity.Chunk
                 for(int i =0; i < maxI; i++){
                     if ((-LoadDistance/2 <= x) && (x <= LoadDistance/2) && (-LoadDistance/2 <= y) && (y <= LoadDistance/2))
                     {
-                        var localx = x + 3;
-                        var localy = y + 3;
+                        var localx = x + (LoadDistance/2-1);
+                        var localy = y + (LoadDistance/2-1);
                                                 
                         Vector2 position = chunkPosition - new Vector2(localx - _loadedChunks.GetLength(0) / 2,
                                                localy - _loadedChunks.GetLength(1) / 2);
@@ -195,7 +195,7 @@ namespace DProject.Entity.Chunk
             {
                 foreach (var chunk in _loadedChunks)
                 {
-                    if (chunk.ChunkStatus == ChunkStatus.Changed)
+                    if (chunk.GetChunkData().ChunkStatus == ChunkStatus.Changed)
                     {
                         chunk.Serialize();
                         count++;
@@ -216,7 +216,7 @@ namespace DProject.Entity.Chunk
             {
                 for (int x = 0; x < _loadedChunks.GetLength(0); x++) {
                     for (int y = 0; y < _loadedChunks.GetLength(1); y++) {
-                        if (_loadedChunks[x,y].ChunkStatus == ChunkStatus.Changed)
+                        if (_loadedChunks[x,y].GetChunkData().ChunkStatus == ChunkStatus.Changed)
                         {
                             _loadedChunks[x,y] = LoadChunk(_loadedChunks[x,y].GetChunkX(), _loadedChunks[x,y].GetChunkY());
                             count++;

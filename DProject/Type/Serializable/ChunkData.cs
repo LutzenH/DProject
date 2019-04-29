@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using DProject.Type.Enum;
 using MessagePack;
 
 namespace DProject.Type.Serializable
@@ -16,6 +17,9 @@ namespace DProject.Type.Serializable
         [Key(3)]
         public virtual List<Object>[] Objects { get; set; }
 
+        [IgnoreMember]
+        public ChunkStatus ChunkStatus { get; set; }
+        
         public int GetFloorCount()
         {
             return Tiles.Length;

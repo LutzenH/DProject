@@ -34,12 +34,12 @@ namespace DProject.Type.Rendering.Map
             return dataColors;
         }
 
-        private int GetPositionX()
+        public int GetPositionX()
         {
             return _xPos;
         }
 
-        private int GetPositionY()
+        public int GetPositionY()
         {
             return _yPos;
         }

@@ -79,7 +79,7 @@ namespace DProject.Entity.Debug
                 {
                     Color color;
                 
-                    switch (chunk.ChunkStatus)
+                    switch (chunk.GetChunkData().ChunkStatus)
                     {
                         case ChunkStatus.Unserialized:
                             color = Color.Blue;
