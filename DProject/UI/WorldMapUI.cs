@@ -1,4 +1,3 @@
-
 using System;
 using System.Collections.Generic;
 #if EDITOR
@@ -60,7 +59,7 @@ namespace DProject.UI
                         var positionX = x * ChunkLoaderEntity.ChunkSize + xOffset;
                         var positionY = y * ChunkLoaderEntity.ChunkSize + yOffset;
                         
-                        spriteBatch.Draw(_mapChunkTexture2D[x,y], new Vector2(positionX, positionY), Color.White);
+                        spriteBatch.Draw(_mapChunkTexture2D[x,y], new Rectangle(positionX, positionY, ChunkLoaderEntity.ChunkSize, ChunkLoaderEntity.ChunkSize), Color.White);
                     }
                 }
             }   
@@ -90,11 +89,10 @@ namespace DProject.UI
                 for(int i =0; i < maxI; i++){
                     if ((-_mapSize/2 <= x) && (x <= _mapSize/2) && (-_mapSize/2 <= y) && (y <= _mapSize/2))
                     {
-                        var localx = x + (_mapSize/2-1);
-                        var localy = y + (_mapSize/2-1);
+                        var localx = x + (_mapSize % 2 == 0 ? _mapSize/2-1 : _mapSize/2);
+                        var localy = y + (_mapSize % 2 == 0 ? _mapSize/2-1 : _mapSize/2);
 
                         Vector2 position = new Vector2(localx + _chunkPositionX, localy + _chunkPositionY);
-                            //new Vector2(_chunkPositionX, _chunkPositionY) - new Vector2(localx - _mapSize / 2, localy - _mapSize / 2);
                         
                         foreach (var chunk in oldChunks)
                         {
@@ -126,7 +124,7 @@ namespace DProject.UI
                 
                 for (int i = 0; i < newChunkPositions.Count; i++)
                 {
-                    _mapChunkTexture2D[(int) newChunkPositions[i].X, (int) newChunkPositions[i].Y] = new MapChunkTexture2D(_graphicsDevice, TerrainEntity.GenerateChunkData((int) newChunkLocations[i].X,(int) newChunkLocations[i].Y), 0);
+                    _mapChunkTexture2D[(int) newChunkPositions[i].X, (int) newChunkPositions[i].Y] = new MapChunkTexture2D(_graphicsDevice, TerrainEntity.GenerateChunkData((int) newChunkLocations[i].X,(int) newChunkLocations[i].Y), 0, MapChunkTexture2D.Resolution.High);
                 }
                 
             }
