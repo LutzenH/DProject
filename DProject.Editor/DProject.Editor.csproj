@@ -3,20 +3,29 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net471</TargetFramework>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <AssemblyName>DProject</AssemblyName>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DefineConstants>TRACE;DEBUG;NETFRAMEWORK;NET471;EDITOR</DefineConstants>
-    <OutputPath>bin\Editor\Debug\</OutputPath>
+    <OutputPath>..\bin\Debug\Editor</OutputPath>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <DefineConstants>TRACE;RELEASE;NETFRAMEWORK;NET471;EDITOR</DefineConstants>
-    <OutputPath>bin\Editor\Release\</OutputPath>
+    <OutputPath>..\bin\Release\Editor</OutputPath>
   </PropertyGroup>
 
   <ItemGroup>
     <MonoGameContentReference Include="**\*.mgcb" />
+    
+    <MonoGameContentReference Include="..\DProject\**\*.mgcb">
+      <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </MonoGameContentReference>
+    <Compile Include="..\DProject\**\*.cs">
+      <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Compile>
   </ItemGroup>
 
   <ItemGroup>
@@ -24,7 +33,7 @@
     <PackageReference Include="LibNoise" Version="0.2.0" />
     <PackageReference Include="MessagePack" Version="1.7.3.4" />
     <PackageReference Include="MonoGame.Content.Builder" Version="3.7.0.9" />
-    <PackageReference Include="MonoGame.Framework.Gtk" Version="3.8.0.1" />
+    <PackageReference Include="MonoGame.Framework.Gtk" Version="3.8.0.4" />
   </ItemGroup>
 
 </Project>

@@ -3,18 +3,29 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net471</TargetFramework>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <AssemblyName>DProject</AssemblyName>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-    <OutputPath>bin\Game\Debug\</OutputPath>
+    <OutputPath>..\bin\Debug\Linux</OutputPath>
+    <DefineConstants>TRACE;DEBUG;NETFRAMEWORK;NET471;LINUX</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-    <OutputPath>bin\Game\Release\</OutputPath>
+    <OutputPath>..\bin\Release\Linux</OutputPath>
+    <DefineConstants>TRACE;RELEASE;NETFRAMEWORK;NET471;LINUX</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
     <MonoGameContentReference Include="**\*.mgcb" />
+    
+    <MonoGameContentReference Include="..\DProject\**\*.mgcb">
+      <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </MonoGameContentReference>
+    <Compile Include="..\DProject\**\*.cs">
+      <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Compile>
   </ItemGroup>
 
   <ItemGroup>
@@ -22,10 +33,6 @@
     <PackageReference Include="MessagePack" Version="1.7.3.4" />
     <PackageReference Include="MonoGame.Content.Builder" Version="3.7.0.9" />
     <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.7.1.189" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Remove="EditorWindow.cs" />
   </ItemGroup>
 
 </Project>

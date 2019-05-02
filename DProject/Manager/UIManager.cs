@@ -22,7 +22,7 @@ namespace DProject.Manager
             
             _userInterfaces.Add(new WorldEditorUI(entityManager.GetWorldEditorEntity()));
             _userInterfaces.Add(new MessageUI(entityManager));
-            _userInterfaces.Add(new WorldMapUI(entityManager.GetChunkLoaderEntity(), 8));
+            //_userInterfaces.Add(new WorldMapUI(entityManager.GetChunkLoaderEntity(), 8));
         }
         
         public void Initialize(GraphicsDevice graphicsDevice)

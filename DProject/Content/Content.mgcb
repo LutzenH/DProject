@@ -400,7 +400,3 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:textures/ui/editor.png
-
-#begin ui/EditorWindow.glade
-/copy:ui/EditorWindow.glade
-
