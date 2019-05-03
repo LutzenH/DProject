@@ -1,128 +1,74 @@
 {"textures": [
     {
         "name":"tile_white",
-        "x_offset":0,
-        "y_offset":0,
-        "x_size":16,
-        "y_size":16
+        "location":"textures/tiles/tile_white.png"
     },
     {
         "name":"planks",
-        "x_offset":16,
-        "y_offset":0,
-        "x_size":16,
-        "y_size":16
+        "location":"textures/tiles/planks.png"
     },
     {
         "name":"metal_floor",
-        "x_offset":32,
-        "y_offset":0,
-        "x_size":16,
-        "y_size":16
+        "location":"textures/tiles/metal_floor.png"
     },
     {
         "name":"metal",
-        "x_offset":48,
-        "y_offset":0,
-        "x_size":16,
-        "y_size":16
+        "location":"textures/tiles/metal.png"
     },
     {
         "name":"grass",
-        "x_offset":64,
-        "y_offset":0,
-        "x_size":16,
-        "y_size":16
+        "location":"textures/tiles/grass.png"
     },
     {
         "name":"savanna_grass",
-        "x_offset":0,
-        "y_offset":16,
-        "x_size":16,
-        "y_size":16
+        "location":"textures/tiles/savanna_grass.png"
     },
     {
         "name":"savanna_grass_dry",
-        "x_offset":16,
-        "y_offset":16,
-        "x_size":16,
-        "y_size":16
+        "location":"textures/tiles/savanna_grass_dry.png"
     },
     {
         "name":"savanna_earth",
-        "x_offset":32,
-        "y_offset":16,
-        "x_size":16,
-        "y_size":16
+        "location":"textures/tiles/savanna_earth.png"
     },
     {
         "name":"road_longtile_front",
-        "x_offset":0,
-        "y_offset":32,
-        "x_size":16,
-        "y_size":16
+        "location":"textures/tiles/road_longtile_front.png"
     },
     {
         "name":"road_longtile_mid",
-        "x_offset":16,
-        "y_offset":32,
-        "x_size":16,
-        "y_size":16
+        "location":"textures/tiles/road_longtile_mid.png"
     },
     {
         "name":"road_longtile_end",
-        "x_offset":32,
-        "y_offset":32,
-        "x_size":16,
-        "y_size":16
+        "location":"textures/tiles/road_longtile_end.png"
     },
     {
         "name":"road_0",
-        "x_offset":0,
-        "y_offset":48,
-        "x_size":16,
-        "y_size":16
+        "location":"textures/tiles/road_0.png"
     },
     {
         "name":"road_1",
-        "x_offset":16,
-        "y_offset":48,
-        "x_size":16,
-        "y_size":16
+        "location":"textures/tiles/road_1.png"
     },
     {
         "name":"road_2",
-        "x_offset":32,
-        "y_offset":48,
-        "x_size":16,
-        "y_size":16
+        "location":"textures/tiles/road_2.png"
     },
     {
         "name":"road_sidewalk",
-        "x_offset":0,
-        "y_offset":64,
-        "x_size":16,
-        "y_size":16
+        "location":"textures/tiles/road_sidewalk.png"
     },
     {
         "name":"sidewalk_tile_0",
-        "x_offset":16,
-        "y_offset":64,
-        "x_size":16,
-        "y_size":16
+        "location":"textures/tiles/sidewalk_tile_0.png"
     },
     {
         "name":"sidewalk_tile_1",
-        "x_offset":32,
-        "y_offset":64,
-        "x_size":16,
-        "y_size":16
+        "location":"textures/tiles/sidewalk_tile_1.png"
     },
     {
         "name":"sidewalk_tile_2",
-        "x_offset":48,
-        "y_offset":32,
-        "x_size":16,
-        "y_size":16
+        "location":"textures/tiles/sidewalk_tile_2.png"
     }
 ]}

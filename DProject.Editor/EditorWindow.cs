@@ -1,4 +1,6 @@
 using System;
+using System.Drawing.Imaging;
+using System.IO;
 using DProject.Entity;
 using DProject.List;
 using Gdk;
@@ -221,10 +223,17 @@ namespace DProject
         
         private void FillTextureList()
         {
+            MemoryStream memoryStream = new MemoryStream();
+            Textures.TextureAtlas.Save(memoryStream, ImageFormat.Png);
+            memoryStream.Position = 0;
+            
+            var buf = new Pixbuf(memoryStream);
+            
             foreach (var texture in Textures.TextureList)
             {
                 box_flow_textures.Add(
                     CreateFlowBoxTexture(
+                        buf,
                         texture.Value.TextureName,
                         texture.Value.XSize,
                         texture.Value.YSize,
@@ -253,18 +262,16 @@ namespace DProject
             return child;
         }
 
-        private FlowBoxChild CreateFlowBoxTexture(string name, int xsize, int ysize, int xoffset, int yoffset, int scale)
+        private FlowBoxChild CreateFlowBoxTexture(Pixbuf buf, string name, int xsize, int ysize, int xoffset, int yoffset, int scale)
         {
             FlowBoxChild child = new FlowBoxChild();
             child.HasTooltip = true;
             child.TooltipText = name;
             
-            var buf = new Pixbuf("Content/textures/textureatlas.png");
-            
-            buf = new Pixbuf(buf, xoffset, yoffset, xsize, ysize);
-            buf = buf.ScaleSimple(xsize * scale, ysize * scale, InterpType.Nearest);
-            
-            Image image = new Image(buf);
+            var buffer = new Pixbuf(buf, xoffset, yoffset, xsize, ysize);
+            buffer = buffer.ScaleSimple(xsize * scale, ysize * scale, InterpType.Nearest);
+                        
+            Image image = new Image(buffer);
             image.WidthRequest = xsize*scale;
             image.HeightRequest = ysize*scale;
             

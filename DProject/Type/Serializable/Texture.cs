@@ -10,16 +10,19 @@ namespace DProject.Type.Serializable
         [Key("name")]
         public string TextureName { get; set; }
         
-        [Key("x_offset")]
+        [Key("location")]
+        public string TexturePath { get; set; }
+        
+        [IgnoreMember]
         public int XOffset { get; set; }
         
-        [Key("y_offset")]
+        [IgnoreMember]
         public int YOffset { get; set; }
         
-        [Key("x_size")]
+        [IgnoreMember]
         public int XSize { get; set; }
         
-        [Key("y_size")]
+        [IgnoreMember]
         public int YSize { get; set; }
            
         [IgnoreMember]

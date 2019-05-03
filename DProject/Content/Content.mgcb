@@ -26,6 +26,26 @@
 #begin collections/textures.json
 /copy:collections/textures.json
 
+#begin textures/tiles/*
+/copy:textures/tiles/grass.png
+/copy:textures/tiles/metal_floor.png
+/copy:textures/tiles/metal.png
+/copy:textures/tiles/planks.png
+/copy:textures/tiles/road_0.png
+/copy:textures/tiles/road_1.png
+/copy:textures/tiles/road_2.png
+/copy:textures/tiles/road_longtile_end.png
+/copy:textures/tiles/road_longtile_front.png
+/copy:textures/tiles/road_longtile_mid.png
+/copy:textures/tiles/road_sidewalk.png
+/copy:textures/tiles/savanna_earth.png
+/copy:textures/tiles/savanna_grass_dry.png
+/copy:textures/tiles/savanna_grass.png
+/copy:textures/tiles/sidewalk_tile_0.png
+/copy:textures/tiles/sidewalk_tile_1.png
+/copy:textures/tiles/sidewalk_tile_2.png
+/copy:textures/tiles/tile_white.png
+
 #begin default.spritefont
 /importer:FontDescriptionImporter
 /processor:LocalizedFontProcessor
@@ -373,21 +393,6 @@
 /processorParam:Protocol=http
 /processorParam:DebugMode=Auto
 /build:shaders/Diffuse.fx
-
-#begin textures/textureatlas.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:textures/textureatlas.png
-
-#begin textures/textureatlas.png
-/copy:textures/textureatlas.png
 
 #begin textures/ui/editor.png
 /importer:TextureImporter

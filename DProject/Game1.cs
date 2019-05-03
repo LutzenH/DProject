@@ -43,6 +43,8 @@ namespace DProject
 
         protected override void Initialize()
         {
+            Textures.Initialize(GraphicsDevice);
+            
             _entityManager.Initialize(GraphicsDevice);
             _uiManager.Initialize(GraphicsDevice);
                         
@@ -50,9 +52,7 @@ namespace DProject
         }
 
         protected override void LoadContent()
-        {
-            Textures.LoadContent(Content);
-            
+        {            
             _entityManager.LoadContent(Content);
             _uiManager.LoadContent(Content);
             

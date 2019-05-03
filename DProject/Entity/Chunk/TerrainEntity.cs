@@ -150,7 +150,7 @@ namespace DProject.Entity.Chunk
             {
                 foreach (var heightMap in _heightMaps)
                 {
-                    heightMap.Draw(activeCamera.GetProjectMatrix(),activeCamera.GetViewMatrix(), GetWorldMatrix(), Textures._terrainTexture);
+                    heightMap.Draw(activeCamera.GetProjectMatrix(),activeCamera.GetViewMatrix(), GetWorldMatrix(), Textures.TerrainTexture);
                 }
                 
                 foreach (var floor in _props)
