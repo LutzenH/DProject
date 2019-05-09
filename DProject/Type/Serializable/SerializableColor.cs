@@ -18,6 +18,13 @@ namespace DProject.Type.Serializable
         [IgnoreMember]
         public Color Color => new Color(Red, Green, Blue);
         
+        public void SetColor(byte red, byte green, byte blue)
+        {
+            Red = red;
+            Green = green;
+            Blue = blue;
+        }
+
         public string GetColorName()
         {
             return Name;

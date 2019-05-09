@@ -3,6 +3,7 @@ using System.Drawing.Imaging;
 using System.IO;
 using DProject.Entity;
 using DProject.List;
+using DProject.Type.Serializable;
 using Gdk;
 using Gtk;
 using Microsoft.Xna.Framework;
@@ -54,16 +55,20 @@ namespace DProject
         
         //Colors
         [Builder.Object] private FlowBox box_flow_colors;
+        [Builder.Object] private ColorButton colorbutton_color;
+        [Builder.Object] private Entry entry_color_name;
+        [Builder.Object] private Button color_add;
+        [Builder.Object] private Button color_apply;
         
         //Textures
         [Builder.Object] private FlowBox box_flow_textures;
         
         public EditorWindow(string[] args)
         {
-            Application.Init("Program1", ref args);
+            Application.Init();
             
             _builder = new Builder();
-            _builder.AddFromFile("Content/ui/EditorWindow.glade");
+            _builder.AddFromFile(Game1.RootDirectory + "ui/EditorWindow.glade");
             _builder.Autoconnect(this);
             
             tree_camera_value.Editable = true;
@@ -111,8 +116,10 @@ namespace DProject
             //Terrain Brush Settings
             adjustment_brush_size.ValueChanged += (o, args) => _game.GetEntityManager().GetWorldEditorEntity().SetBrushSize((int)adjustment_brush_size.Value - 1);
             
-            //Colors List
+            //Colors
             box_flow_colors.SelectedChildrenChanged += UpdateSelectedColor;
+            color_apply.Clicked += ChangeSelectedColor;
+            color_add.Clicked += AddNewColor;
             
             //Texture List
             box_flow_textures.SelectedChildrenChanged += UpdateSelectedTexture;
@@ -161,15 +168,81 @@ namespace DProject
         private void UpdateSelectedColor(object obj, EventArgs args)
         {
             var box = (FlowBox) obj;
-            var selectedChild = (FlowBoxChild) box.SelectedChildren[0];                   
+            var selectedChild = (FlowBoxChild) box.SelectedChildren[0];
+
+            colorbutton_color.Rgba = Colors.GetRgbaFromName(selectedChild.TooltipText);
+            
             _game.GetEntityManager().GetWorldEditorEntity().SetSelectedColor(Colors.GetColorIdFromName(selectedChild.TooltipText));
         }
-        
+
+        private void ChangeSelectedColor(object obj, EventArgs args)
+        {
+            var selectedColor = _game.GetEntityManager().GetWorldEditorEntity().GetSelectedColor();
+            Colors.SetColorFromRgba(colorbutton_color.Rgba, selectedColor);
+            
+            FlowBoxChild child = (FlowBoxChild) box_flow_colors.Children[selectedColor];
+            var image = (Image) child.Children[0];
+            image.ModifyBg(StateType.Normal, new Color((byte) Colors.ColorList[selectedColor].Red, (byte) Colors.ColorList[selectedColor].Green, (byte) Colors.ColorList[selectedColor].Blue));
+        }
+
+        private void AddNewColor(object obj, EventArgs args)
+        {
+            var name = MakeNameConsistent(entry_color_name.Text);
+
+            var alreadyExists = false;
+            
+            foreach (var child in box_flow_colors.Children)
+            {
+                if (child.TooltipText.Equals(name))
+                {
+                    box_flow_colors.SelectChild((FlowBoxChild) child);
+                    alreadyExists = true;
+                }
+            }
+
+            if (!alreadyExists)
+            {
+                if (Colors.ColorList.Count < ushort.MaxValue)
+                {
+                    var color = new SerializableColor()
+                    {
+                        Name = name,
+                        Red = (byte) (colorbutton_color.Rgba.Red * 255),
+                        Green = (byte) (colorbutton_color.Rgba.Green * 255),
+                        Blue = (byte) (colorbutton_color.Rgba.Blue * 255)
+                    };
+                    
+                    Colors.ColorList.Add((ushort) Colors.ColorList.Count, color);
+                    
+                    box_flow_colors.Add(
+                        CreateFlowBoxColor(
+                            color.Name,
+                            (byte) color.Red,
+                            (byte) color.Green,
+                            (byte) color.Blue)
+                    );
+                    
+                    box_flow_colors.ShowAll();
+                }
+                else
+                {
+                    throw new OverflowException("ColorList already contains the maximum amount of colors.");
+                }
+            }
+
+            entry_color_name.Text = name;
+        }
+
+        private string MakeNameConsistent(string name)
+        {
+            return name.Trim().ToLower().Replace(" ", "_");
+        }
+
         private void UpdateSelectedProp(object obj, EventArgs args)
         {
             var box = (ListBox) obj;
             var selectedChild = (ListBoxRow) box.SelectedRows[0];                   
-            _game.GetEntityManager().GetWorldEditorEntity().SetSelectedObject((ushort) (Props.GetPropIdFromName(selectedChild.TooltipText)));
+            _game.GetEntityManager().GetWorldEditorEntity().SetSelectedObject(Props.GetPropIdFromName(selectedChild.TooltipText));
         }
         
         private void UpdateSelectedTexture(object obj, EventArgs args)
@@ -215,7 +288,6 @@ namespace DProject
                         (byte) color.Value.Green,
                         (byte) color.Value.Blue)
                     );
-                
             }
             
             box_flow_colors.ShowAll();
