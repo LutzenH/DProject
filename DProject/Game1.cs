@@ -8,6 +8,8 @@ namespace DProject
 {
     public class Game1 : Game
     {
+        public const string RootDirectory = "Content/";
+
         private readonly GraphicsDeviceManager _graphics;
         
         private readonly EntityManager _entityManager;
@@ -29,7 +31,7 @@ namespace DProject
             _entityManager = new EntityManager();
             _uiManager = new UIManager(_entityManager);
             
-            Content.RootDirectory = "Content";
+            Content.RootDirectory = RootDirectory;
 
             ScreenResolutionX = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
             ScreenResolutionY = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;

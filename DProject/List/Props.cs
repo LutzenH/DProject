@@ -8,11 +8,13 @@ namespace DProject.List
 {
     public static class Props
     {
+        private const string PropListPath = "collections/props.json";
+        
         public static readonly Dictionary<ushort, Prop> PropList = new Dictionary<ushort, Prop>();
 
         static Props()
         {
-            using (TextReader reader = new StreamReader("Content/collections/props.json"))
+            using (TextReader reader = new StreamReader(Game1.RootDirectory + PropListPath))
             {
                 var text = reader.ReadToEnd();
                 var bytes = MessagePackSerializer.FromJson(text);
@@ -22,6 +24,8 @@ namespace DProject.List
                 {
                     PropList[i] = propList["props"][i];
                 }
+                
+                Console.WriteLine("Retrieved " + propList["props"].Count + " Props from " + PropListPath);
             }
         }
         

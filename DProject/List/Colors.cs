@@ -8,11 +8,13 @@ namespace DProject.List
 {
     public static class Colors
     {
+        private const string ColorListPath = "collections/colors.json";
+        
         public static readonly Dictionary<ushort, SerializableColor> ColorList = new Dictionary<ushort, SerializableColor>();
 
         static Colors()
         {
-            using (TextReader reader = new StreamReader("Content/collections/colors.json"))
+            using (TextReader reader = new StreamReader(Game1.RootDirectory + ColorListPath))
             {
                 var text = reader.ReadToEnd();
                 var bytes = MessagePackSerializer.FromJson(text);
@@ -22,6 +24,8 @@ namespace DProject.List
                 {
                     ColorList[i] = colorList["colors"][i];
                 }
+                
+                Console.WriteLine("Retrieved " + colorList["colors"].Count + " Colors from " + ColorListPath);
             }
         }
 

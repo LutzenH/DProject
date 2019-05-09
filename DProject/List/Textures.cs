@@ -12,9 +12,11 @@ namespace DProject.List
 {
     public static class Textures
     {
+        private const string TextureListPath = "collections/textures.json";
+        
         public static readonly Dictionary<ushort, Texture> TextureList = new Dictionary<ushort, Texture>();
 
-        //public const string TextureAtlasLocation = "textures/textureatlas";
+        //This size might become smaller depending on the amount of space that is required.
         public static int TextureAtlasSize = 2048;
 
         public static Bitmap TextureAtlas;
@@ -22,7 +24,7 @@ namespace DProject.List
         
         static Textures()
         {            
-            using (TextReader reader = new StreamReader("Content/collections/textures.json"))
+            using (TextReader reader = new StreamReader(Game1.RootDirectory + TextureListPath))
             {
                 var text = reader.ReadToEnd();
                 var bytes = MessagePackSerializer.FromJson(text);
@@ -39,8 +41,6 @@ namespace DProject.List
         	
         private static void GenerateTextureAtlas()
         {
-            string localpath = "Content/";
-            
             if (TextureList.Count == 0)
                 throw new ArgumentNullException(nameof(TextureList), "Not enough textures in the TextureList");
             
@@ -50,7 +50,7 @@ namespace DProject.List
 
             foreach (var texture in TextureList)
             {
-                textureLocationList.Add(localpath + texture.Value.TexturePath);
+                textureLocationList.Add(Game1.RootDirectory + texture.Value.TexturePath);
             }
             
             imagePacker.PackImage(textureLocationList, false, true, TextureAtlasSize, TextureAtlasSize, 0, true, 
@@ -59,16 +59,16 @@ namespace DProject.List
 
             foreach (var texture in TextureList)
             {
-                texture.Value.XSize = outputMap[localpath + texture.Value.TexturePath].Width;
-                texture.Value.YSize = outputMap[localpath + texture.Value.TexturePath].Height;
-                texture.Value.XOffset = outputMap[localpath + texture.Value.TexturePath].X;
-                texture.Value.YOffset = outputMap[localpath + texture.Value.TexturePath].Y;
+                texture.Value.XSize = outputMap[Game1.RootDirectory + texture.Value.TexturePath].Width;
+                texture.Value.YSize = outputMap[Game1.RootDirectory + texture.Value.TexturePath].Height;
+                texture.Value.XOffset = outputMap[Game1.RootDirectory + texture.Value.TexturePath].X;
+                texture.Value.YOffset = outputMap[Game1.RootDirectory + texture.Value.TexturePath].Y;
             }
 
             TextureAtlasSize = outputImage.Width;
             TextureAtlas = outputImage;
             
-            Console.WriteLine("Done generating a Texture Atlas for collections/textures.json");
+            Console.WriteLine("Generated a Texture Atlas from " + TextureList.Count + " Textures in " + TextureListPath);
         }
 
         public static ushort GetDefaultTextureId()

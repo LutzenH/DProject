@@ -261,13 +261,16 @@ namespace DProject.Entity.Chunk
             int chunkPositionX = (int) Math.Floor(tempPosition.X / ChunkSize);
             int chunkPositionY = (int) Math.Floor(tempPosition.Y / ChunkSize);
 
-            foreach (var chunk in _loadedChunks)
+            for (var x = 0; x < LoadDistance; x++)
             {
-                if (chunk != null)
+                for (var y = 0; y < LoadDistance; y++)
                 {
-                    if (chunk.GetChunkX() == chunkPositionX && chunk.GetChunkY() == chunkPositionY)
+                    if (_loadedChunks[x,y] != null)
                     {
-                        return chunk;
+                        if (_loadedChunks[x,y].GetChunkX() == chunkPositionX && _loadedChunks[x,y].GetChunkY() == chunkPositionY)
+                        {
+                            return _loadedChunks[x,y];
+                        }
                     }
                 }
             }
