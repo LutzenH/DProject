@@ -59,6 +59,8 @@ namespace DProject
         [Builder.Object] private Entry entry_color_name;
         [Builder.Object] private Button color_add;
         [Builder.Object] private Button color_apply;
+        [Builder.Object] private SearchEntry search_entry_color;
+        private string _colorSelectedChild;
         
         //Textures
         [Builder.Object] private FlowBox box_flow_textures;
@@ -120,6 +122,7 @@ namespace DProject
             box_flow_colors.SelectedChildrenChanged += UpdateSelectedColor;
             color_apply.Clicked += ChangeSelectedColor;
             color_add.Clicked += AddNewColor;
+            search_entry_color.SearchChanged += FilterColorList;
             
             //Texture List
             box_flow_textures.SelectedChildrenChanged += UpdateSelectedTexture;
@@ -170,24 +173,36 @@ namespace DProject
             var box = (FlowBox) obj;
             var selectedChild = (FlowBoxChild) box.SelectedChildren[0];
 
-            colorbutton_color.Rgba = Colors.GetRgbaFromName(selectedChild.TooltipText);
+            if (selectedChild != null)
+                _colorSelectedChild = selectedChild.TooltipText;
+
+            colorbutton_color.Rgba = Colors.GetRgbaFromName(_colorSelectedChild);
             
-            _game.GetEntityManager().GetWorldEditorEntity().SetSelectedColor(Colors.GetColorIdFromName(selectedChild.TooltipText));
+            _game.GetEntityManager().GetWorldEditorEntity().SetSelectedColor(Colors.GetColorIdFromName(_colorSelectedChild));
         }
 
         private void ChangeSelectedColor(object obj, EventArgs args)
         {
             var selectedColor = _game.GetEntityManager().GetWorldEditorEntity().GetSelectedColor();
             Colors.SetColorFromRgba(colorbutton_color.Rgba, selectedColor);
-            
-            FlowBoxChild child = (FlowBoxChild) box_flow_colors.Children[selectedColor];
-            var image = (Image) child.Children[0];
-            image.ModifyBg(StateType.Normal, new Color((byte) Colors.ColorList[selectedColor].Red, (byte) Colors.ColorList[selectedColor].Green, (byte) Colors.ColorList[selectedColor].Blue));
+
+            foreach (var widget in box_flow_colors)
+            {
+                var child = (FlowBoxChild) widget;
+                if (child.TooltipText.Equals(_colorSelectedChild))
+                {
+                    var image = (Image) child.Children[0];
+                    image.ModifyBg(StateType.Normal, new Color((byte) Colors.ColorList[selectedColor].Red, (byte) Colors.ColorList[selectedColor].Green, (byte) Colors.ColorList[selectedColor].Blue));
+                }
+            }
         }
 
         private void AddNewColor(object obj, EventArgs args)
         {
             var name = MakeNameConsistent(entry_color_name.Text);
+
+            if (name.Equals(""))
+                return;
 
             var alreadyExists = false;
             
@@ -231,6 +246,33 @@ namespace DProject
             }
 
             entry_color_name.Text = name;
+        }
+
+        private void FilterColorList(object obj, EventArgs args)
+        {
+            var searchEntry = (SearchEntry) obj;
+            var text = MakeNameConsistent(searchEntry.Text);
+
+            foreach (var flowBoxColor in box_flow_colors.Children)
+            {
+                flowBoxColor.Destroy();
+            }
+
+            foreach (var color in Colors.ColorList)
+            {
+                if (color.Value.Name.Contains(text))
+                {
+                    box_flow_colors.Add(
+                        CreateFlowBoxColor(
+                            color.Value.Name,
+                            (byte) color.Value.Red,
+                            (byte) color.Value.Green,
+                            (byte) color.Value.Blue)
+                    );
+                }
+            }
+            
+            box_flow_colors.ShowAll();
         }
 
         private string MakeNameConsistent(string name)
