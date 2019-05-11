@@ -109,7 +109,7 @@ namespace DProject
             button_tool_objectplacer.Pressed += (o, args) => SetSelectedTool(WorldEditorEntity.Tools.ObjectPlacer);
             
             //Menu > File > ...
-            menu_file_save.Activated += (o, args) => _game.GetEntityManager().GetChunkLoaderEntity().SerializeChangedChunks();
+            menu_file_save.Activated += EditorSaveGame;
             menu_file_revert.Activated += (o, args) => _game.GetEntityManager().GetChunkLoaderEntity().ReloadChangedChunks();
             menu_file_quit.Activated += MainWindow_Destroyed;
             
@@ -171,6 +171,12 @@ namespace DProject
                     _game.GetEntityManager().GetActiveCamera().SetPosition(new Vector3(currentPosition.X, currentPosition.Y, newValue));
                     break;
             }
+        }
+
+        private void EditorSaveGame(object obj, EventArgs args)
+        {
+            Colors.ExportColorListToJson();
+            _game.GetEntityManager().GetChunkLoaderEntity().SerializeChangedChunks();
         }
 
         private void UpdateSelectedItem(object obj, EventArgs args, System.Type type)

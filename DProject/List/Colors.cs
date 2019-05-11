@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using DProject.Type.Serializable;
 using MessagePack;
 
@@ -33,7 +34,17 @@ namespace DProject.List
         {
             return 0;
         }
-        
+
+        public static void ExportColorListToJson()
+        {
+            var dictionary = new Dictionary<string, List<SerializableColor>>();
+            dictionary.Add("colors", ColorList.Values.ToList());
+            var json = MessagePackSerializer.ToJson(dictionary);
+            
+            using (var newTask = new StreamWriter(Game1.RootDirectory + ColorListPath, false)) 
+                newTask.WriteLine(json);    
+        }
+
         public static ushort GetColorIdFromName(string name)
         {
             foreach (var color in ColorList)
