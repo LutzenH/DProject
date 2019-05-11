@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Drawing.Imaging;
 using System.IO;
 using DProject.Entity;
@@ -64,6 +65,9 @@ namespace DProject
         
         //Textures
         [Builder.Object] private FlowBox box_flow_textures;
+        [Builder.Object] private SearchEntry search_entry_texture;
+        private Pixbuf _textureAtlasPixBuf;
+        private string _textureSelectedChild;
         
         public EditorWindow(string[] args)
         {
@@ -119,13 +123,14 @@ namespace DProject
             adjustment_brush_size.ValueChanged += (o, args) => _game.GetEntityManager().GetWorldEditorEntity().SetBrushSize((int)adjustment_brush_size.Value - 1);
             
             //Colors
-            box_flow_colors.SelectedChildrenChanged += UpdateSelectedColor;
+            box_flow_colors.SelectedChildrenChanged += (o, args) => UpdateSelectedItem(o, args, typeof(SerializableColor));
+            search_entry_color.SearchChanged += (o, args) => FilterItemList(o, args, box_flow_colors, Colors.ColorList);
             color_apply.Clicked += ChangeSelectedColor;
             color_add.Clicked += AddNewColor;
-            search_entry_color.SearchChanged += FilterColorList;
             
             //Texture List
-            box_flow_textures.SelectedChildrenChanged += UpdateSelectedTexture;
+            box_flow_textures.SelectedChildrenChanged += (o, args) => UpdateSelectedItem(o, args, typeof(Texture));
+            search_entry_texture.SearchChanged += (o, args) => FilterItemList(o, args, box_flow_textures, Textures.TextureList);
             
             //Box Prop List
             box_prop_list.SelectedRowsChanged += UpdateSelectedProp;
@@ -168,17 +173,27 @@ namespace DProject
             }
         }
 
-        private void UpdateSelectedColor(object obj, EventArgs args)
+        private void UpdateSelectedItem(object obj, EventArgs args, System.Type type)
         {
             var box = (FlowBox) obj;
             var selectedChild = (FlowBoxChild) box.SelectedChildren[0];
 
-            if (selectedChild != null)
-                _colorSelectedChild = selectedChild.TooltipText;
-
-            colorbutton_color.Rgba = GetRgbaFromName(_colorSelectedChild);
+            if (type == typeof(Texture))
+            {
+                if (selectedChild != null)
+                    _textureSelectedChild = selectedChild.TooltipText;
             
-            _game.GetEntityManager().GetWorldEditorEntity().SetSelectedColor(Colors.GetColorIdFromName(_colorSelectedChild));
+                _game.GetEntityManager().GetWorldEditorEntity().SetActiveTexture(Textures.GetTextureIdFromName(_textureSelectedChild));
+            }
+            else if (type == typeof(SerializableColor))
+            {
+                if (selectedChild != null)
+                    _colorSelectedChild = selectedChild.TooltipText;
+
+                colorbutton_color.Rgba = GetRgbaFromName(_colorSelectedChild);
+            
+                _game.GetEntityManager().GetWorldEditorEntity().SetSelectedColor(Colors.GetColorIdFromName(_colorSelectedChild));
+            }
         }
 
         private void ChangeSelectedColor(object obj, EventArgs args)
@@ -248,31 +263,55 @@ namespace DProject
             entry_color_name.Text = name;
         }
 
-        private void FilterColorList(object obj, EventArgs args)
+        private void FilterItemList<T>(object obj, EventArgs args, FlowBox flowBox, Dictionary<ushort, T> list)
         {
             var searchEntry = (SearchEntry) obj;
             var text = MakeNameConsistent(searchEntry.Text);
 
-            foreach (var flowBoxColor in box_flow_colors.Children)
+            foreach (var flowBoxChild in flowBox.Children)
             {
-                flowBoxColor.Destroy();
+                flowBoxChild.Destroy();
             }
-
-            foreach (var color in Colors.ColorList)
+            
+            foreach (var item in list)
             {
-                if (color.Value.Name.Contains(text))
+                if (item.Value.GetType() == typeof(SerializableColor))
                 {
-                    box_flow_colors.Add(
-                        CreateFlowBoxColor(
-                            color.Value.Name,
-                            (byte) color.Value.Red,
-                            (byte) color.Value.Green,
-                            (byte) color.Value.Blue)
-                    );
+                    var color = item.Value as SerializableColor;
+                    
+                    if (color.Name.Contains(text))
+                    {
+                        flowBox.Add(
+                            CreateFlowBoxColor(
+                                color.Name,
+                                (byte) color.Red,
+                                (byte) color.Green,
+                                (byte) color.Blue)
+                        );
+                    }
+                }
+                else if (item.Value.GetType() == typeof(Texture))
+                {
+                    var texture = item.Value as Texture;
+                    
+                    if (texture.TextureName.Contains(text))
+                    {
+                        flowBox.Add(
+                            CreateFlowBoxTexture(
+                                _textureAtlasPixBuf,
+                                texture.TextureName,
+                                texture.XSize,
+                                texture.YSize,
+                                texture.XOffset,
+                                texture.YOffset,
+                                2
+                            )
+                        );
+                    }
                 }
             }
             
-            box_flow_colors.ShowAll();
+            flowBox.ShowAll();
         }
 
         private string MakeNameConsistent(string name)
@@ -285,13 +324,6 @@ namespace DProject
             var box = (ListBox) obj;
             var selectedChild = (ListBoxRow) box.SelectedRows[0];                   
             _game.GetEntityManager().GetWorldEditorEntity().SetSelectedObject(Props.GetPropIdFromName(selectedChild.TooltipText));
-        }
-        
-        private void UpdateSelectedTexture(object obj, EventArgs args)
-        {
-            var box = (FlowBox) obj;
-            var selectedChild = (FlowBoxChild) box.SelectedChildren[0];                   
-            _game.GetEntityManager().GetWorldEditorEntity().SetActiveTexture(Textures.GetTextureIdFromName(selectedChild.TooltipText));
         }
 
         private void MainWindow_Destroyed(object sender, EventArgs e)
@@ -337,17 +369,13 @@ namespace DProject
         
         private void FillTextureList()
         {
-            MemoryStream memoryStream = new MemoryStream();
-            Textures.TextureAtlas.Save(memoryStream, ImageFormat.Png);
-            memoryStream.Position = 0;
-            
-            var buf = new Pixbuf(memoryStream);
-            
+            SetupTextureAtlasPixBuf();
+
             foreach (var texture in Textures.TextureList)
             {
                 box_flow_textures.Add(
                     CreateFlowBoxTexture(
-                        buf,
+                        _textureAtlasPixBuf,
                         texture.Value.TextureName,
                         texture.Value.XSize,
                         texture.Value.YSize,
@@ -358,6 +386,15 @@ namespace DProject
             }
             
             box_flow_textures.ShowAll();
+        }
+
+        private void SetupTextureAtlasPixBuf()
+        {
+            MemoryStream memoryStream = new MemoryStream();
+            Textures.TextureAtlas.Save(memoryStream, ImageFormat.Png);
+            memoryStream.Position = 0;
+            
+            _textureAtlasPixBuf = new Pixbuf(memoryStream);
         }
 
         private FlowBoxChild CreateFlowBoxColor(string name, byte r, byte g, byte b)
