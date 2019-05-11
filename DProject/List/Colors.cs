@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using DProject.Type.Serializable;
-using Gdk;
 using MessagePack;
 
 namespace DProject.List
@@ -44,37 +43,6 @@ namespace DProject.List
             }
 
             throw new ArgumentException();
-        }
-
-        public static RGBA GetRgbaFromName(string name)
-        {
-            foreach (var color in ColorList)
-            {
-                if (color.Value.GetColorName() == name)
-                    return new RGBA()
-                    {
-                        Red = color.Value.Red/256d,
-                        Green = color.Value.Green/256d,
-                        Blue = color.Value.Blue/256d,
-                        Alpha = 1d
-                    };
-            }
-            
-            throw new ArgumentException();
-        }
-
-        public static void SetColorFromRgba(RGBA rgba, ushort colorId)
-        {
-            ColorList[colorId].SetColor(
-                (byte) (rgba.Red * 255),
-                (byte) (rgba.Green * 255),
-                (byte) (rgba.Blue * 255)
-                );
-        }
-        
-        public static void SetColorFromRgba(RGBA rgba, string name)
-        {
-            SetColorFromRgba(rgba, GetColorIdFromName(name));
         }
     }
 

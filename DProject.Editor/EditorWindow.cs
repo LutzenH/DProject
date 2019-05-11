@@ -176,7 +176,7 @@ namespace DProject
             if (selectedChild != null)
                 _colorSelectedChild = selectedChild.TooltipText;
 
-            colorbutton_color.Rgba = Colors.GetRgbaFromName(_colorSelectedChild);
+            colorbutton_color.Rgba = GetRgbaFromName(_colorSelectedChild);
             
             _game.GetEntityManager().GetWorldEditorEntity().SetSelectedColor(Colors.GetColorIdFromName(_colorSelectedChild));
         }
@@ -184,7 +184,7 @@ namespace DProject
         private void ChangeSelectedColor(object obj, EventArgs args)
         {
             var selectedColor = _game.GetEntityManager().GetWorldEditorEntity().GetSelectedColor();
-            Colors.SetColorFromRgba(colorbutton_color.Rgba, selectedColor);
+            SetColorFromRgba(colorbutton_color.Rgba, selectedColor);
 
             foreach (var widget in box_flow_colors)
             {
@@ -398,6 +398,37 @@ namespace DProject
         {
             _game.SetWidgetOffset(left_pane.AllocatedWidth+5, top_bar.AllocatedHeight);
             _game.SetScreenResolution(_gameWidget.AllocatedWidth, _gameWidget.AllocatedHeight);
+        }
+        
+        public static RGBA GetRgbaFromName(string name)
+        {
+            foreach (var color in Colors.ColorList)
+            {
+                if (color.Value.GetColorName() == name)
+                    return new RGBA()
+                    {
+                        Red = color.Value.Red/256d,
+                        Green = color.Value.Green/256d,
+                        Blue = color.Value.Blue/256d,
+                        Alpha = 1d
+                    };
+            }
+            
+            throw new ArgumentException();
+        }
+
+        public static void SetColorFromRgba(RGBA rgba, ushort colorId)
+        {
+            Colors.ColorList[colorId].SetColor(
+                (byte) (rgba.Red * 255),
+                (byte) (rgba.Green * 255),
+                (byte) (rgba.Blue * 255)
+            );
+        }
+        
+        public static void SetColorFromRgba(RGBA rgba, string name)
+        {
+            SetColorFromRgba(rgba, Colors.GetColorIdFromName(name));
         }
     }
 }
