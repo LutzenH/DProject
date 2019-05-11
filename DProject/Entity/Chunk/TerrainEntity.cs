@@ -197,7 +197,7 @@ namespace DProject.Entity.Chunk
                     GetTileHeight(
                         _chunkData.Objects[floor][index].PositionX,
                         _chunkData.Objects[floor][index].PositionY,
-                        floor)/4f,
+                        floor)/HeightMap.IncrementsPerHeightUnit,
                     _chunkData.Objects[floor][index].PositionY + _chunkPositionY *ChunkLoaderEntity.ChunkSize),
                 CalculateRotation(_chunkData.Objects[floor][index].ObjectRotation),
                 _chunkData.Objects[floor][index].Scale,
@@ -213,7 +213,7 @@ namespace DProject.Entity.Chunk
                     GetTileHeight(
                         propObject.PositionX,
                         propObject.PositionY,
-                        floor)/4f,
+                        floor)/HeightMap.IncrementsPerHeightUnit,
                     propObject.PositionY + _chunkPositionY *ChunkLoaderEntity.ChunkSize),
                 CalculateRotation(propObject.ObjectRotation),
                 propObject.Scale,

@@ -14,7 +14,7 @@ namespace DProject.Type.Rendering
             {
                 for (int y = 0; y < mapHeight+1; y++)
                 {  
-                    noiseMap[x,y] = (byte) (10+ perlin.GetValue((x+xOffset)/noiseScale, (y+yOffset)/noiseScale) * 10);
+                    noiseMap[x,y] = (byte) (20+ perlin.GetValue((x+xOffset)/noiseScale, (y+yOffset)/noiseScale) * 20);
                 }
             }
 

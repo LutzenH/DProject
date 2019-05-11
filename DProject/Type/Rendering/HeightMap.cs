@@ -1,15 +1,18 @@
 using System;
+using System.Drawing;
 using DProject.List;
 using DProject.Type.Rendering.Shaders;
 using DProject.Type.Serializable;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Color = Microsoft.Xna.Framework.Color;
 
 namespace DProject.Type.Rendering
 {
     public class HeightMap
     {       
         private VertexPositionTextureColorNormal[] _vertexPositions;
+        private Vector3[,] _heightNormals;
 
         private DynamicVertexBuffer _vertexBuffer;
         
@@ -24,15 +27,16 @@ namespace DProject.Type.Rendering
 
         private bool _hasUpdated;
 
-        private const byte DefaultDistanceBetweenFloors = 32;
+        public const byte DefaultDistanceBetweenFloors = 64;
         
-        public const float IncrementsPerHeightUnit = 4f;
+        public const float IncrementsPerHeightUnit = 8f;
 
         public HeightMap(Tile[,] tiles)
         {
             _width = tiles.GetLength(0);
             _height = tiles.GetLength(1);
             
+            _heightNormals = GenerateNormalMap(tiles);
             _vertexPositions = GenerateVertexPositions(tiles);
         }
 
@@ -47,9 +51,9 @@ namespace DProject.Type.Rendering
                 _terrainEffect.Alpha = 1.0f;
             
                 _terrainEffect.LightingEnabled = true;
-                _terrainEffect.AmbientLightColor = new Vector3(0.15f,0.15f,0.15f);
-                _terrainEffect.DirectionalLight0.DiffuseColor = new Vector3(0.6f, 0.6f, 0.6f);
-                _terrainEffect.DirectionalLight0.Direction = new Vector3(1, 0.5f, 0);
+                _terrainEffect.AmbientLightColor = new Vector3(0.3f,0.3f,0.3f);
+                _terrainEffect.DirectionalLight0.DiffuseColor = new Vector3(1f, 1f, 1f);
+                _terrainEffect.DirectionalLight0.Direction = Vector3.Normalize(Vector3.Down);
 
                 _terrainEffect.VertexColorEnabled = true;
 
@@ -104,9 +108,9 @@ namespace DProject.Type.Rendering
 
             int vertexIndex = 0;
             
-            for (int x = 0; x < width; x++)
+            for (var x = 0; x < width; x++)
             {
-                for (int y = 0; y < height; y++)
+                for (var y = 0; y < height; y++)
                 {                    
                     var topLeft = new Vector3 (x-0.5f,  tiles[x,y].TopLeft / IncrementsPerHeightUnit, y-0.5f);
                     var topRight = new Vector3 (x+0.5f,  tiles[x,y].TopRight/ IncrementsPerHeightUnit, y-0.5f);
@@ -129,16 +133,20 @@ namespace DProject.Type.Rendering
 
                         if (tiles[x, y].IsAlternativeDiagonal)
                         {
-                            normal = GenerateNormalDirection(bottomLeft, topLeft, bottomRight);
+                            normal = _heightNormals[x, y+1];
                             vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(bottomLeft, normal, colorBottomLeft, new Vector2(texturePositionTexture0.X,texturePositionTexture0.Y));
+                            normal = _heightNormals[x, y];
                             vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(topLeft, normal, colorTopLeft, new Vector2(texturePositionTexture0.X,texturePositionTexture0.W));
+                            normal = _heightNormals[x+1, y+1];
                             vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(bottomRight, normal, colorBottomRight, new Vector2(texturePositionTexture0.Z,texturePositionTexture0.Y));
                         }
                         else
                         {
-                            normal = GenerateNormalDirection(topRight, bottomRight, bottomLeft);
+                            normal = _heightNormals[x+1, y];
                             vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(topRight, normal, colorTopRight, new Vector2(texturePositionTexture0.Z,texturePositionTexture0.W));
+                            normal = _heightNormals[x+1, y+1];
                             vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(bottomRight, normal, colorBottomRight, new Vector2(texturePositionTexture0.Z,texturePositionTexture0.Y));
+                            normal = _heightNormals[x, y+1];
                             vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(bottomLeft, normal, colorBottomLeft, new Vector2(texturePositionTexture0.X,texturePositionTexture0.Y));
                         }
                     }
@@ -151,16 +159,20 @@ namespace DProject.Type.Rendering
                         
                         if (tiles[x,y].IsAlternativeDiagonal)
                         {                          
-                            normal = GenerateNormalDirection(topLeft, topRight, bottomRight);
+                            normal = _heightNormals[x, y];
                             vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(topLeft, normal, colorTopLeft, new Vector2(texturePositionTexture1.X,texturePositionTexture1.W));
+                            normal = _heightNormals[x+1, y];
                             vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(topRight, normal, colorTopRight, new Vector2(texturePositionTexture1.Z,texturePositionTexture1.W));
+                            normal = _heightNormals[x+1, y+1];
                             vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(bottomRight, normal, colorBottomRight, new Vector2(texturePositionTexture1.Z,texturePositionTexture1.Y));
                         }
                         else
                         {     
-                            normal = GenerateNormalDirection(bottomLeft, topLeft, topRight);
+                            normal = _heightNormals[x, y+1];
                             vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(bottomLeft, normal, colorBottomLeft, new Vector2(texturePositionTexture1.X,texturePositionTexture1.Y));
+                            normal = _heightNormals[x, y];
                             vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(topLeft, normal, colorTopLeft, new Vector2(texturePositionTexture1.X,texturePositionTexture1.W));
+                            normal = _heightNormals[x+1, y];
                             vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(topRight, normal, colorTopRight, new Vector2(texturePositionTexture1.Z,texturePositionTexture1.W));
                         }
                     }
@@ -176,12 +188,12 @@ namespace DProject.Type.Rendering
         {
             byte[,] heightmap = new byte[tilemap.GetLength(0)+1,tilemap.GetLength(1)+1];
             
-            for (var x = 0; x < heightmap.GetLength(0); x++)
+            for (var x = 0; x < heightmap.GetLength(0)-1; x++)
             {
-                for (var y = 0; y < heightmap.GetLength(1); y++)
+                for (var y = 0; y < heightmap.GetLength(1)-1; y++)
                 {
-                    var right = x == tilemap.GetLength(0);
-                    var bottom = y == tilemap.GetLength(1);
+                    var right = x == tilemap.GetLength(0)-1;
+                    var bottom = y == tilemap.GetLength(1)-1;
 
                     if (right || bottom)
                     {
@@ -215,9 +227,9 @@ namespace DProject.Type.Rendering
             
             Tile[,] tempTileMap = new Tile[width,height];
             
-            for (int x = 0; x < width; x++)
+            for (var x = 0; x < width; x++)
             {
-                for (int y = 0; y < height; y++)
+                for (var y = 0; y < height; y++)
                 {
                     var topLeft = heightmap[x,y];
                     var topRight = heightmap[x+1,y];
@@ -233,7 +245,7 @@ namespace DProject.Type.Rendering
                     
                     ushort? textureId = Textures.GetDefaultTextureId();
 
-                    if (topLeft > 31)
+                    if (topLeft > DefaultDistanceBetweenFloors-1)
                         textureId = null;
 
                     var colortl = Colors.GetDefaultColorId();
@@ -288,6 +300,54 @@ namespace DProject.Type.Rendering
 
             return tempTileMap;
         }
+        
+        public Vector3[,] GenerateNormalMap(Tile[,] tiles)
+        {
+            Vector3[,] map = new Vector3[_width+1,_height+1];
+            
+            var heightMap = GenerateHeightMapFromTileMap(tiles);
+
+            var yScale = 0.5f;
+            var xzScale = 1f;
+            
+            for (var y = 0; y<_height+1; ++y)
+            {
+                for (var x = 0; x < _width+1; ++x)
+                {
+                    float sx = heightMap[x<_width-1 ? x+1 : x, y] - heightMap[x != 0 ? x-1 : x, y];
+                    if (x == 0 || x == _width-1)
+                        sx *= 2;
+
+                    float sy = heightMap[x, y<_height-1 ? y+1 : y] - heightMap[x, y != 0 ?  y-1 : y];
+                    if (y == 0 || y == _height -1)
+                        sy *= 2;
+
+                    map[x,y] = new Vector3(-sx * yScale, 2 * xzScale, sy * yScale);
+                    map[x,y].Normalize();
+                }
+            }
+            
+            return map;
+        }
+
+        private static void ExportNormalMapToImage(Vector3[,] normals, string filepath)
+        {
+            var bitmap = new Bitmap(normals.GetLength(0), normals.GetLength(1));
+
+            for (var x = 0; x < bitmap.Width; x++)
+            {
+                for (var y = 0; y < bitmap.Height; y++)
+                {
+                    var color = System.Drawing.Color.FromArgb(
+                        (int)((normals[x,y].X+1f)*127),
+                        (int)((normals[x,y].Y+1f)*127),
+                        (int)((normals[x,y].Z+1f)*127));
+                    bitmap.SetPixel(x,y, color);
+                } 
+            }
+            
+            bitmap.Save(filepath);
+        }
 
         public static Tile[,] GenerateTileMap(int chunkSize, byte floor)
         {
@@ -304,6 +364,7 @@ namespace DProject.Type.Rendering
             return GenerateTileMap(heightmap);
         }
 
+        //Can be used the get the normal of a triangle
         private static Vector3 GenerateNormalDirection(Vector3 vertex1, Vector3 vertex2, Vector3 vertex3)
         {
             Vector3 sum = Vector3.Zero;
