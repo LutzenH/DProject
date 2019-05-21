@@ -148,7 +148,7 @@ namespace DProject.Entity.Chunk
                     y += dy;
                 }
 
-                EntityManager.AddMessage(new Message("Loading new chunks: " + oldChunksCount + " chunks reused and " + newChunksCount + " new chunks."));
+                EditorEntityManager.AddMessage(new Message("Loading new chunks: " + oldChunksCount + " chunks reused and " + newChunksCount + " new chunks."));
 
                 _loadingStatus = ChunkLoadingStatus.Busy;
 
@@ -172,7 +172,7 @@ namespace DProject.Entity.Chunk
                     LoadChunk((int) newChunkLocations[i].X, (int) newChunkLocations[i].Y);
             }
 
-            EntityManager.AddMessage(new Message("Done loading new chunks."));
+            EditorEntityManager.AddMessage(new Message("Done loading new chunks."));
             _loadingStatus = ChunkLoadingStatus.Done;
         }
 
@@ -187,7 +187,7 @@ namespace DProject.Entity.Chunk
 
         public void SerializeChangedChunks()
         {
-            EntityManager.AddMessage(new Message("Starting serialization of changed chunks.."));
+            EditorEntityManager.AddMessage(new Message("Starting serialization of changed chunks.."));
 
             int count = 0;
             
@@ -203,12 +203,12 @@ namespace DProject.Entity.Chunk
                 }
             }
             
-            EntityManager.AddMessage(new Message("Serialized " + count + " changed chunks."));
+            EditorEntityManager.AddMessage(new Message("Serialized " + count + " changed chunks."));
         }
 
         public void ReloadChangedChunks()
         {
-            EntityManager.AddMessage(new Message("Reloading changed chunks.."));
+            EditorEntityManager.AddMessage(new Message("Reloading changed chunks.."));
 
             int count = 0;
             
@@ -225,7 +225,7 @@ namespace DProject.Entity.Chunk
                 }
             }
             
-            EntityManager.AddMessage(new Message("Reloaded " + count + " changed chunks."));
+            EditorEntityManager.AddMessage(new Message("Reloaded " + count + " changed chunks."));
         }
 
         #endregion

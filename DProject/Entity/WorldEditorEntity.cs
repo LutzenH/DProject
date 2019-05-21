@@ -21,7 +21,7 @@ namespace DProject.Entity
         private readonly AxisEntity _pointerEntity;
         private readonly CornerIndicatorEntity _cornerIndicatorEntity;
         
-        private readonly EntityManager _entityManager;
+        private readonly EditorEntityManager _editorEntityManager;
         private readonly ChunkLoaderEntity _chunkLoaderEntity;
         private GraphicsDevice _graphicsDevice;
         
@@ -39,13 +39,13 @@ namespace DProject.Entity
                 
         private byte _currentFloor;
         
-        public WorldEditorEntity(EntityManager entityManager, ChunkLoaderEntity chunkLoaderEntity) : base(Vector3.Zero, Quaternion.Identity, new Vector3(1,1,1))
+        public WorldEditorEntity(EditorEntityManager editorEntityManager, ChunkLoaderEntity chunkLoaderEntity) : base(Vector3.Zero, Quaternion.Identity, new Vector3(1,1,1))
         {
             _axisEntity = new AxisEntity(Vector3.Zero);
             _pointerEntity = new AxisEntity(Vector3.Zero);
             _cornerIndicatorEntity = new CornerIndicatorEntity(Vector3.Zero, TerrainEntity.TileCorner.BottomRight, Color.Cyan);
             
-            _entityManager = entityManager;
+            _editorEntityManager = editorEntityManager;
             _chunkLoaderEntity = chunkLoaderEntity;
 
             _activeTexture = Textures.GetDefaultTextureId();
@@ -316,8 +316,8 @@ namespace DProject.Entity
 
         private Vector3 CalculatePrecisePosition(Vector2 mouseLocation)
         {
-            Ray ray = Game1.CalculateRay(mouseLocation, _entityManager.GetActiveCamera().GetViewMatrix(),
-                _entityManager.GetActiveCamera().GetProjectMatrix(), _graphicsDevice.Viewport);
+            Ray ray = Game1.CalculateRay(mouseLocation, _editorEntityManager.GetActiveCamera().GetViewMatrix(),
+                _editorEntityManager.GetActiveCamera().GetProjectMatrix(), _graphicsDevice.Viewport);
             
             Vector3 position = Vector3.Zero;
             

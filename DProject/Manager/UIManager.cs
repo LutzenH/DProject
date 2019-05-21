@@ -19,10 +19,17 @@ namespace DProject.Manager
         public UIManager(EntityManager entityManager)
         {
             _userInterfaces = new List<AbstractUI>();
-            
-            _userInterfaces.Add(new WorldEditorUI(entityManager.GetWorldEditorEntity()));
-            _userInterfaces.Add(new MessageUI(entityManager));
-            //_userInterfaces.Add(new WorldMapUI(entityManager.GetChunkLoaderEntity(), 8));
+
+            switch (entityManager)
+            {
+                case EditorEntityManager editorEntityManager:
+                    _userInterfaces.Add(new WorldEditorUI(editorEntityManager.GetWorldEditorEntity()));
+                    _userInterfaces.Add(new MessageUI(editorEntityManager));
+                    break;
+                case GameEntityManager gameEntityManager:
+                    _userInterfaces.Add(new WorldMapUI(gameEntityManager.GetChunkLoaderEntity(), 8));
+                    break;
+            }
         }
         
         public void Initialize(GraphicsDevice graphicsDevice)

@@ -1,10 +1,8 @@
-using System.Collections.Generic;
 using DProject.Entity;
+using System.Collections.Generic;
 using DProject.Entity.Camera;
 using DProject.Entity.Chunk;
-using DProject.Entity.Debug;
 using DProject.Entity.Interface;
-using DProject.Type;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -12,46 +10,23 @@ using Microsoft.Xna.Framework.Input;
 
 namespace DProject.Manager
 {
-    public class EntityManager
+    public abstract class EntityManager
     {
-        private readonly List<AbstractEntity> _entities;
-        private readonly List<CameraEntity> _cameraEntities;
+        protected readonly List<AbstractEntity> _entities;
+        protected readonly List<CameraEntity> _cameraEntities;
         
-        public static readonly LinkedList<Message> Messages = new LinkedList<Message>();
-        
-        private CameraEntity _activeCamera;
-
-        private ChunkLoaderEntity _chunkLoaderEntity;
-        private WorldEditorEntity _worldEditorEntity;
+        protected ChunkLoaderEntity _chunkLoaderEntity;
+        protected CameraEntity _activeCamera;
 
         private int _cameraIndex;
-        
-        public EntityManager()
-        {            
-            //Entities Lists Initialisation
-            _entities = new List<AbstractEntity>();
-            _cameraEntities = new List<CameraEntity>
-            {
-                new FlyCameraEntity(new Vector3(0f, 10f, 0f), Quaternion.Identity),
-                new FlyCameraEntity(new Vector3(0f, 0f, 0f), Quaternion.Identity)
-            };            
-            //Adds all camera's to entities list
-            foreach (var cameraEntity in _cameraEntities)
-            {
-                _entities.Add(cameraEntity);
-            }
 
-            _activeCamera = _cameraEntities[0];
-            _activeCamera.IsActiveCamera = true;
+        protected EntityManager()
+        {
+            _entities = new List<AbstractEntity>();
+            _cameraEntities = new List<CameraEntity>();
             
             _chunkLoaderEntity = new ChunkLoaderEntity(this);
-            
             _entities.Add(_chunkLoaderEntity);
-            _worldEditorEntity = new WorldEditorEntity(this, _chunkLoaderEntity);
-            
-            _entities.Add(_worldEditorEntity);
-            
-            _entities.Add(new DebugEntity(_cameraEntities, _chunkLoaderEntity));
         }
 
         public void Initialize(GraphicsDevice graphicsDevice)
@@ -72,10 +47,7 @@ namespace DProject.Manager
         }
 
         public void Update(GameTime gameTime)
-        {      
-            if(Keyboard.GetState().IsKeyUp(Keys.Tab) && Game1.PreviousKeyboardState.IsKeyDown(Keys.Tab))
-                SetNextCamera();
-            
+        {
             foreach (AbstractEntity entity in _entities)
             {
                 if (entity is Entity.Interface.IUpdateable updateEntity)
@@ -84,7 +56,7 @@ namespace DProject.Manager
         }
 
         public void Draw()
-        {          
+        {
             foreach (AbstractEntity entity in _entities)
             {
                 if (entity is Entity.Interface.IDrawable drawableEntity)
@@ -96,7 +68,7 @@ namespace DProject.Manager
         {
             return _entities;
         }
-
+        
         public CameraEntity GetActiveCamera()
         {
             return _activeCamera;
@@ -104,11 +76,13 @@ namespace DProject.Manager
 
         public void SetActiveCamera(int index)
         {
-            _activeCamera.IsActiveCamera = false;
+            if(_activeCamera != null)
+                _activeCamera.IsActiveCamera = false;
+            
             _activeCamera = _cameraEntities[index];
             _activeCamera.IsActiveCamera = true;
         }
-
+        
         public void SetNextCamera()
         {
             _cameraIndex++;
@@ -120,41 +94,21 @@ namespace DProject.Manager
             _activeCamera.IsActiveCamera = true;
         }
 
-        public static void AddMessage(Message message)
+        protected void AddCamera(CameraEntity cameraEntity)
         {
-            Messages.AddLast(message);
+            var cameraEntitiesIsEmpty = _cameraEntities.Count == 0;
+
+            _cameraEntities.Add(cameraEntity);
+            
+            if(cameraEntitiesIsEmpty)
+                SetActiveCamera(0);
+            
+            _entities.Add(cameraEntity);
         }
-
-        public static Message GetFirstMessage()
-        {
-            if (Messages.First != null)
-            {
-                Message message = Messages.First.Value;
-                Messages.RemoveFirst();
-                return message;
-            }
-
-            return null;
-        }
-
-        public static int GetMessagesCount()
-        {
-            return Messages.Count;
-        }
-
-        public WorldEditorEntity GetWorldEditorEntity()
-        {
-            return _worldEditorEntity;
-        }
-
+        
         public ChunkLoaderEntity GetChunkLoaderEntity()
         {
             return _chunkLoaderEntity;
-        }
-
-        public static void ClearMessageList()
-        {
-            Messages.Clear();
         }
     }
 }

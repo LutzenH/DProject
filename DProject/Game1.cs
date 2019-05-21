@@ -24,11 +24,11 @@ namespace DProject
         public static int WidgetOffsetX;
         public static int WidgetOffsetY;
         
-        public Game1()
+        public Game1(EntityManager entityManager)
         {
             _graphics = new GraphicsDeviceManager(this);
-                        
-            _entityManager = new EntityManager();
+
+            _entityManager = entityManager;
             _uiManager = new UIManager(_entityManager);
             
             Content.RootDirectory = RootDirectory;

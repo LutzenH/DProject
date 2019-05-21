@@ -11,7 +11,7 @@ namespace DProject.UI
 {
     public class MessageUI : AbstractUI, IUpdateable
     {
-        private readonly EntityManager _entityManager;
+        private readonly EditorEntityManager _editorEntityManager;
         
         private SpriteFont _spriteFont;
         private string _textString;
@@ -22,9 +22,9 @@ namespace DProject.UI
 
         private readonly LinkedList<Message> _messages;
         
-        public MessageUI(EntityManager entityManager)
+        public MessageUI(EditorEntityManager editorEntityManager)
         {
-            _entityManager = entityManager;
+            _editorEntityManager = editorEntityManager;
             _textString = "";
             _messages = new LinkedList<Message>();
         }
@@ -44,8 +44,8 @@ namespace DProject.UI
             _textString = "";
             _lineCount = 0;
 
-            if (EntityManager.GetMessagesCount() > 0)
-                _messages.AddLast(EntityManager.GetFirstMessage());
+            if (EditorEntityManager.Messages.Count > 0)
+                _messages.AddLast(EditorEntityManager.GetFirstMessage());
 
             foreach (var message in _messages.ToList())
             {

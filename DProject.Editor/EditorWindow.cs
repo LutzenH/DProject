@@ -4,6 +4,7 @@ using System.Drawing.Imaging;
 using System.IO;
 using DProject.Entity;
 using DProject.List;
+using DProject.Manager;
 using DProject.Type.Serializable;
 using Gdk;
 using Gtk;
@@ -68,6 +69,8 @@ namespace DProject
         [Builder.Object] private SearchEntry search_entry_texture;
         private Pixbuf _textureAtlasPixBuf;
         private string _textureSelectedChild;
+
+        private EditorEntityManager _editorEntityManager;
         
         public EditorWindow(string[] args)
         {
@@ -78,8 +81,10 @@ namespace DProject
             _builder.Autoconnect(this);
             
             tree_camera_value.Editable = true;
+
+            _editorEntityManager = new EditorEntityManager();
             
-            _game = new Game1();
+            _game = new Game1(_editorEntityManager);
             _gameWidget = _game.Services.GetService<Widget>();
             _gameBox.PackStart(_gameWidget, true, true, 5);
             
@@ -120,7 +125,7 @@ namespace DProject
             tree_camera_value.Edited += UpdateCamera;
             
             //Terrain Brush Settings
-            adjustment_brush_size.ValueChanged += (o, args) => _game.GetEntityManager().GetWorldEditorEntity().SetBrushSize((int)adjustment_brush_size.Value - 1);
+            adjustment_brush_size.ValueChanged += (o, args) => _editorEntityManager.GetWorldEditorEntity().SetBrushSize((int)adjustment_brush_size.Value - 1);
             
             //Colors
             box_flow_colors.SelectedChildrenChanged += (o, args) => UpdateSelectedItem(o, args, typeof(SerializableColor));
@@ -138,7 +143,7 @@ namespace DProject
 
         private void SetSelectedTool(WorldEditorEntity.Tools tool)
         {
-            _game.GetEntityManager().GetWorldEditorEntity().SetCurrentTool(tool);
+            _editorEntityManager.GetWorldEditorEntity().SetCurrentTool(tool);
         }
 
         private void UpdateCamera(object obj, EditedArgs args)
@@ -189,7 +194,7 @@ namespace DProject
                 if (selectedChild != null)
                     _textureSelectedChild = selectedChild.TooltipText;
             
-                _game.GetEntityManager().GetWorldEditorEntity().SetActiveTexture(Textures.GetTextureIdFromName(_textureSelectedChild));
+                _editorEntityManager.GetWorldEditorEntity().SetActiveTexture(Textures.GetTextureIdFromName(_textureSelectedChild));
             }
             else if (type == typeof(SerializableColor))
             {
@@ -198,13 +203,13 @@ namespace DProject
 
                 colorbutton_color.Rgba = GetRgbaFromName(_colorSelectedChild);
             
-                _game.GetEntityManager().GetWorldEditorEntity().SetSelectedColor(Colors.GetColorIdFromName(_colorSelectedChild));
+                _editorEntityManager.GetWorldEditorEntity().SetSelectedColor(Colors.GetColorIdFromName(_colorSelectedChild));
             }
         }
 
         private void ChangeSelectedColor(object obj, EventArgs args)
         {
-            var selectedColor = _game.GetEntityManager().GetWorldEditorEntity().GetSelectedColor();
+            var selectedColor = _editorEntityManager.GetWorldEditorEntity().GetSelectedColor();
             SetColorFromRgba(colorbutton_color.Rgba, selectedColor);
 
             foreach (var widget in box_flow_colors)
@@ -329,7 +334,7 @@ namespace DProject
         {
             var box = (ListBox) obj;
             var selectedChild = (ListBoxRow) box.SelectedRows[0];                   
-            _game.GetEntityManager().GetWorldEditorEntity().SetSelectedObject(Props.GetPropIdFromName(selectedChild.TooltipText));
+            _editorEntityManager.GetWorldEditorEntity().SetSelectedObject(Props.GetPropIdFromName(selectedChild.TooltipText));
         }
 
         private void MainWindow_Destroyed(object sender, EventArgs e)
