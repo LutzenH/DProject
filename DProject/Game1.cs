@@ -41,6 +41,9 @@ namespace DProject
 
             //VSYNC
             _graphics.SynchronizeWithVerticalRetrace = false;
+            
+            //Mouse
+            IsMouseVisible = true;
         }
 
         protected override void Initialize()
