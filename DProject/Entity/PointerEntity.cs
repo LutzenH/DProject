@@ -11,21 +11,15 @@ using IUpdateable = DProject.Entity.Interface.IUpdateable;
 
 namespace DProject.Entity
 {
-    public class PointerEntity : AbstractEntity, IUpdateable, IInitialize
+    public class PointerEntity : AbstractAwareEntity, IUpdateable, IInitialize
     {
-        private readonly EditorEntityManager _editorEntityManager;
-        private readonly ChunkLoaderEntity _chunkLoaderEntity;
         private GraphicsDevice _graphicsDevice;
         
         private Vector3 _gridPosition;
         private byte _currentFloor;
         private TerrainEntity.TileCorner _selectedCorner;
         
-        public PointerEntity(EditorEntityManager editorEntityManager, ChunkLoaderEntity chunkLoaderEntity) : base(Vector3.Zero, Quaternion.Identity, new Vector3(1,1,1))
-        {
-            _editorEntityManager = editorEntityManager;
-            _chunkLoaderEntity = chunkLoaderEntity;
-        }
+        public PointerEntity(EntityManager entityManager) : base(entityManager, Vector3.Zero, Quaternion.Identity, new Vector3(1,1,1)) { }
 
         public override void LoadContent(ContentManager content) { }
 
@@ -49,7 +43,7 @@ namespace DProject.Entity
             
             var mouseLocation = Game1.GetAdjustedMousePosition();
             
-            Position = CalculatePrecisePosition(mouseLocation, _editorEntityManager.GetActiveCamera(), _graphicsDevice, _chunkLoaderEntity, _currentFloor);
+            Position = CalculatePrecisePosition(mouseLocation, EntityManager.GetActiveCamera(), _graphicsDevice, EntityManager.GetChunkLoaderEntity(), _currentFloor);
             _gridPosition = CalculatePosition(Position);
             _selectedCorner = CalculateCorner(Position);
         }

@@ -12,11 +12,12 @@ namespace DProject.Manager
 {
     public abstract class EntityManager
     {
-        protected readonly List<AbstractEntity> _entities;
-        protected readonly List<CameraEntity> _cameraEntities;
+        private readonly List<AbstractEntity> _entities;
+        private readonly List<CameraEntity> _cameraEntities;
         
-        protected ChunkLoaderEntity _chunkLoaderEntity;
-        protected CameraEntity _activeCamera;
+        private readonly ChunkLoaderEntity _chunkLoaderEntity;
+        private readonly PointerEntity _pointerEntity;
+        private CameraEntity _activeCamera;
 
         private int _cameraIndex;
 
@@ -26,12 +27,15 @@ namespace DProject.Manager
             _cameraEntities = new List<CameraEntity>();
             
             _chunkLoaderEntity = new ChunkLoaderEntity(this);
-            _entities.Add(_chunkLoaderEntity);
+            AddEntity(_chunkLoaderEntity);
+
+            _pointerEntity = new PointerEntity(this);
+            AddEntity(_pointerEntity);
         }
 
         public void Initialize(GraphicsDevice graphicsDevice)
         {
-            foreach (AbstractEntity entity in _entities)
+            foreach (var entity in _entities)
             {
                 if (entity is IInitialize initializeEntity)
                     initializeEntity.Initialize(graphicsDevice);
@@ -40,7 +44,7 @@ namespace DProject.Manager
 
         public void LoadContent(ContentManager content)
         {
-            foreach (AbstractEntity entity in _entities)
+            foreach (var entity in _entities)
             {
                 entity.LoadContent(content);
             }
@@ -48,7 +52,7 @@ namespace DProject.Manager
 
         public void Update(GameTime gameTime)
         {
-            foreach (AbstractEntity entity in _entities)
+            foreach (var entity in _entities)
             {
                 if (entity is Entity.Interface.IUpdateable updateEntity)
                     updateEntity.Update(gameTime);
@@ -57,7 +61,7 @@ namespace DProject.Manager
 
         public void Draw()
         {
-            foreach (AbstractEntity entity in _entities)
+            foreach (var entity in _entities)
             {
                 if (entity is Entity.Interface.IDrawable drawableEntity)
                     drawableEntity.Draw(GetActiveCamera());
@@ -68,7 +72,17 @@ namespace DProject.Manager
         {
             return _entities;
         }
-        
+
+        public void AddEntity(AbstractEntity entity)
+        {
+            _entities.Add(entity);
+        }
+
+        public List<CameraEntity> GetCameraEntities()
+        {
+            return _cameraEntities;
+        }
+
         public CameraEntity GetActiveCamera()
         {
             return _activeCamera;
@@ -109,6 +123,11 @@ namespace DProject.Manager
         public ChunkLoaderEntity GetChunkLoaderEntity()
         {
             return _chunkLoaderEntity;
+        }
+
+        public PointerEntity GetPointerEntity()
+        {
+            return _pointerEntity;
         }
     }
 }

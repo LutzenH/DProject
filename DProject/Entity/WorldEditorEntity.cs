@@ -15,7 +15,7 @@ using IUpdateable = DProject.Entity.Interface.IUpdateable;
 
 namespace DProject.Entity
 {
-    public class WorldEditorEntity : AbstractEntity, IInitialize,IUpdateable, IDrawable
+    public class WorldEditorEntity : AbstractAwareEntity, IInitialize, IUpdateable, IDrawable
     {
         private readonly AxisEntity _axisEntity;
         private readonly AxisEntity _pointerAxisEntity;
@@ -36,14 +36,14 @@ namespace DProject.Entity
         private Rotation _selectedRotation;
         private ushort _selectedColor;
         
-        public WorldEditorEntity(PointerEntity pointerEntity, ChunkLoaderEntity chunkLoaderEntity) : base(Vector3.Zero, Quaternion.Identity, new Vector3(1,1,1))
+        public WorldEditorEntity(EntityManager entityManager) : base(entityManager, Vector3.Zero, Quaternion.Identity, new Vector3(1,1,1))
         {
             _axisEntity = new AxisEntity(Vector3.Zero);
             _pointerAxisEntity = new AxisEntity(Vector3.Zero);
             _cornerIndicatorEntity = new CornerIndicatorEntity(Vector3.Zero, TerrainEntity.TileCorner.BottomRight, Color.Cyan);
 
-            _pointerEntity = pointerEntity;
-            _chunkLoaderEntity = chunkLoaderEntity;
+            _pointerEntity = EntityManager.GetPointerEntity();
+            _chunkLoaderEntity = EntityManager.GetChunkLoaderEntity();
 
             _activeTexture = Textures.GetDefaultTextureId();
             _selectedObject = Props.GetDefaultPropId();

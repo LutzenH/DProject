@@ -20,9 +20,8 @@ using IUpdateable = DProject.Entity.Interface.IUpdateable;
 
 namespace DProject.Entity.Chunk
 {
-    public class ChunkLoaderEntity : AbstractEntity, IDrawable, IInitialize, IUpdateable
+    public class ChunkLoaderEntity : AbstractAwareEntity, IDrawable, IInitialize, IUpdateable
     {
-        private readonly EntityManager _entityManager;
         private GraphicsDevice _graphicsDevice;
         private ContentManager _contentManager;
 
@@ -44,10 +43,9 @@ namespace DProject.Entity.Chunk
 
         private ChunkLoadingStatus _loadingStatus;
 
-        public ChunkLoaderEntity(EntityManager entityManager) : base(Vector3.Zero, Quaternion.Identity,
+        public ChunkLoaderEntity(EntityManager entityManager) : base(entityManager, Vector3.Zero, Quaternion.Identity,
             new Vector3(1, 1, 1))
         {
-            _entityManager = entityManager;
             _chunkPosition = new Vector2(0, 0);
             _previousChunkPosition = new Vector2(-1, 0);
             _loadingStatus = ChunkLoadingStatus.Done;
@@ -60,8 +58,8 @@ namespace DProject.Entity.Chunk
 
         public void Update(GameTime gameTime)
         {
-            _chunkPosition = CalculateChunkPosition(_entityManager.GetActiveCamera().GetPosition().X,
-                _entityManager.GetActiveCamera().GetPosition().Z);
+            _chunkPosition = CalculateChunkPosition(EntityManager.GetActiveCamera().GetPosition().X,
+                EntityManager.GetActiveCamera().GetPosition().Z);
 
             if (!_chunkPosition.Equals(_previousChunkPosition))
             {

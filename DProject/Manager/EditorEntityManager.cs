@@ -13,23 +13,19 @@ namespace DProject.Manager
     {
         public static readonly LinkedList<Message> Messages = new LinkedList<Message>();
         
-        private PointerEntity _pointerEntity;
-        private WorldEditorEntity _worldEditorEntity;
+        private readonly WorldEditorEntity _worldEditorEntity;
         private DebugEntity _debugEntity;
 
         public EditorEntityManager()
         {            
             AddCamera(new FlyCameraEntity(new Vector3(0f, 10f, 0f), Quaternion.Identity));
             AddCamera(new FlyCameraEntity(new Vector3(0f, 0f, 0f), Quaternion.Identity));
-            
-            _pointerEntity = new PointerEntity(this, _chunkLoaderEntity);
-            _entities.Add(_pointerEntity);
-            
-            _worldEditorEntity = new WorldEditorEntity(_pointerEntity, _chunkLoaderEntity);
-            _entities.Add(_worldEditorEntity);
 
-            _debugEntity = new DebugEntity(_cameraEntities, _chunkLoaderEntity);
-            _entities.Add(_debugEntity);
+            _worldEditorEntity = new WorldEditorEntity(this);
+            AddEntity(_worldEditorEntity);
+
+            _debugEntity = new DebugEntity(this);
+            AddEntity(_debugEntity);
         }
 
         public static void AddMessage(Message message)
@@ -49,7 +45,7 @@ namespace DProject.Manager
         {
             if (Messages.First != null)
             {
-                Message message = Messages.First.Value;
+                var message = Messages.First.Value;
                 Messages.RemoveFirst();
                 return message;
             }

@@ -25,6 +25,8 @@ namespace DProject.Entity
 
         public abstract void LoadContent(ContentManager content);
 
+        #region Getters and Setters
+
         public Vector3 GetPosition()
         {
             return Position;
@@ -63,6 +65,8 @@ namespace DProject.Entity
         public Matrix GetWorldMatrix()  
         {   
             return Rotation * Matrix.CreateScale(Scale) *  Matrix.CreateTranslation(Position);   
-        }  
+        }
+
+        #endregion
     }
 }
