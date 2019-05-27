@@ -13,6 +13,7 @@ namespace DProject.Manager
     {
         public static readonly LinkedList<Message> Messages = new LinkedList<Message>();
         
+        private PointerEntity _pointerEntity;
         private WorldEditorEntity _worldEditorEntity;
         private DebugEntity _debugEntity;
 
@@ -21,7 +22,10 @@ namespace DProject.Manager
             AddCamera(new FlyCameraEntity(new Vector3(0f, 10f, 0f), Quaternion.Identity));
             AddCamera(new FlyCameraEntity(new Vector3(0f, 0f, 0f), Quaternion.Identity));
             
-            _worldEditorEntity = new WorldEditorEntity(this, _chunkLoaderEntity);
+            _pointerEntity = new PointerEntity(this, _chunkLoaderEntity);
+            _entities.Add(_pointerEntity);
+            
+            _worldEditorEntity = new WorldEditorEntity(_pointerEntity, _chunkLoaderEntity);
             _entities.Add(_worldEditorEntity);
 
             _debugEntity = new DebugEntity(_cameraEntities, _chunkLoaderEntity);
