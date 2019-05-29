@@ -20,13 +20,22 @@ namespace DProject.Entity.Debug
         
         private readonly List<CameraEntity> _cameraEntities;
         private readonly ChunkLoaderEntity _chunkLoaderEntity;
+        private readonly PointerEntity _pointerEntity;
 
+        private readonly AxisEntity _axisEntity;
+        private readonly AxisEntity _pointerAxisEntity;
+        
         private readonly List<LineFrameEntity> _lineFrameEntities;
 
         private GraphicsDevice _graphicsDevice;
                 
         public DebugEntity(EntityManager entityManager) : base(entityManager,Vector3.Zero, Quaternion.Identity, new Vector3(1,1,1))
         {
+            _pointerEntity = entityManager.GetPointerEntity();
+            
+            _axisEntity = new AxisEntity(Vector3.Zero);
+            _pointerAxisEntity = new AxisEntity(Vector3.Zero);
+            
             var cameraEntities = EntityManager.GetCameraEntities();
             
             cameraProps = new PropEntity[cameraEntities.Count];
@@ -53,6 +62,9 @@ namespace DProject.Entity.Debug
         public void Initialize(GraphicsDevice graphicsDevice)
         {
             _graphicsDevice = graphicsDevice;
+            
+            _axisEntity.Initialize(graphicsDevice);
+            _pointerAxisEntity.Initialize(graphicsDevice);
         }
 
         public void Update(GameTime gameTime)
@@ -70,6 +82,9 @@ namespace DProject.Entity.Debug
                 cameraProps[i].SetPosition(_cameraEntities[i].GetPosition());
                 cameraProps[i].SetRotation(-pitch, yaw+ 1.5f, 0f);
             }
+            
+            _axisEntity.SetPosition(_pointerEntity.GetPosition());
+            _pointerAxisEntity.SetPosition(_pointerEntity.GetGridPosition());
         }
 
         public void UpdateChunkFrames()
@@ -108,6 +123,9 @@ namespace DProject.Entity.Debug
 
         public void Draw(CameraEntity activeCamera)
         {
+            _axisEntity.Draw(activeCamera);
+            _pointerAxisEntity.Draw(activeCamera);
+            
             for (var i = 0; i < cameraProps.Length; i++)
             {
                 cameraProps[i].Draw(activeCamera);

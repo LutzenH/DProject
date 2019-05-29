@@ -17,8 +17,6 @@ namespace DProject.Entity
 {
     public class WorldEditorEntity : AbstractAwareEntity, IInitialize, IUpdateable, IDrawable
     {
-        private readonly AxisEntity _axisEntity;
-        private readonly AxisEntity _pointerAxisEntity;
         private readonly CornerIndicatorEntity _cornerIndicatorEntity;
 
         private readonly PointerEntity _pointerEntity;
@@ -38,8 +36,6 @@ namespace DProject.Entity
         
         public WorldEditorEntity(EntityManager entityManager) : base(entityManager, Vector3.Zero, Quaternion.Identity, new Vector3(1,1,1))
         {
-            _axisEntity = new AxisEntity(Vector3.Zero);
-            _pointerAxisEntity = new AxisEntity(Vector3.Zero);
             _cornerIndicatorEntity = new CornerIndicatorEntity(Vector3.Zero, TerrainEntity.TileCorner.BottomRight, Color.Cyan);
 
             _pointerEntity = EntityManager.GetPointerEntity();
@@ -54,8 +50,6 @@ namespace DProject.Entity
 
         public void Initialize(GraphicsDevice graphicsDevice)
         {
-            _axisEntity.Initialize(graphicsDevice);
-            _pointerAxisEntity.Initialize(graphicsDevice);
             _cornerIndicatorEntity.Initialize(graphicsDevice);
         }
 
@@ -78,9 +72,6 @@ namespace DProject.Entity
 
         public void Draw(CameraEntity activeCamera)
         {
-            _axisEntity.Draw(activeCamera);
-            _pointerAxisEntity.Draw(activeCamera);
-            
             if(_brushSize < 1)
                 _cornerIndicatorEntity.Draw(activeCamera);
         }
@@ -154,7 +145,6 @@ namespace DProject.Entity
                 ChangeColor(position, precisePosition, _selectedColor);
             }
 
-            _axisEntity.SetPosition(precisePosition);
             _cornerIndicatorEntity.SetPosition(position);
             _cornerIndicatorEntity.SetRotation(tileCorner);
         }
@@ -182,7 +172,6 @@ namespace DProject.Entity
                 ChangeHeight(position, precisePosition, (byte)height);
             }
 
-            _axisEntity.SetPosition(precisePosition);
             _cornerIndicatorEntity.SetPosition(position);
             _cornerIndicatorEntity.SetRotation(tileCorner);
         }
@@ -210,15 +199,12 @@ namespace DProject.Entity
                 }
             }
             
-            _axisEntity.SetPosition(precisePosition);
             _cornerIndicatorEntity.SetPosition(position);
             _cornerIndicatorEntity.SetRotation(tileCorner);
         }
         
         private void PlaceObject(Vector3 position)
-        {            
-            _axisEntity.SetPosition(position);
-
+        {
             if (Mouse.GetState().LeftButton == ButtonState.Pressed && Game1.PreviousMouseState.LeftButton == ButtonState.Released)
             {
                 _chunkLoaderEntity.PlaceProp(position, _pointerEntity.GetCurrentFloor(), _selectedRotation, _selectedObject);
@@ -251,8 +237,6 @@ namespace DProject.Entity
 
         private void Paint(Vector3 position, Vector3 precisePosition)
         {
-            _axisEntity.SetPosition(precisePosition);
-
             if (Mouse.GetState().LeftButton == ButtonState.Pressed && !UIManager.ClickedUI)
             {
                 var corner = _pointerEntity.GetSelectedCorner();
