@@ -137,14 +137,14 @@ namespace DProject.Entity.Chunk
                     y += dy;
                 }
 
+                _loadingStatus = ChunkLoadingStatus.Busy;
+
                 var deadChunks = _loadedChunks.Keys.Except(oldChunkPositions).ToArray();
                 
                 foreach (var chunk in deadChunks)
                     _loadedChunks.Remove(chunk);
                 
                 EditorEntityManager.AddMessage(new Message("Loading new chunks: " + oldChunksCount + " chunks reused and " + newChunksCount + " new chunks."));
-
-                _loadingStatus = ChunkLoadingStatus.Busy;
 
 #if EDITOR
                 Application.Invoke((sender, args) => LoadNewChunks(newChunkPositions));           
@@ -206,7 +206,9 @@ namespace DProject.Entity.Chunk
 
                 var count = 0;
 
-                foreach (var key in _loadedChunks.Keys)
+                var positions = _loadedChunks.Keys.ToArray();
+                
+                foreach (var key in positions)
                 {
                     if (_loadedChunks[key].GetChunkData().ChunkStatus == ChunkStatus.Changed)
                     {
