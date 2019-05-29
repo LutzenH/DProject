@@ -42,10 +42,15 @@ namespace DProject.Entity
             }
             
             var mouseLocation = Game1.GetAdjustedMousePosition();
-            
-            Position = CalculatePrecisePosition(mouseLocation, EntityManager.GetActiveCamera(), _graphicsDevice, EntityManager.GetChunkLoaderEntity(), _currentFloor);
-            _gridPosition = CalculatePosition(Position);
-            _selectedCorner = CalculateCorner(Position);
+
+            var position = CalculatePrecisePosition(mouseLocation, EntityManager.GetActiveCamera(), _graphicsDevice, EntityManager.GetChunkLoaderEntity(), _currentFloor);
+
+            if (position != null)
+            {
+                Position = (Vector3) position;
+                _gridPosition = CalculatePosition(Position);
+                _selectedCorner = CalculateCorner(Position);
+            }
         }
         
         #region Calculations
@@ -72,37 +77,30 @@ namespace DProject.Entity
             return new Vector3((int)Math.Round(precisePosition.X), precisePosition.Y, (int)Math.Round(precisePosition.Z));
         }
 
-        private static Vector3 CalculatePrecisePosition(Vector2 mouseLocation, CameraEntity camera,
+        private static Vector3? CalculatePrecisePosition(Vector2 mouseLocation, CameraEntity camera,
             GraphicsDevice graphicsDevice, ChunkLoaderEntity chunkLoaderEntity, int currentFloor)
         {
             Ray ray = Game1.CalculateRay(mouseLocation, camera.GetViewMatrix(),
                 camera.GetProjectMatrix(), graphicsDevice.Viewport);
-            
-            Vector3 position = Vector3.Zero;
-            
-            if (ray.Direction.Y != 0)
-            {
-                Vector3 tempPosition = ray.Position - ray.Direction * (ray.Position.Y / ray.Direction.Y);        
-                position = new Vector3(tempPosition.X, 0, tempPosition.Z);
-            }
 
+            var position = ray.Position - ray.Direction * (ray.Position.Y / ray.Direction.Y);
             var chunk = chunkLoaderEntity.GetChunk(position);
 
             if (chunk != null)
             {
                 for (var x = 0; x < chunk.GetTileBoundingBoxes(currentFloor).GetLength(0); x++) {
                     for (var y = 0; y < chunk.GetTileBoundingBoxes(currentFloor).GetLength(1); y++) {
-                        var intersects = ray.Intersects(chunkLoaderEntity.GetChunk(position).GetTileBoundingBoxes(currentFloor)[x, y]);
+                        var intersects = ray.Intersects(chunk.GetTileBoundingBoxes(currentFloor)[x, y]);
                                                 
                         if (intersects != null)
                         {
-                            position = ray.Position + ray.Direction * (float) intersects;        
+                            return ray.Position + ray.Direction * (float) intersects;        
                         }
                     }
                 }
             }
             
-            return position;
+            return null;
         }
 
         #endregion

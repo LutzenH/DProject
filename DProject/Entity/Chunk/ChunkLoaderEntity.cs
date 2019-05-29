@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 #if EDITOR
 using Gtk;
@@ -25,14 +26,14 @@ namespace DProject.Entity.Chunk
         private GraphicsDevice _graphicsDevice;
         private ContentManager _contentManager;
 
-        private Vector2 _previousChunkPosition;
-        private Vector2 _chunkPosition;
+        private (int, int) _previousChunkPosition;
+        private (int, int) _chunkPosition;
 
         public const int LoadDistance = 8;
         public const int ChunkSize = 64;
         
-        private TerrainEntity[,] _loadedChunks = new TerrainEntity[LoadDistance, LoadDistance];
-
+        private Dictionary<(int, int), TerrainEntity> _loadedChunks;
+        
         private bool _loadedChunksLastFrame;
         
         public enum ChunkLoadingStatus
@@ -46,8 +47,10 @@ namespace DProject.Entity.Chunk
         public ChunkLoaderEntity(EntityManager entityManager) : base(entityManager, Vector3.Zero, Quaternion.Identity,
             new Vector3(1, 1, 1))
         {
-            _chunkPosition = new Vector2(0, 0);
-            _previousChunkPosition = new Vector2(-1, 0);
+            _loadedChunks = new Dictionary<(int, int), TerrainEntity>();
+            
+            _chunkPosition = (0, 0);
+            _previousChunkPosition = (-1, 0);
             _loadingStatus = ChunkLoadingStatus.Done;
         }
 
@@ -74,13 +77,13 @@ namespace DProject.Entity.Chunk
             _previousChunkPosition = _chunkPosition;
 
             foreach (var chunk in _loadedChunks)
-                chunk?.UpdateHeightMap();
+                chunk.Value.UpdateHeightMap();
         }
 
         public void Draw(CameraEntity activeCamera)
         {
             foreach (var chunk in _loadedChunks)
-                chunk?.Draw(activeCamera);
+                chunk.Value.Draw(activeCamera);
         }
 
         public void Initialize(GraphicsDevice graphicsDevice)
@@ -90,54 +93,42 @@ namespace DProject.Entity.Chunk
 
         #region Saving and loading
         
-        private void LoadChunks(Vector2 chunkPosition)
+        private void LoadChunks((int, int) chunkPosition)
         {
             if (_loadingStatus == ChunkLoadingStatus.Done)
             {
-                int oldChunksCount = 0;
-                int newChunksCount = 0;
-
-                TerrainEntity[,] oldChunks = _loadedChunks;
-
-                _loadedChunks = new TerrainEntity[_loadedChunks.GetLength(0), _loadedChunks.GetLength(1)];
-
-                List<Vector2> newChunkPositions = new List<Vector2>();
-                List<Vector2> newChunkLocations = new List<Vector2>();
+                var oldChunksCount = 0;
+                var newChunksCount = 0;
                 
-                int x,y,dx,dy;
+                var oldChunkPositions = new List<(int, int)>();
+                var newChunkPositions = new List<(int, int)>();
+                
+                int x, y, dx, dy;
                 x = y = dx =0;
                 dy = -1;
-                int t = Math.Max(LoadDistance, LoadDistance);
-                int maxI = t*t;
-                for(int i =0; i < maxI; i++){
-                    if ((-LoadDistance/2 <= x) && (x <= LoadDistance/2) && (-LoadDistance/2 <= y) && (y <= LoadDistance/2))
+                var t = Math.Max(LoadDistance, LoadDistance);
+                var maxI = t * t;
+                for(var i = 0; i < maxI; i++){
+                    if (-LoadDistance/2 <= x 
+                        && x <= LoadDistance/2 
+                        && -LoadDistance/2 <= y 
+                        && y <= LoadDistance/2)
                     {
-                        var localx = x + (LoadDistance/2-1);
-                        var localy = y + (LoadDistance/2-1);
-                                                
-                        Vector2 position = chunkPosition - new Vector2(localx - _loadedChunks.GetLength(0) / 2,
-                                               localy - _loadedChunks.GetLength(1) / 2);
+                        var position = (chunkPosition.Item1 + x, chunkPosition.Item2 + y);
 
-                        foreach (var chunk in oldChunks)
+                        if (_loadedChunks.ContainsKey(position))
                         {
-                            if (chunk != null)
-                            {
-                                if (chunk.GetChunkX() == (int) position.X && chunk.GetChunkY() == (int) position.Y)
-                                {
-                                    _loadedChunks[localx, localy] = chunk;
-                                    oldChunksCount++;
-                                }
-                            }
+                            oldChunksCount++;
+                            oldChunkPositions.Add(position);
                         }
-
-                        if (_loadedChunks[localx, localy] == null)
+                        else
                         {
                             newChunksCount++;
-                            newChunkPositions.Add(new Vector2(localx, localy));
-                            newChunkLocations.Add(new Vector2(position.X, position.Y));
+                            newChunkPositions.Add(position);
                         }
                     }
-                    if( (x == y) || ((x < 0) && (x == -y)) || ((x > 0) && (x == 1-y))){
+                    if(x == y || x < 0 && x == -y || x > 0 && x == 1-y)
+                    {
                         t = dx;
                         dx = -dy;
                         dy = t;
@@ -146,15 +137,20 @@ namespace DProject.Entity.Chunk
                     y += dy;
                 }
 
+                var deadChunks = _loadedChunks.Keys.Except(oldChunkPositions).ToArray();
+                
+                foreach (var chunk in deadChunks)
+                    _loadedChunks.Remove(chunk);
+                
                 EditorEntityManager.AddMessage(new Message("Loading new chunks: " + oldChunksCount + " chunks reused and " + newChunksCount + " new chunks."));
 
                 _loadingStatus = ChunkLoadingStatus.Busy;
 
 #if EDITOR
-                Application.Invoke((sender, args) => LoadNewChunks(newChunkPositions, newChunkLocations));           
+                Application.Invoke((sender, args) => LoadNewChunks(newChunkPositions));           
 #else
                 //Use this instead of Application.Invoke when not using the GTK editor
-                Thread thread = new Thread((() => LoadNewChunks(newChunkPositions, newChunkLocations)));
+                Thread thread = new Thread((() => LoadNewChunks(newChunkPositions)));
                 thread.Start();
 #endif
                 
@@ -162,21 +158,19 @@ namespace DProject.Entity.Chunk
             }
         }
 
-        private void LoadNewChunks(List<Vector2> newChunkPositions, List<Vector2> newChunkLocations)
+        private void LoadNewChunks(List<(int,int)> newChunkPositions)
         {            
-            for (int i = 0; i < newChunkPositions.Count; i++)
-            {
-                _loadedChunks[(int) newChunkPositions[i].X, (int) newChunkPositions[i].Y] =
-                    LoadChunk((int) newChunkLocations[i].X, (int) newChunkLocations[i].Y);
-            }
+            foreach (var position in newChunkPositions)
+                _loadedChunks[position] = LoadChunk(position);
 
             EditorEntityManager.AddMessage(new Message("Done loading new chunks."));
             _loadingStatus = ChunkLoadingStatus.Done;
         }
 
-        private TerrainEntity LoadChunk(int x, int y)
+        private TerrainEntity LoadChunk((int, int) position)
         {
-            TerrainEntity chunk = new TerrainEntity(x, y);
+            var chunk = new TerrainEntity(position.Item1, position.Item2);
+            
             chunk.Initialize(_graphicsDevice);
             chunk.LoadContent(_contentManager);
 
@@ -185,109 +179,89 @@ namespace DProject.Entity.Chunk
 
         public void SerializeChangedChunks()
         {
-            EditorEntityManager.AddMessage(new Message("Starting serialization of changed chunks.."));
-
-            int count = 0;
-            
             if (_loadingStatus == ChunkLoadingStatus.Done)
             {
-                foreach (var chunk in _loadedChunks)
+                EditorEntityManager.AddMessage(new Message("Starting serialization of changed chunks.."));
+
+                int count = 0;
+                
+                foreach (var key in _loadedChunks.Keys)
                 {
-                    if (chunk.GetChunkData().ChunkStatus == ChunkStatus.Changed)
+                    if (_loadedChunks[key].GetChunkData().ChunkStatus == ChunkStatus.Changed)
                     {
-                        chunk.Serialize();
+                        _loadedChunks[key].Serialize();
                         count++;
                     }
                 }
+                
+                EditorEntityManager.AddMessage(new Message("Serialized " + count + " changed chunks."));
             }
-            
-            EditorEntityManager.AddMessage(new Message("Serialized " + count + " changed chunks."));
         }
 
         public void ReloadChangedChunks()
         {
-            EditorEntityManager.AddMessage(new Message("Reloading changed chunks.."));
-
-            int count = 0;
-            
             if (_loadingStatus == ChunkLoadingStatus.Done)
             {
-                for (int x = 0; x < _loadedChunks.GetLength(0); x++) {
-                    for (int y = 0; y < _loadedChunks.GetLength(1); y++) {
-                        if (_loadedChunks[x,y].GetChunkData().ChunkStatus == ChunkStatus.Changed)
-                        {
-                            _loadedChunks[x,y] = LoadChunk(_loadedChunks[x,y].GetChunkX(), _loadedChunks[x,y].GetChunkY());
-                            count++;
-                        }
+                EditorEntityManager.AddMessage(new Message("Reloading changed chunks.."));
+
+                var count = 0;
+
+                foreach (var key in _loadedChunks.Keys)
+                {
+                    if (_loadedChunks[key].GetChunkData().ChunkStatus == ChunkStatus.Changed)
+                    {
+                        _loadedChunks[key] = LoadChunk(key);
+                        count++;
                     }
                 }
+
+                EditorEntityManager.AddMessage(new Message("Reloaded " + count + " changed chunks."));
             }
-            
-            EditorEntityManager.AddMessage(new Message("Reloaded " + count + " changed chunks."));
         }
 
         #endregion
         
         #region Chunk Information
         
-        public static Vector2 CalculateChunkPosition(float x, float y)
+        public static (int, int) CalculateChunkPosition(float x, float y)
         {
-            return new Vector2(
-                (int) (x - (ChunkSize / 2)) / ChunkSize,
-                (int) (y - (ChunkSize / 2)) / ChunkSize);
+            return ((int) (x - (ChunkSize / 2)) / ChunkSize, (int) (y - (ChunkSize / 2)) / ChunkSize);
         }
         
         public static Vector2 GetLocalChunkPosition(Vector2 position)
         {
-            Vector2 tempPosition =
-                new Vector2((float) Math.Floor(position.X + 0.5f), (float) Math.Floor(position.Y + 0.5f));
+            var x = Math.Floor(position.X + 0.5f);
+            var y = Math.Floor(position.Y + 0.5f);
 
-            int chunkPositionX = (int) Math.Floor(tempPosition.X / ChunkSize);
-            int chunkPositionY = (int) Math.Floor(tempPosition.Y / ChunkSize);
+            var chunkPositionX = (int) Math.Floor(x / ChunkSize);
+            var chunkPositionY = (int) Math.Floor(y / ChunkSize);
 
-            int localChunkPositionX = (int) tempPosition.X - (chunkPositionX * ChunkSize);
-            int localChunkPositionY = (int) tempPosition.Y - (chunkPositionY * ChunkSize);
+            var localChunkPositionX = (int) x - chunkPositionX * ChunkSize;
+            var localChunkPositionY = (int) y - chunkPositionY * ChunkSize;
 
             return new Vector2(localChunkPositionX, localChunkPositionY);
         }
 
         public TerrainEntity GetChunk(Vector3 position)
         {
-            Vector2 tempPosition =
-                new Vector2((float) Math.Floor(position.X + 0.5f), (float) Math.Floor(position.Z + 0.5f));
+            var x = Math.Floor(position.X + 0.5f);
+            var y = Math.Floor(position.Z + 0.5f);
 
-            int chunkPositionX = (int) Math.Floor(tempPosition.X / ChunkSize);
-            int chunkPositionY = (int) Math.Floor(tempPosition.Y / ChunkSize);
+            var chunkPositionX = (int) Math.Floor(x / ChunkSize);
+            var chunkPositionY = (int) Math.Floor(y / ChunkSize);
 
-            for (var x = 0; x < LoadDistance; x++)
-            {
-                for (var y = 0; y < LoadDistance; y++)
-                {
-                    if (_loadedChunks[x,y] != null)
-                    {
-                        if (_loadedChunks[x,y].GetChunkX() == chunkPositionX && _loadedChunks[x,y].GetChunkY() == chunkPositionY)
-                        {
-                            return _loadedChunks[x,y];
-                        }
-                    }
-                }
-            }
-
-            return null;
-        }
-
-        public TerrainEntity GetChunk(int chunkX, int chunkY)
-        {
-            foreach (var chunk in _loadedChunks)
-            {
-                if (chunk.GetChunkX() == chunkX && chunk.GetChunkY() == chunkY)
-                    return chunk;
-            }
-
-            return null;
+            return GetChunk(chunkPositionX, chunkPositionY);
         }
         
-        public TerrainEntity[,] GetLoadedChunks()
+        public TerrainEntity GetChunk(int chunkX, int chunkY)
+        {
+            if (_loadedChunks.ContainsKey((chunkX, chunkY)))
+                return _loadedChunks[(chunkX, chunkY)];
+            else
+                return null;
+        }
+        
+        public Dictionary<(int, int), TerrainEntity> GetLoadedChunks()
         {
             return _loadedChunks;
         }
@@ -297,7 +271,7 @@ namespace DProject.Entity.Chunk
             return (_loadingStatus == ChunkLoadingStatus.Busy);
         }
 
-        public bool LoadedChunksLastFrame()
+        public bool GetLoadedChunksLastFrame()
         {
             return _loadedChunksLastFrame;
         }
@@ -323,16 +297,7 @@ namespace DProject.Entity.Chunk
             if (localChunkPositionY < 0)
                 localChunkPositionY = ChunkSize + localChunkPositionY;
 
-            foreach (var chunk in _loadedChunks)
-            {
-                if (chunk != null)
-                {
-                    if (chunk.GetChunkX() == chunkPositionX && chunk.GetChunkY() == chunkPositionY)
-                        return chunk.GetTileHeight(localChunkPositionX, localChunkPositionY, floor);
-                }
-            }
-
-            return null;
+            return _loadedChunks[(chunkPositionX, chunkPositionY)].GetTileHeight(localChunkPositionX, localChunkPositionY, floor);
         }
 
         public byte? GetVertexHeight(Vector2 position, TerrainEntity.TileCorner corner, int floor)
@@ -352,16 +317,7 @@ namespace DProject.Entity.Chunk
             if (localChunkPositionY < 0)
                 localChunkPositionY = ChunkSize + localChunkPositionY;
 
-            foreach (var chunk in _loadedChunks)
-            {
-                if (chunk != null)
-                {
-                    if (chunk.GetChunkX() == chunkPositionX && chunk.GetChunkY() == chunkPositionY)
-                        return chunk.GetVertexHeight(localChunkPositionX, localChunkPositionY, floor, corner);
-                }
-            }
-
-            return null;
+            return _loadedChunks[(chunkPositionX, chunkPositionY)].GetVertexHeight(localChunkPositionX, localChunkPositionY, floor, corner);
         }
 
         public void ChangeTileHeight(byte height, Vector3 position, int floor, int brushSize)

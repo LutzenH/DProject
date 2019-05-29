@@ -91,7 +91,7 @@ namespace DProject.Entity.Debug
         {
             _lineFrameEntities.Clear();
 
-            foreach (var chunk in _chunkLoaderEntity.GetLoadedChunks())
+            foreach (var chunk in _chunkLoaderEntity.GetLoadedChunks().Values)
             {
                 if (chunk != null)
                 {
