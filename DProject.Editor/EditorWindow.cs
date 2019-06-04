@@ -10,6 +10,7 @@ using Gdk;
 using Gtk;
 using Microsoft.Xna.Framework;
 using Color = Gdk.Color;
+using Window = Gtk.Window;
 
 #pragma warning disable 649
 
@@ -42,6 +43,7 @@ namespace DProject
         
         //Menu > Edit > ...
         [Builder.Object] private MenuItem menu_edit_resetcameraposition;
+        [Builder.Object] private MenuItem menu_edit_import_heightmap;
         
         //Camera Info Table
         [Builder.Object] private ListStore list_camera_info;
@@ -69,6 +71,12 @@ namespace DProject
         [Builder.Object] private SearchEntry search_entry_texture;
         private Pixbuf _textureAtlasPixBuf;
         private string _textureSelectedChild;
+        
+        //Additional Windows
+        //Import Heightmap
+        [Builder.Object] private Window window_import_heightmap;
+        [Builder.Object] private Button button_import_heightmap_open;
+        [Builder.Object] private Button button_import_heightmap_cancel;
 
         private EditorEntityManager _editorEntityManager;
         
@@ -120,7 +128,8 @@ namespace DProject
             
             //Menu > Edit > ...
             menu_edit_resetcameraposition.Activated += (o, args) => _game.GetEntityManager().GetActiveCamera().SetPosition(new Vector3(0, 0, 0));
-            
+            menu_edit_import_heightmap.Activated += (o, args) => window_import_heightmap.ShowAll();
+
             //Camera Info Tree
             tree_camera_value.Edited += UpdateCamera;
             
