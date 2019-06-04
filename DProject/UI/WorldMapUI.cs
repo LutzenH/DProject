@@ -7,6 +7,7 @@ using System.Threading;
 #endif
 using DProject.Entity.Chunk;
 using DProject.Entity.Interface;
+using DProject.Manager;
 using DProject.Type.Rendering.Map;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -18,26 +19,30 @@ namespace DProject.UI
 {
     public class WorldMapUI : AbstractUI, IInitialize, IUpdateable
     {
-        private readonly ChunkLoaderEntity _chunkLoaderEntity;
-
         private GraphicsDevice _graphicsDevice;
 
         private MapChunkTexture2D[,] _mapChunkTexture2D;
-        
-        private bool _previouslyLoadingChunks;
 
-        private int _chunkPositionX;
-        private int _chunkPositionY;
+        private GameEntityManager _gameEntityManager;
+        
+        private (int, int) _chunkPosition;
+        private (int, int) _positionOffset;
+
+        private readonly Point _position;
 
         private bool _isLoading;
 
-        private int _mapSize;
+        private readonly int _mapSize;
 
-        public WorldMapUI(ChunkLoaderEntity chunkLoaderEntity, int mapSize)
+        public WorldMapUI(GameEntityManager gameEntityManager, int mapSize, Point position) : base(gameEntityManager)
         {
-            _chunkLoaderEntity = chunkLoaderEntity;
-            _mapSize = mapSize;
+            _gameEntityManager = gameEntityManager;
+
+            _positionOffset = (0, 0);
+
+            _position = position;
             
+            _mapSize = mapSize;
             _mapChunkTexture2D = new MapChunkTexture2D[_mapSize, _mapSize];
         }
 
@@ -45,7 +50,7 @@ namespace DProject.UI
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            DrawMap(spriteBatch, 10, 10);
+            DrawMap(spriteBatch, _position.X, _position.Y);
         }
 
         private void DrawMap(SpriteBatch spriteBatch, int xOffset, int yOffset)
@@ -62,24 +67,21 @@ namespace DProject.UI
                         spriteBatch.Draw(_mapChunkTexture2D[x,y], new Rectangle(positionX, positionY, ChunkLoaderEntity.ChunkSize, ChunkLoaderEntity.ChunkSize), Color.White);
                     }
                 }
-            }   
+            }
         }
 
         public void LoadTextureChunks()
         {
             _isLoading = true;
             
-            if (!_chunkLoaderEntity.IsLoadingChunks())
+            if (!_gameEntityManager.GetChunkLoaderEntity().IsLoadingChunks())
             {
-                int oldChunksCount = 0;
-                int newChunksCount = 0;
-
                 MapChunkTexture2D[,] oldChunks = _mapChunkTexture2D;
 
                 _mapChunkTexture2D = new MapChunkTexture2D[_mapSize, _mapSize];
                 
-                List<Vector2> newChunkPositions = new List<Vector2>();
-                List<Vector2> newChunkLocations = new List<Vector2>();
+                List<(int, int)> newChunkPositions = new List<(int, int)>();
+                List<(int, int)> newChunkLocations = new List<(int, int)>();
                 
                 int x,y,dx,dy;
                 x = y = dx =0;
@@ -89,28 +91,27 @@ namespace DProject.UI
                 for(int i =0; i < maxI; i++){
                     if ((-_mapSize/2 <= x) && (x <= _mapSize/2) && (-_mapSize/2 <= y) && (y <= _mapSize/2))
                     {
-                        var localx = x + (_mapSize % 2 == 0 ? _mapSize/2-1 : _mapSize/2);
-                        var localy = y + (_mapSize % 2 == 0 ? _mapSize/2-1 : _mapSize/2);
-
-                        Vector2 position = new Vector2(localx + _chunkPositionX, localy + _chunkPositionY);
+                        var localPosition = (
+                            x + (_mapSize % 2 == 0 ? _mapSize / 2 - 1 : _mapSize / 2),
+                            y + (_mapSize % 2 == 0 ? _mapSize / 2 - 1 : _mapSize / 2));
+                        
+                        var position = (localPosition.Item1 + _chunkPosition.Item1 - (_mapSize/2), localPosition.Item2 + _chunkPosition.Item2 - (_mapSize/2));
                         
                         foreach (var chunk in oldChunks)
                         {
                             if (chunk != null)
                             {
-                                if (chunk.GetPositionX() == (int) position.X && chunk.GetPositionY() == (int) position.Y)
+                                if (chunk.GetPositionX() == position.Item1 && chunk.GetPositionY() == position.Item2)
                                 {
-                                    _mapChunkTexture2D[localx, localy] = chunk;
-                                    oldChunksCount++;
+                                    _mapChunkTexture2D[localPosition.Item1, localPosition.Item2] = chunk;
                                 }
                             }
                         }
 
-                        if (_mapChunkTexture2D[localx, localy] == null)
+                        if (_mapChunkTexture2D[localPosition.Item1, localPosition.Item2] == null)
                         {
-                            newChunksCount++;
-                            newChunkPositions.Add(new Vector2(localx, localy));
-                            newChunkLocations.Add(new Vector2(position.X, position.Y));
+                            newChunkPositions.Add(localPosition);
+                            newChunkLocations.Add(position);
                         }
                     }
                     if( (x == y) || ((x < 0) && (x == -y)) || ((x > 0) && (x == 1-y))){
@@ -122,10 +123,8 @@ namespace DProject.UI
                     y += dy;
                 }   
                 
-                for (int i = 0; i < newChunkPositions.Count; i++)
-                {
-                    _mapChunkTexture2D[(int) newChunkPositions[i].X, (int) newChunkPositions[i].Y] = new MapChunkTexture2D(_graphicsDevice, TerrainEntity.GenerateChunkData((int) newChunkLocations[i].X,(int) newChunkLocations[i].Y), 0, MapChunkTexture2D.Resolution.High);
-                }
+                for (var i = 0; i < newChunkPositions.Count; i++)
+                    _mapChunkTexture2D[newChunkPositions[i].Item1, newChunkPositions[i].Item2] = new MapChunkTexture2D(_graphicsDevice, TerrainEntity.GenerateChunkData(newChunkLocations[i].Item1, newChunkLocations[i].Item2), 0, MapChunkTexture2D.Resolution.High);
                 
             }
 
@@ -141,29 +140,19 @@ namespace DProject.UI
 
         public void Update(GameTime gameTime)
         {
+            var playerPosition = _gameEntityManager.GetPlayerEntity().GetPosition();
+
+            _positionOffset = ((int, int)) (playerPosition.X%64, playerPosition.Z%64);
+            
             var mapHasMoved = false;
 
             if (!_isLoading)
             {
+                var newChunkPosition = ChunkLoaderEntity.CalculateChunkPosition(playerPosition.X, playerPosition.Z);
                 
-                if (Keyboard.GetState().IsKeyUp(Keys.NumPad8) && Game1.PreviousKeyboardState.IsKeyDown(Keys.NumPad8))
+                if (!_chunkPosition.Equals(newChunkPosition))
                 {
-                    _chunkPositionY--;
-                    mapHasMoved = true;
-                }
-                if (Keyboard.GetState().IsKeyUp(Keys.NumPad2) && Game1.PreviousKeyboardState.IsKeyDown(Keys.NumPad2))
-                {
-                    _chunkPositionY++;
-                    mapHasMoved = true;
-                }
-                if (Keyboard.GetState().IsKeyUp(Keys.NumPad4) && Game1.PreviousKeyboardState.IsKeyDown(Keys.NumPad4))
-                {
-                    _chunkPositionX--;
-                    mapHasMoved = true;
-                }
-                if (Keyboard.GetState().IsKeyUp(Keys.NumPad6) && Game1.PreviousKeyboardState.IsKeyDown(Keys.NumPad6))
-                {
-                    _chunkPositionX++;
+                    _chunkPosition = newChunkPosition;
                     mapHasMoved = true;
                 }
 

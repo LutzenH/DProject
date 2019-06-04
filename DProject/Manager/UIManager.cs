@@ -23,11 +23,11 @@ namespace DProject.Manager
             switch (entityManager)
             {
                 case EditorEntityManager editorEntityManager:
-                    _userInterfaces.Add(new WorldEditorUI(editorEntityManager.GetWorldEditorEntity()));
+                    _userInterfaces.Add(new WorldEditorUI(editorEntityManager));
                     _userInterfaces.Add(new MessageUI(editorEntityManager));
                     break;
                 case GameEntityManager gameEntityManager:
-                    _userInterfaces.Add(new WorldMapUI(gameEntityManager.GetChunkLoaderEntity(), 8));
+                    _userInterfaces.Add(new WorldMapUI(gameEntityManager, 8, new Point(10, 10)));
                     break;
             }
         }

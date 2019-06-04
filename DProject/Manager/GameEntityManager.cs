@@ -6,7 +6,7 @@ namespace DProject.Manager
 {
     public class GameEntityManager : EntityManager
     {
-        private PlayerEntity _playerEntity;
+        private readonly PlayerEntity _playerEntity;
         
         public GameEntityManager()
         {
@@ -14,6 +14,11 @@ namespace DProject.Manager
             AddEntity(_playerEntity);
             
             AddCamera(new OrbitCameraEntity(_playerEntity, Quaternion.Identity));
+        }
+
+        public PlayerEntity GetPlayerEntity()
+        {
+            return _playerEntity;
         }
     }
 }

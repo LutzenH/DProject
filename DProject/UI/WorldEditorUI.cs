@@ -14,12 +14,12 @@ namespace DProject.UI
     {
         private Texture2D _spritesheet;
         private SpriteFont _spriteFont;
+
+        private readonly EditorEntityManager _editorEntityManager;
         
-        private readonly WorldEditorEntity _worldEditorEntity;
-        
-        public WorldEditorUI(WorldEditorEntity worldEditorEntity)
+        public WorldEditorUI(EditorEntityManager editorEntityManager) : base(editorEntityManager)
         {
-            _worldEditorEntity = worldEditorEntity;
+            _editorEntityManager = (EditorEntityManager) EntityManager;
         }
 
         public override void LoadContent(ContentManager content)
@@ -67,7 +67,7 @@ namespace DProject.UI
 
             Rectangle destinationRectangle;
             
-            switch (_worldEditorEntity.GetCurrentTool())
+            switch (_editorEntityManager.GetWorldEditorEntity().GetCurrentTool())
             {
                 case WorldEditorEntity.Tools.Select:
                     destinationRectangle = new Rectangle(2, 2, 32, 32);
@@ -89,11 +89,11 @@ namespace DProject.UI
                     break;
             }
 
-            if(_worldEditorEntity.GetCurrentTool() != WorldEditorEntity.Tools.ObjectPlacer && _worldEditorEntity.GetCurrentTool() != WorldEditorEntity.Tools.Select)
+            if(_editorEntityManager.GetWorldEditorEntity().GetCurrentTool() != WorldEditorEntity.Tools.ObjectPlacer && _editorEntityManager.GetWorldEditorEntity().GetCurrentTool() != WorldEditorEntity.Tools.Select)
                 spriteBatch.Draw(
                     _spritesheet,
                     new Rectangle(2,Game1.ScreenResolutionY/2,32,32),
-                    new Rectangle(_worldEditorEntity.GetBrushSize()*16, 16, 16, 16),
+                    new Rectangle(_editorEntityManager.GetWorldEditorEntity().GetBrushSize()*16, 16, 16, 16),
                     Color.White
                     );
             
@@ -104,13 +104,13 @@ namespace DProject.UI
                 Color.White
             );
             
-            if(_worldEditorEntity.GetCurrentTool() == WorldEditorEntity.Tools.Flatten)
-                spriteBatch.DrawString(_spriteFont, "FlattenHeight: " + _worldEditorEntity.GetFlattenHeight(), new Vector2(2, 19 * 2), Color.White);
+            if(_editorEntityManager.GetWorldEditorEntity().GetCurrentTool() == WorldEditorEntity.Tools.Flatten)
+                spriteBatch.DrawString(_spriteFont, "FlattenHeight: " + _editorEntityManager.GetWorldEditorEntity().GetFlattenHeight(), new Vector2(2, 19 * 2), Color.White);
 
-            if (_worldEditorEntity.GetCurrentTool() == WorldEditorEntity.Tools.ObjectPlacer)
+            if (_editorEntityManager.GetWorldEditorEntity().GetCurrentTool() == WorldEditorEntity.Tools.ObjectPlacer)
             {
-                spriteBatch.DrawString(_spriteFont, "SelectedProp: " + Props.PropList[_worldEditorEntity.GetSelectedObject()].GetAssetPath() , new Vector2(2, 19 * 2), Color.White);
-                spriteBatch.DrawString(_spriteFont, "Rotation: " + _worldEditorEntity.GetSelectedRotation().ToString() , new Vector2(2, 19 * 3), Color.White);
+                spriteBatch.DrawString(_spriteFont, "SelectedProp: " + Props.PropList[_editorEntityManager.GetWorldEditorEntity().GetSelectedObject()].GetAssetPath() , new Vector2(2, 19 * 2), Color.White);
+                spriteBatch.DrawString(_spriteFont, "Rotation: " + _editorEntityManager.GetWorldEditorEntity().GetSelectedRotation().ToString() , new Vector2(2, 19 * 3), Color.White);
             }
 
         }

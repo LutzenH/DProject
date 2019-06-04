@@ -11,8 +11,6 @@ namespace DProject.UI
 {
     public class MessageUI : AbstractUI, IUpdateable
     {
-        private readonly EditorEntityManager _editorEntityManager;
-        
         private SpriteFont _spriteFont;
         private string _textString;
 
@@ -22,9 +20,8 @@ namespace DProject.UI
 
         private readonly LinkedList<Message> _messages;
         
-        public MessageUI(EditorEntityManager editorEntityManager)
+        public MessageUI(EntityManager entityManager) : base(entityManager)
         {
-            _editorEntityManager = editorEntityManager;
             _textString = "";
             _messages = new LinkedList<Message>();
         }

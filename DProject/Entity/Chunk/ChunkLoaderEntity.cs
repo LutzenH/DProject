@@ -227,7 +227,13 @@ namespace DProject.Entity.Chunk
         
         public static (int, int) CalculateChunkPosition(float x, float y)
         {
-            return ((int) (x - (ChunkSize / 2)) / ChunkSize, (int) (y - (ChunkSize / 2)) / ChunkSize);
+            var xPos = Math.Floor(x + 0.5f);
+            var yPos = Math.Floor(y + 0.5f);
+
+            var chunkPositionX = (int) Math.Floor(xPos / ChunkSize);
+            var chunkPositionY = (int) Math.Floor(yPos / ChunkSize);
+
+            return (chunkPositionX, chunkPositionY);
         }
         
         public static Vector2 GetLocalChunkPosition(Vector2 position)
@@ -237,7 +243,7 @@ namespace DProject.Entity.Chunk
 
             var chunkPositionX = (int) Math.Floor(x / ChunkSize);
             var chunkPositionY = (int) Math.Floor(y / ChunkSize);
-
+            
             var localChunkPositionX = (int) x - chunkPositionX * ChunkSize;
             var localChunkPositionY = (int) y - chunkPositionY * ChunkSize;
 
@@ -246,13 +252,9 @@ namespace DProject.Entity.Chunk
 
         public TerrainEntity GetChunk(Vector3 position)
         {
-            var x = Math.Floor(position.X + 0.5f);
-            var y = Math.Floor(position.Z + 0.5f);
+            var chunkPosition = CalculateChunkPosition(position.X, position.Z);
 
-            var chunkPositionX = (int) Math.Floor(x / ChunkSize);
-            var chunkPositionY = (int) Math.Floor(y / ChunkSize);
-
-            return GetChunk(chunkPositionX, chunkPositionY);
+            return GetChunk(chunkPosition.Item1, chunkPosition.Item2);
         }
         
         public TerrainEntity GetChunk(int chunkX, int chunkY)
