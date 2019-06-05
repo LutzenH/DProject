@@ -72,9 +72,9 @@ namespace DProject
         private Pixbuf _textureAtlasPixBuf;
         private string _textureSelectedChild;
         
-        //Additional Windows
+        //Additional Windows/Dialogs
         //Import Heightmap
-        [Builder.Object] private Window window_import_heightmap;
+        [Builder.Object] private Dialog dialog_import_heightmap;
         [Builder.Object] private Button button_import_heightmap_open;
         [Builder.Object] private Button button_import_heightmap_cancel;
 
@@ -128,7 +128,7 @@ namespace DProject
             
             //Menu > Edit > ...
             menu_edit_resetcameraposition.Activated += (o, args) => _game.GetEntityManager().GetActiveCamera().SetPosition(new Vector3(0, 0, 0));
-            menu_edit_import_heightmap.Activated += (o, args) => window_import_heightmap.ShowAll();
+            menu_edit_import_heightmap.Activated += (o, args) => dialog_import_heightmap.Show();
 
             //Camera Info Tree
             tree_camera_value.Edited += UpdateCamera;
