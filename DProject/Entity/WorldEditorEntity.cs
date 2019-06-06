@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Drawing;
 using DProject.Entity.Camera;
 using DProject.Entity.Chunk;
 using DProject.Entity.Debug;
@@ -6,12 +8,16 @@ using DProject.Entity.Interface;
 using DProject.List;
 using DProject.Manager;
 using DProject.Type.Enum;
+using DProject.Type.Rendering;
+using DProject.Type.Serializable;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Color = Microsoft.Xna.Framework.Color;
 using IDrawable = DProject.Entity.Interface.IDrawable;
 using IUpdateable = DProject.Entity.Interface.IUpdateable;
+using Object = DProject.Type.Serializable.Object;
 
 namespace DProject.Entity
 {
@@ -77,7 +83,62 @@ namespace DProject.Entity
         }
 
         #region Tools
-        
+
+        public static List<ChunkData> GenerateChunkDataUsingHeightmap(Bitmap image, int xPos, int yPos)
+        {
+            var list = new List<ChunkData>();
+
+            if (image.Width % ChunkLoaderEntity.ChunkSize == 1 
+                && image.Height % ChunkLoaderEntity.ChunkSize == 1)
+            {
+                for (var chunkX = 0; chunkX < (image.Width - 1) / ChunkLoaderEntity.ChunkSize; chunkX++)
+                {
+                    for (var chunkY = 0; chunkY < (image.Height - 1) / ChunkLoaderEntity.ChunkSize; chunkY++)
+                    {
+                        var heightmap = new byte[ChunkLoaderEntity.ChunkSize + 1, ChunkLoaderEntity.ChunkSize + 1];
+
+                        for (var xPix = 0; xPix < ChunkLoaderEntity.ChunkSize + 1; xPix++)
+                        {
+                            for (var yPix = 0; yPix < ChunkLoaderEntity.ChunkSize + 1; yPix++)
+                            {
+                                var xPixel = xPix + ChunkLoaderEntity.ChunkSize * chunkX;
+                                var yPixel = yPix + ChunkLoaderEntity.ChunkSize * chunkY;
+                                
+                                heightmap[xPix, yPix] = image.GetPixel(xPixel, yPixel).R;
+                            }
+                        }
+                        
+                        Tile[][,] tiles = new Tile[1][,];
+                
+                        tiles[0] = HeightMap.GenerateTileMap(heightmap);
+                
+                        var chunkdata = new ChunkData()
+                        {
+                            ChunkPositionX = xPos + chunkX,
+                            ChunkPositionY = yPos + chunkY,
+                            Tiles = tiles,
+                    
+                            Objects = Object.GenerateObjects(0, 0, 1, 0),
+                    
+                            ChunkStatus = ChunkStatus.Unserialized
+                        };
+                        
+                        list.Add(chunkdata);
+                    }
+                }
+
+                return list;
+            }
+
+            return null;
+        }
+
+        public static void SerializeChunkDataList(List<ChunkData> chunkData)
+        {
+            foreach (var chunk in chunkData) 
+                TerrainEntity.Serialize(chunk);
+        }
+
         private void UseTool()
         {
             var precisePosition = _pointerEntity.GetPosition();

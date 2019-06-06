@@ -34,8 +34,6 @@ namespace DProject.Entity.Chunk
         private readonly BoundingSphere _boundingSphere;
         
         public enum TileCorner { TopLeft, TopRight, BottomLeft, BottomRight }
-
-        private const int DefaultFloorCount = 2;
         
         public TerrainEntity(int x, int y) : base(new Vector3(x*ChunkLoaderEntity.ChunkSize, 0, y*ChunkLoaderEntity.ChunkSize), Quaternion.Identity, new Vector3(1,1,1))
         {
@@ -46,7 +44,7 @@ namespace DProject.Entity.Chunk
             
             LoadProps();
             
-            _heightMaps = new HeightMap[DefaultFloorCount];
+            _heightMaps = new HeightMap[_chunkData.GetFloorCount()];
             
             for (var floor = 0; floor < _heightMaps.Length; floor++)
                 _heightMaps[floor] = new HeightMap(_chunkData.Tiles[floor]);
@@ -73,10 +71,9 @@ namespace DProject.Entity.Chunk
             {                   
                 byte[,] heightmap = Noise.GenerateNoiseMap(ChunkLoaderEntity.ChunkSize, ChunkLoaderEntity.ChunkSize, x*ChunkLoaderEntity.ChunkSize, y*ChunkLoaderEntity.ChunkSize, 50f);
                 
-                Tile[][,] tiles = new Tile[DefaultFloorCount][,];
+                Tile[][,] tiles = new Tile[1][,];
                 
                 tiles[0] = HeightMap.GenerateTileMap(heightmap);
-                tiles[1] = HeightMap.GenerateTileMap(ChunkLoaderEntity.ChunkSize, 1);
                 
                 chunkdata = new ChunkData()
                 {
@@ -84,7 +81,7 @@ namespace DProject.Entity.Chunk
                     ChunkPositionY = y,
                     Tiles = tiles,
                     
-                    Objects = Object.GenerateObjects(0, 0, DefaultFloorCount, 1),
+                    Objects = Object.GenerateObjects(0, 0, 1, 1),
                     
                     ChunkStatus = ChunkStatus.Unserialized
                 };
@@ -135,13 +132,18 @@ namespace DProject.Entity.Chunk
             }
         }
 
+        public static void Serialize(ChunkData chunkData)
+        {
+            chunkData.ChunkStatus = ChunkStatus.Current;
+
+            Stream stream = File.Open("Content/chunks/chunk_" + chunkData.ChunkPositionX + "_" + chunkData.ChunkPositionY + ".dat", FileMode.Create);
+            var bytes = LZ4MessagePackSerializer.Serialize(chunkData);
+            stream.Write(bytes, 0, bytes.Length);
+        }
+
         public void Serialize()
         {
-            _chunkData.ChunkStatus = ChunkStatus.Current;
-
-            Stream stream = File.Open("Content/chunks/chunk_" + _chunkPositionX + "_" + _chunkPositionY + ".dat", FileMode.Create);
-            var bytes = LZ4MessagePackSerializer.Serialize(_chunkData);
-            stream.Write(bytes, 0, bytes.Length);
+            Serialize(_chunkData);
         }
 
         public void Draw(CameraEntity activeCamera)

@@ -245,9 +245,11 @@ namespace DProject.Type.Rendering
                     
                     ushort? textureId = Textures.GetDefaultTextureId();
 
+                    /*
                     if (topLeft > DefaultDistanceBetweenFloors-1)
                         textureId = null;
-
+                    */
+                    
                     var colortl = Colors.GetDefaultColorId();
                     var colortr = colortl;
                     var colorbl = colortl;
