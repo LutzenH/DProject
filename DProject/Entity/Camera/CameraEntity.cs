@@ -12,6 +12,9 @@ namespace DProject.Entity.Camera
         //Matrix
         protected Matrix ProjectMatrix;
         protected Matrix ViewMatrix;
+
+        protected const float NearPlaneDistance = 0.01f;
+        protected const float FarPlaneDistance = 180f;
         
         //BoundingFrustum (used for culling)
         protected BoundingFrustum BoundingFrustum;
@@ -25,7 +28,7 @@ namespace DProject.Entity.Camera
             CameraDirection.Normalize();
             
             ViewMatrix = Matrix.CreateLookAt(Position, Position + CameraDirection, Vector3.Up);
-            ProjectMatrix = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(80f), (float)Game1.ScreenResolutionX/(float)Game1.ScreenResolutionY, 0.01f, 300f);
+            ProjectMatrix = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(80f), (float)Game1.ScreenResolutionX/(float)Game1.ScreenResolutionY, NearPlaneDistance, FarPlaneDistance);
         }
 
         public abstract override void LoadContent(ContentManager content);
@@ -33,7 +36,7 @@ namespace DProject.Entity.Camera
         public virtual void Update(GameTime gameTime)
         {
             ViewMatrix = Matrix.CreateLookAt(Position, Position + CameraDirection, Vector3.Up);
-            ProjectMatrix = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(80f), (float)Game1.ScreenResolutionX/(float)Game1.ScreenResolutionY, 0.01f, 300f);
+            ProjectMatrix = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(80f), (float)Game1.ScreenResolutionX/(float)Game1.ScreenResolutionY, NearPlaneDistance, FarPlaneDistance);
             BoundingFrustum = new BoundingFrustum(ViewMatrix * ProjectMatrix);
         }
 

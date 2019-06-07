@@ -120,6 +120,8 @@ namespace DProject.Entity
                     
                             Objects = Object.GenerateObjects(0, 0, 1, 0),
                     
+                            LightingInfo = LightingProperties.DefaultInfo,
+                            
                             ChunkStatus = ChunkStatus.Unserialized
                         };
                         

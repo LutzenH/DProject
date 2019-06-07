@@ -151,7 +151,10 @@ namespace DProject.Entity.Chunk
                 Application.Invoke((sender, args) => LoadNewChunks(newChunkPositions));           
 #else
                 //Use this instead of Application.Invoke when not using the GTK editor
-                Thread thread = new Thread((() => LoadNewChunks(newChunkPositions)));
+                var thread = new Thread((() => LoadNewChunks(newChunkPositions)))
+                {
+                    Priority = ThreadPriority.Highest
+                };
                 thread.Start();
 #endif
                 
@@ -164,9 +167,12 @@ namespace DProject.Entity.Chunk
             foreach (var position in newChunkPositions)
                 _loadedChunks[position] = LoadChunk(position);
 
-            LightingProperties.CurrentInfo = _loadedChunks[(_chunkPosition.Item1, _chunkPosition.Item2)].GetChunkData().LightingInfo;
-            HeightMap.TerrainEffect.SetLightingInfo(LightingProperties.CurrentInfo);
-            
+            if (_loadedChunks.ContainsKey((_chunkPosition.Item1, _chunkPosition.Item2)))
+            {
+                LightingProperties.CurrentInfo = _loadedChunks[(_chunkPosition.Item1, _chunkPosition.Item2)].GetChunkData().LightingInfo;
+                HeightMap.TerrainEffect.SetLightingInfo(LightingProperties.CurrentInfo);
+            }
+
             EditorEntityManager.AddMessage(new Message("Done loading new chunks."));
             _loadingStatus = ChunkLoadingStatus.Done;
         }
