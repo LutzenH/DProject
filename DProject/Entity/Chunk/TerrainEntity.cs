@@ -6,13 +6,13 @@ using DProject.Entity.Interface;
 using DProject.List;
 using DProject.Type.Enum;
 using DProject.Type.Rendering;
-using DProject.Type.Serializable;
+using DProject.Type.Serializable.Chunk;
 using MessagePack;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using IDrawable = DProject.Entity.Interface.IDrawable;
-using Object = DProject.Type.Serializable.Object;
+using Object = DProject.Type.Serializable.Chunk.Object;
 
 namespace DProject.Entity.Chunk
 {
@@ -65,6 +65,11 @@ namespace DProject.Entity.Chunk
                 chunkdata = LZ4MessagePackSerializer.Deserialize<ChunkData>(bytes);
                 stream.Close();
                 
+                Console.WriteLine("____________");
+                Console.WriteLine("L0: " + chunkdata.LightingInfo.DirectionalLight0.DiffuseColor);
+                Console.WriteLine("L1: " + chunkdata.LightingInfo.DirectionalLight1.DiffuseColor);
+                Console.WriteLine("L2: " + chunkdata.LightingInfo.DirectionalLight2.DiffuseColor);
+                
                 chunkdata.ChunkStatus = ChunkStatus.Current;
             }
             else
@@ -82,6 +87,8 @@ namespace DProject.Entity.Chunk
                     Tiles = tiles,
                     
                     Objects = Object.GenerateObjects(0, 0, 1, 1),
+                    
+                    LightingInfo = LightingProperties.DefaultInfo,
                     
                     ChunkStatus = ChunkStatus.Unserialized
                 };

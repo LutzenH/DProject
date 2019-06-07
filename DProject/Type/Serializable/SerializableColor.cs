@@ -14,15 +14,16 @@ namespace DProject.Type.Serializable
         public virtual int Green { get; set; }
         [Key("blue")]
         public virtual int Blue { get; set; }
-            
+
         [IgnoreMember]
-        public Color Color => new Color(Red, Green, Blue);
-        
-        public void SetColor(byte red, byte green, byte blue)
-        {
-            Red = red;
-            Green = green;
-            Blue = blue;
+        public Color Color {
+            get => new Color(Red, Green, Blue);
+            set
+            {
+                Red = value.R;
+                Green = value.G;
+                Blue = value.B;
+            }
         }
 
         public string GetColorName()

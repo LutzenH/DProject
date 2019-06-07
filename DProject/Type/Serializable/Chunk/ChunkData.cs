@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using DProject.Type.Enum;
 using MessagePack;
 
-namespace DProject.Type.Serializable
+namespace DProject.Type.Serializable.Chunk
 {
     [MessagePackObject]
     public class ChunkData
@@ -16,6 +16,9 @@ namespace DProject.Type.Serializable
 
         [Key(3)]
         public virtual List<Object>[] Objects { get; set; }
+
+        [Key(4)]
+        public virtual LightingInfo LightingInfo { get; set; }
 
         [IgnoreMember]
         public ChunkStatus ChunkStatus { get; set; }

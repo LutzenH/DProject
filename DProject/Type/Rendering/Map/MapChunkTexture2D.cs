@@ -1,7 +1,7 @@
 using System;
 using DProject.Entity.Chunk;
 using DProject.List;
-using DProject.Type.Serializable;
+using DProject.Type.Serializable.Chunk;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 

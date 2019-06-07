@@ -13,6 +13,7 @@ using DProject.Entity.Interface;
 using DProject.Manager;
 using DProject.Type;
 using DProject.Type.Enum;
+using DProject.Type.Rendering;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -163,6 +164,9 @@ namespace DProject.Entity.Chunk
             foreach (var position in newChunkPositions)
                 _loadedChunks[position] = LoadChunk(position);
 
+            LightingProperties.CurrentInfo = _loadedChunks[(_chunkPosition.Item1, _chunkPosition.Item2)].GetChunkData().LightingInfo;
+            HeightMap.TerrainEffect.SetLightingInfo(LightingProperties.CurrentInfo);
+            
             EditorEntityManager.AddMessage(new Message("Done loading new chunks."));
             _loadingStatus = ChunkLoadingStatus.Done;
         }

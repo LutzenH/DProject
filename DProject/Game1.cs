@@ -1,5 +1,6 @@
 ﻿using DProject.List;
 using DProject.Manager;
+using DProject.Type.Rendering;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -79,7 +80,7 @@ namespace DProject
         protected override void Draw(GameTime gameTime)
         {                
             //Background color
-            GraphicsDevice.Clear(Color.DarkGray);
+            GraphicsDevice.Clear(LightingProperties.CurrentInfo.BackgroundColor.Color);
             
             GraphicsDevice.BlendState = BlendState.Opaque;
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;

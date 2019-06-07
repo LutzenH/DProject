@@ -9,7 +9,7 @@ using DProject.List;
 using DProject.Manager;
 using DProject.Type.Enum;
 using DProject.Type.Rendering;
-using DProject.Type.Serializable;
+using DProject.Type.Serializable.Chunk;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -17,7 +17,7 @@ using Microsoft.Xna.Framework.Input;
 using Color = Microsoft.Xna.Framework.Color;
 using IDrawable = DProject.Entity.Interface.IDrawable;
 using IUpdateable = DProject.Entity.Interface.IUpdateable;
-using Object = DProject.Type.Serializable.Object;
+using Object = DProject.Type.Serializable.Chunk.Object;
 
 namespace DProject.Entity
 {

@@ -2,7 +2,7 @@ using System;
 using System.Drawing;
 using DProject.List;
 using DProject.Type.Rendering.Shaders;
-using DProject.Type.Serializable;
+using DProject.Type.Serializable.Chunk;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Color = Microsoft.Xna.Framework.Color;
@@ -16,7 +16,7 @@ namespace DProject.Type.Rendering
 
         private DynamicVertexBuffer _vertexBuffer;
         
-        private static TerrainEffect _terrainEffect;
+        public static TerrainEffect TerrainEffect;
 
         private readonly int _width;
         private readonly int _height;
@@ -44,25 +44,17 @@ namespace DProject.Type.Rendering
         {
             _graphicsDevice = graphicsDevice;
 
-            if (_terrainEffect == null)
+            if (TerrainEffect == null)
             {
                 //Graphics Effects
-                _terrainEffect = new TerrainEffect(graphicsDevice);
-                _terrainEffect.Alpha = 1.0f;
+                TerrainEffect = new TerrainEffect(graphicsDevice);
             
-                _terrainEffect.LightingEnabled = true;
-                _terrainEffect.AmbientLightColor = new Vector3(0.3f,0.3f,0.3f);
-                _terrainEffect.DirectionalLight0.DiffuseColor = new Vector3(1f, 1f, 1f);
-                _terrainEffect.DirectionalLight0.Direction = Vector3.Normalize(Vector3.Down);
-
-                _terrainEffect.VertexColorEnabled = true;
-
-                _terrainEffect.FogEnabled = true;
-                _terrainEffect.FogColor = Color.DarkGray.ToVector3();
-                _terrainEffect.FogStart = 120f;
-                _terrainEffect.FogEnd = 160f;
-
-                _terrainEffect.TextureEnabled = true;
+                TerrainEffect.LightingEnabled = true;
+                TerrainEffect.PreferPerPixelLighting = true;
+                TerrainEffect.VertexColorEnabled = true;
+                TerrainEffect.TextureEnabled = false;
+                
+                TerrainEffect.SetLightingInfo(LightingProperties.CurrentInfo);
             }
 
             //Sends Vertex Information to the graphics-card
@@ -74,15 +66,15 @@ namespace DProject.Type.Rendering
 
         public void Draw(Matrix projectMatrix, Matrix viewMatrix, Matrix worldMatrix, Texture2D texture2D)
         {
-            _terrainEffect.Projection = projectMatrix;
-            _terrainEffect.View = viewMatrix;
-            _terrainEffect.World = worldMatrix;
+            TerrainEffect.Projection = projectMatrix;
+            TerrainEffect.View = viewMatrix;
+            TerrainEffect.World = worldMatrix;
 
-            _terrainEffect.Texture = texture2D;
+            TerrainEffect.Texture = texture2D;
 
             _graphicsDevice.SetVertexBuffer(_vertexBuffer);
 
-            foreach (EffectPass pass in _terrainEffect.CurrentTechnique.Passes)
+            foreach (EffectPass pass in TerrainEffect.CurrentTechnique.Passes)
             {
                 pass.Apply();
                 

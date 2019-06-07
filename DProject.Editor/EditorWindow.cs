@@ -334,7 +334,7 @@ namespace DProject
             flowBox.ShowAll();
         }
 
-        private string MakeNameConsistent(string name)
+        private static string MakeNameConsistent(string name)
         {
             return name.Trim().ToLower().Replace(" ", "_");
         }
@@ -417,7 +417,7 @@ namespace DProject
             _textureAtlasPixBuf = new Pixbuf(memoryStream);
         }
 
-        private FlowBoxChild CreateFlowBoxColor(string name, byte r, byte g, byte b)
+        private static FlowBoxChild CreateFlowBoxColor(string name, byte r, byte g, byte b)
         {
             FlowBoxChild child = new FlowBoxChild();
             child.HasTooltip = true;
@@ -433,7 +433,7 @@ namespace DProject
             return child;
         }
 
-        private FlowBoxChild CreateFlowBoxTexture(Pixbuf buf, string name, int xsize, int ysize, int xoffset, int yoffset, int scale)
+        private static FlowBoxChild CreateFlowBoxTexture(Pixbuf buf, string name, int xsize, int ysize, int xoffset, int yoffset, int scale)
         {
             FlowBoxChild child = new FlowBoxChild();
             child.HasTooltip = true;
@@ -474,13 +474,9 @@ namespace DProject
             throw new ArgumentException();
         }
 
-        public static void SetColorFromRgba(RGBA rgba, ushort colorId)
+        private static void SetColorFromRgba(RGBA rgba, ushort colorId)
         {
-            Colors.ColorList[colorId].SetColor(
-                (byte) (rgba.Red * 255),
-                (byte) (rgba.Green * 255),
-                (byte) (rgba.Blue * 255)
-            );
+            Colors.ColorList[colorId].Color = new Microsoft.Xna.Framework.Color((byte) (rgba.Red * 255), (byte) (rgba.Green * 255), (byte) (rgba.Blue * 255));
         }
         
         public static void SetColorFromRgba(RGBA rgba, string name)

@@ -3,7 +3,7 @@ using DProject.Type.Enum;
 using MessagePack;
 using Microsoft.Xna.Framework;
 
-namespace DProject.Type.Serializable
+namespace DProject.Type.Serializable.Chunk
 {
     [MessagePackObject]
     public class Object
