@@ -64,12 +64,7 @@ namespace DProject.Entity.Chunk
                 
                 chunkdata = LZ4MessagePackSerializer.Deserialize<ChunkData>(bytes);
                 stream.Close();
-                
-                Console.WriteLine("____________");
-                Console.WriteLine("L0: " + chunkdata.LightingInfo.DirectionalLight0.DiffuseColor);
-                Console.WriteLine("L1: " + chunkdata.LightingInfo.DirectionalLight1.DiffuseColor);
-                Console.WriteLine("L2: " + chunkdata.LightingInfo.DirectionalLight2.DiffuseColor);
-                
+
                 chunkdata.ChunkStatus = ChunkStatus.Current;
             }
             else
