@@ -247,11 +247,7 @@ namespace DProject.Entity.Chunk
             for (int floor = 0; floor < _heightMaps.Length; floor++)
             {
                 if (_heightMaps[floor].GetHasUpdated())
-                {
-                    _heightMaps[floor] = new HeightMap(_chunkData.Tiles[floor]);
-                    _heightMaps[floor].Initialize(_graphicsDevice);
-                    _heightMaps[floor].SetHasUpdated(false);
-                }
+                    _heightMaps[floor].UpdateHeightMap(_chunkData.Tiles[floor]);
             }
         }
         

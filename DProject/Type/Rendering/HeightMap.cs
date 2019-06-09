@@ -5,12 +5,11 @@ using DProject.Type.Rendering.Shaders;
 using DProject.Type.Serializable.Chunk;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Color = Microsoft.Xna.Framework.Color;
 
 namespace DProject.Type.Rendering
 {
     public class HeightMap
-    {       
+    {
         private VertexPositionTextureColorNormal[] _vertexPositions;
         private Vector3[,] _heightNormals;
 
@@ -24,7 +23,8 @@ namespace DProject.Type.Rendering
         private GraphicsDevice _graphicsDevice;
 
         private int _primitiveCount;
-
+        private int _previousVertexCount;
+        
         private bool _hasUpdated;
 
         public const byte DefaultDistanceBetweenFloors = 64;
@@ -36,8 +36,7 @@ namespace DProject.Type.Rendering
             _width = tiles.GetLength(0);
             _height = tiles.GetLength(1);
             
-            _heightNormals = GenerateNormalMap(tiles);
-            _vertexPositions = GenerateVertexPositions(tiles);
+            UpdateVertexPositions(tiles);
         }
 
         public void Initialize(GraphicsDevice graphicsDevice)
@@ -57,11 +56,27 @@ namespace DProject.Type.Rendering
                 TerrainEffect.SetLightingInfo(LightingProperties.CurrentInfo);
             }
 
-            //Sends Vertex Information to the graphics-card
-            _vertexBuffer = new DynamicVertexBuffer(graphicsDevice, typeof(VertexPositionTextureColorNormal), GetVertexCount(), BufferUsage.WriteOnly);
-                                    
-            if(GetVertexCount() != 0) //Expensive Computation
+            if (_vertexBuffer == null || GetVertexCount() != _previousVertexCount)
+            {
+                _previousVertexCount = GetVertexCount();
+                _vertexBuffer = new DynamicVertexBuffer(graphicsDevice, typeof(VertexPositionTextureColorNormal), GetVertexCount(), BufferUsage.WriteOnly);
+            }
+
+            if(GetVertexCount() != 0)
                 _vertexBuffer.SetData(_vertexPositions);
+        }
+
+        private void UpdateVertexPositions(Tile[,] tiles)
+        {
+            _heightNormals = GenerateNormalMap(tiles);
+            _vertexPositions = GenerateVertexPositions(tiles);
+        }
+
+        public void UpdateHeightMap(Tile[,] tiles)
+        {
+            UpdateVertexPositions(tiles);
+            Initialize(_graphicsDevice);
+            SetHasUpdated(false);
         }
 
         public void Draw(Matrix projectMatrix, Matrix viewMatrix, Matrix worldMatrix, Texture2D texture2D)
