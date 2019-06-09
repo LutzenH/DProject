@@ -84,22 +84,41 @@ namespace DProject.Entity
                 camera.GetProjectMatrix(), graphicsDevice.Viewport);
 
             var position = ray.Position - ray.Direction * (ray.Position.Y / ray.Direction.Y);
-            var chunk = chunkLoaderEntity.GetChunk(position);
+            var chunkPosition = ChunkLoaderEntity.CalculateChunkPosition(position.X, position.Z);
 
-            if (chunk != null)
+            //The closest chunk and all its surrounding chunks.
+            var chunkPositions = new (int, int)[]
             {
-                for (var x = 0; x < chunk.GetTileBoundingBoxes(currentFloor).GetLength(0); x++) {
-                    for (var y = 0; y < chunk.GetTileBoundingBoxes(currentFloor).GetLength(1); y++) {
-                        var intersects = ray.Intersects(chunk.GetTileBoundingBoxes(currentFloor)[x, y]);
+                chunkPosition,
+                (chunkPosition.Item1 - 1, chunkPosition.Item2),
+                (chunkPosition.Item1, chunkPosition.Item2 - 1),
+                (chunkPosition.Item1 + 1, chunkPosition.Item2),
+                (chunkPosition.Item1, chunkPosition.Item2 + 1),
+                (chunkPosition.Item1 - 1, chunkPosition.Item2 - 1),
+                (chunkPosition.Item1 - 1, chunkPosition.Item2 + 1),
+                (chunkPosition.Item1 + 1, chunkPosition.Item2 + 1),
+                (chunkPosition.Item1 + 1, chunkPosition.Item2 - 1)
+            };
+
+            foreach (var (chunkX, chunkY) in chunkPositions)
+            {
+                var chunk = chunkLoaderEntity.GetChunk(chunkX, chunkY);
+                
+                if (chunk != null)
+                {
+                    for (var x = 0; x < chunk.GetTileBoundingBoxes(currentFloor).GetLength(0); x++) {
+                        for (var y = 0; y < chunk.GetTileBoundingBoxes(currentFloor).GetLength(1); y++) {
+                            var intersects = ray.Intersects(chunk.GetTileBoundingBoxes(currentFloor)[x, y]);
                                                 
-                        if (intersects != null)
-                        {
-                            return ray.Position + ray.Direction * (float) intersects;        
+                            if (intersects != null)
+                            {
+                                return ray.Position + ray.Direction * (float) intersects;        
+                            }
                         }
                     }
                 }
             }
-            
+
             return null;
         }
 
