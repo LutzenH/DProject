@@ -212,21 +212,21 @@ namespace DProject.Type.Rendering
             return heightmap;
         }
 
-        public static Tile[,] GenerateTileMap(byte[,] heightmap)
+        public static Tile[,] GenerateTileMap(byte[,] heightMap, ushort[,] splatMap = null)
         {
-            int width = heightmap.GetLength(0)-1;
-            int height = heightmap.GetLength(1)-1;
+            var width = heightMap.GetLength(0)-1;
+            var height = heightMap.GetLength(1)-1;
             
-            Tile[,] tempTileMap = new Tile[width,height];
+            var tempTileMap = new Tile[width,height];
             
             for (var x = 0; x < width; x++)
             {
                 for (var y = 0; y < height; y++)
                 {
-                    var topLeft = heightmap[x,y];
-                    var topRight = heightmap[x+1,y];
-                    var bottomLeft = heightmap[x,y+1];
-                    var bottomRight = heightmap[x+1,y+1];
+                    var topLeft = heightMap[x,y];
+                    var topRight = heightMap[x+1,y];
+                    var bottomLeft = heightMap[x,y+1];
+                    var bottomRight = heightMap[x+1,y+1];
                     
                     var isAlternativeDiagonal = IsAlternativeDiagonal(
                         new Vector3(x, topLeft, y),
@@ -237,44 +237,49 @@ namespace DProject.Type.Rendering
                     
                     ushort? textureId = Textures.GetDefaultTextureId();
 
-                    /*
-                    if (topLeft > DefaultDistanceBetweenFloors-1)
-                        textureId = null;
-                    */
-                    
                     var colortl = Colors.GetDefaultColorId();
                     var colortr = colortl;
                     var colorbl = colortl;
                     var colorbr = colortl;
                     
-                    if (topLeft < 2)
-                        colortl = 6;
-                    else if (topLeft < 8)
-                        colortl = 7;
+                    if (splatMap != null)
+                    {
+                        colortl = splatMap[x,y];
+                        colortr = splatMap[x+1,y];
+                        colorbl = splatMap[x,y+1];
+                        colorbr = splatMap[x+1,y+1];
+                    }
                     else
-                        colortl = 8;
+                    {
+                        if (topLeft < 2)
+                            colortl = 6;
+                        else if (topLeft < 8)
+                            colortl = 7;
+                        else
+                            colortl = 8;
                     
-                    if (topRight < 2)
-                        colortr = 6;
-                    else if (topRight < 8)
-                        colortr = 7;
-                    else
-                        colortr = 8;
+                        if (topRight < 2)
+                            colortr = 6;
+                        else if (topRight < 8)
+                            colortr = 7;
+                        else
+                            colortr = 8;
                     
-                    if (bottomLeft < 2)
-                        colorbl = 6;
-                    else if (bottomLeft < 8)
-                        colorbl = 7;
-                    else
-                        colorbl = 8;
+                        if (bottomLeft < 2)
+                            colorbl = 6;
+                        else if (bottomLeft < 8)
+                            colorbl = 7;
+                        else
+                            colorbl = 8;
                     
-                    if (bottomRight < 2)
-                        colorbr = 6;
-                    else if (bottomRight < 8)
-                        colorbr = 7;
-                    else
-                        colorbr = 8;
-                    
+                        if (bottomRight < 2)
+                            colorbr = 6;
+                        else if (bottomRight < 8)
+                            colorbr = 7;
+                        else
+                            colorbr = 8;
+                    }
+
                     tempTileMap[x,y] = new Tile()
                     {
                         TopLeft =  topLeft,
@@ -294,7 +299,7 @@ namespace DProject.Type.Rendering
 
             return tempTileMap;
         }
-        
+
         public Vector3[,] GenerateNormalMap(Tile[,] tiles)
         {
             Vector3[,] map = new Vector3[_width+1,_height+1];
