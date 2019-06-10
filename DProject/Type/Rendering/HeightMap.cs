@@ -29,7 +29,10 @@ namespace DProject.Type.Rendering
 
         public const byte DefaultDistanceBetweenFloors = 64;
         
-        public const float IncrementsPerHeightUnit = 8f;
+        public const float IncrementsPerHeightUnit = 256f;
+
+        private ushort _lowestHeightValue = ushort.MaxValue;
+        private ushort _highestHeightValue = ushort.MinValue;
 
         public HeightMap(Tile[,] tiles)
         {
@@ -51,7 +54,7 @@ namespace DProject.Type.Rendering
                 TerrainEffect.LightingEnabled = true;
                 TerrainEffect.PreferPerPixelLighting = true;
                 TerrainEffect.VertexColorEnabled = true;
-                TerrainEffect.TextureEnabled = false;
+                TerrainEffect.TextureEnabled = true;
                 
                 TerrainEffect.SetLightingInfo(LightingProperties.CurrentInfo);
             }
@@ -108,22 +111,40 @@ namespace DProject.Type.Rendering
         {
             _primitiveCount = _width * _height * 2;
             
-            int width = tiles.GetLength(0);
-            int height = tiles.GetLength(1);
+            var width = tiles.GetLength(0);
+            var height = tiles.GetLength(1);
             
             VertexPositionTextureColorNormal[] vertexPositions = new VertexPositionTextureColorNormal[GetVertexCount()];
 
-            int vertexIndex = 0;
+            var vertexIndex = 0;
             
             for (var x = 0; x < width; x++)
             {
                 for (var y = 0; y < height; y++)
                 {                    
                     var topLeft = new Vector3 (x-0.5f,  tiles[x,y].TopLeft / IncrementsPerHeightUnit, y-0.5f);
-                    var topRight = new Vector3 (x+0.5f,  tiles[x,y].TopRight/ IncrementsPerHeightUnit, y-0.5f);
-                    var bottomLeft = new Vector3 (x-0.5f, tiles[x,y].BottomLeft/ IncrementsPerHeightUnit, y+0.5f);
-                    var bottomRight = new Vector3 (x+0.5f, tiles[x,y].BottomRight/ IncrementsPerHeightUnit, y+0.5f);
+                    var topRight = new Vector3 (x+0.5f,  tiles[x,y].TopRight / IncrementsPerHeightUnit, y-0.5f);
+                    var bottomLeft = new Vector3 (x-0.5f, tiles[x,y].BottomLeft / IncrementsPerHeightUnit, y+0.5f);
+                    var bottomRight = new Vector3 (x+0.5f, tiles[x,y].BottomRight / IncrementsPerHeightUnit, y+0.5f);
 
+                    if (tiles[x, y].TopLeft < _lowestHeightValue)
+                        _lowestHeightValue = tiles[x, y].TopLeft;
+                    if (tiles[x, y].TopRight < _lowestHeightValue)
+                        _lowestHeightValue = tiles[x, y].TopRight;
+                    if (tiles[x, y].BottomLeft < _lowestHeightValue)
+                        _lowestHeightValue = tiles[x, y].BottomLeft;
+                    if (tiles[x, y].BottomRight < _lowestHeightValue)
+                        _lowestHeightValue = tiles[x, y].BottomRight;
+                    
+                    if (tiles[x, y].TopLeft > _highestHeightValue)
+                        _highestHeightValue = tiles[x, y].TopLeft;
+                    if (tiles[x, y].TopRight > _highestHeightValue)
+                        _highestHeightValue = tiles[x, y].TopRight;
+                    if (tiles[x, y].BottomLeft > _highestHeightValue)
+                        _highestHeightValue = tiles[x, y].BottomLeft;
+                    if (tiles[x, y].BottomRight > _highestHeightValue)
+                        _highestHeightValue = tiles[x, y].BottomRight;
+                    
                     var colorTopLeft = Colors.ColorList[tiles[x, y].ColorTopLeft].Color;
                     var colorTopRight = Colors.ColorList[tiles[x, y].ColorTopRight].Color;
                     var colorBottomLeft = Colors.ColorList[tiles[x, y].ColorBottomLeft].Color;
@@ -227,7 +248,7 @@ namespace DProject.Type.Rendering
             return heightmap;
         }
 
-        public static Tile[,] GenerateTileMap(byte[,] heightMap, ushort[,] splatMap = null)
+        public static Tile[,] GenerateTileMap(ushort[,] heightMap, ushort[,] splatMap = null)
         {
             var width = heightMap.GetLength(0)-1;
             var height = heightMap.GetLength(1)-1;
@@ -321,8 +342,8 @@ namespace DProject.Type.Rendering
             
             var heightMap = GenerateHeightMapFromTileMap(tiles);
 
-            var yScale = 0.5f;
-            var xzScale = 1f;
+            var yScale = 2f;
+            var xzScale = IncrementsPerHeightUnit;
             
             for (var y = 0; y<_height+1; ++y)
             {
@@ -365,7 +386,7 @@ namespace DProject.Type.Rendering
 
         public static Tile[,] GenerateTileMap(int chunkSize, byte floor)
         {
-            var heightmap = new byte[chunkSize+1,chunkSize+1];
+            var heightmap = new ushort[chunkSize+1,chunkSize+1];
 
             for (var x = 0; x < heightmap.GetLength(0); x++)
             {
@@ -406,6 +427,11 @@ namespace DProject.Type.Rendering
         public void SetHasUpdated(bool hasUpdated)
         {
             _hasUpdated = hasUpdated;
+        }
+
+        public (ushort, ushort) GetOuterHeightBounds()
+        {
+            return (_lowestHeightValue, _highestHeightValue);
         }
     }
 }

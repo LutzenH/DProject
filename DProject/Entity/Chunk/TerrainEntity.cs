@@ -30,11 +30,11 @@ namespace DProject.Entity.Chunk
         private List<PropEntity>[] _props;
         private BoundingBox[][,] _tileBoundingBoxes;
         
-        private readonly BoundingSphere _boundingSphere;
+        private readonly BoundingBox _boundingBox;
         
         public enum TileCorner { TopLeft, TopRight, BottomLeft, BottomRight }
         
-        public TerrainEntity(int x, int y) : base(new Vector3(x*ChunkLoaderEntity.ChunkSize, 0, y*ChunkLoaderEntity.ChunkSize), Quaternion.Identity, new Vector3(1,1,1))
+        public TerrainEntity(int x, int y) : base(new Vector3(x * ChunkLoaderEntity.ChunkSize, 0, y * ChunkLoaderEntity.ChunkSize), Quaternion.Identity, new Vector3(1,1,1))
         {
             _chunkPositionX = x;
             _chunkPositionY = y;
@@ -47,8 +47,21 @@ namespace DProject.Entity.Chunk
             
             for (var floor = 0; floor < _heightMaps.Length; floor++)
                 _heightMaps[floor] = new HeightMap(_chunkData.Tiles[floor]);
+
+            var (lowest, highest) = _heightMaps[0].GetOuterHeightBounds();
             
-            _boundingSphere = new BoundingSphere(new Vector3(ChunkLoaderEntity.ChunkSize/2, 0, ChunkLoaderEntity.ChunkSize/2), ChunkLoaderEntity.ChunkSize/1.6f);
+            _boundingBox = BoundingBox.CreateFromPoints
+            (new []{
+                new Vector3(x * ChunkLoaderEntity.ChunkSize, highest / HeightMap.IncrementsPerHeightUnit, y * ChunkLoaderEntity.ChunkSize),
+                new Vector3(x * ChunkLoaderEntity.ChunkSize + ChunkLoaderEntity.ChunkSize, highest / HeightMap.IncrementsPerHeightUnit, y * ChunkLoaderEntity.ChunkSize),
+                new Vector3(x * ChunkLoaderEntity.ChunkSize, highest / HeightMap.IncrementsPerHeightUnit, y * ChunkLoaderEntity.ChunkSize + ChunkLoaderEntity.ChunkSize),
+                new Vector3(x * ChunkLoaderEntity.ChunkSize + ChunkLoaderEntity.ChunkSize, highest / HeightMap.IncrementsPerHeightUnit, y * ChunkLoaderEntity.ChunkSize + ChunkLoaderEntity.ChunkSize),
+                
+                new Vector3(x * ChunkLoaderEntity.ChunkSize, lowest / HeightMap.IncrementsPerHeightUnit, y * ChunkLoaderEntity.ChunkSize),
+                new Vector3(x * ChunkLoaderEntity.ChunkSize + ChunkLoaderEntity.ChunkSize, lowest / HeightMap.IncrementsPerHeightUnit, y * ChunkLoaderEntity.ChunkSize),
+                new Vector3(x * ChunkLoaderEntity.ChunkSize, lowest / HeightMap.IncrementsPerHeightUnit, y * ChunkLoaderEntity.ChunkSize + ChunkLoaderEntity.ChunkSize),
+                new Vector3(x * ChunkLoaderEntity.ChunkSize + ChunkLoaderEntity.ChunkSize, lowest / HeightMap.IncrementsPerHeightUnit, y * ChunkLoaderEntity.ChunkSize + ChunkLoaderEntity.ChunkSize)
+            });
         }
 
         public static ChunkData GenerateChunkData(int x, int y)
@@ -68,7 +81,7 @@ namespace DProject.Entity.Chunk
             }
             else
             {                   
-                byte[,] heightmap = Noise.GenerateNoiseMap(ChunkLoaderEntity.ChunkSize, ChunkLoaderEntity.ChunkSize, x*ChunkLoaderEntity.ChunkSize, y*ChunkLoaderEntity.ChunkSize, 50f);
+                ushort[,] heightmap = Noise.GenerateNoiseMap(ChunkLoaderEntity.ChunkSize, ChunkLoaderEntity.ChunkSize, x*ChunkLoaderEntity.ChunkSize, y*ChunkLoaderEntity.ChunkSize, 50f);
                 
                 Tile[][,] tiles = new Tile[1][,];
                 
@@ -146,10 +159,16 @@ namespace DProject.Entity.Chunk
         {
             Serialize(_chunkData);
         }
+        
+        public static void SerializeChunkDataList(List<ChunkData> chunkData)
+        {
+            foreach (var chunk in chunkData) 
+                Serialize(chunk);
+        }
 
         public void Draw(CameraEntity activeCamera)
         {           
-            if (activeCamera.GetBoundingFrustum().Intersects(_boundingSphere.Transform(GetWorldMatrix())))
+            if (activeCamera.GetBoundingFrustum().Intersects(_boundingBox))
             {
                 foreach (var heightMap in _heightMaps)
                 {

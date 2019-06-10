@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Drawing;
 using DProject.Entity.Camera;
 using DProject.Entity.Chunk;
 using DProject.Entity.Debug;
@@ -8,8 +6,6 @@ using DProject.Entity.Interface;
 using DProject.List;
 using DProject.Manager;
 using DProject.Type.Enum;
-using DProject.Type.Rendering;
-using DProject.Type.Serializable.Chunk;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -17,7 +13,6 @@ using Microsoft.Xna.Framework.Input;
 using Color = Microsoft.Xna.Framework.Color;
 using IDrawable = DProject.Entity.Interface.IDrawable;
 using IUpdateable = DProject.Entity.Interface.IUpdateable;
-using Object = DProject.Type.Serializable.Chunk.Object;
 
 namespace DProject.Entity
 {
@@ -83,113 +78,6 @@ namespace DProject.Entity
         }
 
         #region Tools
-
-        public static List<ChunkData> GenerateChunkDataUsingBitmaps(int xPos, int yPos, Bitmap height)
-        {
-            return GenerateChunkDataUsingBitmaps(xPos, yPos, height, null, null, null, null, null);
-        }
-
-        public static List<ChunkData> GenerateChunkDataUsingBitmaps(int xPos, int yPos, Bitmap height,
-            Bitmap splat, ushort? splatColor1Id, ushort? splatColor2Id, ushort? splatColor3Id, ushort? splatColor4Id)
-        {
-            var list = new List<ChunkData>();
-
-            var hasSplatInfo = (splat != null && splatColor1Id != null && splatColor2Id != null && splatColor3Id != null && splatColor4Id != null);
-            
-            if (height.Width % ChunkLoaderEntity.ChunkSize == 1 
-                && height.Height % ChunkLoaderEntity.ChunkSize == 1)
-            {
-                for (var chunkX = 0; chunkX < (height.Width - 1) / ChunkLoaderEntity.ChunkSize; chunkX++)
-                {
-                    for (var chunkY = 0; chunkY < (height.Height - 1) / ChunkLoaderEntity.ChunkSize; chunkY++)
-                    {
-                        var heightMap = new byte[ChunkLoaderEntity.ChunkSize + 1, ChunkLoaderEntity.ChunkSize + 1];
-                        
-                        for (var xPix = 0; xPix < ChunkLoaderEntity.ChunkSize + 1; xPix++)
-                        {
-                            for (var yPix = 0; yPix < ChunkLoaderEntity.ChunkSize + 1; yPix++)
-                            {
-                                var xPixel = xPix + ChunkLoaderEntity.ChunkSize * chunkX;
-                                var yPixel = yPix + ChunkLoaderEntity.ChunkSize * chunkY;
-                                
-                                heightMap[xPix, yPix] = height.GetPixel(xPixel, yPixel).R;
-                            }
-                        }
-
-                        Tile[][,] tiles = new Tile[1][,];
-
-                        if (hasSplatInfo)
-                        {
-                            var splatMap = new ushort[ChunkLoaderEntity.ChunkSize + 1, ChunkLoaderEntity.ChunkSize + 1];
-
-                            var color1 = (ushort) splatColor1Id;
-                            var color2 = (ushort) splatColor2Id;
-                            var color3 = (ushort) splatColor3Id;
-                            var color4 = (ushort) splatColor4Id;
-                            
-                            for (var xPix = 0; xPix < ChunkLoaderEntity.ChunkSize + 1; xPix++)
-                            {
-                                for (var yPix = 0; yPix < ChunkLoaderEntity.ChunkSize + 1; yPix++)
-                                {
-                                    var xPixel = xPix + ChunkLoaderEntity.ChunkSize * chunkX;
-                                    var yPixel = yPix + ChunkLoaderEntity.ChunkSize * chunkY;
-
-                                    var pixel = splat.GetPixel(xPixel, yPixel);
-                                    
-                                    splatMap[xPix, yPix] = color1;
-
-                                    var value = 0;
-
-                                    if (pixel.R > value)
-                                    {
-                                        value = pixel.R;
-                                        splatMap[xPix, yPix] = color2;
-                                    }
-                                    if (pixel.G > value)
-                                    {
-                                        value = pixel.G;
-                                        splatMap[xPix, yPix] = color3;
-                                    }
-                                    if (pixel.B > value)
-                                    {
-                                        splatMap[xPix, yPix] = color4;
-                                    }
-                                }
-                            }
-                            
-                            tiles[0] = HeightMap.GenerateTileMap(heightMap, splatMap);
-                        }
-                        else
-                            tiles[0] = HeightMap.GenerateTileMap(heightMap);
-
-                        var chunkData = new ChunkData()
-                        {
-                            ChunkPositionX = xPos + chunkX,
-                            ChunkPositionY = yPos + chunkY,
-                            Tiles = tiles,
-                    
-                            Objects = Object.GenerateObjects(0, 0, 1, 0),
-                    
-                            LightingInfo = LightingProperties.DefaultInfo,
-                            
-                            ChunkStatus = ChunkStatus.Unserialized
-                        };
-                        
-                        list.Add(chunkData);
-                    }
-                }
-
-                return list;
-            }
-
-            return null;
-        }
-
-        public static void SerializeChunkDataList(List<ChunkData> chunkData)
-        {
-            foreach (var chunk in chunkData) 
-                TerrainEntity.Serialize(chunk);
-        }
 
         private void UseTool()
         {

@@ -4,17 +4,17 @@ namespace DProject.Type.Rendering
 {
     public static class Noise
     {
-        public static byte[,] GenerateNoiseMap(int mapWidth, int mapHeight, float xOffset, float yOffset, float noiseScale)
+        public static ushort[,] GenerateNoiseMap(int mapWidth, int mapHeight, float xOffset, float yOffset, float noiseScale)
         {
-            SimplexPerlin perlin = new SimplexPerlin();
+            var perlin = new SimplexPerlin();
             
-            byte[,] noiseMap = new byte[mapWidth+1,mapHeight+1];
+            var noiseMap = new ushort[mapWidth + 1,mapHeight + 1];
 
-            for (int x = 0; x < mapWidth+1; x++)
+            for (var x = 0; x < mapWidth + 1; x++)
             {
-                for (int y = 0; y < mapHeight+1; y++)
+                for (var y = 0; y < mapHeight + 1; y++)
                 {  
-                    noiseMap[x,y] = (byte) (20+ perlin.GetValue((x+xOffset)/noiseScale, (y+yOffset)/noiseScale) * 20);
+                    noiseMap[x,y] = (ushort) (1024 + perlin.GetValue((x+xOffset)/noiseScale, (y+yOffset)/noiseScale) * 1024);
                 }
             }
 
