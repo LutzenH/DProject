@@ -314,7 +314,7 @@ namespace DProject.Entity.Chunk
             return _loadedChunks[(chunkPositionX, chunkPositionY)].GetTileHeight(localChunkPositionX, localChunkPositionY, floor);
         }
 
-        public byte? GetVertexHeight(Vector2 position, TerrainEntity.TileCorner corner, int floor)
+        public ushort? GetVertexHeight(Vector2 position, TerrainEntity.TileCorner corner, int floor)
         {
             Vector2 tempPosition =
                 new Vector2((float) Math.Floor(position.X + 0.5f), (float) Math.Floor(position.Y + 0.5f));
@@ -334,7 +334,7 @@ namespace DProject.Entity.Chunk
             return _loadedChunks[(chunkPositionX, chunkPositionY)].GetVertexHeight(localChunkPositionX, localChunkPositionY, floor, corner);
         }
 
-        public void ChangeTileHeight(byte height, Vector3 position, int floor, int brushSize)
+        public void ChangeTileHeight(ushort height, Vector3 position, int floor, int brushSize)
         {
             if (brushSize > 0)
             {
@@ -630,7 +630,7 @@ namespace DProject.Entity.Chunk
             GetChunk(position).ChangeVertexColor(color, (int)localPosition.X, (int)localPosition.Y, floor, tileCorner);
         }
 
-        public void ChangeCornerHeight(byte height, Vector3 position, int floor, TerrainEntity.TileCorner tileCorner)
+        public void ChangeCornerHeight(ushort height, Vector3 position, int floor, TerrainEntity.TileCorner tileCorner)
         {            
             var localPosition = GetLocalChunkPosition(new Vector2(position.X, position.Z));
             

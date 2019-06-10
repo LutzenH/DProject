@@ -23,7 +23,6 @@ namespace DProject.Entity.Chunk
         private readonly int _chunkPositionX;
         private readonly int _chunkPositionY;
 
-        private GraphicsDevice _graphicsDevice;
         private ContentManager _contentManager;
         
         private readonly ChunkData _chunkData;
@@ -167,8 +166,6 @@ namespace DProject.Entity.Chunk
 
         public void Initialize(GraphicsDevice graphicsDevice)
         {
-            _graphicsDevice = graphicsDevice;
-
             foreach (var heightMap in _heightMaps)
             {
                 heightMap.Initialize(graphicsDevice);
@@ -445,7 +442,7 @@ namespace DProject.Entity.Chunk
             _chunkData.ChunkStatus = ChunkStatus.Changed;
         }
 
-        public void ChangeVertexHeight(byte height, int x, int y, int floor, TileCorner corner)
+        public void ChangeVertexHeight(ushort height, int x, int y, int floor, TileCorner corner)
         {
             switch (corner)
             {
@@ -518,16 +515,16 @@ namespace DProject.Entity.Chunk
 
         #region Getters and Setters
         
-        public byte GetTileHeight(int x, int y, int floor)
+        public ushort GetTileHeight(int x, int y, int floor)
         {
-            return (byte) Math.Round((_chunkData.Tiles[floor][x, y].TopLeft
+            return (ushort) Math.Round((_chunkData.Tiles[floor][x, y].TopLeft
                                     +_chunkData.Tiles[floor][x, y].TopRight
                                     +_chunkData.Tiles[floor][x, y].BottomLeft
                                     +_chunkData.Tiles[floor][x, y].BottomRight)
                            /4f);
         }
 
-        public byte GetVertexHeight(int x, int y, int floor, TileCorner corner)
+        public ushort GetVertexHeight(int x, int y, int floor, TileCorner corner)
         {
             switch (corner)
             {

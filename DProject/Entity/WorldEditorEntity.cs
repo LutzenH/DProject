@@ -31,7 +31,7 @@ namespace DProject.Entity
         public enum Tools { Select, Flatten, Raise, Paint, ObjectPlacer }
         private Tools _tools;
 
-        private byte _flattenHeight;
+        private ushort _flattenHeight;
         private int _brushSize;
 
         private ushort _activeTexture;
@@ -221,7 +221,7 @@ namespace DProject.Entity
             }
         }
 
-        private void ChangeHeight(Vector3 position, Vector3 precisePosition, byte height)
+        private void ChangeHeight(Vector3 position, Vector3 precisePosition, ushort height)
         {
             if (_brushSize > 0)
             {
@@ -268,21 +268,21 @@ namespace DProject.Entity
 
             if (Mouse.GetState().LeftButton == ButtonState.Pressed)
             {
-                byte? height = _chunkLoaderEntity.GetVertexHeight(new Vector2(position.X, position.Z), tileCorner, _pointerEntity.GetCurrentFloor());
+                ushort? height = _chunkLoaderEntity.GetVertexHeight(new Vector2(position.X, position.Z), tileCorner, _pointerEntity.GetCurrentFloor());
                 
-                if(height != 255)
+                if(height != ushort.MaxValue)
                     height++;
                 
-                ChangeHeight(position, precisePosition, (byte)height);
+                ChangeHeight(position, precisePosition, (ushort) height);
             } 
             else if (Mouse.GetState().RightButton == ButtonState.Pressed)
             {
-                byte? height = _chunkLoaderEntity.GetVertexHeight(new Vector2(position.X, position.Z), tileCorner, _pointerEntity.GetCurrentFloor());
+                ushort? height = _chunkLoaderEntity.GetVertexHeight(new Vector2(position.X, position.Z), tileCorner, _pointerEntity.GetCurrentFloor());
                 
                 if(height != 0)
                     height--;
                 
-                ChangeHeight(position, precisePosition, (byte)height);
+                ChangeHeight(position, precisePosition, (ushort) height);
             }
 
             _cornerIndicatorEntity.SetPosition(position);

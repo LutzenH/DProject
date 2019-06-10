@@ -10,13 +10,13 @@ namespace DProject.Type.Serializable.Chunk
     {
         //Vertex Heights
         [Key(0)]
-        public virtual byte TopLeft { get; set; }
+        public virtual ushort TopLeft { get; set; }
         [Key(1)]
-        public virtual byte TopRight { get; set; }
+        public virtual ushort TopRight { get; set; }
         [Key(2)]
-        public virtual byte BottomLeft { get; set; }
+        public virtual ushort BottomLeft { get; set; }
         [Key(3)]
-        public virtual byte BottomRight { get; set; }
+        public virtual ushort BottomRight { get; set; }
         
         //If the tile uses the other cross-diagonal triangles
         [Key(4)]
@@ -50,7 +50,7 @@ namespace DProject.Type.Serializable.Chunk
             );
         }
 
-        public void SetCornerHeight(byte height, TerrainEntity.TileCorner corner)
+        public void SetCornerHeight(ushort height, TerrainEntity.TileCorner corner)
         {
             switch (corner)
             {

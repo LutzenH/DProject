@@ -191,9 +191,9 @@ namespace DProject.Type.Rendering
             return vertexPositions;
         }
 
-        public static byte[,] GenerateHeightMapFromTileMap(Tile[,] tilemap)
+        public static ushort[,] GenerateHeightMapFromTileMap(Tile[,] tilemap)
         {
-            byte[,] heightmap = new byte[tilemap.GetLength(0)+1,tilemap.GetLength(1)+1];
+            ushort[,] heightmap = new ushort[tilemap.GetLength(0)+1,tilemap.GetLength(1)+1];
             
             for (var x = 0; x < heightmap.GetLength(0)-1; x++)
             {
