@@ -34,7 +34,7 @@ namespace DProject.Entity.Chunk
         
         public enum TileCorner { TopLeft, TopRight, BottomLeft, BottomRight }
         
-        public TerrainEntity(int x, int y) : base(new Vector3(x * ChunkLoaderEntity.ChunkSize, 0, y * ChunkLoaderEntity.ChunkSize), Quaternion.Identity, new Vector3(1,1,1))
+        public TerrainEntity(int x, int y, LevelOfDetail levelOfDetail) : base(new Vector3(x * ChunkLoaderEntity.ChunkSize, 0, y * ChunkLoaderEntity.ChunkSize), Quaternion.Identity, new Vector3(1,1,1))
         {
             _chunkPositionX = x;
             _chunkPositionY = y;
@@ -43,7 +43,7 @@ namespace DProject.Entity.Chunk
             
             LoadProps();
             
-            _heightMap = new HeightMap(_chunkData.VertexMap);
+            _heightMap = new HeightMap(_chunkData.VertexMap, levelOfDetail);
 
             var (lowest, highest) = _heightMap.GetOuterHeightBounds();
             
@@ -165,6 +165,7 @@ namespace DProject.Entity.Chunk
         public void Initialize(GraphicsDevice graphicsDevice)
         {
             _heightMap.Initialize(graphicsDevice);
+
             _tileBoundingBoxes = GenerateBoundingBoxes();
         }
 
@@ -216,7 +217,12 @@ namespace DProject.Entity.Chunk
             if (_heightMap.GetHasUpdated())
                 _heightMap.UpdateHeightMap(_chunkData.VertexMap);
         }
-        
+
+        public void SetLevelOfDetail(LevelOfDetail levelOfDetail)
+        {
+            _heightMap.SetLevelOfDetail(_chunkData.VertexMap, levelOfDetail);
+        }
+
         #region Editing
         
         public void PlaceProp(int x, int y, Rotation rotation, ushort objectId)

@@ -1,6 +1,6 @@
 using System;
-using System.Drawing;
 using DProject.List;
+using DProject.Type.Enum;
 using DProject.Type.Rendering.Shaders;
 using DProject.Type.Serializable.Chunk;
 using Microsoft.Xna.Framework;
@@ -17,6 +17,8 @@ namespace DProject.Type.Rendering
         
         public static TerrainEffect TerrainEffect;
 
+        private LevelOfDetail _levelOfDetail;
+        
         private readonly int _width;
         private readonly int _height;
 
@@ -32,10 +34,12 @@ namespace DProject.Type.Rendering
         private ushort _lowestHeightValue;
         private ushort _highestHeightValue;
 
-        public HeightMap(Vertex[,] heightMap)
+        public HeightMap(Vertex[,] heightMap, LevelOfDetail levelOfDetail)
         {
             _width = heightMap.GetLength(0);
             _height = heightMap.GetLength(1);
+
+            _levelOfDetail = levelOfDetail;
             
             UpdateVertexPositions(heightMap);
         }
@@ -69,7 +73,6 @@ namespace DProject.Type.Rendering
 
         private void UpdateVertexPositions(Vertex[,] heightMap)
         {
-            _heightNormals = GenerateNormalMap(heightMap);
             _vertexPositions = GenerateVertexPositions(heightMap);
         }
 
@@ -78,6 +81,12 @@ namespace DProject.Type.Rendering
             UpdateVertexPositions(heightMap);
             Initialize(_graphicsDevice);
             SetHasUpdated(false);
+        }
+
+        public void SetLevelOfDetail(Vertex[,] heightMap, LevelOfDetail levelOfDetail)
+        {
+            SetLevelOfDetail(levelOfDetail);
+            UpdateHeightMap(heightMap);
         }
 
         public void Draw(Matrix projectMatrix, Matrix viewMatrix, Matrix worldMatrix, Texture2D texture2D)
@@ -109,27 +118,50 @@ namespace DProject.Type.Rendering
         {
             _lowestHeightValue = ushort.MaxValue;
             _highestHeightValue = ushort.MinValue;
-            
-            _primitiveCount = _width * _height * 2;
-            
+
             var width = heightMap.GetLength(0);
             var height = heightMap.GetLength(1);
+
+            var offset = GetVertexOffset(_levelOfDetail);
+
+            switch (_levelOfDetail)
+            {
+                case LevelOfDetail.Full:
+                    _primitiveCount = _width * _height * 2;
+                    break;
+                case LevelOfDetail.Half:
+                    _primitiveCount = _width * _height;
+                    break;
+                case LevelOfDetail.Quarter:
+                    _primitiveCount = _width * _height / 2;
+                    break;
+                case LevelOfDetail.Eighth:
+                    _primitiveCount = _width * _height / 4;
+                    break;
+                case LevelOfDetail.Sixteenth:
+                    _primitiveCount = _width * _height / 8;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
             
+            _heightNormals = GenerateNormalMap(heightMap, _levelOfDetail);
+
             var vertexPositions = new VertexPositionTextureColorNormal[GetVertexCount()];
             var vertexIndex = 0;
             
-            for (var x = 0; x < width - 1; x++)
+            for (var x = 0; x < width - 1; x += offset)
             {
-                for (var y = 0; y < height - 1; y++)
+                for (var y = 0; y < height - 1; y += offset)
                 {
                     var vertexTextureId = heightMap[x,y].TextureId;
                     
                     if (vertexTextureId != null)
                     {
                         var topLeft = new Vector3 (x,  heightMap[x,y].Height / IncrementsPerHeightUnit, y);
-                        var topRight = new Vector3 (x + 1,  heightMap[x + 1, y].Height / IncrementsPerHeightUnit, y);
-                        var bottomLeft = new Vector3 (x, heightMap[x, y + 1].Height / IncrementsPerHeightUnit, y + 1);
-                        var bottomRight = new Vector3 (x + 1, heightMap[x + 1,y + 1].Height / IncrementsPerHeightUnit, y + 1);
+                        var topRight = new Vector3 (x + offset,  heightMap[x + offset, y].Height / IncrementsPerHeightUnit, y);
+                        var bottomLeft = new Vector3 (x, heightMap[x, y + offset].Height / IncrementsPerHeightUnit, y + offset);
+                        var bottomRight = new Vector3 (x + offset, heightMap[x + offset,y + offset].Height / IncrementsPerHeightUnit, y + offset);
 
                         if (heightMap[x, y].Height < _lowestHeightValue)
                             _lowestHeightValue = heightMap[x, y].Height;
@@ -137,44 +169,47 @@ namespace DProject.Type.Rendering
                             _highestHeightValue = heightMap[x, y].Height;
                     
                         var colorTopLeft = Colors.ColorList[heightMap[x, y].ColorId].Color;
-                        var colorTopRight = Colors.ColorList[heightMap[x + 1, y].ColorId].Color;
-                        var colorBottomLeft = Colors.ColorList[heightMap[x, y + 1].ColorId].Color;
-                        var colorBottomRight = Colors.ColorList[heightMap[x + 1, y + 1].ColorId].Color;
+                        var colorTopRight = Colors.ColorList[heightMap[x + offset, y].ColorId].Color;
+                        var colorBottomLeft = Colors.ColorList[heightMap[x, y + offset].ColorId].Color;
+                        var colorBottomRight = Colors.ColorList[heightMap[x + offset, y + offset].ColorId].Color;
                             
                         Vector3 normal;
                         
                         var texturePositionTexture = Textures.TextureList[(ushort) vertexTextureId].GetAdjustedTexturePosition();
 
+                        var normalIndexX = x / offset;
+                        var normalIndexY = y / offset;
+                        
                         if (IsAlternativeDiagonal(topLeft, topRight, bottomRight, bottomLeft))
                         {
-                            normal = _heightNormals[x, y+1];
+                            normal = _heightNormals[normalIndexX, normalIndexY + 1];
                             vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(bottomLeft, normal, colorBottomLeft, new Vector2(texturePositionTexture.X,texturePositionTexture.Y));
-                            normal = _heightNormals[x, y];
+                            normal = _heightNormals[normalIndexX, normalIndexY];
                             vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(topLeft, normal, colorTopLeft, new Vector2(texturePositionTexture.X,texturePositionTexture.W));
-                            normal = _heightNormals[x+1, y+1];
+                            normal = _heightNormals[normalIndexX + 1, normalIndexY + 1];
                             vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(bottomRight, normal, colorBottomRight, new Vector2(texturePositionTexture.Z,texturePositionTexture.Y));
                         
-                            normal = _heightNormals[x, y];
+                            normal = _heightNormals[normalIndexX, normalIndexY];
                             vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(topLeft, normal, colorTopLeft, new Vector2(texturePositionTexture.X,texturePositionTexture.W));
-                            normal = _heightNormals[x+1, y];
+                            normal = _heightNormals[normalIndexX + 1, normalIndexY];
                             vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(topRight, normal, colorTopRight, new Vector2(texturePositionTexture.Z,texturePositionTexture.W));
-                            normal = _heightNormals[x+1, y+1];
+                            normal = _heightNormals[normalIndexX + 1, normalIndexY + 1];
                             vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(bottomRight, normal, colorBottomRight, new Vector2(texturePositionTexture.Z,texturePositionTexture.Y));
                         }
                         else
                         {
-                            normal = _heightNormals[x+1, y];
+                            normal = _heightNormals[normalIndexX + 1, normalIndexY];
                             vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(topRight, normal, colorTopRight, new Vector2(texturePositionTexture.Z,texturePositionTexture.W));
-                            normal = _heightNormals[x+1, y+1];
+                            normal = _heightNormals[normalIndexX + 1, normalIndexY + 1];
                             vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(bottomRight, normal, colorBottomRight, new Vector2(texturePositionTexture.Z,texturePositionTexture.Y));
-                            normal = _heightNormals[x, y+1];
+                            normal = _heightNormals[normalIndexX, normalIndexY + 1];
                             vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(bottomLeft, normal, colorBottomLeft, new Vector2(texturePositionTexture.X,texturePositionTexture.Y));
                         
-                            normal = _heightNormals[x, y+1];
+                            normal = _heightNormals[normalIndexX, normalIndexY + 1];
                             vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(bottomLeft, normal, colorBottomLeft, new Vector2(texturePositionTexture.X,texturePositionTexture.Y));
-                            normal = _heightNormals[x, y];
+                            normal = _heightNormals[normalIndexX, normalIndexY];
                             vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(topLeft, normal, colorTopLeft, new Vector2(texturePositionTexture.X,texturePositionTexture.W));
-                            normal = _heightNormals[x+1, y];
+                            normal = _heightNormals[normalIndexX + 1, normalIndexY];
                             vertexPositions[vertexIndex++] = new VertexPositionTextureColorNormal(topRight, normal, colorTopRight, new Vector2(texturePositionTexture.Z,texturePositionTexture.W));
                         }
                     }
@@ -229,31 +264,64 @@ namespace DProject.Type.Rendering
             return tempHeightMap;
         }
 
-        public Vector3[,] GenerateNormalMap(Vertex[,] heightMap)
+        public Vector3[,] GenerateNormalMap(Vertex[,] heightMap, LevelOfDetail levelOfDetail)
         {
-            var normalMap = new Vector3[_width, _height];
+            var offset = GetVertexOffset(levelOfDetail);
+            
+            var width = heightMap.GetLength(0);
+            var height = heightMap.GetLength(1);
+            
+            var normalMap = new Vector3[width, height];
             
             const float yScale = 2f;
             const float xzScale = IncrementsPerHeightUnit;
             
-            for (var y = 0; y<_height; ++y)
+            for (var x = 0; x < width; x += offset)
             {
-                for (var x = 0; x < _width; ++x)
+                for (var y = 0; y < height; y += offset)
                 {
-                    float sx = heightMap[x < _width - 1 ? x+1 : x, y].Height - heightMap[x != 0 ? x-1 : x, y].Height;
-                    if (x == 0 || x == _width-1)
+                    var normalIndexX = x / offset;
+                    var normalIndexY = y / offset;
+                    
+                    float sx = heightMap[x < _width - 1 ? x+offset : x, y].Height - heightMap[x != 0 ? x-offset : x, y].Height;
+                    if (x == 0 || x == _width - 1)
                         sx *= 2;
 
-                    float sy = heightMap[x, y<_height - 1 ? y+1 : y].Height - heightMap[x, y != 0 ?  y-1 : y].Height;
+                    float sy = heightMap[x, y<_height - 1 ? y+offset : y].Height - heightMap[x, y != 0 ?  y-offset : y].Height;
                     if (y == 0 || y == _height - 1)
                         sy *= 2;
 
-                    normalMap[x,y] = new Vector3(-sx * yScale, 2 * xzScale, sy * yScale);
-                    normalMap[x,y].Normalize();
+                    normalMap[normalIndexX, normalIndexY] = new Vector3(-sx * yScale, 2 * xzScale, sy * yScale);
+                    normalMap[normalIndexX, normalIndexY].Normalize();
                 }
             }
-            
+
             return normalMap;
+        }
+        
+        
+        public static int GetVertexOffset(LevelOfDetail levelOfDetail)
+        {
+            switch (levelOfDetail)
+            {
+                case LevelOfDetail.Full:
+                    return 1;
+                    break;
+                case LevelOfDetail.Half:
+                    return 2;
+                    break;
+                case LevelOfDetail.Quarter:
+                    return 4;
+                    break;
+                case LevelOfDetail.Eighth:
+                    return 8;
+                    break;
+                case LevelOfDetail.Sixteenth:
+                    return 16;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(levelOfDetail), levelOfDetail, null);
+            }
         }
 
         //Can be used the get the normal of a triangle
@@ -289,6 +357,16 @@ namespace DProject.Type.Rendering
         public (ushort, ushort) GetOuterHeightBounds()
         {
             return (_lowestHeightValue, _highestHeightValue);
+        }
+
+        public LevelOfDetail GetLevelOfDetail()
+        {
+            return _levelOfDetail;
+        }
+
+        public void SetLevelOfDetail(LevelOfDetail levelOfDetail)
+        {
+            _levelOfDetail = levelOfDetail;
         }
     }
 }

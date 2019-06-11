@@ -1,13 +1,13 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-
 #if EDITOR
 using Gtk;
 #else
+using System.Threading.Tasks;
 using System.Threading;
 #endif
-
 using DProject.Entity.Camera;
 using DProject.Entity.Interface;
 using DProject.Manager;
@@ -33,10 +33,13 @@ namespace DProject.Entity.Chunk
         public const int LoadDistance = 8;
         public const int ChunkSize = 64;
         
-        private Dictionary<(int, int), TerrainEntity> _loadedChunks;
+        private ConcurrentDictionary<(int, int), TerrainEntity> _loadedChunks;
         
         private bool _loadedChunksLastFrame;
         
+#if !EDITOR
+        private CancellationTokenSource _cancellationToken;
+#endif
         public enum ChunkLoadingStatus
         {
             Busy,
@@ -48,7 +51,7 @@ namespace DProject.Entity.Chunk
         public ChunkLoaderEntity(EntityManager entityManager) : base(entityManager, Vector3.Zero, Quaternion.Identity,
             new Vector3(1, 1, 1))
         {
-            _loadedChunks = new Dictionary<(int, int), TerrainEntity>();
+            _loadedChunks = new ConcurrentDictionary<(int, int), TerrainEntity>();
             
             _chunkPosition = (0, 0);
             _previousChunkPosition = (-1, 0);
@@ -75,15 +78,21 @@ namespace DProject.Entity.Chunk
             }
 
             _previousChunkPosition = _chunkPosition;
-
+            
             foreach (var chunk in _loadedChunks)
-                chunk.Value.UpdateHeightMap();
+            {
+                if(_loadedChunks.ContainsKey(chunk.Key))
+                    chunk.Value.UpdateHeightMap();
+            }
         }
 
         public void Draw(CameraEntity activeCamera)
         {
             foreach (var chunk in _loadedChunks)
-                chunk.Value.Draw(activeCamera);
+            {
+                if(_loadedChunks.ContainsKey(chunk.Key))
+                    chunk.Value.Draw(activeCamera);
+            }
         }
 
         public void Initialize(GraphicsDevice graphicsDevice)
@@ -101,7 +110,7 @@ namespace DProject.Entity.Chunk
                 var newChunksCount = 0;
                 
                 var oldChunkPositions = new List<(int, int)>();
-                var newChunkPositions = new List<(int, int)>();
+                var newChunkPositions = new List<(int, int, LevelOfDetail)>();
                 
                 int x, y, dx, dy;
                 x = y = dx =0;
@@ -123,8 +132,10 @@ namespace DProject.Entity.Chunk
                         }
                         else
                         {
+                            var levelOfDetail = LevelOfDetail.Full;
+
                             newChunksCount++;
-                            newChunkPositions.Add(position);
+                            newChunkPositions.Add((position.Item1, position.Item2, levelOfDetail));
                         }
                     }
                     if(x == y || x < 0 && x == -y || x > 0 && x == 1-y)
@@ -140,31 +151,61 @@ namespace DProject.Entity.Chunk
                 _loadingStatus = ChunkLoadingStatus.Busy;
 
                 var deadChunks = _loadedChunks.Keys.Except(oldChunkPositions).ToArray();
-                
-                foreach (var chunk in deadChunks)
-                    _loadedChunks.Remove(chunk);
-                
-                EditorEntityManager.AddMessage(new Message("Loading new chunks: " + oldChunksCount + " chunks reused and " + newChunksCount + " new chunks."));
 
-#if EDITOR
-                Application.Invoke((sender, args) => LoadNewChunks(newChunkPositions));           
-#else
-                //Use this instead of Application.Invoke when not using the GTK editor
-                var thread = new Thread((() => LoadNewChunks(newChunkPositions)))
+                foreach (var chunk in deadChunks)
                 {
-                    Priority = ThreadPriority.Highest
-                };
-                thread.Start();
-#endif
+                    if (!_loadedChunks.TryRemove(chunk, out var terrainEntity))
+                        Console.WriteLine("Failed to remove: " + terrainEntity.GetChunkX() + ", " + terrainEntity.GetChunkY());
+                }
+
+                EditorEntityManager.AddMessage(new Message("Loading new chunks: " + oldChunksCount + " chunks reused and " + newChunksCount + " new chunks."));
                 
+                LoadNewChunks(newChunkPositions);
+
                 _loadedChunksLastFrame = true;
             }
         }
 
-        private void LoadNewChunks(List<(int,int)> newChunkPositions)
-        {            
-            foreach (var position in newChunkPositions)
-                _loadedChunks[position] = LoadChunk(position);
+        private void LoadNewChunks(List<(int,int, LevelOfDetail)> newChunkPositions)
+        {
+#if EDITOR
+            Application.Invoke((sender, args) =>
+            {
+                foreach (var newChunk in newChunkPositions)
+                {
+                    var pos = (newChunk.Item1, newChunk.Item2);
+                    var lod = newChunk.Item3;
+            
+                    _loadedChunks[pos] = LoadChunk(pos, lod);
+                }
+            });
+#else
+            AbortLoadingChunks();
+
+            _cancellationToken = new CancellationTokenSource();
+            
+            foreach (var newChunk in newChunkPositions)
+            {
+                var pos = (newChunk.Item1, newChunk.Item2);
+                var lod = newChunk.Item3;
+            
+                Task.Factory.StartNew(() =>
+                {
+                    try
+                    {
+                        using (_cancellationToken.Token.Register(AbortLoadingChunks))
+                        {
+                            return _loadedChunks[pos] = LoadChunk(pos, lod);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
+                        throw;
+                    }
+                });
+            }
+#endif
 
             if (_loadedChunks.ContainsKey((_chunkPosition.Item1, _chunkPosition.Item2)))
             {
@@ -176,9 +217,16 @@ namespace DProject.Entity.Chunk
             _loadingStatus = ChunkLoadingStatus.Done;
         }
 
-        private TerrainEntity LoadChunk((int, int) position)
+#if !EDITOR
+        private void AbortLoadingChunks()
         {
-            var chunk = new TerrainEntity(position.Item1, position.Item2);
+            _cancellationToken?.Cancel();
+        }
+#endif
+        
+        private TerrainEntity LoadChunk((int, int) position, LevelOfDetail levelOfDetail)
+        {
+            var chunk = new TerrainEntity(position.Item1, position.Item2, levelOfDetail);
             
             chunk.Initialize(_graphicsDevice);
             chunk.LoadContent(_contentManager);
@@ -221,7 +269,7 @@ namespace DProject.Entity.Chunk
                 {
                     if (_loadedChunks[key].GetChunkData().ChunkStatus == ChunkStatus.Changed)
                     {
-                        _loadedChunks[key] = LoadChunk(key);
+                        _loadedChunks[key] = LoadChunk(key, _loadedChunks[key].GetHeightMap().GetLevelOfDetail());
                         count++;
                     }
                 }
@@ -270,9 +318,9 @@ namespace DProject.Entity.Chunk
             return _loadedChunks.ContainsKey(chunkPosition) ? _loadedChunks[chunkPosition] : null;
         }
         
-        public Dictionary<(int, int), TerrainEntity> GetLoadedChunks()
+        public IEnumerator<KeyValuePair<(int, int), TerrainEntity>> GetLoadedChunks()
         {
-            return _loadedChunks;
+            return _loadedChunks.GetEnumerator();
         }
 
         public bool IsLoadingChunks()

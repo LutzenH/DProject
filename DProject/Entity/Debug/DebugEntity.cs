@@ -91,8 +91,12 @@ namespace DProject.Entity.Debug
         {
             _lineFrameEntities.Clear();
 
-            foreach (var chunk in _chunkLoaderEntity.GetLoadedChunks().Values)
+            var chunkIterator = _chunkLoaderEntity.GetLoadedChunks();
+            
+            while (chunkIterator.MoveNext())
             {
+                var chunk = chunkIterator.Current.Value;
+                
                 if (chunk != null)
                 {
                     Color color;
