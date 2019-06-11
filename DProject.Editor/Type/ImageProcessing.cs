@@ -6,6 +6,7 @@ using DProject.Entity.Chunk;
 using DProject.Type.Enum;
 using DProject.Type.Rendering;
 using DProject.Type.Serializable.Chunk;
+using Microsoft.Xna.Framework;
 using Object = DProject.Type.Serializable.Chunk.Object;
 
 namespace DProject.Type
@@ -14,10 +15,16 @@ namespace DProject.Type
     {
         public static List<ChunkData> GenerateChunkDataUsingPixelRaster(int xPos, int yPos, ushort[,] heightMap)
         {
-            return GenerateChunkDataUsingPixelRaster(xPos, yPos, heightMap, null, null, null, null, null);
+            return GenerateChunkDataWithPixelRaster(xPos, yPos, heightMap, null, null, null, null, null);
         }
 
         public static List<ChunkData> GenerateChunkDataUsingPixelRaster(int xPos, int yPos, ushort[,] heightMap,
+            Bitmap splat, ushort splatColor1Id, ushort splatColor2Id, ushort splatColor3Id, ushort splatColor4Id)
+        {
+            return GenerateChunkDataWithPixelRaster(xPos, yPos, heightMap, splat, splatColor1Id, splatColor2Id, splatColor3Id, splatColor4Id);
+        }
+
+        private static List<ChunkData> GenerateChunkDataWithPixelRaster(int xPos, int yPos, ushort[,] heightMap,
             Bitmap splat, ushort? splatColor1Id, ushort? splatColor2Id, ushort? splatColor3Id, ushort? splatColor4Id)
         {
             var list = new List<ChunkData>();
@@ -47,7 +54,7 @@ namespace DProject.Type
                             }
                         }
 
-                        var tiles = new Tile[1][,];
+                        Vertex[,] vertexMap;
 
                         if (hasSplatInfo)
                         {
@@ -88,18 +95,18 @@ namespace DProject.Type
                                 }
                             }
                             
-                            tiles[0] = HeightMap.GenerateTileMap(subHeightMap, splatMap);
+                            vertexMap = HeightMap.GenerateVertexMap(subHeightMap, splatMap);
                         }
                         else
-                            tiles[0] = HeightMap.GenerateTileMap(subHeightMap);
+                            vertexMap = HeightMap.GenerateVertexMap(subHeightMap);
 
                         var chunkData = new ChunkData()
                         {
                             ChunkPositionX = xPos + chunkX,
                             ChunkPositionY = yPos + chunkY,
-                            Tiles = tiles,
+                            VertexMap = vertexMap,
                     
-                            Objects = Object.GenerateObjects(0, 0, 1, 0),
+                            Objects = Object.GenerateObjects(0, 0, 0),
                     
                             LightingInfo = LightingProperties.DefaultInfo,
                             
@@ -161,6 +168,25 @@ namespace DProject.Type
             var image = Tiff.Open(imagePath, "r");
             
             return GetPixelRasterFrom16BitTiff(image);
+        }
+        
+        private static void ExportNormalMapToImage(Vector3[,] normals, string filepath)
+        {
+            var bitmap = new Bitmap(normals.GetLength(0), normals.GetLength(1));
+
+            for (var x = 0; x < bitmap.Width; x++)
+            {
+                for (var y = 0; y < bitmap.Height; y++)
+                {
+                    var color = System.Drawing.Color.FromArgb(
+                        (int)((normals[x,y].X+1f)*127),
+                        (int)((normals[x,y].Y+1f)*127),
+                        (int)((normals[x,y].Z+1f)*127));
+                    bitmap.SetPixel(x,y, color);
+                } 
+            }
+            
+            bitmap.Save(filepath);
         }
     }
 } 

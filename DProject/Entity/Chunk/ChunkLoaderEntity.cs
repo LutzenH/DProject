@@ -62,8 +62,7 @@ namespace DProject.Entity.Chunk
 
         public void Update(GameTime gameTime)
         {
-            _chunkPosition = CalculateChunkPosition(EntityManager.GetActiveCamera().GetPosition().X,
-                EntityManager.GetActiveCamera().GetPosition().Z);
+            _chunkPosition = CalculateChunkPosition(EntityManager.GetActiveCamera().GetPosition());
 
             if (!_chunkPosition.Equals(_previousChunkPosition))
             {
@@ -235,44 +234,40 @@ namespace DProject.Entity.Chunk
         
         #region Chunk Information
         
-        public static (int, int) CalculateChunkPosition(float x, float y)
+        public static (int, int) CalculateChunkPosition(Vector3 position)
         {
-            var xPos = Math.Floor(x + 0.5f);
-            var yPos = Math.Floor(y + 0.5f);
+            var xPos = Math.Floor(position.X + 0.5f);
+            var yPos = Math.Floor(position.Z + 0.5f);
 
             var chunkPositionX = (int) Math.Floor(xPos / ChunkSize);
             var chunkPositionY = (int) Math.Floor(yPos / ChunkSize);
 
             return (chunkPositionX, chunkPositionY);
         }
-        
-        public static Vector2 GetLocalChunkPosition(Vector2 position)
+
+        public static (int, int) CalculateLocalChunkPosition((int, int) position)
         {
-            var x = Math.Floor(position.X + 0.5f);
-            var y = Math.Floor(position.Y + 0.5f);
-
-            var chunkPositionX = (int) Math.Floor(x / ChunkSize);
-            var chunkPositionY = (int) Math.Floor(y / ChunkSize);
+            var (x, y) = position;
             
-            var localChunkPositionX = (int) x - chunkPositionX * ChunkSize;
-            var localChunkPositionY = (int) y - chunkPositionY * ChunkSize;
+            var chunkPositionX = x / ChunkSize;
+            var chunkPositionY = y / ChunkSize;
+            
+            var localChunkPositionX = x - chunkPositionX * ChunkSize;
+            var localChunkPositionY = y - chunkPositionY * ChunkSize;
 
-            return new Vector2(localChunkPositionX, localChunkPositionY);
+            return (localChunkPositionX, localChunkPositionY);
         }
 
         public TerrainEntity GetChunk(Vector3 position)
         {
-            var chunkPosition = CalculateChunkPosition(position.X, position.Z);
-
-            return GetChunk(chunkPosition.Item1, chunkPosition.Item2);
+            var chunkPosition = CalculateChunkPosition(position);
+            
+            return GetChunk(chunkPosition);
         }
         
-        public TerrainEntity GetChunk(int chunkX, int chunkY)
+        public TerrainEntity GetChunk((int, int) chunkPosition)
         {
-            if (_loadedChunks.ContainsKey((chunkX, chunkY)))
-                return _loadedChunks[(chunkX, chunkY)];
-            else
-                return null;
+            return _loadedChunks.ContainsKey(chunkPosition) ? _loadedChunks[chunkPosition] : null;
         }
         
         public Dictionary<(int, int), TerrainEntity> GetLoadedChunks()
@@ -293,17 +288,16 @@ namespace DProject.Entity.Chunk
         #endregion
 
         #region Chunk Editing
-        
-        public float? GetHeightFromPosition(Vector2 position, int floor)
+
+        public ushort? GetVertexHeight(Vector2 position)
         {
-            Vector2 tempPosition =
-                new Vector2((float) Math.Floor(position.X + 0.5f), (float) Math.Floor(position.Y + 0.5f));
+            var (x, y) = new Vector2((float) Math.Floor(position.X + 0.5f), (float) Math.Floor(position.Y + 0.5f));
 
-            int chunkPositionX = (int) Math.Floor(tempPosition.X / ChunkSize);
-            int chunkPositionY = (int) Math.Floor(tempPosition.Y / ChunkSize);
+            var chunkPositionX = (int) Math.Floor(x / ChunkSize);
+            var chunkPositionY = (int) Math.Floor(y / ChunkSize);
 
-            int localChunkPositionX = (int) tempPosition.X - (chunkPositionX * ChunkSize);
-            int localChunkPositionY = (int) tempPosition.Y - (chunkPositionY * ChunkSize);
+            var localChunkPositionX = (int) x - (chunkPositionX * ChunkSize);
+            var localChunkPositionY = (int) y - (chunkPositionY * ChunkSize);
 
             if (localChunkPositionX < 0)
                 localChunkPositionX = ChunkSize + localChunkPositionX;
@@ -311,406 +305,42 @@ namespace DProject.Entity.Chunk
             if (localChunkPositionY < 0)
                 localChunkPositionY = ChunkSize + localChunkPositionY;
 
-            return _loadedChunks[(chunkPositionX, chunkPositionY)].GetTileHeight(localChunkPositionX, localChunkPositionY, floor);
+            return _loadedChunks[(chunkPositionX, chunkPositionY)].GetVertexHeight(localChunkPositionX, localChunkPositionY);
         }
 
-        public ushort? GetVertexHeight(Vector2 position, TerrainEntity.TileCorner corner, int floor)
+        public void ChangeVertexTexture(ushort? textureId, Vector3 position)
         {
-            Vector2 tempPosition =
-                new Vector2((float) Math.Floor(position.X + 0.5f), (float) Math.Floor(position.Y + 0.5f));
+            var localChunkPosition = CalculateLocalChunkPosition(((int, int)) (position.X, position.Z));
 
-            int chunkPositionX = (int) Math.Floor(tempPosition.X / ChunkSize);
-            int chunkPositionY = (int) Math.Floor(tempPosition.Y / ChunkSize);
-
-            int localChunkPositionX = (int) tempPosition.X - (chunkPositionX * ChunkSize);
-            int localChunkPositionY = (int) tempPosition.Y - (chunkPositionY * ChunkSize);
-
-            if (localChunkPositionX < 0)
-                localChunkPositionX = ChunkSize + localChunkPositionX;
-
-            if (localChunkPositionY < 0)
-                localChunkPositionY = ChunkSize + localChunkPositionY;
-
-            return _loadedChunks[(chunkPositionX, chunkPositionY)].GetVertexHeight(localChunkPositionX, localChunkPositionY, floor, corner);
+            GetChunk(position).ChangeVertexTexture(textureId, localChunkPosition.Item1, localChunkPosition.Item2);
         }
 
-        public void ChangeTileHeight(ushort height, Vector3 position, int floor, int brushSize)
+        public void ChangeVertexColor(ushort color, Vector3 position)
         {
-            if (brushSize > 0)
-            {
-                ChangeCornerHeight(height, position, floor, TerrainEntity.TileCorner.TopLeft);
-                ChangeCornerHeight(height, position, floor, TerrainEntity.TileCorner.TopRight);
-                ChangeCornerHeight(height, position, floor, TerrainEntity.TileCorner.BottomLeft);
-                ChangeCornerHeight(height, position, floor, TerrainEntity.TileCorner.BottomRight);
-            }
+            var localChunkPosition = CalculateLocalChunkPosition(((int, int)) (position.X, position.Z));
 
-            if (brushSize == 2)
-            {
-                ChangeCornerHeight(height, new Vector3(position.X + 1, position.Y, position.Z), floor, TerrainEntity.TileCorner.TopRight);
-                ChangeCornerHeight(height, new Vector3(position.X + 1, position.Y, position.Z), floor, TerrainEntity.TileCorner.BottomRight);
-                
-                ChangeCornerHeight(height, new Vector3(position.X, position.Y, position.Z + 1), floor, TerrainEntity.TileCorner.BottomLeft);
-                ChangeCornerHeight(height, new Vector3(position.X + 1, position.Y, position.Z + 1), floor, TerrainEntity.TileCorner.BottomLeft);
-                ChangeCornerHeight(height, new Vector3(position.X + 1, position.Y, position.Z + 1), floor, TerrainEntity.TileCorner.BottomRight);
-            }
-            else
-            {
-                if (brushSize > 2)
-                {
-                    ChangeCornerHeight(height, new Vector3(position.X, position.Y, position.Z-1), floor, TerrainEntity.TileCorner.TopLeft);
-                    ChangeCornerHeight(height, new Vector3(position.X, position.Y, position.Z-1), floor, TerrainEntity.TileCorner.TopRight);
-                    ChangeCornerHeight(height, new Vector3(position.X, position.Y, position.Z+1), floor, TerrainEntity.TileCorner.BottomLeft);
-                    ChangeCornerHeight(height, new Vector3(position.X, position.Y, position.Z+1), floor, TerrainEntity.TileCorner.BottomRight);
-                    ChangeCornerHeight(height, new Vector3(position.X-1, position.Y, position.Z), floor, TerrainEntity.TileCorner.TopLeft);
-                    ChangeCornerHeight(height, new Vector3(position.X-1, position.Y, position.Z), floor, TerrainEntity.TileCorner.BottomLeft);
-                    ChangeCornerHeight(height, new Vector3(position.X+1, position.Y, position.Z), floor, TerrainEntity.TileCorner.TopRight);
-                    ChangeCornerHeight(height, new Vector3(position.X+1, position.Y, position.Z), floor, TerrainEntity.TileCorner.BottomRight);
-                }
-                if (brushSize > 3)
-                {
-                    ChangeCornerHeight(height, new Vector3(position.X-1, position.Y, position.Z-1), floor, TerrainEntity.TileCorner.TopLeft);
-                    ChangeCornerHeight(height, new Vector3(position.X+1, position.Y, position.Z-1), floor,  TerrainEntity.TileCorner.TopRight);
-                    ChangeCornerHeight(height, new Vector3(position.X-1, position.Y, position.Z+1), floor, TerrainEntity.TileCorner.BottomLeft);
-                    ChangeCornerHeight(height, new Vector3(position.X+1, position.Y, position.Z+1), floor, TerrainEntity.TileCorner.BottomRight);
-                }
-                if (brushSize > 4)
-                {
-                    ChangeCornerHeight(height, new Vector3(position.X-2, position.Y, position.Z), floor, TerrainEntity.TileCorner.TopLeft);
-                    ChangeCornerHeight(height, new Vector3(position.X-2, position.Y, position.Z), floor, TerrainEntity.TileCorner.BottomLeft);
-                    ChangeCornerHeight(height, new Vector3(position.X+2, position.Y, position.Z), floor, TerrainEntity.TileCorner.TopRight);
-                    ChangeCornerHeight(height, new Vector3(position.X+2, position.Y, position.Z), floor, TerrainEntity.TileCorner.BottomRight);
-                    
-                    ChangeCornerHeight(height, new Vector3(position.X, position.Y, position.Z+3), floor, TerrainEntity.TileCorner.TopLeft);
-                    ChangeCornerHeight(height, new Vector3(position.X, position.Y, position.Z+3), floor, TerrainEntity.TileCorner.TopRight);
-                    ChangeCornerHeight(height, new Vector3(position.X, position.Y, position.Z-3), floor, TerrainEntity.TileCorner.BottomLeft);
-                    ChangeCornerHeight(height, new Vector3(position.X, position.Y, position.Z-3), floor, TerrainEntity.TileCorner.BottomRight);
-                }
-                if (brushSize > 5)
-                {
-                    ChangeCornerHeight(height, new Vector3(position.X-2, position.Y, position.Z-1), floor, TerrainEntity.TileCorner.TopLeft);
-                    ChangeCornerHeight(height, new Vector3(position.X-1, position.Y, position.Z-2), floor, TerrainEntity.TileCorner.TopLeft);
-                    
-                    ChangeCornerHeight(height, new Vector3(position.X+2, position.Y, position.Z-1), floor, TerrainEntity.TileCorner.TopRight);
-                    ChangeCornerHeight(height, new Vector3(position.X+1, position.Y, position.Z-2), floor, TerrainEntity.TileCorner.TopRight);
-       
-                    ChangeCornerHeight(height, new Vector3(position.X-2, position.Y, position.Z+1), floor, TerrainEntity.TileCorner.BottomLeft);
-                    ChangeCornerHeight(height, new Vector3(position.X-1, position.Y, position.Z+2), floor, TerrainEntity.TileCorner.BottomLeft);
-                    
-                    ChangeCornerHeight(height, new Vector3(position.X+2, position.Y, position.Z+1), floor, TerrainEntity.TileCorner.BottomRight);
-                    ChangeCornerHeight(height, new Vector3(position.X+1, position.Y, position.Z+2), floor, TerrainEntity.TileCorner.BottomRight);
-                }
-                if (brushSize > 6)
-                {
-                    ChangeCornerHeight(height, new Vector3(position.X-2, position.Y, position.Z-2), floor, TerrainEntity.TileCorner.TopLeft);
-                    ChangeCornerHeight(height, new Vector3(position.X+2, position.Y, position.Z-2), floor, TerrainEntity.TileCorner.TopRight);
-                    ChangeCornerHeight(height, new Vector3(position.X-2, position.Y, position.Z+2), floor, TerrainEntity.TileCorner.BottomLeft);
-                    ChangeCornerHeight(height, new Vector3(position.X+2, position.Y, position.Z+2), floor, TerrainEntity.TileCorner.BottomRight);
-                }
-            }
-        }
-        
-        public void ChangeTileColor(ushort color, Vector3 position, int floor, int brushSize)
-        {
-            if (brushSize > 0)
-            {
-                ChangeCornerColor(color, position, floor, TerrainEntity.TileCorner.TopLeft);
-                ChangeCornerColor(color, position, floor, TerrainEntity.TileCorner.TopRight);
-                ChangeCornerColor(color, position, floor, TerrainEntity.TileCorner.BottomLeft);
-                ChangeCornerColor(color, position, floor, TerrainEntity.TileCorner.BottomRight);
-            }
-
-            if (brushSize == 2)
-            {
-                ChangeCornerColor(color, new Vector3(position.X + 1, position.Y, position.Z), floor, TerrainEntity.TileCorner.TopRight);
-                ChangeCornerColor(color, new Vector3(position.X + 1, position.Y, position.Z), floor, TerrainEntity.TileCorner.BottomRight);
-                
-                ChangeCornerColor(color, new Vector3(position.X, position.Y, position.Z + 1), floor, TerrainEntity.TileCorner.BottomLeft);
-                ChangeCornerColor(color, new Vector3(position.X + 1, position.Y, position.Z + 1), floor, TerrainEntity.TileCorner.BottomLeft);
-                ChangeCornerColor(color, new Vector3(position.X + 1, position.Y, position.Z + 1), floor, TerrainEntity.TileCorner.BottomRight);
-            }
-            else
-            {
-                if (brushSize > 2)
-                {
-                    ChangeCornerColor(color, new Vector3(position.X, position.Y, position.Z-1), floor, TerrainEntity.TileCorner.TopLeft);
-                    ChangeCornerColor(color, new Vector3(position.X, position.Y, position.Z-1), floor, TerrainEntity.TileCorner.TopRight);
-                    ChangeCornerColor(color, new Vector3(position.X, position.Y, position.Z+1), floor, TerrainEntity.TileCorner.BottomLeft);
-                    ChangeCornerColor(color, new Vector3(position.X, position.Y, position.Z+1), floor, TerrainEntity.TileCorner.BottomRight);
-                    ChangeCornerColor(color, new Vector3(position.X-1, position.Y, position.Z), floor, TerrainEntity.TileCorner.TopLeft);
-                    ChangeCornerColor(color, new Vector3(position.X-1, position.Y, position.Z), floor, TerrainEntity.TileCorner.BottomLeft);
-                    ChangeCornerColor(color, new Vector3(position.X+1, position.Y, position.Z), floor, TerrainEntity.TileCorner.TopRight);
-                    ChangeCornerColor(color, new Vector3(position.X+1, position.Y, position.Z), floor, TerrainEntity.TileCorner.BottomRight);
-                }
-                if (brushSize > 3)
-                {
-                    ChangeCornerColor(color, new Vector3(position.X-1, position.Y, position.Z-1), floor, TerrainEntity.TileCorner.TopLeft);
-                    ChangeCornerColor(color, new Vector3(position.X+1, position.Y, position.Z-1), floor,  TerrainEntity.TileCorner.TopRight);
-                    ChangeCornerColor(color, new Vector3(position.X-1, position.Y, position.Z+1), floor, TerrainEntity.TileCorner.BottomLeft);
-                    ChangeCornerColor(color, new Vector3(position.X+1, position.Y, position.Z+1), floor, TerrainEntity.TileCorner.BottomRight);
-                }
-                if (brushSize > 4)
-                {
-                    ChangeCornerColor(color, new Vector3(position.X-2, position.Y, position.Z), floor, TerrainEntity.TileCorner.TopLeft);
-                    ChangeCornerColor(color, new Vector3(position.X-2, position.Y, position.Z), floor, TerrainEntity.TileCorner.BottomLeft);
-                    ChangeCornerColor(color, new Vector3(position.X+2, position.Y, position.Z), floor, TerrainEntity.TileCorner.TopRight);
-                    ChangeCornerColor(color, new Vector3(position.X+2, position.Y, position.Z), floor, TerrainEntity.TileCorner.BottomRight);
-                    
-                    ChangeCornerColor(color, new Vector3(position.X, position.Y, position.Z+3), floor, TerrainEntity.TileCorner.TopLeft);
-                    ChangeCornerColor(color, new Vector3(position.X, position.Y, position.Z+3), floor, TerrainEntity.TileCorner.TopRight);
-                    ChangeCornerColor(color, new Vector3(position.X, position.Y, position.Z-3), floor, TerrainEntity.TileCorner.BottomLeft);
-                    ChangeCornerColor(color, new Vector3(position.X, position.Y, position.Z-3), floor, TerrainEntity.TileCorner.BottomRight);
-                }
-                if (brushSize > 5)
-                {
-                    ChangeCornerColor(color, new Vector3(position.X-2, position.Y, position.Z-1), floor, TerrainEntity.TileCorner.TopLeft);
-                    ChangeCornerColor(color, new Vector3(position.X-1, position.Y, position.Z-2), floor, TerrainEntity.TileCorner.TopLeft);
-                    
-                    ChangeCornerColor(color, new Vector3(position.X+2, position.Y, position.Z-1), floor, TerrainEntity.TileCorner.TopRight);
-                    ChangeCornerColor(color, new Vector3(position.X+1, position.Y, position.Z-2), floor, TerrainEntity.TileCorner.TopRight);
-       
-                    ChangeCornerColor(color, new Vector3(position.X-2, position.Y, position.Z+1), floor, TerrainEntity.TileCorner.BottomLeft);
-                    ChangeCornerColor(color, new Vector3(position.X-1, position.Y, position.Z+2), floor, TerrainEntity.TileCorner.BottomLeft);
-                    
-                    ChangeCornerColor(color, new Vector3(position.X+2, position.Y, position.Z+1), floor, TerrainEntity.TileCorner.BottomRight);
-                    ChangeCornerColor(color, new Vector3(position.X+1, position.Y, position.Z+2), floor, TerrainEntity.TileCorner.BottomRight);
-                }
-                if (brushSize > 6)
-                {
-                    ChangeCornerColor(color, new Vector3(position.X-2, position.Y, position.Z-2), floor, TerrainEntity.TileCorner.TopLeft);
-                    ChangeCornerColor(color, new Vector3(position.X+2, position.Y, position.Z-2), floor, TerrainEntity.TileCorner.TopRight);
-                    ChangeCornerColor(color, new Vector3(position.X-2, position.Y, position.Z+2), floor, TerrainEntity.TileCorner.BottomLeft);
-                    ChangeCornerColor(color, new Vector3(position.X+2, position.Y, position.Z+2), floor, TerrainEntity.TileCorner.BottomRight);
-                }
-            }
+            GetChunk(position).ChangeVertexColor(color, localChunkPosition.Item1, localChunkPosition.Item2);
         }
 
-        public void ChangeTileTexture(ushort? textureId, Vector3 position, int floor, int brushSize, bool alternativeTriangle)
-        {
-            if (brushSize == 0)
-            {
-                var localChunkPosition = GetLocalChunkPosition(new Vector2(position.X, position.Z));
-                var x = (int)localChunkPosition.X;
-                var y = (int) localChunkPosition.Y;
-            
-                GetChunk(position).ChangeTriangleTexture(textureId, x, y, floor, alternativeTriangle);
-            }
-            else
-            {
-                ChangeTileTexture(textureId, position, floor);
-                if (brushSize == 2)
-                {
-                    ChangeTileTexture(textureId, new Vector3(position.X+1, position.Y, position.Z), floor);
-                    ChangeTileTexture(textureId, new Vector3(position.X, position.Y, position.Z+1), floor);
-                    ChangeTileTexture(textureId, new Vector3(position.X+1, position.Y, position.Z+1), floor);
-                }
-                else
-                {
-                    if (brushSize > 2)
-                    {
-                        ChangeTileTexture(textureId, new Vector3(position.X-1, position.Y, position.Z), floor);
-                        ChangeTileTexture(textureId, new Vector3(position.X+1, position.Y, position.Z), floor);
-                        ChangeTileTexture(textureId, new Vector3(position.X, position.Y, position.Z-1), floor);
-                        ChangeTileTexture(textureId, new Vector3(position.X, position.Y, position.Z+1), floor);
-                    }
-                    if (brushSize > 3)
-                    {
-                        ChangeTileTexture(textureId, new Vector3(position.X-1, position.Y, position.Z-1), floor);
-                        ChangeTileTexture(textureId, new Vector3(position.X+1, position.Y, position.Z-1), floor);
-                        ChangeTileTexture(textureId, new Vector3(position.X-1, position.Y, position.Z+1), floor);
-                        ChangeTileTexture(textureId, new Vector3(position.X+1, position.Y, position.Z+1), floor);
-                    }
-                    if (brushSize > 4)
-                    {
-                        ChangeTileTexture(textureId, new Vector3(position.X-2, position.Y, position.Z), floor);
-                        ChangeTileTexture(textureId, new Vector3(position.X+2, position.Y, position.Z), floor);
-                        ChangeTileTexture(textureId, new Vector3(position.X, position.Y, position.Z+2), floor);
-                        ChangeTileTexture(textureId, new Vector3(position.X, position.Y, position.Z-2), floor);
-                    }
-                    if (brushSize > 5)
-                    {
-                        ChangeTileTexture(textureId, new Vector3(position.X-2, position.Y, position.Z-1), floor);
-                        ChangeTileTexture(textureId, new Vector3(position.X-2, position.Y, position.Z+1), floor);
-    
-                        ChangeTileTexture(textureId, new Vector3(position.X+2, position.Y, position.Z-1), floor);
-                        ChangeTileTexture(textureId, new Vector3(position.X+2, position.Y, position.Z+1), floor);
-                        
-                        ChangeTileTexture(textureId, new Vector3(position.X-1, position.Y, position.Z-2), floor);
-                        ChangeTileTexture(textureId, new Vector3(position.X+1, position.Y, position.Z-2), floor);
-                        
-                        ChangeTileTexture(textureId, new Vector3(position.X-1, position.Y, position.Z+2), floor);
-                        ChangeTileTexture(textureId, new Vector3(position.X+1, position.Y, position.Z+2), floor);
-                    }
-                    if (brushSize > 6)
-                    {
-                        ChangeTileTexture(textureId, new Vector3(position.X-2, position.Y, position.Z-2), floor);
-                        ChangeTileTexture(textureId, new Vector3(position.X-2, position.Y, position.Z+2), floor);
-                        ChangeTileTexture(textureId, new Vector3(position.X+2, position.Y, position.Z-2), floor);
-                        ChangeTileTexture(textureId, new Vector3(position.X+2, position.Y, position.Z+2), floor);
-                    }
-                }
-            }
-        }
-
-        public void ChangeTileTexture(ushort? textureId, Vector3 position, int floor)
-        {
-            Vector2 localChunkPosition = GetLocalChunkPosition(new Vector2(position.X, position.Z));
-
-            int x = (int)localChunkPosition.X;
-            int y = (int) localChunkPosition.Y;
-            
-            GetChunk(position).ChangeTileTexture(textureId, x, y, floor);
-        }
-
-        public void ChangeCornerColor(ushort color, Vector3 position, int floor, TerrainEntity.TileCorner tileCorner)
-        {
-            var localPosition = GetLocalChunkPosition(new Vector2(position.X, position.Z));
-            
-            Vector2 tempPosition = new Vector2((float)Math.Floor(position.X + 0.5f), (float)Math.Floor(position.Z+0.5f));
-            
-            int chunkPositionX = (int)Math.Floor(tempPosition.X / ChunkSize);
-            int chunkPositionY = (int)Math.Floor(tempPosition.Y / ChunkSize);
-            
-            switch (tileCorner)
-            {
-                case TerrainEntity.TileCorner.TopLeft:
-                {
-                    if ((int) localPosition.X == 0 && (int) localPosition.Y == 0)
-                        GetChunk(chunkPositionX-1, chunkPositionY-1).ChangeVertexColor(color, ChunkSize-1, ChunkSize-1, floor, TerrainEntity.TileCorner.BottomRight);
-                
-                    if ((int) localPosition.X == 0)
-                        GetChunk(chunkPositionX-1, chunkPositionY).ChangeVertexColor(color, ChunkSize-1, (int)localPosition.Y, floor, TerrainEntity.TileCorner.TopRight);
-
-                    if ((int) localPosition.Y == 0)
-                        GetChunk(chunkPositionX, chunkPositionY-1).ChangeVertexColor(color, (int)localPosition.X, ChunkSize-1, floor, TerrainEntity.TileCorner.BottomLeft);
-                    break;
-                }
-                
-                case TerrainEntity.TileCorner.TopRight:
-                {
-                    if ((int) localPosition.X == ChunkSize-1 && (int) localPosition.Y == 0)
-                        GetChunk(chunkPositionX+1, chunkPositionY-1).ChangeVertexColor(color, 0, ChunkSize-1, floor, TerrainEntity.TileCorner.BottomLeft);
-                
-                    if ((int) localPosition.X == ChunkSize-1)
-                        GetChunk(chunkPositionX+1, chunkPositionY).ChangeVertexColor(color, 0, (int)localPosition.Y, floor, TerrainEntity.TileCorner.TopLeft);
-                
-                    if ((int) localPosition.Y == 0)
-                        GetChunk(chunkPositionX, chunkPositionY-1).ChangeVertexColor(color, (int)localPosition.X, ChunkSize-1, floor, TerrainEntity.TileCorner.BottomRight);
-                    break;
-                }
-
-                case TerrainEntity.TileCorner.BottomLeft:
-                {
-                    if ((int) localPosition.X == 0 && (int) localPosition.Y == ChunkSize-1)
-                        GetChunk(chunkPositionX-1, chunkPositionY+1).ChangeVertexColor(color, ChunkSize-1, 0, floor, TerrainEntity.TileCorner.TopRight);
-                    
-                    if((int) localPosition.X == 0)
-                        GetChunk(chunkPositionX-1, chunkPositionY).ChangeVertexColor(color, ChunkSize-1, (int)localPosition.Y, floor, TerrainEntity.TileCorner.BottomRight);
-                    
-                    if((int) localPosition.Y == ChunkSize-1)
-                        GetChunk(chunkPositionX, chunkPositionY+1).ChangeVertexColor(color, (int)localPosition.X, 0, floor, TerrainEntity.TileCorner.TopLeft);
-                    
-                    break;
-                }
-
-                case TerrainEntity.TileCorner.BottomRight:
-                {
-                    if ((int) localPosition.X == ChunkSize-1 && (int) localPosition.Y == ChunkSize-1)
-                        GetChunk(chunkPositionX+1, chunkPositionY+1).ChangeVertexColor(color, 0, 0, floor, TerrainEntity.TileCorner.TopLeft);
-                    
-                    if ((int) localPosition.X == ChunkSize-1)
-                        GetChunk(chunkPositionX+1, chunkPositionY).ChangeVertexColor(color, 0, (int)localPosition.Y, floor, TerrainEntity.TileCorner.BottomLeft);
-                    
-                    if((int) localPosition.Y == ChunkSize-1)
-                        GetChunk(chunkPositionX, chunkPositionY+1).ChangeVertexColor(color, (int)localPosition.X, 0, floor, TerrainEntity.TileCorner.TopRight);
-                    
-                    break;
-                }
-            }
-
-            GetChunk(position).ChangeVertexColor(color, (int)localPosition.X, (int)localPosition.Y, floor, tileCorner);
-        }
-
-        public void ChangeCornerHeight(ushort height, Vector3 position, int floor, TerrainEntity.TileCorner tileCorner)
+        public void ChangeVertexHeight(ushort height, Vector3 position)
         {            
-            var localPosition = GetLocalChunkPosition(new Vector2(position.X, position.Z));
-            
-            Vector2 tempPosition = new Vector2((float)Math.Floor(position.X + 0.5f), (float)Math.Floor(position.Z+0.5f));
-            
-            int chunkPositionX = (int)Math.Floor(tempPosition.X / ChunkSize);
-            int chunkPositionY = (int)Math.Floor(tempPosition.Y / ChunkSize);
-            
-            switch (tileCorner)
-            {
-                case TerrainEntity.TileCorner.TopLeft:
-                {
-                    if ((int) localPosition.X == 0 && (int) localPosition.Y == 0)
-                        GetChunk(chunkPositionX-1, chunkPositionY-1).ChangeVertexHeight(height, ChunkSize-1, ChunkSize-1, floor, TerrainEntity.TileCorner.BottomRight);
-                
-                    if ((int) localPosition.X == 0)
-                        GetChunk(chunkPositionX-1, chunkPositionY).ChangeVertexHeight(height, ChunkSize-1, (int)localPosition.Y, floor, TerrainEntity.TileCorner.TopRight);
+            var localChunkPosition = CalculateLocalChunkPosition(((int, int)) (position.X, position.Z));
 
-                    if ((int) localPosition.Y == 0)
-                        GetChunk(chunkPositionX, chunkPositionY-1).ChangeVertexHeight(height, (int)localPosition.X, ChunkSize-1, floor, TerrainEntity.TileCorner.BottomLeft);
-                    break;
-                }
-                
-                case TerrainEntity.TileCorner.TopRight:
-                {
-                    if ((int) localPosition.X == ChunkSize-1 && (int) localPosition.Y == 0)
-                        GetChunk(chunkPositionX+1, chunkPositionY-1).ChangeVertexHeight(height, 0, ChunkSize-1, floor, TerrainEntity.TileCorner.BottomLeft);
-                
-                    if ((int) localPosition.X == ChunkSize-1)
-                        GetChunk(chunkPositionX+1, chunkPositionY).ChangeVertexHeight(height, 0, (int)localPosition.Y, floor, TerrainEntity.TileCorner.TopLeft);
-                
-                    if ((int) localPosition.Y == 0)
-                        GetChunk(chunkPositionX, chunkPositionY-1).ChangeVertexHeight(height, (int)localPosition.X, ChunkSize-1, floor, TerrainEntity.TileCorner.BottomRight);
-                    break;
-                }
-
-                case TerrainEntity.TileCorner.BottomLeft:
-                {
-                    if ((int) localPosition.X == 0 && (int) localPosition.Y == ChunkSize-1)
-                        GetChunk(chunkPositionX-1, chunkPositionY+1).ChangeVertexHeight(height, ChunkSize-1, 0, floor, TerrainEntity.TileCorner.TopRight);
-                    
-                    if((int) localPosition.X == 0)
-                        GetChunk(chunkPositionX-1, chunkPositionY).ChangeVertexHeight(height, ChunkSize-1, (int)localPosition.Y, floor, TerrainEntity.TileCorner.BottomRight);
-                    
-                    if((int) localPosition.Y == ChunkSize-1)
-                        GetChunk(chunkPositionX, chunkPositionY+1).ChangeVertexHeight(height, (int)localPosition.X, 0, floor, TerrainEntity.TileCorner.TopLeft);
-                    
-                    break;
-                }
-
-                case TerrainEntity.TileCorner.BottomRight:
-                {
-                    if ((int) localPosition.X == ChunkSize-1 && (int) localPosition.Y == ChunkSize-1)
-                        GetChunk(chunkPositionX+1, chunkPositionY+1).ChangeVertexHeight(height, 0, 0, floor, TerrainEntity.TileCorner.TopLeft);
-                    
-                    if ((int) localPosition.X == ChunkSize-1)
-                        GetChunk(chunkPositionX+1, chunkPositionY).ChangeVertexHeight(height, 0, (int)localPosition.Y, floor, TerrainEntity.TileCorner.BottomLeft);
-                    
-                    if((int) localPosition.Y == ChunkSize-1)
-                        GetChunk(chunkPositionX, chunkPositionY+1).ChangeVertexHeight(height, (int)localPosition.X, 0, floor, TerrainEntity.TileCorner.TopRight);
-                    
-                    break;
-                }
-            }
-
-            GetChunk(position).ChangeVertexHeight(height, (int)localPosition.X, (int)localPosition.Y, floor, tileCorner);
+            GetChunk(position).ChangeVertexHeight(height, localChunkPosition.Item1, localChunkPosition.Item2);
         }
 
-        public void PlaceProp(Vector3 position, int floor, Rotation rotation, ushort objectId)
+        public void PlaceProp(Vector3 position, Rotation rotation, ushort objectId)
         {
-            var localPosition = GetLocalChunkPosition(new Vector2(position.X, position.Z));
-            
-            GetChunk(position).PlaceProp((int)localPosition.X, (int)localPosition.Y, floor, rotation, objectId);
+            var (x, y) = CalculateLocalChunkPosition(((int, int)) (position.X, position.Z));
+
+            GetChunk(position).PlaceProp((int)x, (int)y, rotation, objectId);
         }
 
-        public void RemoveProp(Vector3 position, int floor)
+        public void RemoveProp(Vector3 position)
         {
-            var localPosition = GetLocalChunkPosition(new Vector2(position.X, position.Z));            
-            
-            GetChunk(position).RemoveProp((int)localPosition.X, (int)localPosition.Y, floor);
+            var (x, y) = CalculateLocalChunkPosition(((int, int)) (position.X, position.Z));
+
+            GetChunk(position).RemoveProp((int)x, (int)y);
         }
         
         #endregion

@@ -84,7 +84,7 @@ namespace DProject.Entity
                 camera.GetProjectMatrix(), graphicsDevice.Viewport);
 
             var position = ray.Position - ray.Direction * (ray.Position.Y / ray.Direction.Y);
-            var chunkPosition = ChunkLoaderEntity.CalculateChunkPosition(position.X, position.Z);
+            var chunkPosition = ChunkLoaderEntity.CalculateChunkPosition(position);
 
             //The closest chunk and all its surrounding chunks.
             var chunkPositions = new (int, int)[]
@@ -100,15 +100,15 @@ namespace DProject.Entity
                 (chunkPosition.Item1 + 1, chunkPosition.Item2 - 1)
             };
 
-            foreach (var (chunkX, chunkY) in chunkPositions)
+            foreach (var pos in chunkPositions)
             {
-                var chunk = chunkLoaderEntity.GetChunk(chunkX, chunkY);
+                var chunk = chunkLoaderEntity.GetChunk(pos);
                 
                 if (chunk != null)
                 {
-                    for (var x = 0; x < chunk.GetTileBoundingBoxes(currentFloor).GetLength(0); x++) {
-                        for (var y = 0; y < chunk.GetTileBoundingBoxes(currentFloor).GetLength(1); y++) {
-                            var intersects = ray.Intersects(chunk.GetTileBoundingBoxes(currentFloor)[x, y]);
+                    for (var x = 0; x < chunk.GetTileBoundingBoxes().GetLength(0); x++) {
+                        for (var y = 0; y < chunk.GetTileBoundingBoxes().GetLength(1); y++) {
+                            var intersects = ray.Intersects(chunk.GetTileBoundingBoxes()[x, y]);
                                                 
                             if (intersects != null)
                             {

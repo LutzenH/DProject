@@ -30,27 +30,22 @@ namespace DProject.Type.Serializable.Chunk
         [IgnoreMember]
         public Vector3 Scale => new Vector3(ScaleX, ScaleY, ScaleZ);
 
-        public static List<Object>[] GenerateObjects(int startPositionX, int startPositionY, int floorCount, int objectCountPerFloor)
+        public static List<Object> GenerateObjects(int startPositionX, int startPositionY, int objectCount)
         {
-            var objects = new List<Object>[floorCount];
-
-            for (var floor = 0; floor < floorCount; floor++)
+            var objects = new List<Object>();
+            
+            for (var i = 0; i < objectCount; i++)
             {
-                objects[floor] = new List<Object>();
-                
-                for (var i = 0; i < objectCountPerFloor; i++)
+                objects.Add(new Object()
                 {
-                    objects[floor].Add(new Object()
-                    {
-                        Id = 0,
-                        PositionX = startPositionX + i%32,
-                        PositionY = startPositionY + i/32,
-                        ObjectRotation = Rotation.North,
-                        ScaleX = 1f,
-                        ScaleY = 1f,
-                        ScaleZ = 1f
-                    });
-                }
+                    Id = 0,
+                    PositionX = startPositionX + i%32,
+                    PositionY = startPositionY + i/32,
+                    ObjectRotation = Rotation.North,
+                    ScaleX = 1f,
+                    ScaleY = 1f,
+                    ScaleZ = 1f
+                });
             }
 
             return objects;

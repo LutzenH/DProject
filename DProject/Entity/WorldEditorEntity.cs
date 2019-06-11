@@ -9,8 +9,6 @@ using DProject.Type.Enum;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
-using Color = Microsoft.Xna.Framework.Color;
 using IDrawable = DProject.Entity.Interface.IDrawable;
 using IUpdateable = DProject.Entity.Interface.IUpdateable;
 
@@ -29,22 +27,22 @@ namespace DProject.Entity
         private ushort _flattenHeight;
         private int _brushSize;
 
-        private ushort _activeTexture;
-        
         private ushort _selectedObject;
         private Rotation _selectedRotation;
+        private ushort _selectedTexture;
         private ushort _selectedColor;
         
         public WorldEditorEntity(EntityManager entityManager) : base(entityManager, Vector3.Zero, Quaternion.Identity, new Vector3(1,1,1))
         {
-            _cornerIndicatorEntity = new CornerIndicatorEntity(Vector3.Zero, TerrainEntity.TileCorner.BottomRight, Color.Cyan);
+            _cornerIndicatorEntity = new CornerIndicatorEntity(Vector3.Zero, TerrainEntity.TileCorner.BottomRight, Microsoft.Xna.Framework.Color.Cyan);
 
             _pointerEntity = EntityManager.GetPointerEntity();
             _chunkLoaderEntity = EntityManager.GetChunkLoaderEntity();
-
-            _activeTexture = Textures.GetDefaultTextureId();
+            
             _selectedObject = Props.GetDefaultPropId();
             _selectedRotation = Type.Enum.Rotation.North;
+            _selectedTexture = Textures.GetDefaultTextureId();
+            _selectedColor = Colors.GetDefaultColorId();
         }
 
         public override void LoadContent(ContentManager content) { }
@@ -58,17 +56,6 @@ namespace DProject.Entity
         {
             if (!_chunkLoaderEntity.IsLoadingChunks())
                 UseTool();
-
-            if (Keyboard.GetState().IsKeyDown(Keys.S) && Keyboard.GetState().IsKeyDown(Keys.LeftControl) &&
-                Game1.PreviousKeyboardState.IsKeyDown(Keys.LeftControl) && Game1.PreviousKeyboardState.IsKeyUp(Keys.S))
-            {
-                _chunkLoaderEntity.SerializeChangedChunks();
-            }
-            if (Keyboard.GetState().IsKeyDown(Keys.R) && Keyboard.GetState().IsKeyDown(Keys.LeftControl) &&
-                Game1.PreviousKeyboardState.IsKeyDown(Keys.LeftControl) && Game1.PreviousKeyboardState.IsKeyUp(Keys.R))
-            {
-                _chunkLoaderEntity.ReloadChangedChunks();
-            }
         }
 
         public void Draw(CameraEntity activeCamera)
@@ -89,7 +76,7 @@ namespace DProject.Entity
                 switch (_tools)
                 {
                     case Tools.Select:
-                        ColorPainter(position, precisePosition);
+                        Color(position, precisePosition);
                         break;
                     case Tools.Flatten:
                         Flatten(precisePosition, position);
@@ -98,7 +85,7 @@ namespace DProject.Entity
                         Raise(position, precisePosition);
                         break;
                     case Tools.Paint:
-                        Paint(position, precisePosition);
+                        Texture(position, precisePosition);
                         break;
                     case Tools.ObjectPlacer:
                         PlaceObject(position);
@@ -109,150 +96,19 @@ namespace DProject.Entity
             }
         }
 
-        private void ChangeHeight(Vector3 position, Vector3 precisePosition, ushort height)
-        {
-            if (_brushSize > 0)
-            {
-                _chunkLoaderEntity.ChangeTileHeight(height, position, _pointerEntity.GetCurrentFloor(), _brushSize); 
-            }
-            else
-            {
-                var tileCorner = _pointerEntity.GetSelectedCorner();
-                
-                _chunkLoaderEntity.ChangeCornerHeight(height, position, _pointerEntity.GetCurrentFloor(), tileCorner);
-            }
-        }
+        private void ChangeHeight(Vector3 position, Vector3 precisePosition, ushort height) { }
         
-        private void ChangeColor(Vector3 position, Vector3 precisePosition, ushort color)
-        {
-            if (_brushSize > 0)
-            {
-                _chunkLoaderEntity.ChangeTileColor(color, position, _pointerEntity.GetCurrentFloor(), _brushSize); 
-            }
-            else
-            {
-                var tileCorner = _pointerEntity.GetSelectedCorner();
-                
-                _chunkLoaderEntity.ChangeCornerColor(color, position, _pointerEntity.GetCurrentFloor(), tileCorner);
-            }
-        }
+        private void ChangeColor(Vector3 position, Vector3 precisePosition, ushort color) { }
 
-        private void ColorPainter(Vector3 position, Vector3 precisePosition)
-        {
-            var tileCorner = _pointerEntity.GetSelectedCorner();
+        private void Color(Vector3 position, Vector3 precisePosition) { }
 
-            if (Mouse.GetState().LeftButton == ButtonState.Pressed)
-            {
-                ChangeColor(position, precisePosition, _selectedColor);
-            }
+        private void Raise(Vector3 position, Vector3 precisePosition) { }
 
-            _cornerIndicatorEntity.SetPosition(position);
-            _cornerIndicatorEntity.SetRotation(tileCorner);
-        }
-
-        private void Raise(Vector3 position, Vector3 precisePosition)
-        {
-            var tileCorner = _pointerEntity.GetSelectedCorner();
-
-            if (Mouse.GetState().LeftButton == ButtonState.Pressed)
-            {
-                ushort? height = _chunkLoaderEntity.GetVertexHeight(new Vector2(position.X, position.Z), tileCorner, _pointerEntity.GetCurrentFloor());
-                
-                if(height != ushort.MaxValue)
-                    height++;
-                
-                ChangeHeight(position, precisePosition, (ushort) height);
-            } 
-            else if (Mouse.GetState().RightButton == ButtonState.Pressed)
-            {
-                ushort? height = _chunkLoaderEntity.GetVertexHeight(new Vector2(position.X, position.Z), tileCorner, _pointerEntity.GetCurrentFloor());
-                
-                if(height != 0)
-                    height--;
-                
-                ChangeHeight(position, precisePosition, (ushort) height);
-            }
-
-            _cornerIndicatorEntity.SetPosition(position);
-            _cornerIndicatorEntity.SetRotation(tileCorner);
-        }
-
-        private void Flatten(Vector3 precisePosition, Vector3 position)
-        {        
-            var (xFloat, yFloat) = ChunkLoaderEntity.GetLocalChunkPosition(new Vector2(position.X, position.Z));
-            
-            var x = (int) xFloat;
-            var y = (int) yFloat;
-
-            var tileCorner = _pointerEntity.GetSelectedCorner();
-            
-            if (Mouse.GetState().LeftButton == ButtonState.Pressed)
-                ChangeHeight(position, precisePosition, _flattenHeight);
-            else if (Mouse.GetState().RightButton == ButtonState.Pressed)
-            {
-                if (_brushSize > 0)
-                {
-                    _flattenHeight = _chunkLoaderEntity.GetChunk(position).GetTileHeight(x, y, _pointerEntity.GetCurrentFloor());
-                }
-                else
-                {
-                    _flattenHeight = _chunkLoaderEntity.GetChunk(position).GetVertexHeight(x, y, _pointerEntity.GetCurrentFloor(), tileCorner);
-                }
-            }
-            
-            _cornerIndicatorEntity.SetPosition(position);
-            _cornerIndicatorEntity.SetRotation(tileCorner);
-        }
+        private void Flatten(Vector3 precisePosition, Vector3 position) { }
         
-        private void PlaceObject(Vector3 position)
-        {
-            if (Mouse.GetState().LeftButton == ButtonState.Pressed && Game1.PreviousMouseState.LeftButton == ButtonState.Released)
-            {
-                _chunkLoaderEntity.PlaceProp(position, _pointerEntity.GetCurrentFloor(), _selectedRotation, _selectedObject);
-                return;
-            }
-            if (Mouse.GetState().RightButton == ButtonState.Pressed && Game1.PreviousMouseState.RightButton == ButtonState.Released)
-            {
-                _chunkLoaderEntity.RemoveProp(position, _pointerEntity.GetCurrentFloor());
-                return;
-            }
-            if (Mouse.GetState().MiddleButton == ButtonState.Pressed && Game1.PreviousMouseState.MiddleButton == ButtonState.Released)
-            {
-                switch (_selectedRotation)
-                {
-                    case Type.Enum.Rotation.North:
-                        _selectedRotation = Type.Enum.Rotation.East;
-                        break;
-                    case Type.Enum.Rotation.East:
-                        _selectedRotation = Type.Enum.Rotation.South;
-                        break;
-                    case Type.Enum.Rotation.South:
-                        _selectedRotation = Type.Enum.Rotation.West;
-                        break;
-                    case Type.Enum.Rotation.West:
-                        _selectedRotation = Type.Enum.Rotation.North;
-                        break;
-                }
-            }
-        }
+        private void PlaceObject(Vector3 position) { }
 
-        private void Paint(Vector3 position, Vector3 precisePosition)
-        {
-            if (Mouse.GetState().LeftButton == ButtonState.Pressed && !UIManager.ClickedUI)
-            {
-                var corner = _pointerEntity.GetSelectedCorner();
-                var alternativeTriangle = (corner == TerrainEntity.TileCorner.BottomLeft || corner == TerrainEntity.TileCorner.BottomRight);
-                
-                _chunkLoaderEntity.ChangeTileTexture(_activeTexture, position, _pointerEntity.GetCurrentFloor(), _brushSize, alternativeTriangle);
-            }
-            if (Mouse.GetState().RightButton == ButtonState.Pressed && !UIManager.ClickedUI)
-            {
-                var corner = _pointerEntity.GetSelectedCorner();
-                var alternativeTriangle = (corner == TerrainEntity.TileCorner.BottomLeft || corner == TerrainEntity.TileCorner.BottomRight);
-                
-                _chunkLoaderEntity.ChangeTileTexture(null, position, _pointerEntity.GetCurrentFloor(), _brushSize, alternativeTriangle);
-            }
-        }
+        private void Texture(Vector3 position, Vector3 precisePosition) { }
         
         #endregion
 
@@ -293,9 +149,19 @@ namespace DProject.Entity
             return _selectedRotation;
         }
 
-        public float GetFlattenHeight()
+        public void SetSelectedRotation(Rotation rotation)
+        {
+            _selectedRotation = rotation;
+        }
+
+        public ushort GetFlattenHeight()
         {
             return _flattenHeight;
+        }
+        
+        public void SetFlattenHeight(ushort height)
+        {
+            _flattenHeight = height;
         }
 
         public int GetBrushSize()
@@ -308,9 +174,14 @@ namespace DProject.Entity
             _brushSize = size;
         }
 
+        public ushort GetActiveTexture()
+        {
+            return _selectedTexture;
+        }
+
         public void SetActiveTexture(ushort textureId)
         {
-            _activeTexture = textureId;
+            _selectedTexture = textureId;
         }
 
         #endregion

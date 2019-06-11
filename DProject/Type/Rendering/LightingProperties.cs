@@ -19,13 +19,11 @@ namespace DProject.Type.Rendering
             
             AmbientLightColor = new SerializableColor()
             {
-                Name = "ambient_light_color",
                 Color = Color.Black
             },
             
             BackgroundColor = new SerializableColor()
             {
-                Name = "background_color",
                 Color = Color.DarkGray
             },
             

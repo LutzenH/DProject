@@ -148,7 +148,7 @@ namespace DProject.UI
 
             if (!_isLoading)
             {
-                var newChunkPosition = ChunkLoaderEntity.CalculateChunkPosition(playerPosition.X, playerPosition.Z);
+                var newChunkPosition = ChunkLoaderEntity.CalculateChunkPosition(playerPosition);
                 
                 if (!_chunkPosition.Equals(newChunkPosition))
                 {

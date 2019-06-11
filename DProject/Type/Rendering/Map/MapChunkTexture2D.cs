@@ -24,15 +24,12 @@ namespace DProject.Type.Rendering.Map
         {            
             position = (chunkData.ChunkPositionX, chunkData.ChunkPositionY);
             
-            SetData(GenerateTileColors(chunkData.Tiles[floor], resolution));
+            SetData(GenerateTileColors(chunkData.VertexMap, resolution));
         }
 
         private static int CalculateSize(Resolution resolution)
         {
-            if (resolution == Resolution.Full)
-                return ChunkLoaderEntity.ChunkSize * 2;
-            else
-                return ChunkLoaderEntity.ChunkSize / CalculateAdd(resolution);
+            return ChunkLoaderEntity.ChunkSize / CalculateAdd(resolution);
         }
 
         private static int CalculateAdd(Resolution resolution)
@@ -40,68 +37,34 @@ namespace DProject.Type.Rendering.Map
             switch (resolution)
             {
                 case Resolution.Horrible:
-                    return 8;
+                    return 16;
                 case Resolution.Low:
-                    return 4;
+                    return 8;
                 case Resolution.Medium:
-                    return 2;
+                    return 4;
                 case Resolution.High:
-                    return 1;
+                    return 2;
                 case Resolution.Full:
-                    return -1;
+                    return 1;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(resolution), resolution, null);
             }
         }
 
-        private static Color[] GenerateTileColors(Tile[,] tilemap, Resolution resolution)
+        private static Color[] GenerateTileColors(Vertex[,] tilemap, Resolution resolution)
         {
             var size = CalculateSize(resolution);
             var add = CalculateAdd(resolution);
             var dataColors = new Color[size * size];
-            
-            if (resolution == Resolution.Full)
+
+            for (var x = 0; x < size; x++)
             {
-                for (var x = 0; x < size; x++)
+                for (var y = 0; y < size; y++)
                 {
-                    for (var y = 0; y < size; y++)
-                    {
-                        if (x % 2 == 0)
-                        {
-                            if (y % 2 == 0)
-                            {
-                                dataColors[x + y * size] = Colors.ColorList[tilemap[x / 2, y / 2].ColorTopLeft].Color;
-                            }
-                            else
-                            {
-                                dataColors[x + y * size] = Colors.ColorList[tilemap[x / 2, y / 2].ColorBottomLeft].Color;
-                            }
-                        }
-                        else
-                        {
-                            if (y % 2 == 0)
-                            {
-                                dataColors[x + y * size] = Colors.ColorList[tilemap[x / 2, y / 2].ColorTopRight].Color;
-                            }
-                            else
-                            {
-                                dataColors[x + y * size] = Colors.ColorList[tilemap[x / 2, y / 2].ColorBottomRight].Color;
-                            }
-                        }
-                    }
+                    dataColors[x + y * size] = Colors.ColorList[tilemap[x * add, y * add].ColorId].Color;
                 }
             }
-            else
-            {            
-                for (var x = 0; x < size; x++)
-                {
-                    for (var y = 0; y < size; y++)
-                    {
-                        dataColors[x + y * size] = Colors.ColorList[tilemap[x * add, y * add].ColorTopLeft].Color;
-                    }
-                }   
-            }
-            
+
             return dataColors;
         }
 

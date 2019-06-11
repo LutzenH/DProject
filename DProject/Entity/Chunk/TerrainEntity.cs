@@ -18,7 +18,7 @@ namespace DProject.Entity.Chunk
 {
     public class TerrainEntity : AbstractEntity, IDrawable, IInitialize
     {
-        private HeightMap[] _heightMaps;
+        private readonly HeightMap _heightMap;
 
         private readonly int _chunkPositionX;
         private readonly int _chunkPositionY;
@@ -27,8 +27,8 @@ namespace DProject.Entity.Chunk
         
         private readonly ChunkData _chunkData;
 
-        private List<PropEntity>[] _props;
-        private BoundingBox[][,] _tileBoundingBoxes;
+        private List<PropEntity> _props;
+        private BoundingBox[,] _tileBoundingBoxes;
         
         private readonly BoundingBox _boundingBox;
         
@@ -43,12 +43,9 @@ namespace DProject.Entity.Chunk
             
             LoadProps();
             
-            _heightMaps = new HeightMap[_chunkData.GetFloorCount()];
-            
-            for (var floor = 0; floor < _heightMaps.Length; floor++)
-                _heightMaps[floor] = new HeightMap(_chunkData.Tiles[floor]);
+            _heightMap = new HeightMap(_chunkData.VertexMap);
 
-            var (lowest, highest) = _heightMaps[0].GetOuterHeightBounds();
+            var (lowest, highest) = _heightMap.GetOuterHeightBounds();
             
             _boundingBox = BoundingBox.CreateFromPoints
             (new []{
@@ -66,34 +63,32 @@ namespace DProject.Entity.Chunk
 
         public static ChunkData GenerateChunkData(int x, int y)
         {
-            string path = "Content/chunks/chunk_" + x + "_" + y + ".dat";
-            ChunkData chunkdata;
+            var path = "Content/chunks/chunk_" + x + "_" + y + ".dat";
+            ChunkData chunkData;
             
             if (File.Exists(path))
             {
                 Stream stream = File.Open(path, FileMode.Open);
                 var bytes = stream;
                 
-                chunkdata = LZ4MessagePackSerializer.Deserialize<ChunkData>(bytes);
+                chunkData = LZ4MessagePackSerializer.Deserialize<ChunkData>(bytes);
                 stream.Close();
 
-                chunkdata.ChunkStatus = ChunkStatus.Current;
+                chunkData.ChunkStatus = ChunkStatus.Current;
             }
             else
             {                   
-                ushort[,] heightmap = Noise.GenerateNoiseMap(ChunkLoaderEntity.ChunkSize, ChunkLoaderEntity.ChunkSize, x*ChunkLoaderEntity.ChunkSize, y*ChunkLoaderEntity.ChunkSize, 50f);
+                ushort[,] shortMap = Noise.GenerateNoiseMap(ChunkLoaderEntity.ChunkSize, ChunkLoaderEntity.ChunkSize, x*ChunkLoaderEntity.ChunkSize, y*ChunkLoaderEntity.ChunkSize, 50f);
                 
-                Tile[][,] tiles = new Tile[1][,];
+                var vertices = HeightMap.GenerateVertexMap(shortMap);
                 
-                tiles[0] = HeightMap.GenerateTileMap(heightmap);
-                
-                chunkdata = new ChunkData()
+                chunkData = new ChunkData()
                 {
                     ChunkPositionX = x,
                     ChunkPositionY = y,
-                    Tiles = tiles,
+                    VertexMap = vertices,
                     
-                    Objects = Object.GenerateObjects(0, 0, 1, 1),
+                    Objects = Object.GenerateObjects(0, 0, 0),
                     
                     LightingInfo = LightingProperties.DefaultInfo,
                     
@@ -101,34 +96,27 @@ namespace DProject.Entity.Chunk
                 };
             }
 
-            return chunkdata;
+            return chunkData;
         }
 
-        private BoundingBox[][,] GenerateBoundingBoxes()
+        private BoundingBox[,] GenerateBoundingBoxes()
         {
-            var floorCount = _chunkData.GetFloorCount();
-            var xSize = _chunkData.Tiles[0].GetLength(0);
-            var ySize = _chunkData.Tiles[0].GetLength(1);
+            var xSize = _chunkData.VertexMap.GetLength(0) - 1;
+            var ySize = _chunkData.VertexMap.GetLength(1) - 1;
             
-            BoundingBox[][,] boundingBoxes = new BoundingBox[floorCount][,];
+            var boundingBoxes = new BoundingBox[xSize, ySize];
 
-            for (int i = 0; i < boundingBoxes.Length; i++)
-                boundingBoxes[i] = new BoundingBox[xSize,ySize];
-            
-            for (int floor = 0; floor < floorCount; floor++)
+            for (var x = 0; x < xSize; x++)
             {
-                for (int x = 0; x < xSize; x++)
+                for (var y = 0; y < ySize; y++)
                 {
-                    for (int y = 0; y < ySize; y++)
-                    {
-                        boundingBoxes[floor][x,y] = BoundingBox.CreateFromPoints
-                        (new []{
-                            new Vector3(x-0.5f, _chunkData.Tiles[floor][x,y].TopLeft/HeightMap.IncrementsPerHeightUnit, y-0.5f) + GetPosition(),
-                            new Vector3(x+0.5f, _chunkData.Tiles[floor][x,y].TopRight/HeightMap.IncrementsPerHeightUnit, y-0.5f) + GetPosition(),
-                            new Vector3(x-0.5f, _chunkData.Tiles[floor][x,y].BottomLeft/HeightMap.IncrementsPerHeightUnit, y+0.5f) + GetPosition(),
-                            new Vector3(x+0.5f, _chunkData.Tiles[floor][x,y].BottomRight/HeightMap.IncrementsPerHeightUnit, y+0.5f) + GetPosition(),
-                        });
-                    }
+                    boundingBoxes[x, y] = BoundingBox.CreateFromPoints
+                    (new []{
+                        new Vector3(x, _chunkData.VertexMap[x, y].Height/HeightMap.IncrementsPerHeightUnit, y) + GetPosition(),
+                        new Vector3(x + 1, _chunkData.VertexMap[x + 1, y].Height/HeightMap.IncrementsPerHeightUnit, y) + GetPosition(),
+                        new Vector3(x, _chunkData.VertexMap[x, y + 1].Height/HeightMap.IncrementsPerHeightUnit, y + 1) + GetPosition(),
+                        new Vector3(x + 1, _chunkData.VertexMap[x + 1, y + 1].Height/HeightMap.IncrementsPerHeightUnit, y + 1) + GetPosition(),
+                    });
                 }
             }
 
@@ -139,11 +127,8 @@ namespace DProject.Entity.Chunk
         {
             _contentManager = content;
             
-            foreach (var floor in _props)
-            {
-                foreach (var prop in floor)
-                    prop.LoadContent(content);
-            }
+            foreach (var prop in _props)
+                prop.LoadContent(content);
         }
 
         public static void Serialize(ChunkData chunkData)
@@ -170,70 +155,38 @@ namespace DProject.Entity.Chunk
         {           
             if (activeCamera.GetBoundingFrustum().Intersects(_boundingBox))
             {
-                foreach (var heightMap in _heightMaps)
-                {
-                    heightMap.Draw(activeCamera.GetProjectMatrix(),activeCamera.GetViewMatrix(), GetWorldMatrix(), Textures.TerrainTexture);
-                }
-                
-                foreach (var floor in _props)
-                {
-                    foreach (var prop in floor)
-                        prop.Draw(activeCamera);
-                }
+                _heightMap.Draw(activeCamera.GetProjectMatrix(),activeCamera.GetViewMatrix(), GetWorldMatrix(), Textures.TerrainTexture);
+
+                foreach (var prop in _props)
+                    prop.Draw(activeCamera);
             }
         }
 
         public void Initialize(GraphicsDevice graphicsDevice)
         {
-            foreach (var heightMap in _heightMaps)
-            {
-                heightMap.Initialize(graphicsDevice);
-            }
-            
+            _heightMap.Initialize(graphicsDevice);
             _tileBoundingBoxes = GenerateBoundingBoxes();
         }
 
         private void LoadProps()
         {
-            _props = new List<PropEntity>[_chunkData.Objects.Length];
-                
-            for(var i = 0; i < _props.Length; i++)
-                _props[i] = new List<PropEntity>();
-            
-            for (var floor = 0; floor < _props.Length; floor++)
-            {                
-                for (var i = 0; i < _chunkData.Objects[floor].Count; i++)
-                {
-                    _props[floor].Add(PropEntityFromObject(floor, i));
-                }
-            }
+            _props = new List<PropEntity>();
+
+            for (var i = 0; i < _chunkData.Objects.Count; i++)
+                _props.Add(PropEntityFromObject(i));
         }
 
-        private PropEntity PropEntityFromObject(int floor, int index)
+        private PropEntity PropEntityFromObject(int index)
         {
-            return new PropEntity(
-                new Vector3(
-                    _chunkData.Objects[floor][index].PositionX + _chunkPositionX *ChunkLoaderEntity.ChunkSize,
-                    GetTileHeight(
-                        _chunkData.Objects[floor][index].PositionX,
-                        _chunkData.Objects[floor][index].PositionY,
-                        floor)/HeightMap.IncrementsPerHeightUnit,
-                    _chunkData.Objects[floor][index].PositionY + _chunkPositionY *ChunkLoaderEntity.ChunkSize),
-                CalculateRotation(_chunkData.Objects[floor][index].ObjectRotation),
-                _chunkData.Objects[floor][index].Scale,
-                _chunkData.Objects[floor][index].Id
-            );
+            return PropEntityFromObject(_chunkData.Objects[index]);
         }
 
-        private PropEntity PropEntityFromObject(Object propObject, int floor)
+        private PropEntity PropEntityFromObject(Object propObject)
         {
             return new PropEntity(
                 new Vector3(
                     propObject.PositionX + _chunkPositionX *ChunkLoaderEntity.ChunkSize,
-                    GetTileHeight(
-                        propObject.PositionX,
-                        propObject.PositionY,
-                        floor)/HeightMap.IncrementsPerHeightUnit,
+                    GetTileHeight(propObject.PositionX, propObject.PositionY) / HeightMap.IncrementsPerHeightUnit,
                     propObject.PositionY + _chunkPositionY *ChunkLoaderEntity.ChunkSize),
                 CalculateRotation(propObject.ObjectRotation),
                 propObject.Scale,
@@ -260,24 +213,19 @@ namespace DProject.Entity.Chunk
 
         public void UpdateHeightMap()
         {
-            for (int floor = 0; floor < _heightMaps.Length; floor++)
-            {
-                if (_heightMaps[floor].GetHasUpdated())
-                    _heightMaps[floor].UpdateHeightMap(_chunkData.Tiles[floor]);
-            }
+            if (_heightMap.GetHasUpdated())
+                _heightMap.UpdateHeightMap(_chunkData.VertexMap);
         }
         
         #region Editing
         
-        public void PlaceProp(int x, int y, int floor, Rotation rotation, ushort objectId)
+        public void PlaceProp(int x, int y, Rotation rotation, ushort objectId)
         {
-            var existingProp = false;
-            
-            for (var i = 0; i < _chunkData.Objects[floor].Count; i++)
+            for (var i = 0; i < _chunkData.Objects.Count; i++)
             {
-                if (_chunkData.Objects[floor][i].PositionX == x && _chunkData.Objects[floor][i].PositionY == y)
+                if (_chunkData.Objects[i].PositionX == x && _chunkData.Objects[i].PositionY == y)
                 {
-                    _chunkData.Objects[floor][i] = new Object()
+                    _chunkData.Objects[i] = new Object()
                     {
                         Id = objectId,
                         PositionX = x,
@@ -289,16 +237,16 @@ namespace DProject.Entity.Chunk
                         ScaleZ = 1f
                     };
 
-                    _props[floor][i] = PropEntityFromObject(_chunkData.Objects[floor][i], floor);
-                    _props[floor][i].LoadContent(_contentManager);
+                    _props[i] = PropEntityFromObject(_chunkData.Objects[i]);
+                    _props[i].LoadContent(_contentManager);
                     
-                    existingProp = true;
                     _chunkData.ChunkStatus = ChunkStatus.Changed;
+                    
                     return;
                 }
             }
 
-            if (!existingProp)
+            //If it did not return:
             {
                 var propObject = new Object()
                 {
@@ -312,221 +260,52 @@ namespace DProject.Entity.Chunk
                     ScaleZ = 1f
                 };
                 
-                _chunkData.Objects[floor].Add(propObject);
+                _chunkData.Objects.Add(propObject);
 
-                var prop = PropEntityFromObject(propObject, floor);
+                var prop = PropEntityFromObject(propObject);
                 
-                _props[floor].Add(prop);
+                _props.Add(prop);
                 prop.LoadContent(_contentManager);
                 
                 _chunkData.ChunkStatus = ChunkStatus.Changed;
             }
         }
 
-        public void RemoveProp(int x, int y, int floor)
+        public void RemoveProp(int x, int y)
         {
-            for (var i = 0; i < _chunkData.Objects[floor].Count; i++)
+            for (var i = 0; i < _chunkData.Objects.Count; i++)
             {
-                if (_chunkData.Objects[floor][i].PositionX == x && _chunkData.Objects[floor][i].PositionY == y)
+                if (_chunkData.Objects[i].PositionX == x && _chunkData.Objects[i].PositionY == y)
                 {
-                    _chunkData.Objects[floor].RemoveAt(i);
-                    _props[floor].RemoveAt(i);
+                    _chunkData.Objects.RemoveAt(i);
+                    _props.RemoveAt(i);
                     _chunkData.ChunkStatus = ChunkStatus.Changed;
                     return;
                 }
             }
         }
 
-        public void ChangeTileTexture(ushort? textureId, int x, int y, int floor)
+        public void ChangeVertexTexture(ushort? textureId, int x, int y)
         {
-            _chunkData.Tiles[floor][x,y].TileTextureIdTriangleOne = textureId;
-            _chunkData.Tiles[floor][x,y].TileTextureIdTriangleTwo = textureId;
+            _chunkData.VertexMap[x,y].TextureId = textureId;
 
-            _heightMaps[floor].SetHasUpdated(true);
-            _chunkData.ChunkStatus = ChunkStatus.Changed;
-        }
-        
-        public void ChangeTriangleTexture(ushort? textureId, int x, int y, int floor, bool alternativeTriangle)
-        {
-            if(alternativeTriangle)
-                _chunkData.Tiles[floor][x,y].TileTextureIdTriangleOne = textureId;
-            else
-                _chunkData.Tiles[floor][x,y].TileTextureIdTriangleTwo = textureId;
-
-            _heightMaps[floor].SetHasUpdated(true);
-            _chunkData.ChunkStatus = ChunkStatus.Changed;
-        }
-        
-        public void ChangeCornerColor(ushort colorId, TileCorner corner, int x, int y, int floor)
-        {
-            switch (corner)
-            {
-                case TileCorner.TopLeft:
-                    _chunkData.Tiles[floor][x, y].ColorTopLeft = colorId;
-                    break;
-                case TileCorner.TopRight:
-                    _chunkData.Tiles[floor][x, y].ColorTopRight = colorId;
-                    break;
-                case TileCorner.BottomLeft:
-                    _chunkData.Tiles[floor][x, y].ColorBottomLeft = colorId;
-                    break;
-                case TileCorner.BottomRight:
-                    _chunkData.Tiles[floor][x, y].ColorBottomRight = colorId;
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(corner), corner, null);
-            }
-
-            _heightMaps[floor].SetHasUpdated(true);
-            _chunkData.ChunkStatus = ChunkStatus.Changed;
-        }
-        
-        public void ChangeVertexColor(ushort color, int x, int y, int floor, TileCorner corner)
-        {
-            switch (corner)
-            {
-                case TileCorner.TopLeft:
-                {
-                    _chunkData.Tiles[floor][x, y].SetCornerColor(color, TileCorner.TopLeft);
-            
-                    if(x > 0)
-                        _chunkData.Tiles[floor][x-1,y].SetCornerColor(color, TileCorner.TopRight);
-            
-                    if(y > 0)
-                        _chunkData.Tiles[floor][x,y-1].SetCornerColor(color, TileCorner.BottomLeft);
-            
-                    if(x > 0 && y > 0)
-                        _chunkData.Tiles[floor][x-1,y-1].SetCornerColor(color, TileCorner.BottomRight);
-                    break;
-                }
-                
-                case TileCorner.TopRight:
-                {
-                    _chunkData.Tiles[floor][x,y].SetCornerColor(color, TileCorner.TopRight);
-                
-                    if(y > 0)
-                        _chunkData.Tiles[floor][x,y-1].SetCornerColor(color, TileCorner.BottomRight);
-                
-                    if(x < ChunkLoaderEntity.ChunkSize-1 && y > 0)
-                        _chunkData.Tiles[floor][x+1,y-1].SetCornerColor(color, TileCorner.BottomLeft);
-                
-                    if(x < ChunkLoaderEntity.ChunkSize-1)
-                        _chunkData.Tiles[floor][x+1,y].SetCornerColor(color, TileCorner.TopLeft);
-                    break;
-                }
-                
-                case TileCorner.BottomLeft:
-                {
-                    _chunkData.Tiles[floor][x,y].SetCornerColor(color, TileCorner.BottomLeft);
-                
-                    if(y < ChunkLoaderEntity.ChunkSize-1)
-                        _chunkData.Tiles[floor][x,y+1].SetCornerColor(color, TileCorner.TopLeft);
-                
-                    if(y < ChunkLoaderEntity.ChunkSize-1 && x > 0)
-                        _chunkData.Tiles[floor][x-1,y+1].SetCornerColor(color, TileCorner.TopRight);
-                
-                    if(x > 0)
-                        _chunkData.Tiles[floor][x-1,y].SetCornerColor(color, TileCorner.BottomRight);
-                    break;
-                }
-                
-                case TileCorner.BottomRight:
-                {
-                    _chunkData.Tiles[floor][x,y].SetCornerColor(color, TileCorner.BottomRight);
-                
-                    if(y < ChunkLoaderEntity.ChunkSize-1)
-                        _chunkData.Tiles[floor][x,y+1].SetCornerColor(color, TileCorner.TopRight);
-                
-                    if(x < ChunkLoaderEntity.ChunkSize-1 && y < ChunkLoaderEntity.ChunkSize-1)
-                        _chunkData.Tiles[floor][x+1,y+1].SetCornerColor(color, TileCorner.TopLeft);
-                
-                    if(x < ChunkLoaderEntity.ChunkSize-1)
-                        _chunkData.Tiles[floor][x+1,y].SetCornerColor(color, TileCorner.BottomLeft);
-                    break;
-                }
-            }
-
-            _heightMaps[floor].SetHasUpdated(true);
-            _chunkData.ChunkStatus = ChunkStatus.Changed;
-        }
-        
-        public void ChangeTileColor(ushort colorId, int x, int y, int floor)
-        {
-            _chunkData.Tiles[floor][x, y].ColorTopLeft = colorId;
-            _chunkData.Tiles[floor][x, y].ColorTopRight = colorId;
-            _chunkData.Tiles[floor][x, y].ColorBottomLeft = colorId;
-            _chunkData.Tiles[floor][x, y].ColorBottomRight = colorId;
-
-            _heightMaps[floor].SetHasUpdated(true);
+            _heightMap.SetHasUpdated(true);
             _chunkData.ChunkStatus = ChunkStatus.Changed;
         }
 
-        public void ChangeVertexHeight(ushort height, int x, int y, int floor, TileCorner corner)
+        public void ChangeVertexColor(ushort color, int x, int y)
         {
-            switch (corner)
-            {
-                case TileCorner.TopLeft:
-                {
-                    _chunkData.Tiles[floor][x, y].SetCornerHeight(height, TileCorner.TopLeft);
-            
-                    if(x > 0)
-                        _chunkData.Tiles[floor][x-1,y].SetCornerHeight(height, TileCorner.TopRight);
-            
-                    if(y > 0)
-                        _chunkData.Tiles[floor][x,y-1].SetCornerHeight(height, TileCorner.BottomLeft);
-            
-                    if(x > 0 && y > 0)
-                        _chunkData.Tiles[floor][x-1,y-1].SetCornerHeight(height, TileCorner.BottomRight);
-                    break;
-                }
-                
-                case TileCorner.TopRight:
-                {
-                    _chunkData.Tiles[floor][x,y].SetCornerHeight(height, TileCorner.TopRight);
-                
-                    if(y > 0)
-                        _chunkData.Tiles[floor][x,y-1].SetCornerHeight(height, TileCorner.BottomRight);
-                
-                    if(x < ChunkLoaderEntity.ChunkSize-1 && y > 0)
-                        _chunkData.Tiles[floor][x+1,y-1].SetCornerHeight(height, TileCorner.BottomLeft);
-                
-                    if(x < ChunkLoaderEntity.ChunkSize-1)
-                        _chunkData.Tiles[floor][x+1,y].SetCornerHeight(height, TileCorner.TopLeft);
-                    break;
-                }
-                
-                case TileCorner.BottomLeft:
-                {
-                    _chunkData.Tiles[floor][x,y].SetCornerHeight(height, TileCorner.BottomLeft);
-                
-                    if(y < ChunkLoaderEntity.ChunkSize-1)
-                        _chunkData.Tiles[floor][x,y+1].SetCornerHeight(height, TileCorner.TopLeft);
-                
-                    if(y < ChunkLoaderEntity.ChunkSize-1 && x > 0)
-                        _chunkData.Tiles[floor][x-1,y+1].SetCornerHeight(height, TileCorner.TopRight);
-                
-                    if(x > 0)
-                        _chunkData.Tiles[floor][x-1,y].SetCornerHeight(height, TileCorner.BottomRight);
-                    break;
-                }
-                
-                case TileCorner.BottomRight:
-                {
-                    _chunkData.Tiles[floor][x,y].SetCornerHeight(height, TileCorner.BottomRight);
-                
-                    if(y < ChunkLoaderEntity.ChunkSize-1)
-                        _chunkData.Tiles[floor][x,y+1].SetCornerHeight(height, TileCorner.TopRight);
-                
-                    if(x < ChunkLoaderEntity.ChunkSize-1 && y < ChunkLoaderEntity.ChunkSize-1)
-                        _chunkData.Tiles[floor][x+1,y+1].SetCornerHeight(height, TileCorner.TopLeft);
-                
-                    if(x < ChunkLoaderEntity.ChunkSize-1)
-                        _chunkData.Tiles[floor][x+1,y].SetCornerHeight(height, TileCorner.BottomLeft);
-                    break;
-                }
-            }
+            _chunkData.VertexMap[x, y].ColorId = color;
 
-            _heightMaps[floor].SetHasUpdated(true);
+            _heightMap.SetHasUpdated(true);
+            _chunkData.ChunkStatus = ChunkStatus.Changed;
+        }
+
+        public void ChangeVertexHeight(ushort height, int x, int y)
+        {
+            _chunkData.VertexMap[x, y].Height = height;
+
+            _heightMap.SetHasUpdated(true);
             _chunkData.ChunkStatus = ChunkStatus.Changed;
         }
 
@@ -534,50 +313,33 @@ namespace DProject.Entity.Chunk
 
         #region Getters and Setters
         
-        public ushort GetTileHeight(int x, int y, int floor)
+        public ushort GetTileHeight(int x, int y)
         {
-            return (ushort) Math.Round((_chunkData.Tiles[floor][x, y].TopLeft
-                                    +_chunkData.Tiles[floor][x, y].TopRight
-                                    +_chunkData.Tiles[floor][x, y].BottomLeft
-                                    +_chunkData.Tiles[floor][x, y].BottomRight)
+            return (ushort) Math.Round((_chunkData.VertexMap[x, y].Height
+                                    +_chunkData.VertexMap[x + 1, y].Height
+                                    +_chunkData.VertexMap[x, y + 1].Height
+                                    +_chunkData.VertexMap[x + 1, y + 1].Height)
                            /4f);
         }
 
-        public ushort GetVertexHeight(int x, int y, int floor, TileCorner corner)
+        public ushort GetVertexHeight(int x, int y)
         {
-            switch (corner)
-            {
-                case TileCorner.TopLeft:
-                    return _chunkData.Tiles[floor][x, y].TopLeft;
-                case TileCorner.TopRight:
-                    return _chunkData.Tiles[floor][x, y].TopRight;
-                case TileCorner.BottomLeft:
-                    return _chunkData.Tiles[floor][x, y].BottomLeft;
-                case TileCorner.BottomRight:
-                    return _chunkData.Tiles[floor][x, y].BottomRight;
-                default:
-                    return 0;
-            }
+            return _chunkData.VertexMap[x, y].Height;
         }
 
-        public List<PropEntity>[] GetProps()
+        public List<PropEntity> GetProps()
         {
             return _props;
         }
 
-        public List<PropEntity> GetProps(int floor)
+        public BoundingBox[,] GetTileBoundingBoxes()
         {
-            return _props[floor];
+            return _tileBoundingBoxes;
         }
 
-        public BoundingBox[,] GetTileBoundingBoxes(int floor)
+        public BoundingBox GetTileBoundingBox(int x, int y)
         {
-            return _tileBoundingBoxes[floor];
-        }
-
-        public BoundingBox GetTileBoundingBox(int x, int y, int floor)
-        {
-            return _tileBoundingBoxes[floor][x,y];
+            return _tileBoundingBoxes[x, y];
         }
         
         public int GetChunkX()
@@ -590,9 +352,9 @@ namespace DProject.Entity.Chunk
             return _chunkPositionY;
         }
 
-        public HeightMap GetHeightMap(int floor)
+        public HeightMap GetHeightMap()
         {
-            return _heightMaps[floor];
+            return _heightMap;
         }
 
         public ChunkData GetChunkData()
