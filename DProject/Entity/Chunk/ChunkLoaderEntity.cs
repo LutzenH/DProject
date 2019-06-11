@@ -183,13 +183,15 @@ namespace DProject.Entity.Chunk
             AbortLoadingChunks();
 
             _cancellationToken = new CancellationTokenSource();
-            
-            foreach (var newChunk in newChunkPositions)
+
+            var tasks = new Task<TerrainEntity>[newChunkPositions.Count];
+
+            for (var i = 0; i < newChunkPositions.Count; i++)
             {
-                var pos = (newChunk.Item1, newChunk.Item2);
-                var lod = newChunk.Item3;
+                var pos = (newChunkPositions[i].Item1, newChunkPositions[i].Item2);
+                var lod = newChunkPositions[i].Item3;
             
-                Task.Factory.StartNew(() =>
+                tasks[i] = Task.Factory.StartNew(() =>
                 {
                     try
                     {
@@ -205,6 +207,15 @@ namespace DProject.Entity.Chunk
                     }
                 });
             }
+
+            if (newChunkPositions.Count != 0)
+            {
+                Task.Factory.ContinueWhenAll(tasks, tasks1 =>
+                {
+                    EditorEntityManager.AddMessage(new Message("Done loading new chunks."));
+                    _loadingStatus = ChunkLoadingStatus.Done;
+                });
+            }
 #endif
 
             if (_loadedChunks.ContainsKey((_chunkPosition.Item1, _chunkPosition.Item2)))
@@ -212,9 +223,6 @@ namespace DProject.Entity.Chunk
                 LightingProperties.CurrentInfo = _loadedChunks[(_chunkPosition.Item1, _chunkPosition.Item2)].GetChunkData().LightingInfo;
                 HeightMap.TerrainEffect.SetLightingInfo(LightingProperties.CurrentInfo);
             }
-
-            EditorEntityManager.AddMessage(new Message("Done loading new chunks."));
-            _loadingStatus = ChunkLoadingStatus.Done;
         }
 
 #if !EDITOR
