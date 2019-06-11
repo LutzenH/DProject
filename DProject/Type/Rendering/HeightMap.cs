@@ -31,8 +31,8 @@ namespace DProject.Type.Rendering
         
         public const float IncrementsPerHeightUnit = 256f;
 
-        private ushort _lowestHeightValue = ushort.MaxValue;
-        private ushort _highestHeightValue = ushort.MinValue;
+        private ushort _lowestHeightValue;
+        private ushort _highestHeightValue;
 
         public HeightMap(Tile[,] tiles)
         {
@@ -109,6 +109,9 @@ namespace DProject.Type.Rendering
 
         private VertexPositionTextureColorNormal[] GenerateVertexPositions(Tile[,] tiles)
         {
+            _lowestHeightValue = ushort.MaxValue;
+            _highestHeightValue = ushort.MinValue;
+            
             _primitiveCount = _width * _height * 2;
             
             var width = tiles.GetLength(0);

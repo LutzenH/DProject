@@ -80,7 +80,7 @@ namespace DProject.Entity
         private static Vector3? CalculatePrecisePosition(Vector2 mouseLocation, CameraEntity camera,
             GraphicsDevice graphicsDevice, ChunkLoaderEntity chunkLoaderEntity, int currentFloor)
         {
-            Ray ray = Game1.CalculateRay(mouseLocation, camera.GetViewMatrix(),
+            Ray ray = CalculateRay(mouseLocation, camera.GetViewMatrix(),
                 camera.GetProjectMatrix(), graphicsDevice.Viewport);
 
             var position = ray.Position - ray.Direction * (ray.Position.Y / ray.Direction.Y);
@@ -120,6 +120,26 @@ namespace DProject.Entity
             }
 
             return null;
+        }
+        
+        private static Ray CalculateRay(Vector2 mouseLocation, Matrix view, Matrix projection, Viewport viewport) {
+            Vector3 nearPoint = viewport.Unproject(new Vector3(mouseLocation.X,
+                    mouseLocation.Y, 0.0f),
+                projection,
+                view,
+                Matrix.Identity);
+ 
+            Vector3 farPoint = viewport.Unproject(new Vector3(mouseLocation.X,
+                    mouseLocation.Y, 10f),
+                projection,
+                view,
+                Matrix.Identity);
+
+            Vector3 direction = nearPoint - farPoint;
+            
+            direction.Normalize();
+
+            return new Ray(nearPoint, direction);
         }
 
         #endregion

@@ -91,26 +91,6 @@ namespace DProject
             
             base.Draw(gameTime);
         }
-        
-        public static Ray CalculateRay(Vector2 mouseLocation, Matrix view, Matrix projection, Viewport viewport) {
-            Vector3 nearPoint = viewport.Unproject(new Vector3(mouseLocation.X,
-                    mouseLocation.Y, 0.0f),
-                projection,
-                view,
-                Matrix.Identity);
- 
-            Vector3 farPoint = viewport.Unproject(new Vector3(mouseLocation.X,
-                    mouseLocation.Y, 10.0f),
-                projection,
-                view,
-                Matrix.Identity);
- 
-            Vector3 direction = nearPoint - farPoint;
-            
-            direction.Normalize();
- 
-            return new Ray(nearPoint, direction);
-        }
 
         public void SetScreenResolution(int x, int y)
         {           
