@@ -179,6 +179,9 @@ namespace DProject.Entity.Chunk
                     _loadedChunks[pos] = LoadChunk(pos, lod);
                 }
             });
+            
+            EditorEntityManager.AddMessage(new Message("Done loading new chunks."));
+            _loadingStatus = ChunkLoadingStatus.Done;
 #else
             AbortLoadingChunks();
 
