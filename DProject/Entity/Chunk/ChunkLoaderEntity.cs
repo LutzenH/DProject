@@ -10,6 +10,7 @@ using System.Threading;
 #endif
 using DProject.Entity.Camera;
 using DProject.Entity.Interface;
+using DProject.List;
 using DProject.Manager;
 using DProject.Type;
 using DProject.Type.Enum;
@@ -220,11 +221,9 @@ namespace DProject.Entity.Chunk
                 });
             }
 #endif
-
             if (_loadedChunks.ContainsKey((_chunkPosition.Item1, _chunkPosition.Item2)))
             {
-                LightingProperties.CurrentInfo = _loadedChunks[(_chunkPosition.Item1, _chunkPosition.Item2)].GetChunkData().LightingInfo;
-                HeightMap.TerrainEffect.SetLightingInfo(LightingProperties.CurrentInfo);
+                HeightMap.TerrainEffect.SetLightingInfo(Skies.SkyList[_loadedChunks[(_chunkPosition.Item1, _chunkPosition.Item2)].GetChunkData().SkyId]);
             }
         }
 

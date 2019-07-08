@@ -3,6 +3,7 @@ using System.Drawing;
 using System.Collections.Generic;
 using BitMiracle.LibTiff.Classic;
 using DProject.Entity.Chunk;
+using DProject.List;
 using DProject.Type.Enum;
 using DProject.Type.Rendering;
 using DProject.Type.Serializable.Chunk;
@@ -108,7 +109,7 @@ namespace DProject.Type
                     
                             Objects = Object.GenerateObjects(0, 0, 0),
                     
-                            LightingInfo = LightingProperties.DefaultInfo,
+                            SkyId = Skies.GetDefaultSkyId(),
                             
                             ChunkStatus = ChunkStatus.Unserialized
                         };

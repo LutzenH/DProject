@@ -90,7 +90,7 @@ namespace DProject.Entity.Chunk
                     
                     Objects = Object.GenerateObjects(0, 0, 0),
                     
-                    LightingInfo = LightingProperties.DefaultInfo,
+                    SkyId = Skies.GetDefaultSkyId(),
                     
                     ChunkStatus = ChunkStatus.Unserialized
                 };

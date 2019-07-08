@@ -36,10 +36,10 @@ namespace DProject.List
         
         public static ushort GetPropIdFromName(string name)
         {
-            foreach (var texture in PropList)
+            foreach (var prop in PropList)
             {
-                if (texture.Value.Name == name)
-                    return texture.Key;
+                if (prop.Value.Name == name)
+                    return prop.Key;
             }
 
             throw new ArgumentException();

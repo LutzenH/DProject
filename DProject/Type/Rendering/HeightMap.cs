@@ -58,7 +58,7 @@ namespace DProject.Type.Rendering
                 TerrainEffect.VertexColorEnabled = true;
                 TerrainEffect.TextureEnabled = true;
                 
-                TerrainEffect.SetLightingInfo(LightingProperties.CurrentInfo);
+                TerrainEffect.SetLightingInfo(Skies.SkyList[Skies.GetDefaultSkyId()]);
             }
 
             if (_vertexBuffer == null || GetVertexCount() != _previousVertexCount)

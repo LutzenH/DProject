@@ -16,6 +16,8 @@ namespace DProject
         private readonly EntityManager _entityManager;
         private readonly UIManager _uiManager;
 
+        private static Color _backgroundColor;
+        
         public static KeyboardState PreviousKeyboardState;
         public static MouseState PreviousMouseState;
 
@@ -40,6 +42,8 @@ namespace DProject
             _graphics.PreferredBackBufferWidth = ScreenResolutionX;
             _graphics.PreferredBackBufferHeight = ScreenResolutionY;
 
+            _backgroundColor = Color.Black;
+            
             //VSYNC
             _graphics.SynchronizeWithVerticalRetrace = false;
             
@@ -80,7 +84,7 @@ namespace DProject
         protected override void Draw(GameTime gameTime)
         {                
             //Background color
-            GraphicsDevice.Clear(LightingProperties.CurrentInfo.BackgroundColor.Color);
+            GraphicsDevice.Clear(_backgroundColor);
             
             GraphicsDevice.BlendState = BlendState.Opaque;
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
@@ -90,6 +94,11 @@ namespace DProject
             _uiManager.Draw();
             
             base.Draw(gameTime);
+        }
+
+        public static void SetBackgroundColor(Color color)
+        {
+            _backgroundColor = color;
         }
 
         public void SetScreenResolution(int x, int y)

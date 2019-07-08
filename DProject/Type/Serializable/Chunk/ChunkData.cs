@@ -19,7 +19,7 @@ namespace DProject.Type.Serializable.Chunk
         public virtual List<Object> Objects { get; set; }
 
         [Key(4)]
-        public virtual LightingInfo LightingInfo { get; set; }
+        public virtual ushort SkyId { get; set; }
 
         [IgnoreMember]
         public ChunkStatus ChunkStatus { get; set; }

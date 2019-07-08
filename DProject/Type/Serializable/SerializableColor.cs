@@ -8,10 +8,13 @@ namespace DProject.Type.Serializable
     {
         [Key("name")]
         public virtual string Name { get; set; }
+        
         [Key("red")]
         public virtual int Red { get; set; }
+        
         [Key("green")]
         public virtual int Green { get; set; }
+        
         [Key("blue")]
         public virtual int Blue { get; set; }
 
