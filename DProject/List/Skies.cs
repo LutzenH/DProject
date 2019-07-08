@@ -46,52 +46,5 @@ namespace DProject.List
 
             throw new ArgumentException();
         }
-        
-        public static readonly Sky DefaultSky = new Sky()
-        {
-            Name = "Default",
-            
-            Fog = new Fog()
-            {
-                FogStart = 120f,
-                FogEnd = 160f,
-                
-                Color = new SerializableColor()
-                {
-                    Color = Color.DarkGray
-                }
-            },
-
-            BackgroundColor = new SerializableColor()
-            {
-                Color = Color.DarkGray
-            },
-            
-            AmbientLightColor = new SerializableColor()
-            {
-                Color = Color.Black
-            },
-
-            DirectionalLight0 = new DirectionalLight()
-            {
-                DiffuseColor = new SerializableColor()
-                {
-                    Color = Color.White
-                },
-                SpecularColor = new SerializableColor()
-                {
-                    Color = Color.Black
-                },
-                Direction = Vector3.Normalize(Vector3.Down)
-            }
-        };
-        
-        public static void ExportDefaultSkyToJson()
-        {
-            var json = MessagePackSerializer.ToJson(DefaultSky);
-            
-            using (var newTask = new StreamWriter(Game1.RootDirectory + "collections/sky.json", false)) 
-                newTask.WriteLine(json);    
-        }
     }
 } 
