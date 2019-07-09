@@ -1,5 +1,6 @@
 using System;
 using DProject.List;
+using DProject.Manager;
 using DProject.Type.Enum;
 using DProject.Type.Rendering.Shaders;
 using DProject.Type.Serializable.Chunk;
@@ -15,8 +16,6 @@ namespace DProject.Type.Rendering
 
         private DynamicVertexBuffer _vertexBuffer;
         
-        public static TerrainEffect TerrainEffect;
-
         private LevelOfDetail _levelOfDetail;
         
         private readonly int _width;
@@ -48,19 +47,6 @@ namespace DProject.Type.Rendering
         {
             _graphicsDevice = graphicsDevice;
 
-            if (TerrainEffect == null)
-            {
-                //Graphics Effects
-                TerrainEffect = new TerrainEffect(graphicsDevice);
-            
-                TerrainEffect.LightingEnabled = true;
-                TerrainEffect.PreferPerPixelLighting = true;
-                TerrainEffect.VertexColorEnabled = true;
-                TerrainEffect.TextureEnabled = true;
-                
-                TerrainEffect.SetLightingInfo(Skies.SkyList[Skies.GetDefaultSkyId()]);
-            }
-
             if (_vertexBuffer == null || GetVertexCount() != _previousVertexCount)
             {
                 _previousVertexCount = GetVertexCount();
@@ -91,15 +77,11 @@ namespace DProject.Type.Rendering
 
         public void Draw(Matrix projectMatrix, Matrix viewMatrix, Matrix worldMatrix, Texture2D texture2D)
         {
-            TerrainEffect.Projection = projectMatrix;
-            TerrainEffect.View = viewMatrix;
-            TerrainEffect.World = worldMatrix;
-
-            TerrainEffect.Texture = texture2D;
-
+            ShaderManager.TerrainEffect.SetDrawInfo(projectMatrix, viewMatrix, worldMatrix, texture2D);
+            
             _graphicsDevice.SetVertexBuffer(_vertexBuffer);
 
-            foreach (EffectPass pass in TerrainEffect.CurrentTechnique.Passes)
+            foreach (EffectPass pass in ShaderManager.TerrainEffect.CurrentTechnique.Passes)
             {
                 pass.Apply();
                 

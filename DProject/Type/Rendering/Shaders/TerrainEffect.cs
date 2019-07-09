@@ -1,3 +1,4 @@
+using DProject.List;
 using DProject.Type.Serializable.Chunk;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -6,8 +7,16 @@ namespace DProject.Type.Rendering.Shaders
 {
     public class TerrainEffect : BasicEffect
     {
-        public TerrainEffect(GraphicsDevice device) : base(device) { }
-        
+        public TerrainEffect(GraphicsDevice device) : base(device)
+        {
+            LightingEnabled = true;
+            PreferPerPixelLighting = true;
+            VertexColorEnabled = true;
+            TextureEnabled = true;
+
+            SetLightingInfo(Skies.SkyList[Skies.GetDefaultSkyId()]);
+        }
+
         public void SetLightingInfo(Sky info)
         {
             AmbientLightColor = info.AmbientLightColor?.Color.ToVector3() ?? Vector3.Zero;
@@ -37,7 +46,7 @@ namespace DProject.Type.Rendering.Shaders
                 DirectionalLight2.SpecularColor = info.DirectionalLight2.SpecularColor.Color.ToVector3();
                 DirectionalLight2.Direction = info.DirectionalLight2.Direction;
             }
-            
+
             if (info.Fog != null)
             {
                 FogEnabled = true;
@@ -45,6 +54,15 @@ namespace DProject.Type.Rendering.Shaders
                 FogStart = info.Fog.FogStart;
                 FogEnd = info.Fog.FogEnd;
             }
+        }
+
+        public void SetDrawInfo(Matrix projectMatrix, Matrix viewMatrix, Matrix worldMatrix, Texture2D texture2D)
+        {
+            Projection = projectMatrix;
+            View = viewMatrix;
+            World = worldMatrix;
+
+            Texture = texture2D;
         }
     }
 }

@@ -223,7 +223,7 @@ namespace DProject.Entity.Chunk
 #endif
             if (_loadedChunks.ContainsKey((_chunkPosition.Item1, _chunkPosition.Item2)))
             {
-                HeightMap.TerrainEffect.SetLightingInfo(Skies.SkyList[_loadedChunks[(_chunkPosition.Item1, _chunkPosition.Item2)].GetChunkData().SkyId]);
+                ShaderManager.TerrainEffect.SetLightingInfo(Skies.SkyList[_loadedChunks[(_chunkPosition.Item1, _chunkPosition.Item2)].GetChunkData().SkyId]);
             }
         }
 

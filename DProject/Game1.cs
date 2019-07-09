@@ -30,7 +30,7 @@ namespace DProject
         public Game1(EntityManager entityManager)
         {
             _graphics = new GraphicsDeviceManager(this);
-
+            
             _entityManager = entityManager;
             _uiManager = new UIManager(_entityManager);
             
@@ -53,6 +53,7 @@ namespace DProject
 
         protected override void Initialize()
         {
+            ShaderManager.Initialize(Content, GraphicsDevice);
             Textures.Initialize(GraphicsDevice);
             
             _entityManager.Initialize(GraphicsDevice);
