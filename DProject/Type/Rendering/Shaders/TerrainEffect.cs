@@ -1,4 +1,5 @@
 using DProject.Type.Serializable.Chunk;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace DProject.Type.Rendering.Shaders
@@ -9,9 +10,10 @@ namespace DProject.Type.Rendering.Shaders
         
         public void SetLightingInfo(Sky info)
         {
-            AmbientLightColor = info.AmbientLightColor.Color.ToVector3();
-            Game1.SetBackgroundColor(info.BackgroundColor.Color);
-            
+            AmbientLightColor = info.AmbientLightColor?.Color.ToVector3() ?? Vector3.Zero;
+
+            Game1.SetBackgroundColor(info.BackgroundColor?.Color ?? Color.Black);
+
             if (info.DirectionalLight0 != null)
             {
                 DirectionalLight0.Enabled = true;
