@@ -31,6 +31,7 @@ namespace DProject
         
         private DateTime _last = DateTime.Now;
         private int _fps;
+        private int _lastRecordedFPS;
         
         public Game1(EntityManager entityManager)
         {
@@ -83,7 +84,8 @@ namespace DProject
         {
             if ((DateTime.Now - _last).TotalMilliseconds >= 1000)
             {
-                var title = string.Concat("DProject | FPS:", _fps);
+                _lastRecordedFPS = _fps;
+                var title = string.Concat("DProject | FPS:", _lastRecordedFPS);
                 Window.Title = title;
                 _fps = 0;
                 _last = DateTime.Now;
@@ -129,8 +131,7 @@ namespace DProject
             _graphics.PreferredBackBufferWidth = ScreenResolutionX;
             _graphics.PreferredBackBufferHeight = ScreenResolutionY;
         }
-        
-        
+
 #if EDITOR
         public void SetWidgetOffset(int x, int y)
         {
@@ -150,6 +151,11 @@ namespace DProject
         public EntityManager GetEntityManager()
         {
             return _entityManager;
+        }
+
+        public int GetFPS()
+        {
+            return _lastRecordedFPS;
         }
     }
 }
