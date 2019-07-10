@@ -24,9 +24,11 @@ namespace DProject
         public static int ScreenResolutionX;
         public static int ScreenResolutionY;
 
+#if EDITOR
         public static int WidgetOffsetX;
         public static int WidgetOffsetY;
-
+#endif
+        
         private DateTime _last = DateTime.Now;
         private int _fps;
         
@@ -127,16 +129,22 @@ namespace DProject
             _graphics.PreferredBackBufferWidth = ScreenResolutionX;
             _graphics.PreferredBackBufferHeight = ScreenResolutionY;
         }
-
-        public static Vector2 GetAdjustedMousePosition()
-        {
-            return new Vector2(Mouse.GetState().X + WidgetOffsetX, Mouse.GetState().Y + WidgetOffsetY);
-        }
-
+        
+        
+#if EDITOR
         public void SetWidgetOffset(int x, int y)
         {
             WidgetOffsetX = x;
             WidgetOffsetY = y;
+        }
+#endif
+        public static Vector2 GetMousePosition()
+        {
+#if EDITOR
+            return new Vector2(Mouse.GetState().X + WidgetOffsetX, Mouse.GetState().Y + WidgetOffsetY);
+#else
+            return Mouse.GetState().Position.ToVector2();
+#endif
         }
 
         public EntityManager GetEntityManager()

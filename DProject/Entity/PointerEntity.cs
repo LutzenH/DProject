@@ -41,7 +41,7 @@ namespace DProject.Entity
                     _currentFloor--;
             }
             
-            var mouseLocation = Game1.GetAdjustedMousePosition();
+            var mouseLocation = Game1.GetMousePosition();
 
             var position = CalculatePrecisePosition(mouseLocation, EntityManager.GetActiveCamera(), _graphicsDevice, EntityManager.GetChunkLoaderEntity(), _currentFloor);
 

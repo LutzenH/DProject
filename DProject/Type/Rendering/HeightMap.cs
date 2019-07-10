@@ -288,19 +288,14 @@ namespace DProject.Type.Rendering
             {
                 case LevelOfDetail.Full:
                     return 1;
-                    break;
                 case LevelOfDetail.Half:
                     return 2;
-                    break;
                 case LevelOfDetail.Quarter:
                     return 4;
-                    break;
                 case LevelOfDetail.Eighth:
                     return 8;
-                    break;
                 case LevelOfDetail.Sixteenth:
                     return 16;
-                    break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(levelOfDetail), levelOfDetail, null);
             }
