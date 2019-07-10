@@ -29,6 +29,9 @@ namespace DProject.Entity.Debug
 
         private GraphicsDevice _graphicsDevice;
                 
+        private readonly RasterizerState _rasterizerStateWireFrame;
+        private readonly RasterizerState _rasterizerStateSolid;
+        
         public DebugEntity(EntityManager entityManager) : base(entityManager,Vector3.Zero, Quaternion.Identity, new Vector3(1,1,1))
         {
             _pointerEntity = entityManager.GetPointerEntity();
@@ -44,6 +47,9 @@ namespace DProject.Entity.Debug
             _chunkLoaderEntity = EntityManager.GetChunkLoaderEntity();
             
             _lineFrameEntities = new List<LineFrameEntity>();
+            
+            _rasterizerStateWireFrame = new RasterizerState();
+            _rasterizerStateSolid = new RasterizerState();
             
             for (var i = 0; i < cameraProps.Length; i++)
             {
@@ -63,12 +69,21 @@ namespace DProject.Entity.Debug
         {
             _graphicsDevice = graphicsDevice;
             
+            _rasterizerStateSolid.CullMode = CullMode.CullCounterClockwiseFace;
+            _rasterizerStateSolid.FillMode = FillMode.Solid;
+
+            _rasterizerStateWireFrame.CullMode = CullMode.CullCounterClockwiseFace;
+            _rasterizerStateWireFrame.FillMode = FillMode.WireFrame;
+            
             _axisEntity.Initialize(graphicsDevice);
             _pointerAxisEntity.Initialize(graphicsDevice);
         }
 
         public void Update(GameTime gameTime)
         {
+            if (Keyboard.GetState().IsKeyDown(Keys.F3))
+                _graphicsDevice.RasterizerState = _rasterizerStateWireFrame;
+            
             if(Keyboard.GetState().IsKeyDown(Keys.LeftControl))
                 UpdateChunkFrames();
             

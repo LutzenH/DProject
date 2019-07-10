@@ -256,7 +256,7 @@ namespace DProject.Type.Rendering
             var normalMap = new Vector3[width, height];
             
             const float yScale = 2f;
-            const float xzScale = IncrementsPerHeightUnit;
+            float xzScale = IncrementsPerHeightUnit * ((float) levelOfDetail + 1);
             
             for (var x = 0; x < width; x += offset)
             {

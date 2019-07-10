@@ -6,7 +6,7 @@ namespace DProject.Entity.Camera
 {
     public class FlyCameraEntity : CameraEntity
     {
-        private const float Speed = 0.5f;
+        private const float Speed = 80f;
 
         public FlyCameraEntity(Vector3 position, Quaternion rotation) : base(position, rotation) { }
 
@@ -16,10 +16,10 @@ namespace DProject.Entity.Camera
         {            
             if (IsActiveCamera)
             {
-                int anglex = 0;
-                int angley = 0;
+                var angleX = 0f;
+                var angleY = 0f;
 
-                float moveSpeed = Keyboard.GetState().IsKeyDown(Keys.LeftShift) ? Speed * 2 : Speed;
+                var moveSpeed = (float) ((Keyboard.GetState().IsKeyDown(Keys.LeftShift) ? Speed * 2 : Speed) * gameTime.ElapsedGameTime.TotalSeconds);
             
                 if (Keyboard.GetState().IsKeyDown(Keys.W))
                     Position += CameraDirection * moveSpeed;
@@ -30,24 +30,24 @@ namespace DProject.Entity.Camera
                 if (Keyboard.GetState().IsKeyDown(Keys.D))
                     Position -= Vector3.Cross(Vector3.Up, CameraDirection) * moveSpeed;
                 if (Keyboard.GetState().IsKeyDown(Keys.Q))
-                    Position.Y += 0.1f;
+                    Position.Y += moveSpeed;
                 if (Keyboard.GetState().IsKeyDown(Keys.E))
-                    Position.Y -= 0.1f;
+                    Position.Y -= moveSpeed;
 
                 if (Keyboard.GetState().IsKeyDown(Keys.Left))
-                    anglex -= 10;
+                    angleX -= moveSpeed*6;
                 if (Keyboard.GetState().IsKeyDown(Keys.Right))
-                    anglex += 10;
+                    angleX += moveSpeed*6;
                 if (Keyboard.GetState().IsKeyDown(Keys.Up))
-                    angley += 10;
+                    angleY += moveSpeed*6;
                 if (Keyboard.GetState().IsKeyDown(Keys.Down))
-                    angley -= 10;
+                    angleY -= moveSpeed*6;
                 
                 Vector3 cameraUpPerpendicular = Vector3.Cross(Vector3.Up, CameraDirection);
                 cameraUpPerpendicular.Normalize();
             
-                CameraDirection = Vector3.Transform(CameraDirection, Matrix.CreateFromAxisAngle(cameraUpPerpendicular, (-MathHelper.PiOver4 / 150) * angley));
-                CameraDirection = Vector3.Transform(CameraDirection, Matrix.CreateFromAxisAngle(Vector3.Up,(-MathHelper.PiOver4 / 150) * anglex));       
+                CameraDirection = Vector3.Transform(CameraDirection, Matrix.CreateFromAxisAngle(cameraUpPerpendicular, (-MathHelper.PiOver4 / 150) * angleY));
+                CameraDirection = Vector3.Transform(CameraDirection, Matrix.CreateFromAxisAngle(Vector3.Up,(-MathHelper.PiOver4 / 150) * angleX));       
             
                 CameraDirection.Normalize();
             

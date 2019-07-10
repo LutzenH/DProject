@@ -1,6 +1,6 @@
-﻿using DProject.List;
+﻿using System;
+using DProject.List;
 using DProject.Manager;
-using DProject.Type.Rendering;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -26,6 +26,9 @@ namespace DProject
 
         public static int WidgetOffsetX;
         public static int WidgetOffsetY;
+
+        private DateTime _last = DateTime.Now;
+        private int _fps;
         
         public Game1(EntityManager entityManager)
         {
@@ -43,9 +46,10 @@ namespace DProject
             _graphics.PreferredBackBufferHeight = ScreenResolutionY;
 
             _backgroundColor = Color.Black;
-            
+
             //VSYNC
             _graphics.SynchronizeWithVerticalRetrace = false;
+            IsFixedTimeStep = false;
             
             //Mouse
             IsMouseVisible = true;
@@ -63,7 +67,7 @@ namespace DProject
         }
 
         protected override void LoadContent()
-        {            
+        {
             _entityManager.LoadContent(Content);
             _uiManager.LoadContent(Content);
             
@@ -72,6 +76,16 @@ namespace DProject
 
         protected override void Update(GameTime gameTime)
         {
+            if ((DateTime.Now - _last).TotalMilliseconds >= 1000)
+            {
+                var title = string.Concat("DProject | FPS:", _fps);
+                Window.Title = title;
+                _fps = 0;
+                _last = DateTime.Now;
+            }
+            else
+                _fps++;
+            
             _uiManager.Update(gameTime);
             _entityManager.Update(gameTime);
             
@@ -83,7 +97,7 @@ namespace DProject
         }
 
         protected override void Draw(GameTime gameTime)
-        {                
+        {
             //Background color
             GraphicsDevice.Clear(_backgroundColor);
             
