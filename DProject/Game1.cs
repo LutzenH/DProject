@@ -39,8 +39,8 @@ namespace DProject
             
             Content.RootDirectory = RootDirectory;
 
-            ScreenResolutionX = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
-            ScreenResolutionY = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
+            ScreenResolutionX = (int) (GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width/1.5);
+            ScreenResolutionY = (int) (GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height/1.5);
             
             _graphics.PreferredBackBufferWidth = ScreenResolutionX;
             _graphics.PreferredBackBufferHeight = ScreenResolutionY;
@@ -50,6 +50,9 @@ namespace DProject
             //VSYNC
             _graphics.SynchronizeWithVerticalRetrace = false;
             IsFixedTimeStep = false;
+
+            Window.AllowUserResizing = true;
+            Window.ClientSizeChanged += (sender, args) => SetScreenResolution(Window.ClientBounds.Width, Window.ClientBounds.Height);
             
             //Mouse
             IsMouseVisible = true;
