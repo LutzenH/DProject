@@ -5,6 +5,8 @@ using System.IO;
 using System.Timers;
 using Cairo;
 using DProject.Entity;
+using DProject.Entity.Camera;
+using DProject.Entity.Chunk;
 using DProject.List;
 using DProject.Manager;
 using DProject.Type.Serializable;
@@ -13,6 +15,8 @@ using Gtk;
 using Microsoft.Xna.Framework;
 using Color = Gdk.Color;
 using Rectangle = Gdk.Rectangle;
+// ReSharper disable InconsistentNaming
+// ReSharper disable IdentifierTypo
 
 #pragma warning disable 649
 
@@ -115,10 +119,9 @@ namespace DProject
 
         private void SetTimer()
         {
-            // Create a timer with a two second interval.
             _timer = new Timer(1000);
-            // Hook up the Elapsed event for the timer. 
             _timer.Elapsed += (sender, args) => FetchGameInfo();
+            
             _timer.AutoReset = true;
             _timer.Enabled = true;
         }
@@ -409,15 +412,17 @@ namespace DProject
 
         private static FlowBoxChild CreateFlowBoxColor(string name, byte r, byte g, byte b)
         {
-            FlowBoxChild child = new FlowBoxChild();
-            child.HasTooltip = true;
-            child.TooltipText = name;
+            var child = new FlowBoxChild
+            {
+                HasTooltip = true,
+                TooltipText = name
+            };
 
-            Image image = new Image();
-
+            var image = new Image();
             image.ModifyBg(StateType.Normal, new Color(r, g, b));
             image.WidthRequest = 25;
             image.HeightRequest = 25;
+            
             child.Add(image);
 
             return child;
@@ -426,16 +431,20 @@ namespace DProject
         private static FlowBoxChild CreateFlowBoxTexture(Pixbuf buf, string name, int xsize, int ysize, int xoffset,
             int yoffset, int scale)
         {
-            FlowBoxChild child = new FlowBoxChild();
-            child.HasTooltip = true;
-            child.TooltipText = name;
+            var child = new FlowBoxChild
+            {
+                HasTooltip = true,
+                TooltipText = name
+            };
 
             var buffer = new Pixbuf(buf, xoffset, yoffset, xsize, ysize);
             buffer = buffer.ScaleSimple(xsize * scale, ysize * scale, InterpType.Nearest);
 
-            Image image = new Image(buffer);
-            image.WidthRequest = xsize * scale;
-            image.HeightRequest = ysize * scale;
+            var image = new Image(buffer)
+            {
+                WidthRequest = xsize * scale,
+                HeightRequest = ysize * scale
+            };
 
             child.Add(image);
 
@@ -452,9 +461,10 @@ namespace DProject
         {
             list_debug_info_items = new Dictionary<string, object>
             {
-                {"camera_position_x", 0.00f},
-                {"camera_position_y", 0.00f},
-                {"camera_position_z", 0.00f}
+                { "camera_position", new Vector3(-1f, -1f, -1f) },
+                { "load_distance", -1 },
+                { "camera_near_plane_distance", -1f },
+                { "camera_far_plane_distance", -1f }
             };
 
             var keyColumn = new TreeViewColumn { Title = "Key" };
@@ -462,7 +472,7 @@ namespace DProject
             keyColumn.PackStart (keyCell, true);
 
             var valueColumn = new TreeViewColumn { Title = "Value" };
-            var valueCell = new VariableCellRenderer();
+            var valueCell = new CellRendererText() { Editable = true };
             valueColumn.PackStart (valueCell, true);
 
             var listDebugInfo = new ListStore(typeof(string), typeof(object));
@@ -478,77 +488,6 @@ namespace DProject
             debug_info_tree_view.AppendColumn(valueColumn);
         }
 
-        private class VariableCellRenderer : CellRenderer
-        {
-            internal enum CellRendererType { Text, Toggle, Spin, Combo };
-
-            public static CellRendererType RendererType = CellRendererType.Text;
-            
-            private readonly CellRendererText _textRenderer;
-            private readonly CellRendererToggle _toggleRenderer;
-            private readonly CellRendererSpin _spinRenderer;
-            private readonly CellRendererCombo _comboRenderer;
-
-            private readonly Adjustment _spinnerAdjustment;
-
-            public VariableCellRenderer()
-            {
-                _textRenderer = new CellRendererText { Editable = true };
-                _spinRenderer = new CellRendererSpin { Editable = true };
-                _toggleRenderer = new CellRendererToggle { Activatable = true };
-                _comboRenderer = new CellRendererCombo { HasEntry = false, TextColumn = 0, Editable = true };
-                
-                _spinnerAdjustment = new Adjustment(0d, float.MinValue, float.MaxValue, 1d, 10d, 0d);
-                _spinRenderer.Adjustment = _spinnerAdjustment;
-            }
-
-            protected override void OnRender(Context cr, Widget widget, Rectangle background_area, Rectangle cell_area, CellRendererState flags)
-            {
-                switch (RendererType)
-                {
-                    case CellRendererType.Text:
-                        _textRenderer.Render(cr, widget, background_area, cell_area, flags);
-                        break;
-                    case CellRendererType.Toggle:
-                        _toggleRenderer.Render(cr, widget, background_area, cell_area, flags);
-                        break;
-                    case CellRendererType.Spin:
-                        _spinRenderer.Render(cr, widget, background_area, cell_area, flags);
-                        break;
-                    case CellRendererType.Combo:
-                        _comboRenderer.Render(cr, widget, background_area, cell_area, flags);
-                        break;
-                    default:
-                        base.OnRender(cr, widget, background_area, cell_area, flags);
-                        break;
-                }
-            }
-
-            public CellRendererToggle GetCellRendererToggle()
-            {
-                RendererType = CellRendererType.Toggle;
-                return _toggleRenderer;
-            }
-
-            public CellRendererText GetCellRendererText()
-            {
-                RendererType = CellRendererType.Text;
-                return _textRenderer;
-            }
-
-            public CellRendererSpin GetCellRendererSpin()
-            {
-                RendererType = CellRendererType.Spin;
-                return _spinRenderer;
-            }
-
-            public CellRendererCombo GetCellRendererCombo()
-            {
-                RendererType = CellRendererType.Combo;
-                return _comboRenderer;
-            }
-        }
-
         private void RenderDebugTreeKeyText (TreeViewColumn column, CellRenderer cell, ITreeModel model, TreeIter iter)
         {
             var item = (string) model.GetValue (iter, 0);
@@ -560,17 +499,14 @@ namespace DProject
             var item = (string) model.GetValue (iter, 0);
 
             var value = list_debug_info_items[item];
-            
+
             switch (System.Type.GetTypeCode(value.GetType()))
             {
                 case TypeCode.Boolean:
-                    ((VariableCellRenderer) cell).GetCellRendererToggle().Active = (bool) value;
+                    ((CellRendererText) cell).Text = value.ToString().ToLower();
                     break;
-                case TypeCode.Single:
-                    ((VariableCellRenderer) cell).GetCellRendererSpin().Adjustment.Value = (float) value;
-                    break;
-                case TypeCode.String:
-                    ((VariableCellRenderer) cell).GetCellRendererText().Text = value.ToString();
+                default:
+                    ((CellRendererText) cell).Text = value.ToString();
                     break;
             }
         }
@@ -579,10 +515,11 @@ namespace DProject
         {
             label_bottom_info.Text = "FPS: " + _game.GetFPS();
 
-            list_debug_info_items["camera_position_x"] = _game.GetEntityManager().GetActiveCamera().GetPosition().X;
-            list_debug_info_items["camera_position_y"] = _game.GetEntityManager().GetActiveCamera().GetPosition().Y;
-            list_debug_info_items["camera_position_z"] = _game.GetEntityManager().GetActiveCamera().GetPosition().Z;
-            
+            list_debug_info_items["camera_position"] = _editorEntityManager.GetActiveCamera().GetPosition();
+            list_debug_info_items["camera_near_plane_distance"] = _editorEntityManager.GetActiveCamera().GetNearPlaneDistance();
+            list_debug_info_items["camera_far_plane_distance"] = _editorEntityManager.GetActiveCamera().GetFarPlaneDistance();
+            list_debug_info_items["load_distance"] = _editorEntityManager.GetChunkLoaderEntity().GetLoadDistance();
+
             debug_info_tree_view.QueueDraw();
         }
 
@@ -593,9 +530,9 @@ namespace DProject
                 if (color.Value.GetColorName() == name)
                     return new RGBA()
                     {
-                        Red = color.Value.Red/256d,
-                        Green = color.Value.Green/256d,
-                        Blue = color.Value.Blue/256d,
+                        Red = color.Value.Red / 256d,
+                        Green = color.Value.Green / 256d,
+                        Blue = color.Value.Blue / 256d,
                         Alpha = 1d
                     };
             }

@@ -14,7 +14,6 @@ using DProject.List;
 using DProject.Manager;
 using DProject.Type;
 using DProject.Type.Enum;
-using DProject.Type.Rendering;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -31,10 +30,12 @@ namespace DProject.Entity.Chunk
         private (int, int) _previousChunkPosition;
         private (int, int) _chunkPosition;
 
-        public const int LoadDistance = 8;
+        private const int DefaultLoadDistance = 8;
         public const int ChunkSize = 64;
+
+        private int _loadDistance;
         
-        private ConcurrentDictionary<(int, int), TerrainEntity> _loadedChunks;
+        private readonly ConcurrentDictionary<(int, int), TerrainEntity> _loadedChunks;
         
         private bool _loadedChunksLastFrame;
         
@@ -53,6 +54,8 @@ namespace DProject.Entity.Chunk
             new Vector3(1, 1, 1))
         {
             _loadedChunks = new ConcurrentDictionary<(int, int), TerrainEntity>();
+
+            _loadDistance = DefaultLoadDistance;
             
             _chunkPosition = (0, 0);
             _previousChunkPosition = (-1, 0);
@@ -116,13 +119,13 @@ namespace DProject.Entity.Chunk
                 int x, y, dx, dy;
                 x = y = dx =0;
                 dy = -1;
-                var t = Math.Max(LoadDistance, LoadDistance);
+                var t = Math.Max(_loadDistance, _loadDistance);
                 var maxI = t * t;
                 for(var i = 0; i < maxI; i++){
-                    if (-LoadDistance/2 <= x 
-                        && x <= LoadDistance/2 
-                        && -LoadDistance/2 <= y 
-                        && y <= LoadDistance/2)
+                    if (-_loadDistance/2 <= x 
+                        && x <= _loadDistance/2 
+                        && -_loadDistance/2 <= y 
+                        && y <= _loadDistance/2)
                     {
                         var position = (chunkPosition.Item1 + x, chunkPosition.Item2 + y);
 
@@ -231,6 +234,7 @@ namespace DProject.Entity.Chunk
         private void AbortLoadingChunks()
         {
             _cancellationToken?.Cancel();
+            EditorEntityManager.AddMessage(new Message("Chunkloading has been aborted."));
         }
 #endif
         
@@ -341,6 +345,16 @@ namespace DProject.Entity.Chunk
         public bool GetLoadedChunksLastFrame()
         {
             return _loadedChunksLastFrame;
+        }
+
+        public int GetLoadDistance()
+        {
+            return _loadDistance;
+        }
+
+        public void SetLoadDistance(int distance)
+        {
+            _loadDistance = distance;
         }
 
         #endregion

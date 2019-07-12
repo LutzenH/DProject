@@ -13,8 +13,11 @@ namespace DProject.Entity.Camera
         protected Matrix ProjectMatrix;
         protected Matrix ViewMatrix;
 
-        protected const float NearPlaneDistance = 0.01f;
-        protected const float FarPlaneDistance = 180f;
+        private const float DefaultNearPlaneDistance = 0.01f;
+        private const float DefaultFarPlaneDistance = 180f;
+        
+        private float _nearPlaneDistance;
+        private float _farPlaneDistance;
         
         //BoundingFrustum (used for culling)
         protected BoundingFrustum BoundingFrustum;
@@ -27,8 +30,11 @@ namespace DProject.Entity.Camera
             CameraDirection = Vector3.Forward;
             CameraDirection.Normalize();
             
+            _nearPlaneDistance = DefaultNearPlaneDistance;
+            _farPlaneDistance = DefaultFarPlaneDistance;
+            
             ViewMatrix = Matrix.CreateLookAt(Position, Position + CameraDirection, Vector3.Up);
-            ProjectMatrix = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(80f), (float)Game1.ScreenResolutionX/(float)Game1.ScreenResolutionY, NearPlaneDistance, FarPlaneDistance);
+            ProjectMatrix = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(80f), (float)Game1.ScreenResolutionX/(float)Game1.ScreenResolutionY, _nearPlaneDistance, _farPlaneDistance);
         }
 
         public abstract override void LoadContent(ContentManager content);
@@ -36,7 +42,7 @@ namespace DProject.Entity.Camera
         public virtual void Update(GameTime gameTime)
         {
             ViewMatrix = Matrix.CreateLookAt(Position, Position + CameraDirection, Vector3.Up);
-            ProjectMatrix = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(80f), (float)Game1.ScreenResolutionX/(float)Game1.ScreenResolutionY, NearPlaneDistance, FarPlaneDistance);
+            ProjectMatrix = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(80f), (float)Game1.ScreenResolutionX/(float)Game1.ScreenResolutionY, _nearPlaneDistance, _farPlaneDistance);
             BoundingFrustum = new BoundingFrustum(ViewMatrix * ProjectMatrix);
         }
 
@@ -58,6 +64,26 @@ namespace DProject.Entity.Camera
         public Vector3 GetCameraDirection()
         {
             return CameraDirection;
+        }
+
+        public float GetNearPlaneDistance()
+        {
+            return _nearPlaneDistance;
+        }
+
+        public void SetNearPlaneDistance(float distance)
+        {
+            _nearPlaneDistance = distance;
+        }
+
+        public float GetFarPlaneDistance()
+        {
+            return _farPlaneDistance;
+        }
+        
+        public void SetFarPlaneDistance(float distance)
+        {
+            _farPlaneDistance = distance;
         }
     }
 }
