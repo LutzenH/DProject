@@ -3,3 +3,4 @@ bin/
 DProject/Content/obj/
 DProject.Editor/obj/
 DProject.Linux/obj/
+*.blend1

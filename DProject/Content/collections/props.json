@@ -138,5 +138,26 @@
         "default_scale_x":1.00,
         "default_scale_y":1.00,
         "default_scale_z":1.00
+    },
+    {
+        "name":"crate",
+        "path":"models/ports/crate",
+        "default_scale_x":1.00,
+        "default_scale_y":1.00,
+        "default_scale_z":1.00
+    },
+    {
+        "name":"crate_covered",
+        "path":"models/ports/crate_covered",
+        "default_scale_x":1.00,
+        "default_scale_y":1.00,
+        "default_scale_z":1.00
+    },
+    {
+        "name":"shelves_empty",
+        "path":"models/ports/shelves_empty",
+        "default_scale_x":1.00,
+        "default_scale_y":1.00,
+        "default_scale_z":1.00
     }
 ]} 
