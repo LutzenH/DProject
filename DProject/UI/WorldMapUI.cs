@@ -12,7 +12,6 @@ using DProject.Type.Rendering.Map;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using IUpdateable = DProject.Entity.Interface.IUpdateable;
 
 namespace DProject.UI

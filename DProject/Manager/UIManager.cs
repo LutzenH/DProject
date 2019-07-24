@@ -27,7 +27,7 @@ namespace DProject.Manager
                     _userInterfaces.Add(new MessageUI(editorEntityManager));
                     break;
                 case GameEntityManager gameEntityManager:
-                    _userInterfaces.Add(new WorldMapUI(gameEntityManager, 8, new Point(10, 10)));
+                    
                     break;
             }
         }

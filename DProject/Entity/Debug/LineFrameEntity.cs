@@ -1,7 +1,6 @@
 using DProject.Entity.Camera;
 using DProject.Entity.Interface;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using IDrawable = DProject.Entity.Interface.IDrawable;
 
@@ -70,7 +69,5 @@ namespace DProject.Entity.Debug
                 _graphicsDevice.DrawPrimitives(PrimitiveType.LineList, 0, 4);
             }
         }
-
-        public override void LoadContent(ContentManager content) {}
     }
 }

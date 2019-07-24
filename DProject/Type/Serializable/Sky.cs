@@ -1,5 +1,4 @@
 using MessagePack;
-using Microsoft.Xna.Framework;
 
 namespace DProject.Type.Serializable.Chunk
 {

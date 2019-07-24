@@ -6,7 +6,6 @@ using DProject.Entity.Interface;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 
 namespace DProject.Manager
 {
@@ -46,7 +45,8 @@ namespace DProject.Manager
         {
             foreach (var entity in _entities)
             {
-                entity.LoadContent(content);
+                if(entity is ILoadContent loadContentEntity)
+                    loadContentEntity.LoadContent(content);
             }
         }
 

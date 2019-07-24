@@ -22,7 +22,7 @@ using IUpdateable = DProject.Entity.Interface.IUpdateable;
 
 namespace DProject.Entity.Chunk
 {
-    public class ChunkLoaderEntity : AbstractAwareEntity, IDrawable, IInitialize, IUpdateable
+    public class ChunkLoaderEntity : AbstractAwareEntity, IDrawable, IInitialize, IUpdateable, ILoadContent
     {
         private GraphicsDevice _graphicsDevice;
         private ContentManager _contentManager;
@@ -62,7 +62,7 @@ namespace DProject.Entity.Chunk
             _loadingStatus = ChunkLoadingStatus.Done;
         }
 
-        public override void LoadContent(ContentManager content)
+        public void LoadContent(ContentManager content)
         {
             _contentManager = content;
         }
@@ -405,14 +405,14 @@ namespace DProject.Entity.Chunk
         {
             var (x, y) = CalculateLocalChunkPosition(((int, int)) (position.X, position.Z));
 
-            GetChunk(position).PlaceProp((int)x, (int)y, rotation, objectId);
+            GetChunk(position).PlaceProp(x, y, rotation, objectId);
         }
 
         public void RemoveProp(Vector3 position)
         {
             var (x, y) = CalculateLocalChunkPosition(((int, int)) (position.X, position.Z));
 
-            GetChunk(position).RemoveProp((int)x, (int)y);
+            GetChunk(position).RemoveProp(x, y);
         }
         
         #endregion

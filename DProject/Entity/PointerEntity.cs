@@ -4,9 +4,7 @@ using DProject.Entity.Chunk;
 using DProject.Entity.Interface;
 using DProject.Manager;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using IUpdateable = DProject.Entity.Interface.IUpdateable;
 
 namespace DProject.Entity
@@ -16,13 +14,10 @@ namespace DProject.Entity
         private GraphicsDevice _graphicsDevice;
         
         private Vector3 _gridPosition;
-        private byte _currentFloor;
         private TerrainEntity.TileCorner _selectedCorner;
         
         public PointerEntity(EntityManager entityManager) : base(entityManager, Vector3.Zero, Quaternion.Identity, new Vector3(1,1,1)) { }
-
-        public override void LoadContent(ContentManager content) { }
-
+        
         public void Initialize(GraphicsDevice graphicsDevice)
         {
             _graphicsDevice = graphicsDevice;
@@ -30,20 +25,9 @@ namespace DProject.Entity
         
         public void Update(GameTime gameTime)
         {
-            if (Keyboard.GetState().IsKeyUp(Keys.OemPlus) && Game1.PreviousKeyboardState.IsKeyDown(Keys.OemPlus))
-            {
-                _currentFloor++;
-            }
-
-            if (Keyboard.GetState().IsKeyUp(Keys.OemMinus) && Game1.PreviousKeyboardState.IsKeyDown(Keys.OemMinus))
-            {
-                if (_currentFloor != 0)
-                    _currentFloor--;
-            }
-            
             var mouseLocation = Game1.GetMousePosition();
 
-            var position = CalculatePrecisePosition(mouseLocation, EntityManager.GetActiveCamera(), _graphicsDevice, EntityManager.GetChunkLoaderEntity(), _currentFloor);
+            var position = CalculatePrecisePosition(mouseLocation, EntityManager.GetActiveCamera(), _graphicsDevice, EntityManager.GetChunkLoaderEntity());
 
             if (position != null)
             {
@@ -78,7 +62,7 @@ namespace DProject.Entity
         }
 
         private static Vector3? CalculatePrecisePosition(Vector2 mouseLocation, CameraEntity camera,
-            GraphicsDevice graphicsDevice, ChunkLoaderEntity chunkLoaderEntity, int currentFloor)
+            GraphicsDevice graphicsDevice, ChunkLoaderEntity chunkLoaderEntity)
         {
             Ray ray = CalculateRay(mouseLocation, camera.GetViewMatrix(),
                 camera.GetProjectMatrix(), graphicsDevice.Viewport);
@@ -87,7 +71,7 @@ namespace DProject.Entity
             var chunkPosition = ChunkLoaderEntity.CalculateChunkPosition(position);
 
             //The closest chunk and all its surrounding chunks.
-            var chunkPositions = new (int, int)[]
+            var chunkPositions = new[]
             {
                 chunkPosition,
                 (chunkPosition.Item1 - 1, chunkPosition.Item2),
@@ -145,11 +129,6 @@ namespace DProject.Entity
         #endregion
 
         #region Getters and Setters
-
-        public int GetCurrentFloor()
-        {
-            return _currentFloor;
-        }
 
         public Vector3 GetGridPosition()
         {

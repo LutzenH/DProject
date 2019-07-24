@@ -14,9 +14,9 @@ using IUpdateable = DProject.Entity.Interface.IUpdateable;
 
 namespace DProject.Entity.Debug
 {
-    public class DebugEntity : AbstractAwareEntity, IInitialize, IUpdateable, IDrawable
+    public class DebugEntity : AbstractAwareEntity, IInitialize, IUpdateable, IDrawable, ILoadContent
     {
-        private readonly PropEntity[] cameraProps;
+        private readonly PropEntity[] _cameraProps;
         
         private readonly List<CameraEntity> _cameraEntities;
         private readonly ChunkLoaderEntity _chunkLoaderEntity;
@@ -41,7 +41,7 @@ namespace DProject.Entity.Debug
             
             var cameraEntities = EntityManager.GetCameraEntities();
             
-            cameraProps = new PropEntity[cameraEntities.Count];
+            _cameraProps = new PropEntity[cameraEntities.Count];
             
             _cameraEntities = cameraEntities;
             _chunkLoaderEntity = EntityManager.GetChunkLoaderEntity();
@@ -51,17 +51,17 @@ namespace DProject.Entity.Debug
             _rasterizerStateWireFrame = new RasterizerState();
             _rasterizerStateSolid = new RasterizerState();
             
-            for (var i = 0; i < cameraProps.Length; i++)
+            for (var i = 0; i < _cameraProps.Length; i++)
             {
-                cameraProps[i] = new PropEntity(_cameraEntities[i].GetPosition(), Quaternion.Identity, cameraEntities[i].GetScale(), 5); //camera
+                _cameraProps[i] = new PropEntity(_cameraEntities[i].GetPosition(), Quaternion.Identity, cameraEntities[i].GetScale(), 5); //camera
             }
         }
 
-        public override void LoadContent(ContentManager content)
+        public void LoadContent(ContentManager content)
         {
-            for (var i = 0; i < cameraProps.Length; i++)
+            for (var i = 0; i < _cameraProps.Length; i++)
             {
-                cameraProps[i].LoadContent(content);
+                _cameraProps[i].LoadContent(content);
             }
         }
 
@@ -87,15 +87,15 @@ namespace DProject.Entity.Debug
             if(Keyboard.GetState().IsKeyDown(Keys.LeftControl))
                 UpdateChunkFrames();
             
-            for (var i = 0; i < cameraProps.Length; i++)
+            for (var i = 0; i < _cameraProps.Length; i++)
             {
                 var cameraDirection = _cameraEntities[i].GetCameraDirection();
 
                 var yaw = (float) Math.Asin(cameraDirection.X / Math.Cos(Math.Asin(cameraDirection.Y)));
                 var pitch = (float) Math.Asin(cameraDirection.Y);
           
-                cameraProps[i].SetPosition(_cameraEntities[i].GetPosition());
-                cameraProps[i].SetRotation(-pitch, yaw+ 1.5f, 0f);
+                _cameraProps[i].SetPosition(_cameraEntities[i].GetPosition());
+                _cameraProps[i].SetRotation(-pitch, yaw+ 1.5f, 0f);
             }
             
             _axisEntity.SetPosition(_pointerEntity.GetPosition());
@@ -145,9 +145,9 @@ namespace DProject.Entity.Debug
             _axisEntity.Draw(activeCamera);
             _pointerAxisEntity.Draw(activeCamera);
             
-            for (var i = 0; i < cameraProps.Length; i++)
+            for (var i = 0; i < _cameraProps.Length; i++)
             {
-                cameraProps[i].Draw(activeCamera);
+                _cameraProps[i].Draw(activeCamera);
             }
 
             foreach (var lineFrame in _lineFrameEntities)

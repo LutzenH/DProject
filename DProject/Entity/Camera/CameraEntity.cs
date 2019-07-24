@@ -1,5 +1,4 @@
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
 using IUpdateable = DProject.Entity.Interface.IUpdateable;
 
 namespace DProject.Entity.Camera
@@ -34,15 +33,13 @@ namespace DProject.Entity.Camera
             _farPlaneDistance = DefaultFarPlaneDistance;
             
             ViewMatrix = Matrix.CreateLookAt(Position, Position + CameraDirection, Vector3.Up);
-            ProjectMatrix = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(80f), (float)Game1.ScreenResolutionX/(float)Game1.ScreenResolutionY, _nearPlaneDistance, _farPlaneDistance);
+            ProjectMatrix = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(80f), Game1.ScreenResolutionX/(float)Game1.ScreenResolutionY, _nearPlaneDistance, _farPlaneDistance);
         }
-
-        public abstract override void LoadContent(ContentManager content);
-
+        
         public virtual void Update(GameTime gameTime)
         {
             ViewMatrix = Matrix.CreateLookAt(Position, Position + CameraDirection, Vector3.Up);
-            ProjectMatrix = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(80f), (float)Game1.ScreenResolutionX/(float)Game1.ScreenResolutionY, _nearPlaneDistance, _farPlaneDistance);
+            ProjectMatrix = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(80f), Game1.ScreenResolutionX/(float)Game1.ScreenResolutionY, _nearPlaneDistance, _farPlaneDistance);
             BoundingFrustum = new BoundingFrustum(ViewMatrix * ProjectMatrix);
         }
 

@@ -2,7 +2,6 @@ using DProject.Entity.Camera;
 using DProject.Entity.Chunk;
 using DProject.Entity.Interface;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using IDrawable = DProject.Entity.Interface.IDrawable;
 
@@ -88,7 +87,5 @@ namespace DProject.Entity.Debug
         {
             SetRotation(GenerateRotationFromCorner(corner));
         }
-
-        public override void LoadContent(ContentManager content) {}
     }
 }

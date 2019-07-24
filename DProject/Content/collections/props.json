@@ -187,5 +187,19 @@
         "default_scale_x":1.00,
         "default_scale_y":1.00,
         "default_scale_z":1.00
+    },
+    {
+        "name":"seat",
+        "path":"models/ports/seat",
+        "default_scale_x":1.00,
+        "default_scale_y":1.00,
+        "default_scale_z":1.00
+    },
+    {
+        "name":"stool",
+        "path":"models/ports/stool",
+        "default_scale_x":1.00,
+        "default_scale_y":1.00,
+        "default_scale_z":1.00
     }
 ]} 

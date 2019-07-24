@@ -1,5 +1,4 @@
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Input;
 
 namespace DProject.Entity.Camera
@@ -9,9 +8,7 @@ namespace DProject.Entity.Camera
         private const float Speed = 80f;
 
         public FlyCameraEntity(Vector3 position, Quaternion rotation) : base(position, rotation) { }
-
-        public override void LoadContent(ContentManager content) { }
-
+        
         public override void Update(GameTime gameTime)
         {            
             if (IsActiveCamera)

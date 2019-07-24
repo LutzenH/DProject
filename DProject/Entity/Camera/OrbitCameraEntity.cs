@@ -1,6 +1,5 @@
 using System;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Input;
 
 namespace DProject.Entity.Camera
@@ -18,7 +17,7 @@ namespace DProject.Entity.Camera
 
         private Vector3 _cameraOffset;
         private float _distanceFromCamera = 10f;
-        private float _cameraOrbitInDegrees = 0f;
+        private float _cameraOrbitInDegrees;
         
         public OrbitCameraEntity(AbstractEntity entityToOrbit, Quaternion rotation) : base(new Vector3(0,0,0f), rotation)
         {
@@ -29,9 +28,7 @@ namespace DProject.Entity.Camera
             var entityPosition = _entity.GetPosition();
             Position = entityPosition + _cameraOffset;
         }
-
-        public override void LoadContent(ContentManager content) { }
-
+        
         public override void Update(GameTime gameTime)
         {
             var entityPosition = _entity.GetPosition();

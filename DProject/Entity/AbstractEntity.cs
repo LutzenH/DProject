@@ -1,5 +1,4 @@
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
 
 namespace DProject.Entity
 {
@@ -22,8 +21,6 @@ namespace DProject.Entity
             Rotation = Matrix.CreateFromYawPitchRoll(yaw, pitch, roll);
             Scale = scale;
         }
-
-        public abstract void LoadContent(ContentManager content);
 
         #region Getters and Setters
 

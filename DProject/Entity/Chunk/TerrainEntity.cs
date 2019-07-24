@@ -16,7 +16,7 @@ using Object = DProject.Type.Serializable.Chunk.Object;
 
 namespace DProject.Entity.Chunk
 {
-    public class TerrainEntity : AbstractEntity, IDrawable, IInitialize
+    public class TerrainEntity : AbstractEntity, IDrawable, IInitialize, ILoadContent
     {
         private readonly HeightMap _heightMap;
 
@@ -123,7 +123,7 @@ namespace DProject.Entity.Chunk
             return boundingBoxes;
         }
 
-        public override void LoadContent(ContentManager content)
+        public void LoadContent(ContentManager content)
         {
             _contentManager = content;
             

@@ -1,4 +1,5 @@
 using DProject.Entity.Camera;
+using DProject.Entity.Interface;
 using DProject.List;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -7,7 +8,7 @@ using IDrawable = DProject.Entity.Interface.IDrawable;
 
 namespace DProject.Entity
 {
-    public class PropEntity : AbstractEntity, IDrawable
+    public class PropEntity : AbstractEntity, IDrawable, ILoadContent
     {        
         //Models
         private Model _model;
@@ -25,7 +26,7 @@ namespace DProject.Entity
 
         public PropEntity(Vector3 position, ushort id) : this(position, Quaternion.Identity, Props.PropList[id].GetDefaultScale(), id) { }
 
-        public override void LoadContent(ContentManager content)
+        public void LoadContent(ContentManager content)
         {
             _model = content.Load<Model>(_modelPath);
         }

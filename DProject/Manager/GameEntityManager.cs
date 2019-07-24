@@ -1,5 +1,6 @@
 using DProject.Entity;
 using DProject.Entity.Camera;
+using DProject.Entity.Ports;
 using Microsoft.Xna.Framework;
 
 namespace DProject.Manager
@@ -10,10 +11,8 @@ namespace DProject.Manager
         
         public GameEntityManager()
         {
-            _playerEntity = new PlayerEntity(this, 0, 0, 0);
-            AddEntity(_playerEntity);
-            
-            AddCamera(new OrbitCameraEntity(_playerEntity, Quaternion.Identity));
+            AddEntity(new GameTimeEntity());
+            AddCamera(new FlyCameraEntity(new Vector3(0, 10, 0), Quaternion.Identity));
         }
 
         public PlayerEntity GetPlayerEntity()

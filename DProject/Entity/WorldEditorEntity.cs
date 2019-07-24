@@ -7,7 +7,6 @@ using DProject.List;
 using DProject.Manager;
 using DProject.Type.Enum;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using IDrawable = DProject.Entity.Interface.IDrawable;
 using IUpdateable = DProject.Entity.Interface.IUpdateable;
@@ -44,9 +43,7 @@ namespace DProject.Entity
             _selectedTexture = Textures.GetDefaultTextureId();
             _selectedColor = Colors.GetDefaultColorId();
         }
-
-        public override void LoadContent(ContentManager content) { }
-
+        
         public void Initialize(GraphicsDevice graphicsDevice)
         {
             _cornerIndicatorEntity.Initialize(graphicsDevice);

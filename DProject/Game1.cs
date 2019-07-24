@@ -31,7 +31,7 @@ namespace DProject
         
         private DateTime _last = DateTime.Now;
         private int _fps;
-        private int _lastRecordedFPS;
+        private int _lastRecordedFps;
         
         public Game1(EntityManager entityManager)
         {
@@ -84,8 +84,8 @@ namespace DProject
         {
             if ((DateTime.Now - _last).TotalMilliseconds >= 1000)
             {
-                _lastRecordedFPS = _fps;
-                var title = string.Concat("DProject | FPS:", _lastRecordedFPS);
+                _lastRecordedFps = _fps;
+                var title = string.Concat("DProject | FPS:", _lastRecordedFps);
                 Window.Title = title;
                 _fps = 0;
                 _last = DateTime.Now;
@@ -153,9 +153,9 @@ namespace DProject
             return _entityManager;
         }
 
-        public int GetFPS()
+        public int GetFps()
         {
-            return _lastRecordedFPS;
+            return _lastRecordedFps;
         }
     }
 }

@@ -513,7 +513,7 @@ namespace DProject
 
         private void FetchGameInfo()
         {
-            label_bottom_info.Text = "FPS: " + _game.GetFPS();
+            label_bottom_info.Text = "FPS: " + _game.GetFps();
 
             list_debug_info_items["camera_position"] = _editorEntityManager.GetActiveCamera().GetPosition();
             list_debug_info_items["camera_near_plane_distance"] = _editorEntityManager.GetActiveCamera().GetNearPlaneDistance();

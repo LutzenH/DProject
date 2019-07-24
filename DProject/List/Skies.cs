@@ -1,10 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using DProject.Type.Serializable;
 using DProject.Type.Serializable.Chunk;
 using MessagePack;
-using Microsoft.Xna.Framework;
 
 namespace DProject.List
 {
