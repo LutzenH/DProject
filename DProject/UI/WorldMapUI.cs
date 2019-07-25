@@ -10,7 +10,6 @@ using DProject.Entity.Interface;
 using DProject.Manager;
 using DProject.Type.Rendering.Map;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using IUpdateable = DProject.Entity.Interface.IUpdateable;
 
@@ -44,9 +43,7 @@ namespace DProject.UI
             _mapSize = mapSize;
             _mapChunkTexture2D = new MapChunkTexture2D[_mapSize, _mapSize];
         }
-
-        public override void LoadContent(ContentManager content) { }
-
+        
         public override void Draw(SpriteBatch spriteBatch)
         {
             DrawMap(spriteBatch, _position.X, _position.Y);

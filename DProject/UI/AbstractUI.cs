@@ -1,5 +1,4 @@
 using DProject.Manager;
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace DProject.UI
@@ -13,8 +12,6 @@ namespace DProject.UI
             EntityManager = entityManager;
         }
         
-        public abstract void LoadContent(ContentManager content);
-
         public abstract void Draw(SpriteBatch spriteBatch);
     }
 }

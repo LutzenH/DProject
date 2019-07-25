@@ -1,4 +1,5 @@
 using DProject.Entity;
+using DProject.Entity.Interface;
 using DProject.List;
 using DProject.Manager;
 using Microsoft.Xna.Framework;
@@ -7,7 +8,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace DProject.UI
 {
-    public class WorldEditorUI : AbstractUI
+    public class WorldEditorUI : AbstractUI, ILoadContent
     {
         private Texture2D _spritesheet;
         private SpriteFont _spriteFont;
@@ -19,7 +20,7 @@ namespace DProject.UI
             _editorEntityManager = (EditorEntityManager) EntityManager;
         }
 
-        public override void LoadContent(ContentManager content)
+        public void LoadContent(ContentManager content)
         {
             _spritesheet = content.Load<Texture2D>("textures/ui/editor");
             _spriteFont = content.Load<SpriteFont>("default");

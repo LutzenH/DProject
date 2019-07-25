@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Drawing;
-using System.Drawing.Imaging;
-using System.Runtime.InteropServices;
+using System.IO;
 using Microsoft.Xna.Framework.Graphics;
 using Texture = DProject.Type.Serializable.Texture;
 
@@ -27,14 +26,21 @@ namespace DProject.Type
         
         public void Initialize(GraphicsDevice graphicsDevice)
         {
-            AtlasTexture2D = new Texture2D(graphicsDevice, AtlasBitmap.Width, AtlasBitmap.Height, false, SurfaceFormat.Color);
+            AtlasTexture2D = ConvertToTexture(AtlasBitmap, graphicsDevice);
+        }
+        
+        private static Texture2D ConvertToTexture(Bitmap bitmap, GraphicsDevice graphicsDevice)
+        {
+            Texture2D texture2D;
             
-            var data = AtlasBitmap.LockBits(new Rectangle(0, 0, AtlasBitmap.Width, AtlasBitmap.Height), ImageLockMode.ReadOnly, AtlasBitmap.PixelFormat);
-            var bytes = new byte[data.Height * data.Stride];    
-
-            Marshal.Copy(data.Scan0, bytes, 0, bytes.Length);
+            using (var memoryStream = new MemoryStream())
+            {
+                bitmap.Save(memoryStream, System.Drawing.Imaging.ImageFormat.Png);
+                memoryStream.Seek(0, SeekOrigin.Begin);
+                texture2D = Texture2D.FromStream(graphicsDevice, memoryStream);
+            }
             
-            AtlasTexture2D.SetData(bytes);
+            return texture2D;
         }
     }
 }

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using DProject.Entity.Interface;
 using DProject.Manager;
 using DProject.Type;
 using Microsoft.Xna.Framework;
@@ -9,7 +10,7 @@ using IUpdateable = DProject.Entity.Interface.IUpdateable;
 
 namespace DProject.UI
 {
-    public class MessageUI : AbstractUI, IUpdateable
+    public class MessageUI : AbstractUI, IUpdateable, ILoadContent
     {
         private SpriteFont _spriteFont;
         private string _textString;
@@ -26,7 +27,7 @@ namespace DProject.UI
             _messages = new LinkedList<Message>();
         }
         
-        public override void LoadContent(ContentManager content)
+        public void LoadContent(ContentManager content)
         {
             _spriteFont = content.Load<SpriteFont>("default");
         }

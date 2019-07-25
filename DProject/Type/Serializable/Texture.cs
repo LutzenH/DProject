@@ -27,11 +27,16 @@ namespace DProject.Type.Serializable
            
         [IgnoreMember]
         public Vector4 TexturePosition => new Vector4(XOffset, YOffset, XOffset+XSize, YOffset+YSize);
+        
+        [IgnoreMember]
+        public Rectangle TextureRectangle => new Rectangle(XOffset, YOffset, XSize, YSize);
 
         public Vector4 GetTexturePosition()
         {
             return TexturePosition;
         }
+
+        public Point GetTextureSize() => new Point(XSize, YSize);
 
         public Vector4 GetAdjustedTexturePosition()
         {
