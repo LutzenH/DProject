@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using DProject.Entity.Camera;
 using DProject.Entity.Chunk;
 using DProject.Entity.Debug;
@@ -40,7 +41,7 @@ namespace DProject.Entity
             
             _selectedObject = Props.GetDefaultPropId();
             _selectedRotation = Type.Enum.Rotation.North;
-            _selectedTexture = Textures.GetDefaultTextureId();
+            _selectedTexture = Textures.FloorTextureIdentifiers.First().Key;
             _selectedColor = Colors.GetDefaultColorId();
         }
         

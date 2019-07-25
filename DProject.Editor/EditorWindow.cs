@@ -166,7 +166,7 @@ namespace DProject
             //Texture List
             box_flow_textures.SelectedChildrenChanged += (o, args) => UpdateSelectedItem(o, args, typeof(Texture));
             search_entry_texture.SearchChanged +=
-                (o, args) => FilterItemList(o, args, box_flow_textures, Textures.TextureList);
+                (o, args) => FilterItemList(o, args, box_flow_textures, Textures.AtlasList["floor_textures"].TextureList);
 
             //Box Prop List
             box_prop_list.SelectedRowsChanged += UpdateSelectedProp;
@@ -277,7 +277,7 @@ namespace DProject
             entry_color_name.Text = name;
         }
 
-        private void FilterItemList<T>(object obj, EventArgs args, FlowBox flowBox, Dictionary<ushort, T> list)
+        private void FilterItemList<K, T>(object obj, EventArgs args, FlowBox flowBox, Dictionary<K, T> list)
         {
             var searchEntry = (SearchEntry) obj;
             var text = MakeNameConsistent(searchEntry.Text);
@@ -306,14 +306,15 @@ namespace DProject
                 }
                 else if (item.Value.GetType() == typeof(Texture))
                 {
-                    var texture = item.Value as Texture;
-
-                    if (texture.TextureName.Contains(text))
+                    var itemName = (string)(object) item.Key;
+                    if (itemName.Contains(text))
                     {
+                        var texture = item.Value as Texture;
+
                         flowBox.Add(
                             CreateFlowBoxTexture(
                                 _textureAtlasPixBuf,
-                                texture.TextureName,
+                                itemName,
                                 texture.XSize,
                                 texture.YSize,
                                 texture.XOffset,
@@ -384,12 +385,12 @@ namespace DProject
         {
             SetupTextureAtlasPixBuf();
 
-            foreach (var texture in Textures.TextureList)
+            foreach (var texture in Textures.AtlasList["floor_textures"].TextureList)
             {
                 box_flow_textures.Add(
                     CreateFlowBoxTexture(
                         _textureAtlasPixBuf,
-                        texture.Value.TextureName,
+                        texture.Key,
                         texture.Value.XSize,
                         texture.Value.YSize,
                         texture.Value.XOffset,
@@ -404,7 +405,7 @@ namespace DProject
         private void SetupTextureAtlasPixBuf()
         {
             MemoryStream memoryStream = new MemoryStream();
-            Textures.TextureAtlas.Save(memoryStream, ImageFormat.Png);
+            Textures.AtlasList["floor_textures"].AtlasBitmap.Save(memoryStream, ImageFormat.Png);
             memoryStream.Position = 0;
 
             _textureAtlasPixBuf = new Pixbuf(memoryStream);

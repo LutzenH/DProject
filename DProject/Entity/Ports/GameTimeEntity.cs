@@ -28,7 +28,7 @@ namespace DProject.Entity.Ports
             GameSpeed = 1.0f;
 
             _currentSecond = 0f;
-            _currentSeason = Seasons.Spring;
+            _currentSeason = Seasons.Vernal;
         }
         
         public void Update(GameTime gameTime)
@@ -42,10 +42,6 @@ namespace DProject.Entity.Ports
                 _currentSecond = 0.0d;
                 Tick();
             }
-            
-            Console.WriteLine("Season: " + GetCurrentSeason()
-                                         + ", Day: " + CurrentDay
-                                         + ", Time: " + TimeToTimeString(CurrentTime, _currentSecond));
         }
 
         public void Tick(uint amount = 1)

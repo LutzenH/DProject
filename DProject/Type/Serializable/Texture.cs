@@ -7,12 +7,12 @@ namespace DProject.Type.Serializable
     [MessagePackObject]
     public class Texture
     {
-        [Key("name")]
-        public string TextureName { get; set; }
-        
         [Key("location")]
         public string TexturePath { get; set; }
-        
+
+        [IgnoreMember]
+        public int TextureAtlasSize { get; set; }
+
         [IgnoreMember]
         public int XOffset { get; set; }
         
@@ -33,14 +33,9 @@ namespace DProject.Type.Serializable
             return TexturePosition;
         }
 
-        public string GetTextureName()
-        {
-            return TextureName;
-        }
-
         public Vector4 GetAdjustedTexturePosition()
         {
-            return TexturePosition / Textures.TextureAtlasSize;
+            return TexturePosition / TextureAtlasSize;
         }
     }
 }

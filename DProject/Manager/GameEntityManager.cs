@@ -7,17 +7,10 @@ namespace DProject.Manager
 {
     public class GameEntityManager : EntityManager
     {
-        private readonly PlayerEntity _playerEntity;
-        
         public GameEntityManager()
         {
             AddEntity(new GameTimeEntity());
             AddCamera(new FlyCameraEntity(new Vector3(0, 10, 0), Quaternion.Identity));
-        }
-
-        public PlayerEntity GetPlayerEntity()
-        {
-            return _playerEntity;
         }
     }
 }

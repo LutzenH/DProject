@@ -139,7 +139,7 @@ namespace DProject.UI
 
         public void Update(GameTime gameTime)
         {
-            var playerPosition = _gameEntityManager.GetPlayerEntity().GetPosition();
+            var playerPosition = _gameEntityManager.GetActiveCamera().GetPosition();
 
             _positionOffset = ((int, int)) (playerPosition.X%64, playerPosition.Z%64);
             

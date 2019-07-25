@@ -1,74 +1,138 @@
-{"textures": [
-    {
-        "name":"tile_white",
-        "location":"textures/tiles/tile_white.png"
-    },
-    {
-        "name":"planks",
-        "location":"textures/tiles/planks.png"
-    },
-    {
-        "name":"metal_floor",
-        "location":"textures/tiles/metal_floor.png"
-    },
-    {
-        "name":"metal",
-        "location":"textures/tiles/metal.png"
-    },
-    {
-        "name":"grass",
-        "location":"textures/tiles/grass.png"
-    },
-    {
-        "name":"savanna_grass",
-        "location":"textures/tiles/savanna_grass.png"
-    },
-    {
-        "name":"savanna_grass_dry",
-        "location":"textures/tiles/savanna_grass_dry.png"
-    },
-    {
-        "name":"savanna_earth",
-        "location":"textures/tiles/savanna_earth.png"
-    },
-    {
-        "name":"road_longtile_front",
-        "location":"textures/tiles/road_longtile_front.png"
-    },
-    {
-        "name":"road_longtile_mid",
-        "location":"textures/tiles/road_longtile_mid.png"
-    },
-    {
-        "name":"road_longtile_end",
-        "location":"textures/tiles/road_longtile_end.png"
-    },
-    {
-        "name":"road_0",
-        "location":"textures/tiles/road_0.png"
-    },
-    {
-        "name":"road_1",
-        "location":"textures/tiles/road_1.png"
-    },
-    {
-        "name":"road_2",
-        "location":"textures/tiles/road_2.png"
-    },
-    {
-        "name":"road_sidewalk",
-        "location":"textures/tiles/road_sidewalk.png"
-    },
-    {
-        "name":"sidewalk_tile_0",
-        "location":"textures/tiles/sidewalk_tile_0.png"
-    },
-    {
-        "name":"sidewalk_tile_1",
-        "location":"textures/tiles/sidewalk_tile_1.png"
-    },
-    {
-        "name":"sidewalk_tile_2",
-        "location":"textures/tiles/sidewalk_tile_2.png"
-    }
-]}
+{
+	"floor_textures": {
+		"tile_white": {
+			"location": "textures/tiles/tile_white.png"
+		},
+		"planks": {
+			"location": "textures/tiles/planks.png"
+		},
+		"metal_floor": {
+			"location": "textures/tiles/metal_floor.png"
+		},
+		"metal": {
+			"location": "textures/tiles/metal.png"
+		},
+		"grass": {
+			"location": "textures/tiles/grass.png"
+		},
+		"savanna_grass": {
+			"location": "textures/tiles/savanna_grass.png"
+		},
+		"savanna_grass_dry": {
+			"location": "textures/tiles/savanna_grass_dry.png"
+		},
+		"savanna_earth": {
+			"location": "textures/tiles/savanna_earth.png"
+		},
+		"road_longtile_front": {
+			"location": "textures/tiles/road_longtile_front.png"
+		},
+		"road_longtile_mid": {
+			"location": "textures/tiles/road_longtile_mid.png"
+		},
+		"road_longtile_end": {
+			"location": "textures/tiles/road_longtile_end.png"
+		},
+		"road_0": {
+			"location": "textures/tiles/road_0.png"
+		},
+		"road_1": {
+			"location": "textures/tiles/road_1.png"
+		},
+		"road_2": {
+			"location": "textures/tiles/road_2.png"
+		},
+		"road_sidewalk": {
+			"location": "textures/tiles/road_sidewalk.png"
+		},
+		"sidewalk_tile_0": {
+			"location": "textures/tiles/sidewalk_tile_0.png"
+		},
+		"sidewalk_tile_1": {
+			"location": "textures/tiles/sidewalk_tile_1.png"
+		},
+		"sidewalk_tile_2": {
+			"location": "textures/tiles/sidewalk_tile_2.png"
+		}
+	},
+	"ui_elements": {
+		"clock_frame": {
+			"location": "textures/ui/ports/clock_frame.png"
+		},
+		"clock_sky": {
+			"location": "textures/ui/ports/clock_sky.png"
+		},
+		"compass": {
+			"location": "textures/ui/ports/compass.png"
+		},
+		"frame_simple": {
+			"location": "textures/ui/ports/frame_simple.png"
+		},
+		"map_large": {
+			"location": "textures/ui/ports/map_large.png"
+		},
+		"map_small": {
+			"location": "textures/ui/ports/map_small.png"
+		},
+		"season_autumnal": {
+			"location": "textures/ui/ports/season_autumnal.png"
+		},
+		"season_estival": {
+			"location": "textures/ui/ports/season_estival.png"
+		},
+		"season_hibernal": {
+			"location": "textures/ui/ports/season_hibernal.png"
+		},
+		"season_prevernal": {
+			"location": "textures/ui/ports/season_prevernal.png"
+		},
+		"season_serotinal": {
+			"location": "textures/ui/ports/season_serotinal.png"
+		},
+		"season_vernal": {
+			"location": "textures/ui/ports/season_vernal.png"
+		},
+		"timer_backdrop_disabled": {
+			"location": "textures/ui/ports/timer_backdrop_disabled.png"
+		},
+		"timer_backdrop": {
+			"location": "textures/ui/ports/timer_backdrop.png"
+		},
+		"timer_end_clicked": {
+			"location": "textures/ui/ports/timer_end_clicked.png"
+		},
+		"timer_end_disabled": {
+			"location": "textures/ui/ports/timer_end_disabled.png"
+		},
+		"timer_end": {
+			"location": "textures/ui/ports/timer_end.png"
+		},
+		"timer_pause_clicked": {
+			"location": "textures/ui/ports/timer_pause_clicked.png"
+		},
+		"timer_pause_disabled": {
+			"location": "textures/ui/ports/timer_pause_disabled.png"
+		},
+		"timer_pause": {
+			"location": "textures/ui/ports/timer_pause.png"
+		},
+		"timer_play_clicked": {
+			"location": "textures/ui/ports/timer_play_clicked.png"
+		},
+		"timer_play_disabled": {
+			"location": "textures/ui/ports/timer_play_disabled.png"
+		},
+		"timer_play": {
+			"location": "textures/ui/ports/timer_play.png"
+		},
+		"timer_speedup_clicked": {
+			"location": "textures/ui/ports/timer_speedup_clicked.png"
+		},
+		"timer_speedup_disabled": {
+			"location": "textures/ui/ports/timer_speedup_disabled.png"
+		},
+		"timer_speedup": {
+			"location": "textures/ui/ports/timer_speedup.png"
+		}
+	}
+}

@@ -25,18 +25,6 @@ namespace DProject.Manager
 
             _debugEntity = new DebugEntity(this);
             AddEntity(_debugEntity);
-            
-            AddEntity(new PropEntity(new Vector3(0, 10, 0), 18));
-            AddEntity(new PropEntity(new Vector3(1.5f, 10, 0), 26));
-            AddEntity(new PropEntity(new Vector3(3, 10, 0), 19));
-            AddEntity(new PropEntity(new Vector3(5, 10, 0), 20));
-            AddEntity(new PropEntity(new Vector3(7, 10, 0), 21));
-            AddEntity(new PropEntity(new Vector3(9, 10, 0), 22));
-            AddEntity(new PropEntity(new Vector3(11, 10, 0), 23));
-            AddEntity(new PropEntity(new Vector3(13, 10, 0), 24));
-            AddEntity(new PropEntity(new Vector3(13, 10, 2), 25));
-            AddEntity(new PropEntity(new Vector3(3, 10, 2), 27));
-            AddEntity(new PropEntity(new Vector3(5, 10, 2), 28));
         }
 
         public static void AddMessage(Message message)

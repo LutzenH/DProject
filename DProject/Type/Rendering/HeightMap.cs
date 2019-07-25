@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using DProject.List;
 using DProject.Manager;
 using DProject.Type.Enum;
@@ -156,8 +157,10 @@ namespace DProject.Type.Rendering
                         var colorBottomRight = Colors.ColorList[heightMap[x + offset, y + offset].ColorId].Color;
                             
                         Vector3 normal;
-                        
-                        var texturePositionTexture = Textures.TextureList[(ushort) vertexTextureId].GetAdjustedTexturePosition();
+
+                        var texturePositionTexture = Textures.AtlasList["floor_textures"]
+                            .TextureList[Textures.FloorTextureIdentifiers[(ushort) vertexTextureId]]
+                            .GetAdjustedTexturePosition();
 
                         var normalIndexX = x / offset;
                         var normalIndexY = y / offset;
@@ -219,7 +222,7 @@ namespace DProject.Type.Rendering
                 for (var y = 0; y < length; y++)
                 {
                     var height = heightMap[x,y];
-                    ushort? textureId = Textures.GetDefaultTextureId();
+                    ushort? textureId = Textures.FloorTextureIdentifiers.First().Key;
                     var color = Colors.GetDefaultColorId();
 
                     if (splatMap != null)

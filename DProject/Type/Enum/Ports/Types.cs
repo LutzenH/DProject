@@ -2,7 +2,7 @@ namespace DProject.Type.Enum
 {
     public enum Seasons
     {
-        Spring, Summer, Monsoon, Autumn, Winter, Prevernal
+        Vernal, Estival, Serotinal, Autumnal, Hibernal, Prevernal
     }
 
     public enum Goods
