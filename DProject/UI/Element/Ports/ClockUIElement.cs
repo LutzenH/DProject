@@ -1,11 +1,11 @@
+ using System;
+ using DProject.Entity.Ports;
  using Microsoft.Xna.Framework;
 
  namespace DProject.UI.Element.Ports
 {
     public class ClockUIElement : AbstractUIElement
     {
-        private int currentTime;
-        
         private Sprite _clockSky;
         private Sprite _clockFrame;
         
@@ -16,6 +16,13 @@
             
             AddSprite(_clockSky);
             AddSprite(_clockFrame);
+        }
+
+        public void SetRotation(uint currentTime)
+        {
+            var relativeTime = currentTime / (float) GameTimeEntity.TicksInADay;
+            
+            _clockSky.Rotation = (float) (Math.PI * 2) * relativeTime + (float)Math.PI;
         }
     }
 }

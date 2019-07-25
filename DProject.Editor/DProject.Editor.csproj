@@ -37,4 +37,8 @@
     <PackageReference Include="MonoGame.Framework.Gtk" Version="3.8.0.4" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
+
 </Project>

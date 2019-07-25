@@ -7,8 +7,8 @@ namespace DProject.Entity.Ports
 {
     public class GameTimeEntity  : AbstractEntity, IUpdateable
     {
-        private const uint TicksInADay = 720;
-        private const uint DaysInASeason = 30;
+        public const uint TicksInADay = 720;
+        public const uint DaysInASeason = 30;
         
         public bool IsPaused { get; set; }
         public float GameSpeed { get; set; }

@@ -1,5 +1,6 @@
 using DProject.Entity;
 using System.Collections.Generic;
+using System.Dynamic;
 using DProject.Entity.Camera;
 using DProject.Entity.Chunk;
 using DProject.Entity.Interface;
@@ -9,7 +10,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace DProject.Manager
 {
-    public abstract class EntityManager
+    public abstract class EntityManager : DynamicObject
     {
         private readonly List<AbstractEntity> _entities;
         private readonly List<CameraEntity> _cameraEntities;

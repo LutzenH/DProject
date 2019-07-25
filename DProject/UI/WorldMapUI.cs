@@ -20,8 +20,6 @@ namespace DProject.UI
         private GraphicsDevice _graphicsDevice;
 
         private MapChunkTexture2D[,] _mapChunkTexture2D;
-
-        private GameEntityManager _gameEntityManager;
         
         private (int, int) _chunkPosition;
         private (int, int) _positionOffset;
@@ -34,8 +32,6 @@ namespace DProject.UI
 
         public WorldMapUI(GameEntityManager gameEntityManager, int mapSize, Point position) : base(gameEntityManager)
         {
-            _gameEntityManager = gameEntityManager;
-
             _positionOffset = (0, 0);
 
             _position = position;
@@ -70,7 +66,7 @@ namespace DProject.UI
         {
             _isLoading = true;
             
-            if (!_gameEntityManager.GetChunkLoaderEntity().IsLoadingChunks())
+            if (!EntityManager.GetChunkLoaderEntity().IsLoadingChunks())
             {
                 MapChunkTexture2D[,] oldChunks = _mapChunkTexture2D;
 
@@ -136,7 +132,7 @@ namespace DProject.UI
 
         public void Update(GameTime gameTime)
         {
-            var playerPosition = _gameEntityManager.GetActiveCamera().GetPosition();
+            var playerPosition = EntityManager.GetActiveCamera().GetPosition();
 
             _positionOffset = ((int, int)) (playerPosition.X%64, playerPosition.Z%64);
             

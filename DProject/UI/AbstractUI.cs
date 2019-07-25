@@ -5,7 +5,7 @@ namespace DProject.UI
 {
     public abstract class AbstractUI
     {
-        protected EntityManager EntityManager;
+        protected readonly dynamic EntityManager;
         
         protected AbstractUI(EntityManager entityManager)
         {
