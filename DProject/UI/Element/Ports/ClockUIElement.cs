@@ -6,13 +6,13 @@
 {
     public class ClockUIElement : AbstractUIElement
     {
-        private Sprite _clockSky;
-        private Sprite _clockFrame;
+        private readonly Sprite _clockSky;
+        private readonly Sprite _clockFrame;
         
-        public ClockUIElement(Point position) : base(position, "ui_elements")
+        public ClockUIElement(Point position) : base(position)
         {
-            _clockSky = new Sprite(new Point(position.X + 48, position.Y + 48), "ui_elements", "clock_sky");
-            _clockFrame = new Sprite(new Point(position.X + 48, position.Y + 48), "ui_elements", "clock_frame");
+            _clockSky = new Sprite(new Point(position.X, position.Y), "ui_elements", "clock_sky");
+            _clockFrame = new Sprite(new Point(position.X, position.Y), "ui_elements", "clock_frame");
             
             AddSprite(_clockSky);
             AddSprite(_clockFrame);

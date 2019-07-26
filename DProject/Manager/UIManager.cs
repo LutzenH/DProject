@@ -65,7 +65,7 @@ namespace DProject.Manager
         {        
             _spriteBatch.Begin(SpriteSortMode.Deferred,
                 BlendState.AlphaBlend,
-                SamplerState.PointClamp,
+                SamplerState.LinearClamp,
                 null,
                 null,
                 null,
@@ -73,9 +73,7 @@ namespace DProject.Manager
             );
             
             foreach (var ui in _userInterfaces)
-            {
                 ui.Draw(_spriteBatch);
-            }
             
             _spriteBatch.End();
         }

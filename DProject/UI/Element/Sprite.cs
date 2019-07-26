@@ -7,31 +7,34 @@ namespace DProject.UI.Element
 {
     public class Sprite : IInitialize
     {
-        public Vector2 Position { get; set; }
-
-        public Rectangle SourceRectangle { get; set; }
-
+        public bool Visible { get; set; }
+        
         public Vector2 Origin { get; set; }
 
         public float Rotation { get; set; }
-
-        public float Scale { get; set; }
-
+        
         public Color Color { get; set; }
 
-        private string _atlasName;
+        public Rectangle Rectangle { get; set; }
+
+        private readonly Rectangle _sourceRectangle;
+        private readonly Rectangle _destinationRectangle;
+        
+        private readonly string _atlasName;
         private Texture2D _spriteSheet;
 
         public Sprite(Point position, string atlasName, string name)
         {
-            Position = position.ToVector2();
-            SourceRectangle = Textures.AtlasList[atlasName].TextureList[name].TextureRectangle;
-            Origin = new Vector2(SourceRectangle.Width / 2f, SourceRectangle.Height / 2f);
+            _sourceRectangle = Textures.AtlasList[atlasName].TextureList[name].TextureRectangle;
+            _destinationRectangle = new Rectangle(position, _sourceRectangle.Size);
+            Origin = new Vector2(_sourceRectangle.Width / 2f, _sourceRectangle.Height / 2f);
             Rotation = 0.0f;
-            Scale = 1.0f;
             Color = Color.White;
+            Visible = true;
 
             _atlasName = atlasName;
+            
+            Rectangle = new Rectangle(new Point(_destinationRectangle.X - (int) Origin.X, _destinationRectangle.Y - (int) Origin.Y), _destinationRectangle.Size);
         }
         
         public void Initialize(GraphicsDevice graphicsDevice)
@@ -41,7 +44,8 @@ namespace DProject.UI.Element
 
         public void Draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(_spriteSheet, Position, SourceRectangle, Color, Rotation, Origin, Scale, SpriteEffects.None, 0f);
+            if(Visible)
+                spriteBatch.Draw(_spriteSheet, _destinationRectangle, _sourceRectangle, Color, Rotation, Origin, SpriteEffects.None, 0f);
         }
     }
 } 

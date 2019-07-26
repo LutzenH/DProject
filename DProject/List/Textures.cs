@@ -69,7 +69,7 @@ namespace DProject.List
                 textureLocationList.Add(Game1.RootDirectory + texture.Value.TexturePath);
             }
             
-            imagePacker.PackImage(textureLocationList, false, true, textureAtlas.AtlasSize, textureAtlas.AtlasSize, 0, true, 
+            imagePacker.PackImage(textureLocationList, false, true, textureAtlas.AtlasSize, textureAtlas.AtlasSize, 1, true, 
                 out var outputImage,
                 out var outputMap);
 
