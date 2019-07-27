@@ -74,6 +74,9 @@
 		"map_small": {
 			"location": "textures/ui/ports/map_small.png"
 		},
+        "map_disabled": {
+			"location": "textures/ui/ports/map_disabled.png"
+		},
 		"season_autumnal": {
 			"location": "textures/ui/ports/season_autumnal.png"
 		},

@@ -56,6 +56,7 @@
 /copy:textures/ui/ports/frame_simple.png
 /copy:textures/ui/ports/map_large.png
 /copy:textures/ui/ports/map_small.png
+/copy:textures/ui/ports/map_disabled.png
 /copy:textures/ui/ports/season_autumnal.png
 /copy:textures/ui/ports/season_estival.png
 /copy:textures/ui/ports/season_hibernal.png

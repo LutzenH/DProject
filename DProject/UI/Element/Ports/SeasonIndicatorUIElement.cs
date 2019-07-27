@@ -34,6 +34,8 @@ namespace DProject.UI.Element.Ports
             AddSprite(_seasonVernal);
             
             AddSprite(_frame);
+            
+            SetSeason(Season.Vernal);
         }
 
         public void SetSeason(Season season)

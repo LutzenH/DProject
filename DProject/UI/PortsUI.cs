@@ -15,6 +15,7 @@ namespace DProject.UI
         private readonly TimeControlUIElement _timeControl;
         private readonly CompassUIElement _compass;
         private readonly SeasonIndicatorUIElement _seasonIndicator;
+        private readonly MapButtonUIElement _mapButton;
         
         public PortsUI(GameEntityManager entityManager) : base(entityManager)
         {
@@ -22,6 +23,7 @@ namespace DProject.UI
             _timeControl = new TimeControlUIElement(new Point(155, 20));
             _compass = new CompassUIElement(new Point(48, 128));
             _seasonIndicator = new SeasonIndicatorUIElement(new Point(48, 200));
+            _mapButton = new MapButtonUIElement(new Point(48, 272));
 
             GameTimeEntity gameTimeEntity = EntityManager.GetGameTimeEntity();
             gameTimeEntity.TimeChanged += (sender, args) => _clock.SetRotation(args.CurrentTime);
@@ -34,6 +36,7 @@ namespace DProject.UI
             _timeControl.Initialize(graphicsDevice);
             _compass.Initialize(graphicsDevice);
             _seasonIndicator.Initialize(graphicsDevice);
+            _mapButton.Initialize(graphicsDevice);
         }
         
         public override void Draw(SpriteBatch spriteBatch)
@@ -42,6 +45,7 @@ namespace DProject.UI
             _timeControl.Draw(spriteBatch);
             _compass.Draw(spriteBatch);
             _seasonIndicator.Draw(spriteBatch);
+            _mapButton.Draw(spriteBatch);
         }
 
         public void Update(GameTime gameTime)
@@ -58,6 +62,8 @@ namespace DProject.UI
                         _timeControl.SelectedButton = (TimeControlUIElement.TimeControlOption) (i + 1);
                 }
             }
+
+            _mapButton.Large = _mapButton.Rectangle.Contains(mousePosition);
         }
 
         public TimeControlUIElement.TimeControlOption GetTimeControlOption()

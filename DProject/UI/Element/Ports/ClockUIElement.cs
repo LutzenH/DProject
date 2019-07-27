@@ -16,6 +16,8 @@
             
             AddSprite(_clockSky);
             AddSprite(_clockFrame);
+            
+            SetRotation(0);
         }
 
         public void SetRotation(uint currentTime)

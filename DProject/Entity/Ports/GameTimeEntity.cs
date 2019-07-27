@@ -105,8 +105,6 @@ namespace DProject.Entity.Ports
         public event EventHandler<SeasonChangedEventArgs> SeasonChanged;
         protected virtual void OnSeasonChanged(SeasonChangedEventArgs e)
         {
-            Console.WriteLine(e.CurrentSeason + ", day:" + e.Day);
-            
             var handler = SeasonChanged;
             handler?.Invoke(this, e);
         }
