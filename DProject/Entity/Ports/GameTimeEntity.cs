@@ -10,7 +10,7 @@ namespace DProject.Entity.Ports
         public const uint TicksInADay = 720;
         public const uint DaysInASeason = 30;
         
-        public bool IsPaused { get; set; }
+        public bool Paused { get; set; }
         public float GameSpeed { get; set; }
 
         public uint CurrentDay { get; set; }
@@ -18,52 +18,111 @@ namespace DProject.Entity.Ports
 
         private double _currentSecond;
 
-        private Seasons _currentSeason;
+        private Season _currentSeason;
 
         public GameTimeEntity() : base(Vector3.Zero, Quaternion.Identity, Vector3.Zero)
         {
             CurrentDay = 0;
             CurrentTime = 0;
-            IsPaused = false;
+            Paused = false;
             GameSpeed = 1.0f;
 
             _currentSecond = 0f;
-            _currentSeason = Seasons.Vernal;
+            _currentSeason = Season.Vernal;
         }
         
         public void Update(GameTime gameTime)
         {
-            if (IsPaused) return;
+            if (Paused) return;
             
             _currentSecond += gameTime.ElapsedGameTime.TotalSeconds * GameSpeed;
 
             if (_currentSecond >= 1.0d)
             {
+                Tick( Convert.ToUInt32(Math.Floor(_currentSecond)));
                 _currentSecond = 0.0d;
-                Tick();
             }
         }
 
         public void Tick(uint amount = 1)
         {
+            var previousTime = CurrentTime;
+            
             CurrentTime += amount;
 
             if (CurrentTime >= TicksInADay)
             {
                 CurrentTime = 0;
-                CurrentDay++;
-                _currentSeason = DayToSeason(CurrentDay);
+                SetNextDay();
             }
+            
+            var args = new TimeChangedEventArgs
+            {
+                PreviousTime = previousTime,
+                CurrentTime = CurrentTime
+            };
+            
+            OnTimeChanged(args);
         }
 
-        public Seasons GetCurrentSeason()
+        public Season GetCurrentSeason()
         {
             return _currentSeason;
         }
 
-        private static Seasons DayToSeason(uint currentDay)
+        private void SetNextDay()
         {
-            return (Seasons) (currentDay / DaysInASeason % DaysInASeason);
+            var args = new DayChangedEventArgs()
+            {
+                Yesterday = CurrentDay,
+                Today = ++CurrentDay
+            };
+            
+            OnDayChanged(args);
+            
+            _currentSeason = DayToSeason(CurrentDay);
+        }
+        
+        private Season DayToSeason(uint currentDay)
+        {
+            var newSeason = (Season) (currentDay / DaysInASeason % DaysInASeason % (int) Season.Count);
+
+            if (newSeason != _currentSeason)
+            {
+                var args = new SeasonChangedEventArgs
+                {
+                    Day = currentDay,
+                    PreviousSeason = _currentSeason,
+                    CurrentSeason = newSeason
+                };
+                
+                OnSeasonChanged(args);
+            }
+
+            return newSeason;
+        }
+
+        public event EventHandler<SeasonChangedEventArgs> SeasonChanged;
+        protected virtual void OnSeasonChanged(SeasonChangedEventArgs e)
+        {
+            Console.WriteLine(e.CurrentSeason + ", day:" + e.Day);
+            
+            var handler = SeasonChanged;
+            handler?.Invoke(this, e);
+        }
+
+        public event EventHandler<DayChangedEventArgs> DayChanged; 
+        protected virtual void OnDayChanged(DayChangedEventArgs e)
+        {
+            var handler = DayChanged;
+            handler?.Invoke(this, e);
+        }
+
+        public event EventHandler<TimeChangedEventArgs> TimeChanged;
+        protected virtual void OnTimeChanged(TimeChangedEventArgs e)
+        {
+            var handler = TimeChanged;
+            handler?.Invoke(this, e);
         }
 
         private static string TimeToTimeString(uint currentTime, double currentSecond)
@@ -83,5 +142,24 @@ namespace DProject.Entity.Ports
 
             return (hour, minute);
         }
+    }
+
+    public class SeasonChangedEventArgs : EventArgs
+    {
+        public uint Day { get; set; }
+        public Season PreviousSeason { get; set; }
+        public Season CurrentSeason { get; set; }
+    }
+
+    public class DayChangedEventArgs : EventArgs
+    {
+        public uint Yesterday { get; set; }
+        public uint Today { get; set; }
+    }
+
+    public class TimeChangedEventArgs : EventArgs
+    {
+        public uint PreviousTime { get; set; }
+        public uint CurrentTime { get; set; }
     }
 }

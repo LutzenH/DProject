@@ -1,8 +1,8 @@
 namespace DProject.Type.Enum
 {
-    public enum Seasons
+    public enum Season
     {
-        Vernal, Estival, Serotinal, Autumnal, Hibernal, Prevernal
+        Vernal, Estival, Serotinal, Autumnal, Hibernal, Prevernal, Count
     }
 
     public enum Goods
@@ -10,7 +10,7 @@ namespace DProject.Type.Enum
         Fish, Coal, Cotton, Coffee, Livestock, Tobacco, Weaponry, Silk, Gemstones
     }
 
-    public enum Buildings
+    public enum Building
     {
         Lodgings, NavigatorsOffice, Warehouse, Bar, Shipwright
     }
