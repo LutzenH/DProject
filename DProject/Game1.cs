@@ -1,4 +1,5 @@
 ﻿using System;
+using DProject.Entity.Ports;
 using DProject.List;
 using DProject.Manager;
 using Microsoft.Xna.Framework;
@@ -106,7 +107,7 @@ namespace DProject
 
         protected override void Draw(GameTime gameTime)
         {
-            ShaderManager.SetShaderInfo(_entityManager.GetActiveCamera());
+            ShaderManager.SetShaderInfo(_entityManager.GetActiveCamera(), (float) _entityManager.GetGameTimeEntity().GetRelativeTime());
 
             ShaderManager.CurrentRenderTarget = ShaderManager.RenderTarget.Depth;
             DrawSceneToRenderTarget(ShaderManager.RenderTarget.Depth);
@@ -133,7 +134,8 @@ namespace DProject
                     // Set the render target
                     GraphicsDevice.SetRenderTarget(ShaderManager.DepthBuffer);
                     GraphicsDevice.DepthStencilState = new DepthStencilState() { DepthBufferEnable = true };
- 
+                    GraphicsDevice.BlendState = BlendState.Opaque;
+
                     // Clear the screen
                     GraphicsDevice.Clear(Color.Transparent);
                     break;

@@ -4,6 +4,7 @@ using System.Dynamic;
 using DProject.Entity.Camera;
 using DProject.Entity.Chunk;
 using DProject.Entity.Interface;
+using DProject.Entity.Ports;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -15,6 +16,7 @@ namespace DProject.Manager
         private readonly List<AbstractEntity> _entities;
         private readonly List<CameraEntity> _cameraEntities;
         
+        private readonly GameTimeEntity _gameTimeEntity;
         private readonly ChunkLoaderEntity _chunkLoaderEntity;
         private readonly PointerEntity _pointerEntity;
         private CameraEntity _activeCamera;
@@ -25,6 +27,9 @@ namespace DProject.Manager
         {
             _entities = new List<AbstractEntity>();
             _cameraEntities = new List<CameraEntity>();
+            
+            _gameTimeEntity = new GameTimeEntity();
+            AddEntity(_gameTimeEntity);
             
             _chunkLoaderEntity = new ChunkLoaderEntity(this);
             AddEntity(_chunkLoaderEntity);
@@ -87,6 +92,11 @@ namespace DProject.Manager
         public CameraEntity GetActiveCamera()
         {
             return _activeCamera;
+        }
+
+        public GameTimeEntity GetGameTimeEntity()
+        {
+            return _gameTimeEntity;
         }
 
         public void SetActiveCamera(int index)

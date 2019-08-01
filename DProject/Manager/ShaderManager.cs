@@ -20,6 +20,8 @@ namespace DProject.Manager
 
         public static RenderTarget CurrentRenderTarget;
 
+        private static Texture2D _dudvTexture;
+
         public static void Initialize(ContentManager contentManager, GraphicsDevice graphicsDevice)
         {
             DepthBuffer = new RenderTarget2D(
@@ -32,16 +34,16 @@ namespace DProject.Manager
             
             ReflectionBuffer = new RenderTarget2D(
                 graphicsDevice,
-                graphicsDevice.PresentationParameters.BackBufferWidth/2,
-                graphicsDevice.PresentationParameters.BackBufferHeight/2,
+                graphicsDevice.PresentationParameters.BackBufferWidth,
+                graphicsDevice.PresentationParameters.BackBufferHeight,
                 false,
                 graphicsDevice.PresentationParameters.BackBufferFormat,
                 DepthFormat.Depth24);
             
             RefractionBuffer = new RenderTarget2D(
                 graphicsDevice,
-                graphicsDevice.PresentationParameters.BackBufferWidth/2,
-                graphicsDevice.PresentationParameters.BackBufferHeight/2,
+                graphicsDevice.PresentationParameters.BackBufferWidth,
+                graphicsDevice.PresentationParameters.BackBufferHeight,
                 false,
                 graphicsDevice.PresentationParameters.BackBufferFormat,
                 DepthFormat.Depth24);
@@ -53,9 +55,11 @@ namespace DProject.Manager
             _depthEffect = content.Load<Effect>("Shaders/DepthShader");
             _terrainEffect = content.Load<Effect>("Shaders/TerrainShader");
             _propEffect = content.Load<Effect>("Shaders/PropShader");
+
+            _dudvTexture = content.Load<Texture2D>("water_dudv");
         }
 
-        public static void SetShaderInfo(CameraEntity activeCamera)
+        public static void SetShaderInfo(CameraEntity activeCamera, float relativeGameTime)
         {
             //DepthEffect
             _depthEffect.Parameters["View"].SetValue(activeCamera.GetViewMatrix());
@@ -68,6 +72,8 @@ namespace DProject.Manager
             _waterEffect.Parameters["CameraPosition"].SetValue(activeCamera.GetPosition());
             _waterEffect.Parameters["reflectionTexture"].SetValue(ReflectionBuffer);
             _waterEffect.Parameters["refractionTexture"].SetValue(RefractionBuffer);
+            _waterEffect.Parameters["dudvTexture"].SetValue(_dudvTexture);
+            _waterEffect.Parameters["RelativeGameTime"].SetValue(relativeGameTime);
 
             //TerrainEffect
             _terrainEffect.Parameters["View"].SetValue(activeCamera.GetViewMatrix());

@@ -70,6 +70,11 @@ namespace DProject.Entity.Ports
             return _currentSeason;
         }
 
+        public double GetRelativeTime()
+        {
+            return (CurrentTime + _currentSecond) / TicksInADay;
+        }
+
         private void SetNextDay()
         {
             var args = new DayChangedEventArgs()
