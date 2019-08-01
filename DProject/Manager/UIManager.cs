@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using DProject.Entity.Interface;
 using DProject.UI;
@@ -15,26 +16,28 @@ namespace DProject.Manager
         public static bool ClickedUI;
         
         private SpriteBatch _spriteBatch;
+
+        private GraphicsDevice _graphicsDevice;
         
         public UIManager(EntityManager entityManager)
         {
             _userInterfaces = new List<AbstractUI>();
 
-            switch (entityManager)
-            {
-                case EditorEntityManager editorEntityManager:
-                    _userInterfaces.Add(new WorldEditorUI(editorEntityManager));
-                    _userInterfaces.Add(new MessageUI(editorEntityManager));
-                    break;
-                case GameEntityManager gameEntityManager:
-                    _userInterfaces.Add(new PortsUI(gameEntityManager));
-                    break;
-            }
+#if EDITOR
+            var editorEntityManager = (EditorEntityManager) entityManager;
+            _userInterfaces.Add(new WorldEditorUI(editorEntityManager));
+            _userInterfaces.Add(new MessageUI(editorEntityManager)); 
+#else
+            var gameEntityManager = (GameEntityManager) entityManager;
+            _userInterfaces.Add(new PortsUI(gameEntityManager));
+#endif
         }
         
         public void Initialize(GraphicsDevice graphicsDevice)
         {    
             _spriteBatch = new SpriteBatch(graphicsDevice);
+            
+            _graphicsDevice = graphicsDevice;
             
             foreach (var ui in _userInterfaces)
             {
@@ -75,6 +78,11 @@ namespace DProject.Manager
             foreach (var ui in _userInterfaces)
                 ui.Draw(_spriteBatch);
             
+            //DEBUG
+            _spriteBatch.Draw(ShaderManager.DepthBuffer, new Rectangle(Game1.ScreenResolutionX-320, 0, 320, 180), Color.White);
+            _spriteBatch.Draw(ShaderManager.ReflectionBuffer, new Rectangle(Game1.ScreenResolutionX-320, 180, 320, 180), Color.White);
+            _spriteBatch.Draw(ShaderManager.RefractionBuffer, new Rectangle(Game1.ScreenResolutionX-320, 360, 320, 180), Color.White);
+
             _spriteBatch.End();
         }
     }

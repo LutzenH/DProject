@@ -55,14 +55,5 @@ namespace DProject.Type.Rendering.Shaders
                 FogEnd = info.Fog.FogEnd;
             }
         }
-
-        public void SetDrawInfo(Matrix projectMatrix, Matrix viewMatrix, Matrix worldMatrix, Texture2D texture2D)
-        {
-            Projection = projectMatrix;
-            View = viewMatrix;
-            World = worldMatrix;
-
-            Texture = texture2D;
-        }
     }
 }

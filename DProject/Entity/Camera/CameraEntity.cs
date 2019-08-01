@@ -1,3 +1,4 @@
+using System;
 using Microsoft.Xna.Framework;
 using IUpdateable = DProject.Entity.Interface.IUpdateable;
 
@@ -81,6 +82,14 @@ namespace DProject.Entity.Camera
         public void SetFarPlaneDistance(float distance)
         {
             _farPlaneDistance = distance;
+        }
+
+        public Matrix GetReflectionViewMatrix()
+        {
+            var distanceFromWater = 2 * Position.Y - 4 * WaterPlaneEntity.WaterHeight;
+            var underWaterPosition = new Vector3(Position.X, Position.Y - distanceFromWater, Position.Z);
+            
+            return Matrix.CreateLookAt(underWaterPosition, underWaterPosition + new Vector3(CameraDirection.X, -CameraDirection.Y, CameraDirection.Z), Vector3.Up);
         }
     }
 }

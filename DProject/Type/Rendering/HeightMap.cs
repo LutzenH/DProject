@@ -3,7 +3,6 @@ using System.Linq;
 using DProject.List;
 using DProject.Manager;
 using DProject.Type.Enum;
-using DProject.Type.Rendering.Shaders;
 using DProject.Type.Serializable.Chunk;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -76,13 +75,29 @@ namespace DProject.Type.Rendering
             UpdateHeightMap(heightMap);
         }
 
-        public void Draw(Matrix projectMatrix, Matrix viewMatrix, Matrix worldMatrix, Texture2D texture2D)
+        public void Draw(Matrix worldMatrix, Texture2D texture2D)
         {
-            ShaderManager.TerrainEffect.SetDrawInfo(projectMatrix, viewMatrix, worldMatrix, texture2D);
+            Effect effect = null;
+            
+            switch (ShaderManager.CurrentRenderTarget)
+            {
+                case ShaderManager.RenderTarget.Depth:
+                    effect = ShaderManager.DepthEffect;
+                    effect.Parameters["World"].SetValue(worldMatrix);
+                    break;
+                case ShaderManager.RenderTarget.Refraction:
+                case ShaderManager.RenderTarget.Reflection:
+                case ShaderManager.RenderTarget.Final:
+                    effect = ShaderManager.TerrainEffect;
+                    effect.Parameters["World"].SetValue(worldMatrix);
+                    break;
+                default:
+                    return;
+            }
             
             _graphicsDevice.SetVertexBuffer(_vertexBuffer);
-
-            foreach (EffectPass pass in ShaderManager.TerrainEffect.CurrentTechnique.Passes)
+            
+            foreach (var pass in effect.CurrentTechnique.Passes)
             {
                 pass.Apply();
                 

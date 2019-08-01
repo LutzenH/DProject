@@ -226,7 +226,8 @@ namespace DProject.Entity.Chunk
 #endif
             if (_loadedChunks.ContainsKey((_chunkPosition.Item1, _chunkPosition.Item2)))
             {
-                ShaderManager.TerrainEffect.SetLightingInfo(Skies.SkyList[_loadedChunks[(_chunkPosition.Item1, _chunkPosition.Item2)].GetChunkData().SkyId]);
+				//Disabled until the new TerrainEffect Properly supports the given LightingInfo
+                //ShaderManager.TerrainEffect.SetLightingInfo(Skies.SkyList[_loadedChunks[(_chunkPosition.Item1, _chunkPosition.Item2)].GetChunkData().SkyId]);
             }
         }
 

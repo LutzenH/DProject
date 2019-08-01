@@ -74,6 +74,7 @@ namespace DProject
 
         protected override void LoadContent()
         {
+            ShaderManager.LoadContent(Content);
             _entityManager.LoadContent(Content);
             _uiManager.LoadContent(Content);
             
@@ -105,17 +106,85 @@ namespace DProject
 
         protected override void Draw(GameTime gameTime)
         {
-            //Background color
-            GraphicsDevice.Clear(_backgroundColor);
+            ShaderManager.SetShaderInfo(_entityManager.GetActiveCamera());
+
+            ShaderManager.CurrentRenderTarget = ShaderManager.RenderTarget.Depth;
+            DrawSceneToRenderTarget(ShaderManager.RenderTarget.Depth);
             
-            GraphicsDevice.BlendState = BlendState.Opaque;
-            GraphicsDevice.DepthStencilState = DepthStencilState.Default;
-            GraphicsDevice.SamplerStates[0] = SamplerState.PointWrap;
+            ShaderManager.CurrentRenderTarget = ShaderManager.RenderTarget.Reflection;
+            DrawSceneToRenderTarget(ShaderManager.RenderTarget.Reflection);
             
-            _entityManager.Draw();
+            ShaderManager.CurrentRenderTarget = ShaderManager.RenderTarget.Refraction;
+            DrawSceneToRenderTarget(ShaderManager.RenderTarget.Refraction);
+
+            ShaderManager.CurrentRenderTarget = ShaderManager.RenderTarget.Final;
+            DrawSceneToRenderTarget(ShaderManager.RenderTarget.Final);
+            
             _uiManager.Draw();
             
             base.Draw(gameTime);
+        }
+        
+        private void DrawSceneToRenderTarget(ShaderManager.RenderTarget target)
+        {
+            switch (target)
+            {
+                case ShaderManager.RenderTarget.Depth:
+                    // Set the render target
+                    GraphicsDevice.SetRenderTarget(ShaderManager.DepthBuffer);
+                    GraphicsDevice.DepthStencilState = new DepthStencilState() { DepthBufferEnable = true };
+ 
+                    // Clear the screen
+                    GraphicsDevice.Clear(Color.Transparent);
+                    break;
+                case ShaderManager.RenderTarget.Reflection:
+                    //Setup Shaders
+                    ShaderManager.TerrainEffect.CurrentTechnique = ShaderManager.TerrainEffect.Techniques[1];
+                    ShaderManager.PropEffect.CurrentTechnique = ShaderManager.PropEffect.Techniques[1];
+                    
+                    // Set the render target
+                    GraphicsDevice.SetRenderTarget(ShaderManager.ReflectionBuffer);
+                    GraphicsDevice.BlendState = BlendState.Opaque;
+                    GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+                    GraphicsDevice.SamplerStates[0] = SamplerState.PointWrap;
+                    
+                    //Clear the screen
+                    GraphicsDevice.Clear(_backgroundColor);
+                    break;
+                case ShaderManager.RenderTarget.Refraction:
+                    //Setup Shaders
+                    ShaderManager.TerrainEffect.CurrentTechnique = ShaderManager.TerrainEffect.Techniques[2];
+                    ShaderManager.PropEffect.CurrentTechnique = ShaderManager.PropEffect.Techniques[2];
+                    
+                    // Set the render target
+                    GraphicsDevice.SetRenderTarget(ShaderManager.RefractionBuffer);
+                    GraphicsDevice.BlendState = BlendState.Opaque;
+                    GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+                    GraphicsDevice.SamplerStates[0] = SamplerState.PointWrap;
+                    
+                    //Clear the screen
+                    GraphicsDevice.Clear(_backgroundColor);
+                    break;
+                case ShaderManager.RenderTarget.Final:
+                    //Setup Shaders
+                    ShaderManager.TerrainEffect.CurrentTechnique = ShaderManager.TerrainEffect.Techniques[0];
+                    ShaderManager.PropEffect.CurrentTechnique = ShaderManager.PropEffect.Techniques[0];
+
+                    GraphicsDevice.SetRenderTarget(null);
+                    GraphicsDevice.BlendState = BlendState.Opaque;
+                    GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+                    GraphicsDevice.SamplerStates[0] = SamplerState.PointWrap;
+                    
+                    // Clear the screen
+                    GraphicsDevice.Clear(_backgroundColor);
+                    break;
+            }
+
+            //Draw the scene
+            _entityManager.Draw();
+            
+            // Drop the render target
+            GraphicsDevice.SetRenderTarget(null);
         }
 
         public static void SetBackgroundColor(Color color)

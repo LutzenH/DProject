@@ -155,7 +155,7 @@ namespace DProject.Entity.Chunk
         {           
             if (activeCamera.GetBoundingFrustum().Intersects(_boundingBox))
             {
-                _heightMap.Draw(activeCamera.GetProjectMatrix(),activeCamera.GetViewMatrix(), GetWorldMatrix(), Textures.AtlasList["floor_textures"].AtlasTexture2D);
+                _heightMap.Draw(GetWorldMatrix(), Textures.AtlasList["floor_textures"].AtlasTexture2D);
 
                 foreach (var prop in _props)
                     prop.Draw(activeCamera);
