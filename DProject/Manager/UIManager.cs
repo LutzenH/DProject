@@ -77,11 +77,6 @@ namespace DProject.Manager
             
             foreach (var ui in _userInterfaces)
                 ui.Draw(_spriteBatch);
-            
-            //DEBUG
-            _spriteBatch.Draw(ShaderManager.DepthBuffer, new Rectangle(Game1.ScreenResolutionX-320, 0, 320, 180), Color.White);
-            _spriteBatch.Draw(ShaderManager.ReflectionBuffer, new Rectangle(Game1.ScreenResolutionX-320, 180, 320, 180), Color.White);
-            _spriteBatch.Draw(ShaderManager.RefractionBuffer, new Rectangle(Game1.ScreenResolutionX-320, 360, 320, 180), Color.White);
 
             _spriteBatch.End();
         }

@@ -109,6 +109,7 @@ namespace DProject
         {
             ShaderManager.SetShaderInfo(_entityManager.GetActiveCamera(), (float) _entityManager.GetGameTimeEntity().GetRelativeTime());
 
+#if !EDITOR
             ShaderManager.CurrentRenderTarget = ShaderManager.RenderTarget.Depth;
             DrawSceneToRenderTarget(ShaderManager.RenderTarget.Depth);
             
@@ -116,7 +117,8 @@ namespace DProject
             DrawSceneToRenderTarget(ShaderManager.RenderTarget.Reflection);
             
             ShaderManager.CurrentRenderTarget = ShaderManager.RenderTarget.Refraction;
-            DrawSceneToRenderTarget(ShaderManager.RenderTarget.Refraction);
+            DrawSceneToRenderTarget(ShaderManager.RenderTarget.Refraction);      
+#endif
 
             ShaderManager.CurrentRenderTarget = ShaderManager.RenderTarget.Final;
             DrawSceneToRenderTarget(ShaderManager.RenderTarget.Final);

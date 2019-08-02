@@ -20,6 +20,9 @@ namespace DProject.Manager
             AddCamera(new FlyCameraEntity(new Vector3(0f, 10f, 0f), Quaternion.Identity));
             AddCamera(new FlyCameraEntity(new Vector3(0f, 0f, 0f), Quaternion.Identity));
 
+            AddEntity(new WaterPlaneEntity(Vector2.Zero, new Vector2(128, 128)));
+            AddEntity(new PropEntity(new Vector3(12, WaterPlaneEntity.WaterHeight*2, 5), 9));
+            
             _worldEditorEntity = new WorldEditorEntity(this);
             AddEntity(_worldEditorEntity);
 
