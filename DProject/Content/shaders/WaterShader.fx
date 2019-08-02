@@ -52,17 +52,17 @@ sampler2D dudvSampler = sampler_state
 struct VertexShaderInput
 {
 	float4 Position : POSITION0;
-    float4 Normal : NORMAL0;
+    float4 Normal : NORMAL;
     float2 TextureCoordinate : TEXCOORD0;
 };
 
 struct VertexShaderOutput
 {
 	float4 Position : SV_POSITION;
-    float3 Normal : NORMAL0;
-    float2 TextureCoordinate : TEXCOORD0;
-    float3 toCameraVector : NORMAL1;
-    float4 ClipSpace : TEXCOORD1;
+    float3 Normal : TEXCOORD0;
+    float2 TextureCoordinate : TEXCOORD1;
+    float3 toCameraVector : TEXCOORD2;
+    float4 ClipSpace : TEXCOORD3;
 };
 
 VertexShaderOutput MainVS(in VertexShaderInput input)
