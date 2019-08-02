@@ -1,0 +1,94 @@
+
+#----------------------------- Global Properties ----------------------------#
+
+/outputDir:../bin/$(Platform)
+/intermediateDir:obj/$(Platform)
+/platform:DesktopGL
+/config:
+/profile:Reach
+/compress:False
+
+#This value has to be changed depending on the current platform.
+/define:platform=DesktopGL
+
+$if platform=DesktopGL
+
+/reference:../../../../../.nuget/packages/infinitespacestudios.pipeline/1.0.9/tools/InfinitespaceStudios.Pipeline.dll
+
+#begin shaders/DepthShader.fx
+/importer:EffectImporter
+/processor:RemoteEffectProcessor
+/processorParam:RemoteAddress=192.168.1.108
+/processorParam:RemotePort=8001
+/processorParam:Protocol=http
+/processorParam:DebugMode=Auto
+/build:shaders/DepthShader.fx
+
+#begin shaders/PropShader.fx
+/importer:EffectImporter
+/processor:RemoteEffectProcessor
+/processorParam:RemoteAddress=192.168.1.108
+/processorParam:RemotePort=8001
+/processorParam:Protocol=http
+/processorParam:DebugMode=Auto
+/build:shaders/PropShader.fx
+
+#begin shaders/TerrainShader.fx
+/importer:EffectImporter
+/processor:RemoteEffectProcessor
+/processorParam:RemoteAddress=192.168.1.108
+/processorParam:RemotePort=8001
+/processorParam:Protocol=http
+/processorParam:DebugMode=Auto
+/build:shaders/TerrainShader.fx
+
+#begin shaders/WaterShader.fx
+/importer:EffectImporter
+/processor:RemoteEffectProcessor
+/processorParam:RemoteAddress=192.168.1.108
+/processorParam:RemotePort=8001
+/processorParam:Protocol=http
+/processorParam:DebugMode=Auto
+/build:shaders/WaterShader.fx
+
+$endif
+
+$if platform=Windows
+
+#begin shaders/DepthShader.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:shaders/DepthShader.fx
+
+#begin shaders/PropShader.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:shaders/PropShader.fx
+
+#begin shaders/TerrainShader.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:shaders/TerrainShader.fx
+
+#begin shaders/WaterShader.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:shaders/WaterShader.fx
+
+$endif
+
+#begin shaders/water_dudv.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:shaders/water_dudv.png

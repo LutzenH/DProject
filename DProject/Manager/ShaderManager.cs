@@ -51,12 +51,12 @@ namespace DProject.Manager
 
         public static void LoadContent(ContentManager content)
         {
-            _waterEffect = content.Load<Effect>("Shaders/WaterShader");
-            _depthEffect = content.Load<Effect>("Shaders/DepthShader");
-            _terrainEffect = content.Load<Effect>("Shaders/TerrainShader");
-            _propEffect = content.Load<Effect>("Shaders/PropShader");
+            _waterEffect = content.Load<Effect>("shaders/WaterShader");
+            _depthEffect = content.Load<Effect>("shaders/DepthShader");
+            _terrainEffect = content.Load<Effect>("shaders/TerrainShader");
+            _propEffect = content.Load<Effect>("shaders/PropShader");
 
-            _dudvTexture = content.Load<Texture2D>("water_dudv");
+            _dudvTexture = content.Load<Texture2D>("shaders/water_dudv");
         }
 
         public static void SetShaderInfo(CameraEntity activeCamera, float relativeGameTime)
