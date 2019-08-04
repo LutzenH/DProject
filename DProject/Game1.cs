@@ -1,8 +1,8 @@
 ﻿using System;
-using DProject.Entity;
-using DProject.Entity.Ports;
 using DProject.List;
 using DProject.Manager;
+using DProject.Manager.Entity;
+using DProject.Manager.UI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -42,7 +42,12 @@ namespace DProject
             
             _shaderManager = new ShaderManager();
             _entityManager = entityManager;
-            _uiManager = new UIManager(_entityManager);
+            
+#if EDITOR
+            _uiManager = new EditorUIManager(_entityManager);
+#else
+            _uiManager = new GameUIManager(_entityManager);
+#endif
             
             Content.RootDirectory = RootDirectory;
 

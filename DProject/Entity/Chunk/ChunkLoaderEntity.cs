@@ -12,6 +12,7 @@ using DProject.Entity.Camera;
 using DProject.Entity.Interface;
 using DProject.List;
 using DProject.Manager;
+using DProject.Manager.Entity;
 using DProject.Type;
 using DProject.Type.Enum;
 using Microsoft.Xna.Framework;
@@ -235,6 +236,7 @@ namespace DProject.Entity.Chunk
         private void AbortLoadingChunks()
         {
             _cancellationToken?.Cancel();
+            _loadingStatus = ChunkLoadingStatus.Done;
             EditorEntityManager.AddMessage(new Message("Chunkloading has been aborted."));
         }
 #endif

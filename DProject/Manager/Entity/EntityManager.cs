@@ -8,8 +8,10 @@ using DProject.Entity.Ports;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using IDrawable = DProject.Entity.Interface.IDrawable;
+using IUpdateable = DProject.Entity.Interface.IUpdateable;
 
-namespace DProject.Manager
+namespace DProject.Manager.Entity
 {
     public abstract class EntityManager : DynamicObject
     {
@@ -60,7 +62,7 @@ namespace DProject.Manager
         {
             foreach (var entity in _entities)
             {
-                if (entity is Entity.Interface.IUpdateable updateEntity)
+                if (entity is IUpdateable updateEntity)
                     updateEntity.Update(gameTime);
             }
         }
@@ -69,7 +71,7 @@ namespace DProject.Manager
         {
             foreach (var entity in _entities)
             {
-                if (entity is Entity.Interface.IDrawable drawableEntity)
+                if (entity is IDrawable drawableEntity)
                     drawableEntity.Draw(GetActiveCamera(), _shaderManager);
             }
         }

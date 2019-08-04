@@ -10,14 +10,13 @@ namespace DProject.Entity.Ports
         public const uint TicksInADay = 720;
         public const uint DaysInASeason = 30;
         
-        public bool Paused { get; set; }
-        public float GameSpeed { get; set; }
-
-        public uint CurrentDay { get; set; }
-        public uint CurrentTime { get; set; }
+        public uint CurrentDay { get; private set; }
+        public uint CurrentTime { get; private set; }
+        public Season CurrentSeason { get; private set; }
 
         private double _currentSecond;
-        private Season _currentSeason;
+        private float _gameSpeed;
+        private bool _paused;
 
         public GameTimeEntity() : base(Vector3.Zero, Quaternion.Identity, Vector3.Zero)
         {
@@ -27,7 +26,7 @@ namespace DProject.Entity.Ports
             GameSpeed = 1.0f;
 
             _currentSecond = 0f;
-            _currentSeason = Season.Vernal;
+            CurrentSeason = Season.Vernal;
         }
         
         public void Update(GameTime gameTime)
@@ -64,11 +63,6 @@ namespace DProject.Entity.Ports
             OnTimeChanged(args);
         }
 
-        public Season GetCurrentSeason()
-        {
-            return _currentSeason;
-        }
-
         public double GetRelativeTime()
         {
             return (CurrentTime + _currentSecond) / TicksInADay;
@@ -84,19 +78,19 @@ namespace DProject.Entity.Ports
             
             OnDayChanged(args);
             
-            _currentSeason = DayToSeason(CurrentDay);
+            CurrentSeason = DayToSeason(CurrentDay);
         }
         
         private Season DayToSeason(uint currentDay)
         {
             var newSeason = (Season) (currentDay / DaysInASeason % DaysInASeason % (int) Season.Count);
 
-            if (newSeason != _currentSeason)
+            if (newSeason != CurrentSeason)
             {
                 var args = new SeasonChangedEventArgs
                 {
                     Day = currentDay,
-                    PreviousSeason = _currentSeason,
+                    PreviousSeason = CurrentSeason,
                     CurrentSeason = newSeason
                 };
                 
@@ -105,6 +99,45 @@ namespace DProject.Entity.Ports
 
             return newSeason;
         }
+        
+        public bool Paused {
+            get => _paused;
+            set
+            {
+                if (_paused != value)
+                {
+                    var args = new PauseStateChangedEventArgs()
+                    {
+                        PreviousPauseState = _paused
+                    };
+                    
+                    OnPauseStateChanged(args);
+                    
+                    _paused = value;
+                }
+            }
+        }
+        
+        public float GameSpeed {
+            get => _gameSpeed;
+            set
+            {
+                if (Math.Abs(_gameSpeed - value) > 0.05f)
+                {
+                    var args = new GameSpeedChangedEventArgs()
+                    {
+                        PreviousGameSpeed = _gameSpeed,
+                        NewGameSpeed = value
+                    };
+                    
+                    OnGameSpeedChanged(args);
+                    
+                    _gameSpeed = value;
+                }
+            }
+        }
+
+        #region Events
 
         public event EventHandler<SeasonChangedEventArgs> SeasonChanged;
         protected virtual void OnSeasonChanged(SeasonChangedEventArgs e)
@@ -127,6 +160,24 @@ namespace DProject.Entity.Ports
             handler?.Invoke(this, e);
         }
 
+        public event EventHandler<PauseStateChangedEventArgs> PauseStateChanged;
+        protected virtual void OnPauseStateChanged(PauseStateChangedEventArgs e)
+        {
+            var handler = PauseStateChanged;
+            handler?.Invoke(this, e);
+        }
+
+        public event EventHandler<GameSpeedChangedEventArgs> GameSpeedChanged;
+        protected virtual void OnGameSpeedChanged(GameSpeedChangedEventArgs e)
+        {
+            var handler = GameSpeedChanged;
+            handler?.Invoke(this, e);
+        }
+
+        #endregion
+
+        #region Utilities
+
         private static string TimeToTimeString(uint currentTime, double currentSecond)
         {
             var (hour, minute) = GetTimeAsSiTime(currentTime, currentSecond);
@@ -144,8 +195,12 @@ namespace DProject.Entity.Ports
 
             return (hour, minute);
         }
+
+        #endregion
     }
 
+    #region Event Arguments
+    
     public class SeasonChangedEventArgs : EventArgs
     {
         public uint Day { get; set; }
@@ -164,4 +219,17 @@ namespace DProject.Entity.Ports
         public uint PreviousTime { get; set; }
         public uint CurrentTime { get; set; }
     }
+
+    public class PauseStateChangedEventArgs : EventArgs
+    {
+        public bool PreviousPauseState { get; set; }
+    }
+
+    public class GameSpeedChangedEventArgs : EventArgs
+    {
+        public float PreviousGameSpeed { get; set; }
+        public float NewGameSpeed { get; set; }
+    }
+    
+    #endregion
 }

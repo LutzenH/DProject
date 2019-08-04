@@ -2,7 +2,7 @@ using DProject.Entity;
 using DProject.Entity.Camera;
 using Microsoft.Xna.Framework;
 
-namespace DProject.Manager
+namespace DProject.Manager.Entity
 {
     public class GameEntityManager : EntityManager
     {

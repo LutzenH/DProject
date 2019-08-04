@@ -6,7 +6,7 @@ using DProject.Type;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
-namespace DProject.Manager
+namespace DProject.Manager.Entity
 {
     public class EditorEntityManager : EntityManager
     {

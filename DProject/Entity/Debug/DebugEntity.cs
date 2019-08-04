@@ -4,6 +4,7 @@ using DProject.Entity.Camera;
 using DProject.Entity.Chunk;
 using DProject.Entity.Interface;
 using DProject.Manager;
+using DProject.Manager.Entity;
 using DProject.Type.Enum;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;

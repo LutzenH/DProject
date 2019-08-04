@@ -7,11 +7,12 @@ using System.Threading;
 #endif
 using DProject.Entity.Chunk;
 using DProject.Entity.Interface;
-using DProject.Manager;
+using DProject.Manager.Entity;
 using DProject.Type.Rendering.Map;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using IUpdateable = DProject.Entity.Interface.IUpdateable;
+using UIManager = DProject.Manager.UI.UIManager;
 
 namespace DProject.UI
 {
@@ -30,7 +31,7 @@ namespace DProject.UI
 
         private readonly int _mapSize;
 
-        public WorldMapUI(GameEntityManager gameEntityManager, int mapSize, Point position) : base(gameEntityManager)
+        public WorldMapUI(GameEntityManager gameEntityManager, UIManager uiManager, int mapSize, Point position) : base(gameEntityManager, uiManager)
         {
             _positionOffset = (0, 0);
 

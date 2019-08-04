@@ -1,7 +1,8 @@
 using DProject.Entity.Interface;
-using DProject.Entity.Ports;
-using DProject.Manager;
+using DProject.Manager.Entity;
+using DProject.Manager.UI;
 using DProject.UI.Element.Ports;
+using DProject.UI.Handler;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -11,64 +12,74 @@ namespace DProject.UI
 {
     public class PortsUI : AbstractUI, IInitialize, IUpdateable
     {
-        private readonly ClockUIElement _clock;
-        private readonly TimeControlUIElement _timeControl;
-        private readonly CompassUIElement _compass;
-        private readonly SeasonIndicatorUIElement _seasonIndicator;
-        private readonly MapButtonUIElement _mapButton;
+        public ClockUIElement Clock { get; }
+        public TimeControlUIElement TimeControl { get; }
+        public CompassUIElement Compass { get; }
+        public SeasonIndicatorUIElement SeasonIndicator { get; }
+        public MapButtonUIElement MapButton { get; }
         
-        public PortsUI(GameEntityManager entityManager) : base(entityManager)
+        public PortsUI(GameEntityManager entityManager, UIManager uiManager) : base(entityManager, uiManager)
         {
-            _clock = new ClockUIElement(new Point(48, 48));
-            _timeControl = new TimeControlUIElement(new Point(155, 20));
-            _compass = new CompassUIElement(new Point(48, 128));
-            _seasonIndicator = new SeasonIndicatorUIElement(new Point(48, 200));
-            _mapButton = new MapButtonUIElement(new Point(48, 272));
-
-            GameTimeEntity gameTimeEntity = EntityManager.GetGameTimeEntity();
-            gameTimeEntity.TimeChanged += (sender, args) => _clock.SetRotation(args.CurrentTime);
-            gameTimeEntity.SeasonChanged += (season, args) => _seasonIndicator.SetSeason(args.CurrentSeason);
+            Clock = new ClockUIElement(new Point(48, 48));
+            TimeControl = new TimeControlUIElement(new Point(155, 20));
+            Compass = new CompassUIElement(new Point(48, 128));
+            SeasonIndicator = new SeasonIndicatorUIElement(new Point(48, 200));
+            MapButton = new MapButtonUIElement(new Point(48, 272));
         }
 
         public void Initialize(GraphicsDevice graphicsDevice)
         {
-            _clock.Initialize(graphicsDevice);
-            _timeControl.Initialize(graphicsDevice);
-            _compass.Initialize(graphicsDevice);
-            _seasonIndicator.Initialize(graphicsDevice);
-            _mapButton.Initialize(graphicsDevice);
+            Clock.Initialize(graphicsDevice);
+            TimeControl.Initialize(graphicsDevice);
+            Compass.Initialize(graphicsDevice);
+            SeasonIndicator.Initialize(graphicsDevice);
+            MapButton.Initialize(graphicsDevice);
         }
         
         public override void Draw(SpriteBatch spriteBatch)
         {
-            _clock.Draw(spriteBatch);
-            _timeControl.Draw(spriteBatch);
-            _compass.Draw(spriteBatch);
-            _seasonIndicator.Draw(spriteBatch);
-            _mapButton.Draw(spriteBatch);
+            Clock.Draw(spriteBatch);
+            TimeControl.Draw(spriteBatch);
+            Compass.Draw(spriteBatch);
+            SeasonIndicator.Draw(spriteBatch);
+            MapButton.Draw(spriteBatch);
         }
 
         public void Update(GameTime gameTime)
         {
-            _compass.SetRotation(EntityManager.GetActiveCamera().GetCameraDirection());
+            Compass.SetRotation(EntityManager.GetActiveCamera().GetCameraDirection());
 
             var mousePosition = Game1.GetMousePosition();
 
-            for (var i = 0; i < _timeControl.ButtonRectangles.Length; i++)
+            for (var i = 0; i < TimeControl.ButtonRectangles.Length; i++)
             {
-                if (_timeControl.ButtonRectangles[i].Contains(mousePosition))
+                if (TimeControl.ButtonRectangles[i].Contains(mousePosition))
                 {
-                    if (Mouse.GetState().LeftButton == ButtonState.Released && Game1.PreviousMouseState.LeftButton == ButtonState.Pressed)
-                        _timeControl.SelectedButton = (TimeControlUIElement.TimeControlOption) (i + 1);
+                    if (Mouse.GetState().LeftButton == ButtonState.Released &&
+                        Game1.PreviousMouseState.LeftButton == ButtonState.Pressed)
+                    {
+                        var clickedButton = (TimeControlUIElement.TimeControlOption) (i + 1);
+                        
+                        switch (clickedButton)
+                        {
+                            case TimeControlUIElement.TimeControlOption.Pause:
+                                UIManager.PortsEventHandler.HandleInput(Button.TimeControlPause);
+                                break;
+                            case TimeControlUIElement.TimeControlOption.Play:
+                                UIManager.PortsEventHandler.HandleInput(Button.TimeControlPlay);
+                                break;
+                            case TimeControlUIElement.TimeControlOption.Speedup:
+                                UIManager.PortsEventHandler.HandleInput(Button.TimeControlSpeedUp);
+                                break;
+                            case TimeControlUIElement.TimeControlOption.End:
+                                UIManager.PortsEventHandler.HandleInput(Button.TimeControlEnd);
+                                break;
+                        }
+                    }
                 }
             }
 
-            _mapButton.Large = _mapButton.Rectangle.Contains(mousePosition);
-        }
-
-        public TimeControlUIElement.TimeControlOption GetTimeControlOption()
-        {
-            return _timeControl.SelectedButton;
+            MapButton.Large = MapButton.Rectangle.Contains(mousePosition);
         }
     }
 } 

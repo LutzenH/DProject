@@ -1,7 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using DProject.Entity.Interface;
-using DProject.Manager;
+using DProject.Manager.Entity;
+using DProject.Manager.UI;
 using DProject.Type;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -21,7 +22,7 @@ namespace DProject.UI
 
         private readonly LinkedList<Message> _messages;
         
-        public MessageUI(EntityManager entityManager) : base(entityManager)
+        public MessageUI(EntityManager entityManager, UIManager uiManager) : base(entityManager, uiManager)
         {
             _textString = "";
             _messages = new LinkedList<Message>();

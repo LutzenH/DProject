@@ -6,6 +6,7 @@ using DProject.Entity.Debug;
 using DProject.Entity.Interface;
 using DProject.List;
 using DProject.Manager;
+using DProject.Manager.Entity;
 using DProject.Type.Enum;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;

@@ -3,6 +3,7 @@ using DProject.Entity.Camera;
 using DProject.Entity.Chunk;
 using DProject.Entity.Interface;
 using DProject.Manager;
+using DProject.Manager.Entity;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using IUpdateable = DProject.Entity.Interface.IUpdateable;

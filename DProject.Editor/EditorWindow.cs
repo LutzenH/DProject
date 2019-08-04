@@ -3,18 +3,14 @@ using System.Collections.Generic;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Timers;
-using Cairo;
 using DProject.Entity;
-using DProject.Entity.Camera;
-using DProject.Entity.Chunk;
 using DProject.List;
-using DProject.Manager;
+using DProject.Manager.Entity;
 using DProject.Type.Serializable;
 using Gdk;
 using Gtk;
 using Microsoft.Xna.Framework;
 using Color = Gdk.Color;
-using Rectangle = Gdk.Rectangle;
 // ReSharper disable InconsistentNaming
 // ReSharper disable IdentifierTypo
 

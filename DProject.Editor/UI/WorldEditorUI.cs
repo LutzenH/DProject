@@ -1,7 +1,8 @@
 using DProject.Entity;
 using DProject.Entity.Interface;
 using DProject.List;
-using DProject.Manager;
+using DProject.Manager.Entity;
+using DProject.Manager.UI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -13,7 +14,7 @@ namespace DProject.UI
         private Texture2D _spritesheet;
         private SpriteFont _spriteFont;
         
-        public WorldEditorUI(EditorEntityManager editorEntityManager) : base(editorEntityManager) { }
+        public WorldEditorUI(EditorEntityManager editorEntityManager, EditorUIManager editorUIManager) : base(editorEntityManager, editorUIManager) { }
 
         public void LoadContent(ContentManager content)
         {

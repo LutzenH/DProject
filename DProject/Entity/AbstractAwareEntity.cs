@@ -1,4 +1,4 @@
-using DProject.Manager;
+using DProject.Manager.Entity;
 using Microsoft.Xna.Framework;
 
 namespace DProject.Entity

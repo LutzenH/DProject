@@ -1,5 +1,5 @@
 ﻿using System;
-using DProject.Manager;
+using DProject.Manager.Entity;
 
 namespace DProject
 {
