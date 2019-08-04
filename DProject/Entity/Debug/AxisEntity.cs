@@ -1,5 +1,6 @@
 using DProject.Entity.Camera;
 using DProject.Entity.Interface;
+using DProject.Manager;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using IDrawable = DProject.Entity.Interface.IDrawable;
@@ -50,7 +51,7 @@ namespace DProject.Entity.Debug
         }
 
 
-        public void Draw(CameraEntity activeCamera)
+        public void Draw(CameraEntity activeCamera, ShaderManager shaderManager)
         {
             _basicEffect.View = activeCamera.GetViewMatrix();
             _basicEffect.World = GetWorldMatrix();

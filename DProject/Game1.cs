@@ -1,4 +1,5 @@
 ﻿using System;
+using DProject.Entity;
 using DProject.Entity.Ports;
 using DProject.List;
 using DProject.Manager;
@@ -13,7 +14,8 @@ namespace DProject
         public const string RootDirectory = "Content/";
 
         private readonly GraphicsDeviceManager _graphics;
-        
+
+        private readonly ShaderManager _shaderManager;
         private readonly EntityManager _entityManager;
         private readonly UIManager _uiManager;
 
@@ -38,6 +40,7 @@ namespace DProject
         {
             _graphics = new GraphicsDeviceManager(this);
             
+            _shaderManager = new ShaderManager();
             _entityManager = entityManager;
             _uiManager = new UIManager(_entityManager);
             
@@ -64,22 +67,25 @@ namespace DProject
 
         protected override void Initialize()
         {
-            ShaderManager.Initialize(Content, GraphicsDevice);
             Textures.Initialize(GraphicsDevice);
             
+            _shaderManager.Initialize(GraphicsDevice);
             _entityManager.Initialize(GraphicsDevice);
             _uiManager.Initialize(GraphicsDevice);
-                        
+            
             base.Initialize();
         }
 
         protected override void LoadContent()
         {
-            ShaderManager.LoadContent(Content);
+            _shaderManager.LoadContent(Content);
             _entityManager.LoadContent(Content);
             _uiManager.LoadContent(Content);
             
             base.LoadContent();
+            
+            // This method is temporary until it will be replaces by a proper information handler.
+            _shaderManager.SetInitiateShaderInfo(_entityManager.GetActiveCamera());
         }
 
         protected override void Update(GameTime gameTime)
@@ -107,7 +113,7 @@ namespace DProject
 
         protected override void Draw(GameTime gameTime)
         {
-            ShaderManager.SetShaderInfo(_entityManager.GetActiveCamera(), (float) _entityManager.GetGameTimeEntity().GetRelativeTime());
+            _shaderManager.SetContinuousShaderInfo(_entityManager.GetActiveCamera(), (float) _entityManager.GetGameTimeEntity().GetRelativeTime());
 
 #if !EDITOR
             ShaderManager.CurrentRenderTarget = ShaderManager.RenderTarget.Depth;
@@ -134,7 +140,7 @@ namespace DProject
             {
                 case ShaderManager.RenderTarget.Depth:
                     // Set the render target
-                    GraphicsDevice.SetRenderTarget(ShaderManager.DepthBuffer);
+                    GraphicsDevice.SetRenderTarget(_shaderManager.DepthBuffer);
                     GraphicsDevice.DepthStencilState = new DepthStencilState() { DepthBufferEnable = true };
                     GraphicsDevice.BlendState = BlendState.Opaque;
 
@@ -143,11 +149,11 @@ namespace DProject
                     break;
                 case ShaderManager.RenderTarget.Reflection:
                     //Setup Shaders
-                    ShaderManager.TerrainEffect.CurrentTechnique = ShaderManager.TerrainEffect.Techniques[1];
-                    ShaderManager.PropEffect.CurrentTechnique = ShaderManager.PropEffect.Techniques[1];
+                    _shaderManager.TerrainEffect.CurrentTechnique = _shaderManager.TerrainEffect.Techniques[1];
+                    _shaderManager.PropEffect.CurrentTechnique = _shaderManager.PropEffect.Techniques[1];
                     
                     // Set the render target
-                    GraphicsDevice.SetRenderTarget(ShaderManager.ReflectionBuffer);
+                    GraphicsDevice.SetRenderTarget(_shaderManager.ReflectionBuffer);
                     GraphicsDevice.BlendState = BlendState.Opaque;
                     GraphicsDevice.DepthStencilState = DepthStencilState.Default;
                     GraphicsDevice.SamplerStates[0] = SamplerState.PointWrap;
@@ -157,11 +163,11 @@ namespace DProject
                     break;
                 case ShaderManager.RenderTarget.Refraction:
                     //Setup Shaders
-                    ShaderManager.TerrainEffect.CurrentTechnique = ShaderManager.TerrainEffect.Techniques[2];
-                    ShaderManager.PropEffect.CurrentTechnique = ShaderManager.PropEffect.Techniques[2];
+                    _shaderManager.TerrainEffect.CurrentTechnique = _shaderManager.TerrainEffect.Techniques[2];
+                    _shaderManager.PropEffect.CurrentTechnique = _shaderManager.PropEffect.Techniques[2];
                     
                     // Set the render target
-                    GraphicsDevice.SetRenderTarget(ShaderManager.RefractionBuffer);
+                    GraphicsDevice.SetRenderTarget(_shaderManager.RefractionBuffer);
                     GraphicsDevice.BlendState = BlendState.Opaque;
                     GraphicsDevice.DepthStencilState = DepthStencilState.Default;
                     GraphicsDevice.SamplerStates[0] = SamplerState.PointWrap;
@@ -171,8 +177,8 @@ namespace DProject
                     break;
                 case ShaderManager.RenderTarget.Final:
                     //Setup Shaders
-                    ShaderManager.TerrainEffect.CurrentTechnique = ShaderManager.TerrainEffect.Techniques[0];
-                    ShaderManager.PropEffect.CurrentTechnique = ShaderManager.PropEffect.Techniques[0];
+                    _shaderManager.TerrainEffect.CurrentTechnique = _shaderManager.TerrainEffect.Techniques[0];
+                    _shaderManager.PropEffect.CurrentTechnique = _shaderManager.PropEffect.Techniques[0];
 
                     GraphicsDevice.SetRenderTarget(null);
                     GraphicsDevice.BlendState = BlendState.Opaque;
@@ -185,10 +191,7 @@ namespace DProject
             }
 
             //Draw the scene
-            _entityManager.Draw();
-            
-            // Drop the render target
-            GraphicsDevice.SetRenderTarget(null);
+            _entityManager.Draw(_shaderManager);
         }
 
         public static void SetBackgroundColor(Color color)
@@ -224,6 +227,11 @@ namespace DProject
         public EntityManager GetEntityManager()
         {
             return _entityManager;
+        }
+
+        public ShaderManager GetShaderManager()
+        {
+            return _shaderManager;
         }
 
         public int GetFps()

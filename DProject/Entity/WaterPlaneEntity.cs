@@ -1,5 +1,6 @@
 using DProject.Entity.Camera;
 using DProject.Entity.Interface;
+using DProject.Manager;
 using DProject.Type.Rendering;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -9,7 +10,7 @@ namespace DProject.Entity
 {
     public class WaterPlaneEntity : AbstractEntity, IInitialize, IDrawable
     {
-        public const float WaterHeight = 1f;
+        public const float WaterHeight = 70f;
 
         private readonly WaterPlane _waterPlane;
         
@@ -23,9 +24,9 @@ namespace DProject.Entity
             _waterPlane.Initialize(graphicsDevice);
         }
 
-        public void Draw(CameraEntity activeCamera)
+        public void Draw(CameraEntity activeCamera, ShaderManager shaderManager)
         {
-            _waterPlane.Draw(activeCamera);
+            _waterPlane.Draw(activeCamera, shaderManager);
         }
     }
 }

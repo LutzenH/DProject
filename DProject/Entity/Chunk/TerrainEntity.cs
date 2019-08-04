@@ -4,6 +4,7 @@ using System.IO;
 using DProject.Entity.Camera;
 using DProject.Entity.Interface;
 using DProject.List;
+using DProject.Manager;
 using DProject.Type.Enum;
 using DProject.Type.Rendering;
 using DProject.Type.Serializable.Chunk;
@@ -151,14 +152,14 @@ namespace DProject.Entity.Chunk
                 Serialize(chunk);
         }
 
-        public void Draw(CameraEntity activeCamera)
+        public void Draw(CameraEntity activeCamera, ShaderManager shaderManager)
         {           
             if (activeCamera.GetBoundingFrustum().Intersects(_boundingBox))
             {
-                _heightMap.Draw(GetWorldMatrix(), Textures.AtlasList["floor_textures"].AtlasTexture2D);
+                _heightMap.Draw(GetWorldMatrix(), Textures.AtlasList["floor_textures"].AtlasTexture2D, shaderManager);
 
                 foreach (var prop in _props)
-                    prop.Draw(activeCamera);
+                    prop.Draw(activeCamera, shaderManager);
             }
         }
 

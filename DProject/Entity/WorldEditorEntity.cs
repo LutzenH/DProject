@@ -56,10 +56,10 @@ namespace DProject.Entity
                 UseTool();
         }
 
-        public void Draw(CameraEntity activeCamera)
+        public void Draw(CameraEntity activeCamera, ShaderManager shaderManager)
         {
             if(_brushSize < 1)
-                _cornerIndicatorEntity.Draw(activeCamera);
+                _cornerIndicatorEntity.Draw(activeCamera, shaderManager);
         }
 
         #region Tools

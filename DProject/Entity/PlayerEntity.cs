@@ -36,9 +36,9 @@ namespace DProject.Entity
             }
         }
 
-        public void Draw(CameraEntity activeCamera)
+        public void Draw(CameraEntity activeCamera, ShaderManager shaderManager)
         {
-            _playerModel.Draw(activeCamera);
+            _playerModel.Draw(activeCamera, shaderManager);
         }
     }
 }

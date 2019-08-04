@@ -111,13 +111,13 @@ namespace DProject.Entity.Debug
             }
         }
 
-        public void Draw(CameraEntity activeCamera)
+        public void Draw(CameraEntity activeCamera, ShaderManager shaderManager)
         {
-            _axisEntity.Draw(activeCamera);
-            _pointerAxisEntity.Draw(activeCamera);
+            _axisEntity.Draw(activeCamera, shaderManager);
+            _pointerAxisEntity.Draw(activeCamera, shaderManager);
 
             foreach (var lineFrame in _lineFrameEntities)
-                lineFrame.Draw(activeCamera);
+                lineFrame.Draw(activeCamera, shaderManager);
         }
     }
 }

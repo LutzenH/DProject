@@ -44,7 +44,7 @@ namespace DProject.Entity
             return _model;
         }
         
-        public void Draw(CameraEntity activeCamera)
+        public void Draw(CameraEntity activeCamera, ShaderManager shaderManager)
         {
             switch (ShaderManager.CurrentRenderTarget)
             {
@@ -53,8 +53,8 @@ namespace DProject.Entity
                     {
                         if (activeCamera.GetBoundingFrustum().Intersects(mesh.BoundingSphere.Transform(GetWorldMatrix())))
                         {
-                            ShaderManager.DepthEffect.Parameters["World"].SetValue(GetWorldMatrix());
-                            DrawMesh(ShaderManager.DepthEffect, mesh.MeshParts, _graphicsDevice);
+                            shaderManager.DepthEffect.World = GetWorldMatrix();
+                            DrawMesh(shaderManager.DepthEffect, mesh.MeshParts, _graphicsDevice);
                         }
                     }
                     break;
@@ -65,8 +65,8 @@ namespace DProject.Entity
                     {
                         if (activeCamera.GetBoundingFrustum().Intersects(mesh.BoundingSphere.Transform(GetWorldMatrix())))
                         {
-                            ShaderManager.PropEffect.Parameters["World"].SetValue(GetWorldMatrix());
-                            DrawMesh(ShaderManager.PropEffect, mesh.MeshParts, _graphicsDevice);
+                            shaderManager.PropEffect.World = GetWorldMatrix();
+                            DrawMesh(shaderManager.PropEffect, mesh.MeshParts, _graphicsDevice);
                         }
                     }
                     break;

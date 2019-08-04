@@ -11,6 +11,7 @@ float4x4 World;
 float4x4 View;
 float4x4 Projection;
 
+float NearClip;
 float FarClip;
 
 struct VertexShaderInput
@@ -42,7 +43,7 @@ VertexShaderOutput MainVS(in VertexShaderInput input)
 
 float4 MainPS(VertexShaderOutput input) : COLOR
 {
-    float depth = input.ViewPositionVS.z / FarClip;
+    float depth = ((input.ViewPositionVS.z + NearClip) / FarClip);
     input.Normal = normalize(input.Normal);
     
     return float4(input.Normal.x, input.Normal.y, input.Normal.z, depth);

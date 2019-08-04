@@ -17,7 +17,6 @@ namespace DProject.Entity.Ports
         public uint CurrentTime { get; set; }
 
         private double _currentSecond;
-
         private Season _currentSeason;
 
         public GameTimeEntity() : base(Vector3.Zero, Quaternion.Identity, Vector3.Zero)

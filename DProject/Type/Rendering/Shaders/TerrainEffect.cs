@@ -1,13 +1,27 @@
-using DProject.List;
-using DProject.Type.Serializable.Chunk;
+using DProject.Type.Rendering.Shaders.Interface;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace DProject.Type.Rendering.Shaders
 {
-    public class TerrainEffect : BasicEffect
+    public class TerrainEffect : AbstractEffect, IReflected
     {
-        public TerrainEffect(GraphicsDevice device) : base(device)
+        public TerrainEffect(Effect cloneSource) : base(cloneSource) { }
+        
+        public Matrix ReflectionView
+        {
+            get => Parameters["ReflectionView"].GetValueMatrix();
+            set => Parameters["ReflectionView"].SetValue(value);
+        }
+
+        public float WaterHeight
+        {
+            get => Parameters["WaterHeight"].GetValueSingle();
+            set => Parameters["WaterHeight"].SetValue(value);
+        }
+        
+        //Needs to be re-implemented once the shader supports the given Sky info
+        /*public TerrainEffect(GraphicsDevice device) : base(device)
         {
             LightingEnabled = true;
             PreferPerPixelLighting = true;
@@ -54,6 +68,6 @@ namespace DProject.Type.Rendering.Shaders
                 FogStart = info.Fog.FogStart;
                 FogEnd = info.Fog.FogEnd;
             }
-        }
+        }*/
     }
 }

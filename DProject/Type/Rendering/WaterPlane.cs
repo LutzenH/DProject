@@ -1,6 +1,7 @@
 using DProject.Entity.Camera;
 using DProject.Entity.Interface;
 using DProject.Manager;
+using DProject.Type.Rendering.Shaders;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using IDrawable = DProject.Entity.Interface.IDrawable;
@@ -43,15 +44,15 @@ namespace DProject.Type.Rendering
                 });
         }
 
-        public void Draw(CameraEntity activeCamera)
+        public void Draw(CameraEntity activeCamera, ShaderManager shaderManager)
         {
-            Effect effect = null;
+            AbstractEffect effect = null;
             
             switch (ShaderManager.CurrentRenderTarget)
             {
                 case ShaderManager.RenderTarget.Final:
-                    effect = ShaderManager.WaterEffect;
-                    effect.Parameters["World"].SetValue(_worldMatrix);
+                    effect = shaderManager.WaterEffect;
+                    effect.World = _worldMatrix;
                     break;
                 default:
                     return;

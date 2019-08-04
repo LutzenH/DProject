@@ -90,12 +90,12 @@ namespace DProject.Entity.Chunk
             }
         }
 
-        public void Draw(CameraEntity activeCamera)
+        public void Draw(CameraEntity activeCamera, ShaderManager shaderManager)
         {
             foreach (var chunk in _loadedChunks)
             {
                 if(_loadedChunks.ContainsKey(chunk.Key))
-                    chunk.Value.Draw(activeCamera);
+                    chunk.Value.Draw(activeCamera, shaderManager);
             }
         }
 
