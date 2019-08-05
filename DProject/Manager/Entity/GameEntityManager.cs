@@ -8,8 +8,9 @@ namespace DProject.Manager.Entity
     {
         public GameEntityManager()
         {
-            AddEntity(new WaterPlaneEntity(Vector2.Zero, new Vector2(128, 128)));
-            AddEntity(new PropEntity(new Vector3(12, WaterPlaneEntity.WaterHeight*2, 5), 9));
+            AddEntity(new WaterPlaneEntity(Vector2.Zero, new Vector2(512, 512)));
+            AddEntity(new PropEntity(new Vector3(100, WaterPlaneEntity.WaterHeight*2, 34), 9));
+            AddEntity(new PropEntity(new Vector3(50, WaterPlaneEntity.WaterHeight*2 - 0.2f, 12), 8));
             
             AddCamera(new FlyCameraEntity(new Vector3(0, 10, 0), Quaternion.Identity));
         }

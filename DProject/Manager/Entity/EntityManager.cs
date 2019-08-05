@@ -67,12 +67,12 @@ namespace DProject.Manager.Entity
             }
         }
 
-        public void Draw(ShaderManager _shaderManager)
+        public void Draw(ShaderManager shaderManager)
         {
             foreach (var entity in _entities)
             {
                 if (entity is IDrawable drawableEntity)
-                    drawableEntity.Draw(GetActiveCamera(), _shaderManager);
+                    drawableEntity.Draw(GetActiveCamera(), shaderManager);
             }
         }
 

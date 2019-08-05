@@ -13,7 +13,7 @@ namespace DProject.Entity.Camera
         protected Matrix ProjectMatrix;
         protected Matrix ViewMatrix;
 
-        private const float DefaultNearPlaneDistance = 0.01f;
+        private const float DefaultNearPlaneDistance = 0.1f;
         private const float DefaultFarPlaneDistance = 180f;
         
         private float _nearPlaneDistance;

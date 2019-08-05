@@ -26,6 +26,30 @@ namespace DProject.Type.Rendering.Shaders
             set => Parameters["refractionTexture"].SetValue(value);
         }
 
+        public Texture2D DepthBuffer
+        {
+            get => Parameters["depthTexture"].GetValueTexture2D();
+            set => Parameters["depthTexture"].SetValue(value);
+        }
+
+        public float NearClipPlane
+        {
+            get => Parameters["NearClip"].GetValueSingle();
+            set => Parameters["NearClip"].SetValue(value);
+        }
+        
+        public float FarClipPlane
+        {
+            get => Parameters["FarClip"].GetValueSingle();
+            set => Parameters["FarClip"].SetValue(value);
+        }
+        
+        public float MaxWaterDepth
+        {
+            get => Parameters["MaxWaterDepth"].GetValueSingle();
+            set => Parameters["MaxWaterDepth"].SetValue(value);
+        }
+        
         public Texture2D DuDvTexture
         {
             get => Parameters["dudvTexture"].GetValueTexture2D();
@@ -60,6 +84,30 @@ namespace DProject.Type.Rendering.Shaders
         {
             get => Parameters["WaterSpeed"].GetValueSingle();
             set => Parameters["WaterSpeed"].SetValue(value);
+        }
+
+        public Vector3 WaterColor
+        {
+            get => Parameters["WaterColor"].GetValueVector3();
+            set => Parameters["WaterColor"].SetValue(value);
+        }
+        
+        public Vector3 DeepWaterColor
+        {
+            get => Parameters["DeepWaterColor"].GetValueVector3();
+            set => Parameters["DeepWaterColor"].SetValue(value);
+        }
+
+        public float MinimumFoamDistance
+        {
+            get => Parameters["MinimumFoamDistance"].GetValueSingle();
+            set => Parameters["MinimumFoamDistance"].SetValue(value);
+        }
+        
+        public float MaximumFoamDistance
+        {
+            get => Parameters["MaximumFoamDistance"].GetValueSingle();
+            set => Parameters["MaximumFoamDistance"].SetValue(value);
         }
     }
 }

@@ -80,6 +80,15 @@ namespace DProject.UI
             }
 
             MapButton.Large = MapButton.Rectangle.Contains(mousePosition);
+
+            if (MapButton.Rectangle.Contains(mousePosition))
+            {
+                if (Mouse.GetState().LeftButton == ButtonState.Released &&
+                    Game1.PreviousMouseState.LeftButton == ButtonState.Pressed)
+                {
+                    UIManager.PortsEventHandler.HandleInput(Button.MapButtonPressed);
+                }
+            }
         }
     }
 } 

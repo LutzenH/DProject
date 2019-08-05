@@ -39,7 +39,7 @@ namespace DProject.Manager
                 graphicsDevice.PresentationParameters.BackBufferWidth,
                 graphicsDevice.PresentationParameters.BackBufferHeight,
                 false,
-                graphicsDevice.PresentationParameters.BackBufferFormat,
+                SurfaceFormat.HdrBlendable,
                 DepthFormat.Depth24);
             
             ReflectionBuffer = new RenderTarget2D(
@@ -102,17 +102,43 @@ namespace DProject.Manager
                     reflectiveEffect.RefractionBuffer = RefractionBuffer;
                 }
             }
-            
+
+            _waterEffect.DepthBuffer = DepthBuffer;
             _waterEffect.RelativeGameTime = relativeGameTime;
         }
         
         //This method is temporary until it will be replaces by a proper information handler.
         public void SetInitiateShaderInfo(CameraEntity activeCamera)
         {
-            SetInitiateShaderInfo(activeCamera.GetNearPlaneDistance(), activeCamera.GetFarPlaneDistance(), WaterPlaneEntity.WaterHeight, 5.0f, 0.03f, 2.0f, 8.0f);
+            SetInitiateShaderInfo(
+                activeCamera.GetNearPlaneDistance(),
+                activeCamera.GetFarPlaneDistance(),
+                WaterPlaneEntity.WaterHeight,
+                0.05f,
+                20.0f,
+                0.03f,
+                2.0f,
+                8.0f,
+                new Vector3(0.12f, 0.19f, 0.37f),
+                new Vector3(0f, 1f, 1f),
+                0.05f,
+                0.1f
+                );
         }
 
-        public void SetInitiateShaderInfo(float nearPlaneDistance, float farPlaneDistance, float waterHeight, float dudvTiling, float distortionIntensity, float fresnelIntensity, float waterSpeed)
+        public void SetInitiateShaderInfo(
+            float nearPlaneDistance,
+            float farPlaneDistance,
+            float waterHeight,
+            float maxWaterDepth,
+            float dudvTiling,
+            float distortionIntensity,
+            float fresnelIntensity,
+            float waterSpeed,
+            Vector3 waterColor,
+            Vector3 deepWaterColor,
+            float minimumFoamDistance,
+            float maximumFoamDistance)
         {
             foreach (var effect in _effects)
             {
@@ -121,14 +147,21 @@ namespace DProject.Manager
                     reflectedEffect.WaterHeight = waterHeight;
                 }
             }
-            
+
             _depthEffect.NearClipPlane = nearPlaneDistance;
             _depthEffect.FarClipPlane = farPlaneDistance;
 
+            _waterEffect.NearClipPlane = nearPlaneDistance;
+            _waterEffect.FarClipPlane = farPlaneDistance;
+            _waterEffect.MaxWaterDepth = maxWaterDepth;
             _waterEffect.DuDvTiling = dudvTiling;
             _waterEffect.DistortionIntensity = distortionIntensity;
             _waterEffect.FresnelIntensity = fresnelIntensity;
             _waterEffect.WaterSpeed = waterSpeed;
+            _waterEffect.WaterColor = waterColor;
+            _waterEffect.DeepWaterColor = deepWaterColor;
+            _waterEffect.MinimumFoamDistance = minimumFoamDistance;
+            _waterEffect.MaximumFoamDistance = maximumFoamDistance;
         }
 
         public TerrainEffect TerrainEffect => _terrainEffect ?? throw new ContentLoadException("The TerrainEffect shader has not been loaded yet.");

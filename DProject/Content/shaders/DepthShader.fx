@@ -36,17 +36,17 @@ VertexShaderOutput MainVS(in VertexShaderInput input)
     
     output.Position = mul(viewPosition, Projection);	
     output.Normal = mul(input.Normal, View);
-    output.ViewPositionVS = mul(input.Position, mul(World, mul(View, Projection)));
+    output.ViewPositionVS = output.Position;
 
 	return output;
 }
 
 float4 MainPS(VertexShaderOutput input) : COLOR
 {
-    float depth = ((input.ViewPositionVS.z + NearClip) / FarClip);
+    float depth = (input.ViewPositionVS.w + NearClip) / FarClip;
     input.Normal = normalize(input.Normal);
     
-    return float4(input.Normal.x, input.Normal.y, input.Normal.z, depth);
+    return float4(input.Normal.xyz, depth);
 }
 
 technique BasicColorDrawing

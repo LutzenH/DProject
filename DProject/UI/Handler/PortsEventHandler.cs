@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using DProject.Entity.Ports;
 using DProject.Manager.Entity;
@@ -20,7 +21,7 @@ namespace DProject.UI.Handler
             _gameTimeEntity.SeasonChanged += (season, args) => _portsUI.SeasonIndicator.SetSeason(args.CurrentSeason);
         }
 
-        public void HandleInput(Button button, List<object> linkedValues = null)
+        public void HandleInput(Button button, object[] linkedValues = null)
         {
             switch (button)
             {
@@ -38,12 +39,14 @@ namespace DProject.UI.Handler
                     _gameTimeEntity.GameSpeed = 3.0f;
                     _portsUI.TimeControl.SelectedButton = TimeControlUIElement.TimeControlOption.Speedup;
                     break;
+                case Button.MapButtonPressed:
+                    break;
             }
         }
 
     }
 
     public enum Button {
-        TimeControlPause, TimeControlPlay, TimeControlSpeedUp, TimeControlEnd
+        TimeControlPause, TimeControlPlay, TimeControlSpeedUp, TimeControlEnd, MapButtonPressed
     };
 } 
