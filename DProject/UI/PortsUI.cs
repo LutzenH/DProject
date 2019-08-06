@@ -1,6 +1,7 @@
 using DProject.Entity.Interface;
 using DProject.Manager.Entity;
 using DProject.Manager.UI;
+using DProject.UI.Element;
 using DProject.UI.Element.Ports;
 using DProject.UI.Handler;
 using Microsoft.Xna.Framework;
@@ -18,8 +19,10 @@ namespace DProject.UI
         public SeasonIndicatorUIElement SeasonIndicator { get; }
         public MapButtonUIElement MapButton { get; }
 
-        public ListUIElement List { get; }
+        public WindowUIElement DebugWindow { get; }
 
+        private Rectangle? _currentRectangleBeingDragged;
+        
         public PortsUI(GameEntityManager entityManager, UIManager uiManager) : base(entityManager, uiManager)
         {
             Clock = new ClockUIElement(new Point(48, 48));
@@ -27,7 +30,7 @@ namespace DProject.UI
             Compass = new CompassUIElement(new Point(48, 128));
             SeasonIndicator = new SeasonIndicatorUIElement(new Point(48, 200));
             MapButton = new MapButtonUIElement(new Point(48, 272));
-            List = new ListUIElement(new Point(0,320));
+            DebugWindow = new WindowUIElement(new Point(0,320));
         }
 
         public void Initialize(GraphicsDevice graphicsDevice)
@@ -37,7 +40,7 @@ namespace DProject.UI
             Compass.Initialize(graphicsDevice);
             SeasonIndicator.Initialize(graphicsDevice);
             MapButton.Initialize(graphicsDevice);
-            List.Initialize(graphicsDevice);
+            DebugWindow.Initialize(graphicsDevice);
         }
         
         public override void Draw(SpriteBatch spriteBatch)
@@ -47,7 +50,7 @@ namespace DProject.UI
             Compass.Draw(spriteBatch);
             SeasonIndicator.Draw(spriteBatch);
             MapButton.Draw(spriteBatch);
-            List.Draw(spriteBatch);
+            DebugWindow.Draw(spriteBatch);
         }
 
         public void Update(GameTime gameTime)
@@ -84,6 +87,23 @@ namespace DProject.UI
                 }
             }
 
+            if (DebugWindow.CornerGrabRectangle.Contains(mousePosition) || _currentRectangleBeingDragged == DebugWindow.CornerGrabRectangle)
+            {
+                if (Mouse.GetState().LeftButton == ButtonState.Pressed)
+                {
+                    DebugWindow.Size += mousePosition.ToPoint() - Game1.PreviousMouseState.Position;
+                    _currentRectangleBeingDragged= DebugWindow.CornerGrabRectangle;
+                }
+            }
+            else if (DebugWindow.WindowBarRectangle.Contains(mousePosition) || _currentRectangleBeingDragged == DebugWindow.WindowBarRectangle)
+            {
+                if (Mouse.GetState().LeftButton == ButtonState.Pressed)
+                {
+                    DebugWindow.Position += mousePosition.ToPoint() - Game1.PreviousMouseState.Position;
+                    _currentRectangleBeingDragged = DebugWindow.WindowBarRectangle;
+                }
+            }
+
             MapButton.Large = MapButton.Rectangle.Contains(mousePosition);
 
             if (MapButton.Rectangle.Contains(mousePosition))
@@ -93,6 +113,12 @@ namespace DProject.UI
                 {
                     UIManager.PortsEventHandler.HandleInput(Button.MapButtonPressed);
                 }
+            }
+
+            if (Mouse.GetState().LeftButton == ButtonState.Released &&
+                Game1.PreviousMouseState.LeftButton == ButtonState.Pressed)
+            {
+                _currentRectangleBeingDragged = null;
             }
         }
     }

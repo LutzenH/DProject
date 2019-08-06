@@ -28,17 +28,27 @@ namespace DProject.UI.Element
 
             Rectangle = new Rectangle(new Point(size.X - (int) Origin.X, size.Y - (int) Origin.Y), size);
         }
-        
+
+        public new Point Position
+        {
+            get => base.Position;
+            set
+            {
+                base.Position = value;
+                _destinationRectangles = SetDestinationRectangles(value, _size, _sourceRectangles);
+                Rectangle = new Rectangle(new Point(_size.X - (int) Origin.X, _size.Y - (int) Origin.Y), _size);
+            }
+        }
+
         public Point Size {
             get => _size;
             set
             {
-                if (value.X >= _minimumSize.X && value.Y >= _minimumSize.Y)
-                    _size = value;
-                else
-                    _size = _minimumSize;
+                _size.X = value.X >= _minimumSize.X ? value.X : _minimumSize.X;
+                _size.Y = value.Y >= _minimumSize.Y ? value.Y : _minimumSize.Y;
                 
                 _destinationRectangles = SetDestinationRectangles(Position, _size, _sourceRectangles);
+                Rectangle = new Rectangle(new Point(_size.X - (int) Origin.X, _size.Y - (int) Origin.Y), _size);
             }
         }
 

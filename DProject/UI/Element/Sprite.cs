@@ -15,7 +15,7 @@ namespace DProject.UI.Element
         
         public Color Color { get; set; }
 
-        public Rectangle Rectangle { get; set; }
+        public Rectangle Rectangle { get; protected set; }
 
         private readonly Rectangle _sourceRectangle;
         private Rectangle _destinationRectangle;
@@ -48,6 +48,7 @@ namespace DProject.UI.Element
             {
                 _position = value;
                 _destinationRectangle = new Rectangle(_position, _sourceRectangle.Size);
+                Rectangle = new Rectangle(new Point(_destinationRectangle.X - (int) Origin.X, _destinationRectangle.Y - (int) Origin.Y), _destinationRectangle.Size);
             }
         }
 
