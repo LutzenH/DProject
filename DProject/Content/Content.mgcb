@@ -77,6 +77,9 @@
 /copy:textures/ui/ports/timer_speedup_clicked.png
 /copy:textures/ui/ports/timer_speedup_disabled.png
 /copy:textures/ui/ports/timer_speedup.png
+/copy:textures/ui/ports/backdrop_list.png
+/copy:textures/ui/ports/backdrop_list_item.png
+/copy:textures/ui/ports/menu_corner_grab.png
 
 #begin default.spritefont
 /importer:FontDescriptionImporter

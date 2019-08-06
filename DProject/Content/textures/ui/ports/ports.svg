@@ -478,6 +478,16 @@
        y1="64.700783"
        x2="-127.68665"
        y2="47.469795" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#1099-9-5-1"
+       id="linearGradient1120"
+       x1="165.84367"
+       y1="174.89694"
+       x2="165.84367"
+       y2="-18.248871"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1.8378014,0,0,1.8378014,-124.51702,-13.763467)" />
   </defs>
   <sodipodi:namedview
      id="base"
@@ -486,16 +496,16 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.70710681"
-     inkscape:cx="-9.187645"
-     inkscape:cy="865.94339"
+     inkscape:zoom="2.0000002"
+     inkscape:cx="174.7031"
+     inkscape:cy="989.59202"
      inkscape:document-units="mm"
-     inkscape:current-layer="layer4"
+     inkscape:current-layer="layer1"
      showgrid="false"
      inkscape:snap-others="true"
      inkscape:snap-nodes="true"
      inkscape:snap-bbox="true"
-     inkscape:snap-global="false"
+     inkscape:snap-global="true"
      inkscape:snap-bbox-midpoints="true"
      inkscape:bbox-paths="true"
      inkscape:snap-to-guides="true"
@@ -1102,6 +1112,64 @@
            inkscape:connector-curvature="0" />
       </g>
     </g>
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer1"
+     inkscape:label="Backdrops"
+     style="display:inline">
+    <g
+       id="backdrop_list"
+       transform="translate(-35.983332,2.7781249)">
+      <rect
+         ry="1.4447955"
+         y="3.669277"
+         x="133.0775"
+         height="13.918108"
+         width="8.4683075"
+         id="rect1085"
+         style="opacity:1;fill:url(#linearGradient1120);fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:stroke fill markers" />
+      <path
+         sodipodi:nodetypes="cc"
+         inkscape:connector-curvature="0"
+         id="path1087"
+         d="m 132.92258,11.058967 h 8.7169"
+         style="fill:none;stroke:#000000;stroke-width:0.25;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <rect
+         ry="1.1027411"
+         y="11.527403"
+         x="133.51727"
+         height="5.6365891"
+         width="7.5977783"
+         id="rect1104"
+         style="opacity:1;fill:#bf936a;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.89115739;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:stroke fill markers" />
+      <rect
+         ry="1.0693637"
+         y="4.1395063"
+         x="133.55533"
+         height="6.4493151"
+         width="7.5594301"
+         id="rect1104-6"
+         style="display:inline;opacity:1;fill:#bf936a;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.89115739;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:stroke fill markers" />
+    </g>
+    <g
+       id="backdrop_list_item"
+       transform="matrix(1.0010146,0,0,1.0810436,-46.657364,2.8062214)">
+      <rect
+         ry="1.4844503"
+         y="3.2587328"
+         x="154.5851"
+         height="3.671221"
+         width="3.9647274"
+         id="rect1104-5"
+         style="display:inline;opacity:1;fill:#a56f3d;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.92192042;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:stroke fill markers" />
+    </g>
+    <path
+       style="display:inline;fill:#a56f3d;fill-opacity:1;stroke:#000000;stroke-width:0.25;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 100.45113,26.742034 c 1.61663,-0.119059 2.78085,-1.079198 3.07762,-3.266038 h 1.4518 c -0.0865,3.150405 -1.96346,4.597802 -4.53509,4.602176 z"
+       id="menu_corner_grab"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccccc" />
   </g>
   <g
      inkscape:groupmode="layer"

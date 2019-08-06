@@ -17,7 +17,9 @@ namespace DProject.UI
         public CompassUIElement Compass { get; }
         public SeasonIndicatorUIElement SeasonIndicator { get; }
         public MapButtonUIElement MapButton { get; }
-        
+
+        public ListUIElement List { get; }
+
         public PortsUI(GameEntityManager entityManager, UIManager uiManager) : base(entityManager, uiManager)
         {
             Clock = new ClockUIElement(new Point(48, 48));
@@ -25,6 +27,7 @@ namespace DProject.UI
             Compass = new CompassUIElement(new Point(48, 128));
             SeasonIndicator = new SeasonIndicatorUIElement(new Point(48, 200));
             MapButton = new MapButtonUIElement(new Point(48, 272));
+            List = new ListUIElement(new Point(0,320));
         }
 
         public void Initialize(GraphicsDevice graphicsDevice)
@@ -34,6 +37,7 @@ namespace DProject.UI
             Compass.Initialize(graphicsDevice);
             SeasonIndicator.Initialize(graphicsDevice);
             MapButton.Initialize(graphicsDevice);
+            List.Initialize(graphicsDevice);
         }
         
         public override void Draw(SpriteBatch spriteBatch)
@@ -43,6 +47,7 @@ namespace DProject.UI
             Compass.Draw(spriteBatch);
             SeasonIndicator.Draw(spriteBatch);
             MapButton.Draw(spriteBatch);
+            List.Draw(spriteBatch);
         }
 
         public void Update(GameTime gameTime)

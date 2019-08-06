@@ -18,13 +18,18 @@ namespace DProject.UI.Element
         public Rectangle Rectangle { get; set; }
 
         private readonly Rectangle _sourceRectangle;
-        private readonly Rectangle _destinationRectangle;
+        private Rectangle _destinationRectangle;
         
         private readonly string _atlasName;
-        private Texture2D _spriteSheet;
+
+        private Point _position;
+        
+        protected Texture2D SpriteSheet;
 
         public Sprite(Point position, string atlasName, string name)
         {
+            Position = position;
+            
             _sourceRectangle = Textures.AtlasList[atlasName].TextureList[name].TextureRectangle;
             _destinationRectangle = new Rectangle(position, _sourceRectangle.Size);
             Origin = new Vector2(_sourceRectangle.Width / 2f, _sourceRectangle.Height / 2f);
@@ -37,15 +42,24 @@ namespace DProject.UI.Element
             Rectangle = new Rectangle(new Point(_destinationRectangle.X - (int) Origin.X, _destinationRectangle.Y - (int) Origin.Y), _destinationRectangle.Size);
         }
         
-        public void Initialize(GraphicsDevice graphicsDevice)
-        {
-            _spriteSheet = Textures.AtlasList[_atlasName].AtlasTexture2D;
+        public Point Position {
+            get => _position;
+            set
+            {
+                _position = value;
+                _destinationRectangle = new Rectangle(_position, _sourceRectangle.Size);
+            }
         }
 
-        public void Draw(SpriteBatch spriteBatch)
+        public void Initialize(GraphicsDevice graphicsDevice)
+        {
+            SpriteSheet = Textures.AtlasList[_atlasName].AtlasTexture2D;
+        }
+
+        public virtual void Draw(SpriteBatch spriteBatch)
         {
             if(Visible)
-                spriteBatch.Draw(_spriteSheet, _destinationRectangle, _sourceRectangle, Color, Rotation, Origin, SpriteEffects.None, 0f);
+                spriteBatch.Draw(SpriteSheet, _destinationRectangle, _sourceRectangle, Color, Rotation, Origin, SpriteEffects.None, 0f);
         }
     }
 } 

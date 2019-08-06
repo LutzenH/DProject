@@ -74,7 +74,7 @@
 		"map_small": {
 			"location": "textures/ui/ports/map_small.png"
 		},
-        "map_disabled": {
+		"map_disabled": {
 			"location": "textures/ui/ports/map_disabled.png"
 		},
 		"season_autumnal": {
@@ -136,6 +136,23 @@
 		},
 		"timer_speedup": {
 			"location": "textures/ui/ports/timer_speedup.png"
+		},
+		"backdrop_list": {
+			"location": "textures/ui/ports/backdrop_list.png",
+			"border_left": 0.205882352941,
+			"border_right": 0.205882352941,
+			"border_top": 0.648148148148,
+			"border_bottom": 0.12962962963
+		},
+		"backdrop_list_item": {
+			"location": "textures/ui/ports/backdrop_list_item.png",
+			"border_left": 0.4,
+			"border_right": 0.4,
+			"border_top": 0.4,
+			"border_bottom": 0.4
+		},
+		"menu_corner_grab": {
+			"location": "textures/ui/ports/menu_corner_grab.png"
 		}
 	}
 }
