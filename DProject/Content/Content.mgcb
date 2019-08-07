@@ -29,6 +29,9 @@
 #begin collections/textures.json
 /copy:collections/textures.json
 
+#begin collections/fonts.json
+/copy:collections/fonts.json
+
 #begin textures/tiles/*
 /copy:textures/tiles/grass.png
 /copy:textures/tiles/metal_floor.png
@@ -81,12 +84,19 @@
 /copy:textures/ui/ports/backdrop_list_item.png
 /copy:textures/ui/ports/menu_corner_grab.png
 
-#begin default.spritefont
+#begin fonts/default.spritefont
 /importer:FontDescriptionImporter
 /processor:LocalizedFontProcessor
 /processorParam:PremultiplyAlpha=True
 /processorParam:TextureFormat=Compressed
-/build:default.spritefont
+/build:fonts/default.spritefont
+
+#begin fonts/written.spritefont
+/importer:FontDescriptionImporter
+/processor:LocalizedFontProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:fonts/written.spritefont
 
 #begin models/ports/barrel.fbx
 /importer:FbxImporter

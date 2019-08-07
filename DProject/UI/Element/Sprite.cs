@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace DProject.UI.Element
 {
-    public class Sprite : IInitialize
+    public class Sprite
     {
         public bool Visible { get; set; }
         
@@ -20,12 +20,10 @@ namespace DProject.UI.Element
         private readonly Rectangle _sourceRectangle;
         private Rectangle _destinationRectangle;
         
-        private readonly string _atlasName;
+        protected readonly string AtlasName;
 
         private Point _position;
         
-        protected Texture2D SpriteSheet;
-
         public Sprite(Point position, string atlasName, string name)
         {
             Position = position;
@@ -37,7 +35,7 @@ namespace DProject.UI.Element
             Color = Color.White;
             Visible = true;
 
-            _atlasName = atlasName;
+            AtlasName = atlasName;
             
             Rectangle = new Rectangle(new Point(_destinationRectangle.X - (int) Origin.X, _destinationRectangle.Y - (int) Origin.Y), _destinationRectangle.Size);
         }
@@ -52,15 +50,10 @@ namespace DProject.UI.Element
             }
         }
 
-        public void Initialize(GraphicsDevice graphicsDevice)
-        {
-            SpriteSheet = Textures.AtlasList[_atlasName].AtlasTexture2D;
-        }
-
         public virtual void Draw(SpriteBatch spriteBatch)
         {
             if(Visible)
-                spriteBatch.Draw(SpriteSheet, _destinationRectangle, _sourceRectangle, Color, Rotation, Origin, SpriteEffects.None, 0f);
+                spriteBatch.Draw(Textures.AtlasList[AtlasName].AtlasTexture2D, _destinationRectangle, _sourceRectangle, Color, Rotation, Origin, SpriteEffects.None, 0f);
         }
     }
 } 

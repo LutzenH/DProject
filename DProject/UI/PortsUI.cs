@@ -1,7 +1,5 @@
-using DProject.Entity.Interface;
 using DProject.Manager.Entity;
 using DProject.Manager.UI;
-using DProject.UI.Element;
 using DProject.UI.Element.Ports;
 using DProject.UI.Handler;
 using Microsoft.Xna.Framework;
@@ -11,7 +9,7 @@ using IUpdateable = DProject.Entity.Interface.IUpdateable;
 
 namespace DProject.UI
 {
-    public class PortsUI : AbstractUI, IInitialize, IUpdateable
+    public class PortsUI : AbstractUI, IUpdateable
     {
         public ClockUIElement Clock { get; }
         public TimeControlUIElement TimeControl { get; }
@@ -30,19 +28,9 @@ namespace DProject.UI
             Compass = new CompassUIElement(new Point(48, 128));
             SeasonIndicator = new SeasonIndicatorUIElement(new Point(48, 200));
             MapButton = new MapButtonUIElement(new Point(48, 272));
-            DebugWindow = new WindowUIElement(new Point(0,320));
+            DebugWindow = new WindowUIElement(new Point(0,320), "Debug Window", new Point(200, 200));
         }
 
-        public void Initialize(GraphicsDevice graphicsDevice)
-        {
-            Clock.Initialize(graphicsDevice);
-            TimeControl.Initialize(graphicsDevice);
-            Compass.Initialize(graphicsDevice);
-            SeasonIndicator.Initialize(graphicsDevice);
-            MapButton.Initialize(graphicsDevice);
-            DebugWindow.Initialize(graphicsDevice);
-        }
-        
         public override void Draw(SpriteBatch spriteBatch)
         {
             Clock.Draw(spriteBatch);

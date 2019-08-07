@@ -44,11 +44,6 @@ namespace DProject.Type.Serializable
         [IgnoreMember]
         public Rectangle TextureRectangle => new Rectangle(XOffset, YOffset, XSize, YSize);
 
-        public Vector4 GetTexturePosition()
-        {
-            return TexturePosition;
-        }
-
         public Point GetTextureSize() => new Point(XSize, YSize);
 
         public Vector4 GetAdjustedTexturePosition()

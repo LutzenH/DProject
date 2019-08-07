@@ -19,7 +19,7 @@ namespace DProject.UI
         public void LoadContent(ContentManager content)
         {
             _spritesheet = content.Load<Texture2D>("textures/ui/editor");
-            _spriteFont = content.Load<SpriteFont>("default");
+            _spriteFont = content.Load<SpriteFont>("fonts/default");
         }
         
         public override void Draw(SpriteBatch spriteBatch)

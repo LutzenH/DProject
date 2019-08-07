@@ -1,0 +1,10 @@
+{
+	"default_fonts": {
+		"default": {
+			"location": "fonts/default"
+		},
+		"written": {
+			"location": "fonts/written"
+		}
+	}
+}

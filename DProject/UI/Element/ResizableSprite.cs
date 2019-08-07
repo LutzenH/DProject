@@ -57,7 +57,7 @@ namespace DProject.UI.Element
             if (Visible)
             {
                 for (var i = 0; i < _sourceRectangles.Length; i++)
-                    spriteBatch.Draw(SpriteSheet, _destinationRectangles[i], _sourceRectangles[i], Color);
+                    spriteBatch.Draw(Textures.AtlasList[AtlasName].AtlasTexture2D, _destinationRectangles[i], _sourceRectangles[i], Color);
             }
         }
 

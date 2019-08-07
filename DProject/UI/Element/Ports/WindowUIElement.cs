@@ -5,21 +5,36 @@ namespace DProject.UI.Element.Ports
     public class WindowUIElement : AbstractUIElement
     {
         private const int WindowBarHeight = 28;
+        private const int WindowTitleTextYOffset = 4;
+        private const int CornerGrabOffset = 5;
         
         private readonly ResizableSprite _backdrop;
         private readonly Sprite _cornerGrab;
 
-        public Rectangle WindowBarRectangle { get; private set; }
+        private readonly Text _windowTitleText;
 
-        public WindowUIElement(Point position) : base(position)
+        public Rectangle WindowBarRectangle { get; private set; }
+        
+        public WindowUIElement(Point position, string windowTitle, Point size) : base(position)
         {
-            _backdrop = new ResizableSprite(position, new Point(200, 200), "ui_elements", "backdrop_list");
-            _cornerGrab = new Sprite(new Point(position.X - 5, position.Y - 5) + _backdrop.Rectangle.Size, "ui_elements", "menu_corner_grab");
+            _backdrop = new ResizableSprite(position, size, "ui_elements", "backdrop_list");
+            _cornerGrab = new Sprite(new Point(position.X - CornerGrabOffset, position.Y - CornerGrabOffset) + _backdrop.Rectangle.Size, "ui_elements", "menu_corner_grab");
+
+            WindowBarRectangle = new Rectangle(position, new Point(_backdrop.Rectangle.Width, WindowBarHeight));
+
+            _windowTitleText = new Text(WindowBarRectangle, "written", windowTitle)
+            {
+                Alignment = Text.AlignmentType.Center,
+                Offset = new Point(0, WindowTitleTextYOffset),
+                DropShadow = true
+            };
+            
+            Title = windowTitle;
+
+            AddText(_windowTitleText);
             
             AddSprite(_backdrop);
             AddSprite(_cornerGrab);
-            
-            WindowBarRectangle = new Rectangle(position, new Point(_backdrop.Rectangle.Width, WindowBarHeight));
         }
         
         public Rectangle CornerGrabRectangle => _cornerGrab.Rectangle;
@@ -30,8 +45,9 @@ namespace DProject.UI.Element.Ports
             set
             {
                 _backdrop.Size = value;
-                _cornerGrab.Position = new Point(Position.X - 5, Position.Y - 5) + _backdrop.Size;
+                _cornerGrab.Position = new Point(Position.X - CornerGrabOffset, Position.Y - CornerGrabOffset) + _backdrop.Size;
                 WindowBarRectangle = new Rectangle(Position, new Point(_backdrop.Rectangle.Width, WindowBarHeight));
+                _windowTitleText.Bounds = WindowBarRectangle;
             }
         }
 
@@ -42,9 +58,15 @@ namespace DProject.UI.Element.Ports
             {
                 base.Position = value;
                 _backdrop.Position = value;
-                _cornerGrab.Position = new Point(value.X - 5, value.Y - 5) + _backdrop.Size;
+                _cornerGrab.Position = new Point(value.X - CornerGrabOffset, value.Y - CornerGrabOffset) + _backdrop.Size;
                 WindowBarRectangle = new Rectangle(value, new Point(_backdrop.Rectangle.Width, WindowBarHeight));
+                _windowTitleText.Bounds = WindowBarRectangle;
             }
+        }
+        
+        public string Title {
+            get => _windowTitleText.String;
+            set => _windowTitleText.String = value;
         }
     }
 } 

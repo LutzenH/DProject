@@ -83,6 +83,8 @@ namespace DProject
 
         protected override void LoadContent()
         {
+            Fonts.LoadFonts(Content);
+            
             _shaderManager.LoadContent(Content);
             _entityManager.LoadContent(Content);
             _uiManager.LoadContent(Content);

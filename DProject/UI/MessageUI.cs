@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using DProject.Entity.Interface;
+using DProject.List;
 using DProject.Manager.Entity;
 using DProject.Manager.UI;
 using DProject.Type;
@@ -11,9 +12,8 @@ using IUpdateable = DProject.Entity.Interface.IUpdateable;
 
 namespace DProject.UI
 {
-    public class MessageUI : AbstractUI, IUpdateable, ILoadContent
+    public class MessageUI : AbstractUI, IUpdateable
     {
-        private SpriteFont _spriteFont;
         private string _textString;
 
         private int _lineCount;
@@ -27,15 +27,10 @@ namespace DProject.UI
             _textString = "";
             _messages = new LinkedList<Message>();
         }
-        
-        public void LoadContent(ContentManager content)
-        {
-            _spriteFont = content.Load<SpriteFont>("default");
-        }
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.DrawString(_spriteFont, _textString, new Vector2(2, Game1.ScreenResolutionY - FontPixelSize * _lineCount), Color.White);
+            spriteBatch.DrawString(Fonts.FontList["default_fonts"]["default"].SpriteFont, _textString, new Vector2(2, Game1.ScreenResolutionY - FontPixelSize * _lineCount), Color.White);
         }
 
         public void Update(GameTime gameTime)

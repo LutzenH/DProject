@@ -23,15 +23,5 @@ namespace DProject.Type.Serializable
         
         [IgnoreMember]
         public Vector3 DefaultScale => new Vector3((float)ScaleX, (float)ScaleY, (float)ScaleZ);
-
-        public string GetAssetPath()
-        {
-            return AssetPath;
-        }
-
-        public Vector3 GetDefaultScale()
-        {
-            return DefaultScale;
-        }
     }
 }

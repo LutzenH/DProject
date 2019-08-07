@@ -349,7 +349,7 @@ namespace DProject
             foreach (var prop in Props.PropList)
             {
                 var prop_list_row = new ListBoxRow();
-                var text_label = new Label(prop.Value.GetAssetPath());
+                var text_label = new Label(prop.Value.AssetPath);
 
                 text_label.Halign = Align.Start;
                 prop_list_row.Child = text_label;
@@ -524,7 +524,7 @@ namespace DProject
         {
             foreach (var color in Colors.ColorList)
             {
-                if (color.Value.GetColorName() == name)
+                if (color.Value.Name == name)
                     return new RGBA()
                     {
                         Red = color.Value.Red / 256d,

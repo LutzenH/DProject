@@ -49,7 +49,7 @@ namespace DProject.List
         {
             foreach (var color in ColorList)
             {
-                if (color.Value.GetColorName() == name)
+                if (color.Value.Name == name)
                     return color.Key;
             }
 

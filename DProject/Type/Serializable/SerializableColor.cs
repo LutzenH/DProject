@@ -28,10 +28,5 @@ namespace DProject.Type.Serializable
                 Blue = value.B;
             }
         }
-
-        public string GetColorName()
-        {
-            return Name;
-        }
     }
 }
