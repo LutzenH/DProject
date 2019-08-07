@@ -10,8 +10,6 @@ namespace DProject.Manager.UI
         public EditorUIManager(EntityManager entityManager) : base(entityManager)
         {
             var editorEntityManager = (EditorEntityManager) entityManager;
-            AddInterface(new WorldEditorUI(editorEntityManager, this));
-            AddInterface(new MessageUI(editorEntityManager, this)); 
         }
     }
 }

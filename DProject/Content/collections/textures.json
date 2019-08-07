@@ -153,6 +153,12 @@
 		},
 		"menu_corner_grab": {
 			"location": "textures/ui/ports/menu_corner_grab.png"
+		},
+		"window_button_exit": {
+			"location": "textures/ui/ports/window_button_exit.png"
+		},
+		"window_button_exit_pressed": {
+			"location": "textures/ui/ports/window_button_exit_pressed.png"
 		}
 	}
 }

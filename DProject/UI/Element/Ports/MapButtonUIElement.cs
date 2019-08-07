@@ -1,8 +1,10 @@
+using DProject.UI.Element.Interface;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
 
 namespace DProject.UI.Element.Ports
 {
-    public class MapButtonUIElement : AbstractUIElement
+    public class MapButtonUIElement : AbstractUIElement, IUpdateableUIElement
     {
         private readonly Sprite _mapSmall;
         private readonly Sprite _mapLarge;
@@ -25,6 +27,16 @@ namespace DProject.UI.Element.Ports
 
             Enabled = true;
             Large = false;
+        }
+        
+        public void Update(Vector2 mousePosition, ref Rectangle? currentRectangleBeingDragged, ref (object, string)? pressedButton)
+        {
+            Large = Rectangle.Contains(mousePosition);
+            if (Rectangle.Contains(mousePosition))
+            {
+                if (Mouse.GetState().LeftButton == ButtonState.Released && Game1.PreviousMouseState.LeftButton == ButtonState.Pressed)
+                    pressedButton = (this, "map_button");
+            }
         }
         
         public bool Enabled

@@ -1,18 +1,17 @@
 using System.Collections.Generic;
 using System.Linq;
-using DProject.Entity.Interface;
 using DProject.List;
 using DProject.Manager.Entity;
 using DProject.Manager.UI;
 using DProject.Type;
+using DProject.UI.Element;
+using DProject.UI.Element.Interface;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using IUpdateable = DProject.Entity.Interface.IUpdateable;
 
 namespace DProject.UI
 {
-    public class MessageUI : AbstractUI, IUpdateable
+    public class MessageUIElement : AbstractUIElement, IUpdateableUIElement
     {
         private string _textString;
 
@@ -21,19 +20,20 @@ namespace DProject.UI
         private const int FontPixelSize = 19;
 
         private readonly LinkedList<Message> _messages;
+
+        private readonly Text _text;
         
-        public MessageUI(EntityManager entityManager, UIManager uiManager) : base(entityManager, uiManager)
+        public MessageUIElement(Rectangle bounds) : base(bounds.Location)
         {
             _textString = "";
             _messages = new LinkedList<Message>();
+            
+            _text = new Text(bounds, "default", _textString);
+            
+            AddText(_text);
         }
 
-        public override void Draw(SpriteBatch spriteBatch)
-        {
-            spriteBatch.DrawString(Fonts.FontList["default_fonts"]["default"].SpriteFont, _textString, new Vector2(2, Game1.ScreenResolutionY - FontPixelSize * _lineCount), Color.White);
-        }
-
-        public void Update(GameTime gameTime)
+        public void Update(Vector2 mousePosition, ref Rectangle? currentRectangleBeingDragged, ref (object, string)? pressedButtons)
         {
             _textString = "";
             _lineCount = 0;
@@ -54,6 +54,8 @@ namespace DProject.UI
                     _messages.Remove(message);
                 }
             }
+            
+            _text.Offset = new Point(0, _lineCount* FontPixelSize);
         }
     }
 }

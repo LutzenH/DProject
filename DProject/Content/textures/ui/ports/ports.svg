@@ -496,9 +496,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="2.0000002"
-     inkscape:cx="174.7031"
-     inkscape:cy="989.59202"
+     inkscape:zoom="5.6568548"
+     inkscape:cx="359.47849"
+     inkscape:cy="1073.6205"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -1170,6 +1170,32 @@
        id="menu_corner_grab"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="ccccc" />
+    <g
+       style="display:inline;fill:#c83737;stroke:#000000;stroke-width:0.71319932"
+       id="window_button_exit"
+       transform="matrix(0.67853092,0,0,0.72435008,2.8474677,9.6165389)">
+      <rect
+         ry="1.4844503"
+         y="3.2587328"
+         x="154.5851"
+         height="3.671221"
+         width="3.9647274"
+         id="rect1104-5-6"
+         style="display:inline;opacity:1;fill:#c83737;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:0.71319932;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:stroke fill markers" />
+    </g>
+    <g
+       style="display:inline;fill:#800000;stroke:#000000;stroke-width:0.71319932"
+       id="window_button_exit_pressed"
+       transform="matrix(0.67853092,0,0,0.72435008,6.4441477,9.6165389)">
+      <rect
+         ry="1.4844503"
+         y="3.2587328"
+         x="154.5851"
+         height="3.671221"
+         width="3.9647274"
+         id="rect1104-5-6-5"
+         style="display:inline;opacity:1;fill:#800000;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:0.71319932;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:stroke fill markers" />
+    </g>
   </g>
   <g
      inkscape:groupmode="layer"

@@ -1,3 +1,4 @@
+using System;
 using DProject.Entity.Ports;
 using DProject.Manager.Entity;
 using DProject.Manager.UI;
@@ -17,6 +18,39 @@ namespace DProject.UI.Handler
             
             _gameTimeEntity.TimeChanged += (sender, args) => _portsUI.Clock.SetRotation(args.CurrentTime);
             _gameTimeEntity.SeasonChanged += (season, args) => _portsUI.SeasonIndicator.SetSeason(args.CurrentSeason);
+        }
+
+        public Button? ConvertPressedButtonToInputButton((object, string)? pressedButton)
+        {
+            if (pressedButton.HasValue)
+            {
+                if (pressedButton.Value.Item1 == _portsUI.TimeControl)
+                {
+                    switch (pressedButton.Value.Item2)
+                    {
+                        case "button_pause":
+                            return Button.TimeControlPause;
+                        case "button_play":
+                            return Button.TimeControlPlay;
+                        case "button_speedup":
+                            return Button.TimeControlSpeedUp;
+                        case "button_end":
+                            return Button.TimeControlEnd;
+                        default:
+                            throw new ArgumentException("The given button_id does not exist");
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        public void HandleInput((object, string)? pressedButton)
+        {
+            var button = ConvertPressedButtonToInputButton(pressedButton);
+
+            if (button != null)
+                HandleInput((Button) button);
         }
 
         public void HandleInput(Button button, object[] linkedValues = null)

@@ -1,9 +1,11 @@
 using System;
+using DProject.UI.Element.Interface;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
 
 namespace DProject.UI.Element.Ports
 {
-    public class TimeControlUIElement : AbstractUIElement
+    public class TimeControlUIElement : AbstractUIElement, IUpdateableUIElement
     {
         public enum TimeControlOption { None, Pause, Play, Speedup, End }
 
@@ -77,6 +79,36 @@ namespace DProject.UI.Element.Ports
                 _timerSpeedup.Rectangle,
                 _timerEnd.Rectangle
             };
+        }
+        
+        public void Update(Vector2 mousePosition, ref Rectangle? currentRectangleBeingDragged, ref (object, string)? pressedButton)
+        {
+            for (var i = 0; i < ButtonRectangles.Length; i++)
+            {
+                if (ButtonRectangles[i].Contains(mousePosition))
+                {
+                    if (Mouse.GetState().LeftButton == ButtonState.Released && Game1.PreviousMouseState.LeftButton == ButtonState.Pressed)
+                    {
+                        var clickedButton = (TimeControlOption) (i + 1);
+                        
+                        switch (clickedButton)
+                        {
+                            case TimeControlOption.Pause:
+                                pressedButton = (this, "button_pause");
+                                break;
+                            case TimeControlOption.Play:
+                                pressedButton = (this, "button_play");
+                                break;
+                            case TimeControlOption.Speedup:
+                                pressedButton = (this, "button_speedup");
+                                break;
+                            case TimeControlOption.End:
+                                pressedButton = (this, "button_end");
+                                break;
+                        }
+                    }
+                }
+            }
         }
 
         public bool Enabled

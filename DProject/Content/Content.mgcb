@@ -83,6 +83,8 @@
 /copy:textures/ui/ports/backdrop_list.png
 /copy:textures/ui/ports/backdrop_list_item.png
 /copy:textures/ui/ports/menu_corner_grab.png
+/copy:textures/ui/ports/window_button_exit.png
+/copy:textures/ui/ports/window_button_exit_pressed.png
 
 #begin fonts/default.spritefont
 /importer:FontDescriptionImporter
