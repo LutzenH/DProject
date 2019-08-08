@@ -1,13 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
-using DProject.List;
 using DProject.Manager.Entity;
-using DProject.Manager.UI;
 using DProject.Type;
 using DProject.UI.Element;
 using DProject.UI.Element.Interface;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace DProject.UI
 {

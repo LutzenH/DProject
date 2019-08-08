@@ -25,7 +25,6 @@
 #endregion
 
 using System;
-using System.Runtime.Serialization;
 
 namespace DProject.List.ImagePacker
 {

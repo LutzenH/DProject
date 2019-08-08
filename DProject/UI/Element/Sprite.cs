@@ -1,4 +1,3 @@
-using DProject.Entity.Interface;
 using DProject.List;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;

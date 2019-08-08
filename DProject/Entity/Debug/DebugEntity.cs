@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using DProject.Entity.Camera;
 using DProject.Entity.Chunk;
@@ -16,7 +15,6 @@ namespace DProject.Entity.Debug
 {
     public class DebugEntity : AbstractAwareEntity, IInitialize, IUpdateable, IDrawable
     {
-        private readonly List<CameraEntity> _cameraEntities;
         private readonly ChunkLoaderEntity _chunkLoaderEntity;
         private readonly PointerEntity _pointerEntity;
 
@@ -37,9 +35,6 @@ namespace DProject.Entity.Debug
             _axisEntity = new AxisEntity(Vector3.Zero);
             _pointerAxisEntity = new AxisEntity(Vector3.Zero);
             
-            var cameraEntities = EntityManager.GetCameraEntities();
-            
-            _cameraEntities = cameraEntities;
             _chunkLoaderEntity = EntityManager.GetChunkLoaderEntity();
             
             _lineFrameEntities = new List<LineFrameEntity>();

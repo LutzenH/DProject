@@ -11,6 +11,8 @@ namespace DProject.Manager.UI
 {
     public abstract class UIManager
     {
+        protected dynamic EntityManager;
+        
         private readonly List<AbstractUI> _userInterfaces;
 
         public static bool ClickedUI;
@@ -19,6 +21,8 @@ namespace DProject.Manager.UI
         
         public UIManager(EntityManager entityManager)
         {
+            EntityManager = entityManager;
+            
             _userInterfaces = new List<AbstractUI>();
         }
         

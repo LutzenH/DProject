@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using DProject.Entity.Interface;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 

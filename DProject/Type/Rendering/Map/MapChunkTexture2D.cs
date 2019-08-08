@@ -9,7 +9,7 @@ namespace DProject.Type.Rendering.Map
 {
     public class MapChunkTexture2D : Texture2D
     {
-        private readonly (int, int) position;
+        private readonly (int, int) _position;
 
         public enum Resolution
         {
@@ -20,9 +20,9 @@ namespace DProject.Type.Rendering.Map
             Full
         }
         
-        public MapChunkTexture2D(GraphicsDevice graphicsDevice, ChunkData chunkData, int floor, Resolution resolution) : base(graphicsDevice, CalculateSize(resolution), CalculateSize(resolution))
+        public MapChunkTexture2D(GraphicsDevice graphicsDevice, ChunkData chunkData, Resolution resolution) : base(graphicsDevice, CalculateSize(resolution), CalculateSize(resolution))
         {            
-            position = (chunkData.ChunkPositionX, chunkData.ChunkPositionY);
+            _position = (chunkData.ChunkPositionX, chunkData.ChunkPositionY);
             
             SetData(GenerateTileColors(chunkData.VertexMap, resolution));
         }
@@ -70,17 +70,17 @@ namespace DProject.Type.Rendering.Map
 
         public int GetPositionX()
         {
-            return position.Item1;
+            return _position.Item1;
         }
 
         public int GetPositionY()
         {
-            return position.Item2;
+            return _position.Item2;
         }
 
         public (int, int) GetPosition()
         {
-            return position;
+            return _position;
         }
     }
 }

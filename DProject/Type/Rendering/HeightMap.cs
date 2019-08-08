@@ -320,21 +320,6 @@ namespace DProject.Type.Rendering
             }
         }
 
-        //Can be used the get the normal of a triangle
-        private static Vector3 GenerateNormalDirection(Vector3 vertex1, Vector3 vertex2, Vector3 vertex3)
-        {
-            Vector3 sum = Vector3.Zero;
-            
-            var n0 = (vertex2 - vertex1) * 10f;
-            var n1 = (vertex3 - vertex2) * 10f;
-
-            var cnorm = Vector3.Cross(n0, n1);
-            
-            sum += cnorm;
-
-            return Vector3.Normalize(sum);
-        }
-
         public static bool IsAlternativeDiagonal(Vector3 a, Vector3 b, Vector3 c, Vector3 d)
         {
             return Vector3.Distance(a, c) < Vector3.Distance(b, d);

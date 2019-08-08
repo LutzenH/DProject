@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using DProject.UI.Element.Interface;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
