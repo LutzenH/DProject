@@ -159,6 +159,20 @@
 		},
 		"window_button_exit_pressed": {
 			"location": "textures/ui/ports/window_button_exit_pressed.png"
+		},
+		"scrollbar_backdrop": {
+			"location": "textures/ui/ports/scrollbar_backdrop.png",
+			"border_left": 0.0,
+			"border_right": 0.0,
+			"border_top": 0.333333,
+			"border_bottom": 0.333333
+		},
+		"scrollbar_handle": {
+			"location": "textures/ui/ports/scrollbar_handle.png",
+			"border_left": 0.0,
+			"border_right": 0.0,
+			"border_top": 0.333333,
+			"border_bottom": 0.333333
 		}
 	}
 }

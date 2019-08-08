@@ -1,13 +1,13 @@
+using System;
 using Microsoft.Xna.Framework;
 using IUpdateable = DProject.Entity.Interface.IUpdateable;
 
 namespace DProject.Entity.Camera
 {
     public abstract class CameraEntity : AbstractEntity, IUpdateable
-    {    
-        //Vectors
-        protected Vector3 CameraDirection;
-        
+    {
+        private Vector3 _cameraDirection;
+
         //Matrix
         protected Matrix ProjectMatrix;
         protected Matrix ViewMatrix;
@@ -43,6 +43,22 @@ namespace DProject.Entity.Camera
             BoundingFrustum = new BoundingFrustum(ViewMatrix * ProjectMatrix);
         }
 
+        protected Vector3 CameraDirection
+        {
+            get => _cameraDirection;
+            set
+            {
+                _cameraDirection = value;
+
+                var args = new CameraDirectionChangedEventArgs
+                {
+                    CameraDirection = value
+                };
+
+                OnDirectionChanged(args);
+            }
+        }
+        
         public BoundingFrustum GetBoundingFrustum()
         {
             return BoundingFrustum;
@@ -56,11 +72,6 @@ namespace DProject.Entity.Camera
         public Matrix GetViewMatrix()
         {
             return ViewMatrix;
-        }
-
-        public Vector3 GetCameraDirection()
-        {
-            return CameraDirection;
         }
 
         public float GetNearPlaneDistance()
@@ -90,5 +101,17 @@ namespace DProject.Entity.Camera
             
             return Matrix.CreateLookAt(underWaterPosition, underWaterPosition + new Vector3(CameraDirection.X, -CameraDirection.Y, CameraDirection.Z), Vector3.Up);
         }
+        
+        public event EventHandler<CameraDirectionChangedEventArgs> DirectionChanged;
+        protected void OnDirectionChanged(CameraDirectionChangedEventArgs e)
+        {
+            var handler = DirectionChanged;
+            handler?.Invoke(this, e);
+        }
+    }
+    
+    public class CameraDirectionChangedEventArgs : EventArgs
+    {
+        public Vector3 CameraDirection { get; set; }
     }
 }

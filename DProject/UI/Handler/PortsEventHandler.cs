@@ -18,6 +18,7 @@ namespace DProject.UI.Handler
             
             _gameTimeEntity.TimeChanged += (sender, args) => _portsUI.Clock.SetRotation(args.CurrentTime);
             _gameTimeEntity.SeasonChanged += (season, args) => _portsUI.SeasonIndicator.SetSeason(args.CurrentSeason);
+            entityManager.GetActiveCamera().DirectionChanged += (sender, args) => _portsUI.Compass.SetRotation(args.CameraDirection);
         }
 
         public Button? ConvertPressedButtonToInputButton((object, string)? pressedButton)

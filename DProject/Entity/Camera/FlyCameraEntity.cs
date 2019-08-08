@@ -43,9 +43,8 @@ namespace DProject.Entity.Camera
                 Vector3 cameraUpPerpendicular = Vector3.Cross(Vector3.Up, CameraDirection);
                 cameraUpPerpendicular.Normalize();
             
-                CameraDirection = Vector3.Transform(CameraDirection, Matrix.CreateFromAxisAngle(cameraUpPerpendicular, (-MathHelper.PiOver4 / 150) * angleY));
-                CameraDirection = Vector3.Transform(CameraDirection, Matrix.CreateFromAxisAngle(Vector3.Up,(-MathHelper.PiOver4 / 150) * angleX));       
-            
+                var tempDirection = Vector3.Transform(CameraDirection, Matrix.CreateFromAxisAngle(cameraUpPerpendicular, (-MathHelper.PiOver4 / 150) * angleY));
+                CameraDirection = Vector3.Transform(tempDirection, Matrix.CreateFromAxisAngle(Vector3.Up,(-MathHelper.PiOver4 / 150) * angleX));
                 CameraDirection.Normalize();
             
                 ViewMatrix = Matrix.CreateLookAt(Position, Position + CameraDirection, Vector3.Up);

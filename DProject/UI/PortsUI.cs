@@ -14,7 +14,7 @@ namespace DProject.UI
         public SeasonIndicatorUIElement SeasonIndicator { get; }
         public MapButtonUIElement MapButton { get; }
         public WindowUIElement DebugWindow { get; }
-
+        
         public PortsUI(GameEntityManager entityManager, UIManager uiManager) : base(entityManager, uiManager)
         {
             Clock = new ClockUIElement(new Point(48, 48));
@@ -34,8 +34,6 @@ namespace DProject.UI
 
         public override void Update(GameTime gameTime)
         {
-            Compass.SetRotation(EntityManager.GetActiveCamera().GetCameraDirection());
-            
             base.Update(gameTime);
             
             UIManager.PortsEventHandler.HandleInput(PressedButton);

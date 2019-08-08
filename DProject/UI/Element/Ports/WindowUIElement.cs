@@ -7,6 +7,7 @@ namespace DProject.UI.Element.Ports
     public class WindowUIElement : AbstractUIElement, IUpdateableUIElement
     {
         private const int WindowBarHeight = 28;
+        private const int ContentBoundsShrinkSize = 4;
         private const int WindowTitleTextYOffset = 4;
         private const int CornerGrabOffset = -5;
 
@@ -24,7 +25,9 @@ namespace DProject.UI.Element.Ports
         private bool _exitButtonPressed;
         
         public Rectangle WindowBarRectangle { get; private set; }
-        
+
+        public Rectangle ContentBounds { get; set; }
+
         public Rectangle CornerGrabRectangle => _cornerGrab.Rectangle;
 
         public Rectangle ExitButtonRectangle => _buttonExit.Rectangle;
@@ -38,7 +41,8 @@ namespace DProject.UI.Element.Ports
             _buttonExitPressed = new Sprite(new Point(position.X + _backdrop.Rectangle.Size.X + ButtonExitXOffset, position.Y + ButtonExitYOffset), "ui_elements", "window_button_exit_pressed");
             
             WindowBarRectangle = new Rectangle(position, new Point(_backdrop.Rectangle.Width, WindowBarHeight));
-
+            ContentBounds = CreateContentBounds(Position, Size, ContentBoundsShrinkSize, WindowBarHeight);
+            
             _windowTitleText = new Text(WindowBarRectangle, "written", windowTitle)
             {
                 Alignment = Text.AlignmentType.Center,
@@ -98,6 +102,7 @@ namespace DProject.UI.Element.Ports
                 _cornerGrab.Position = new Point(Position.X + CornerGrabOffset, Position.Y + CornerGrabOffset) + _backdrop.Size;
                 _buttonExit.Position = new Point(Position.X + _backdrop.Rectangle.Size.X + ButtonExitXOffset, Position.Y + ButtonExitYOffset);
                 _buttonExitPressed.Position = new Point(Position.X + _backdrop.Rectangle.Size.X + ButtonExitXOffset, Position.Y + ButtonExitYOffset);
+                ContentBounds = CreateContentBounds(Position, Size, ContentBoundsShrinkSize, WindowBarHeight);
                 WindowBarRectangle = new Rectangle(Position, new Point(_backdrop.Rectangle.Width, WindowBarHeight));
                 _windowTitleText.Bounds = WindowBarRectangle;
             }
@@ -113,6 +118,7 @@ namespace DProject.UI.Element.Ports
                 _cornerGrab.Position = new Point(value.X + CornerGrabOffset, value.Y + CornerGrabOffset) + _backdrop.Size;
                 _buttonExit.Position = new Point(Position.X + _backdrop.Rectangle.Size.X + ButtonExitXOffset, Position.Y + ButtonExitYOffset);
                 _buttonExitPressed.Position = new Point(Position.X + _backdrop.Rectangle.Size.X + ButtonExitXOffset, Position.Y + ButtonExitYOffset);
+                ContentBounds = CreateContentBounds(Position, Size, ContentBoundsShrinkSize, WindowBarHeight);
                 WindowBarRectangle = new Rectangle(value, new Point(_backdrop.Rectangle.Width, WindowBarHeight));
                 _windowTitleText.Bounds = WindowBarRectangle;
             }
@@ -139,6 +145,11 @@ namespace DProject.UI.Element.Ports
             if (exit != null) _buttonExit.Visible = (bool) exit;
             if (exitPressed != null) _buttonExitPressed.Visible = (bool) exitPressed;
             if (cornerGrab != null) _cornerGrab.Visible = (bool) cornerGrab;
+        }
+
+        private static Rectangle CreateContentBounds(Point position, Point size, int shrinkSize, int windowBarHeight)
+        {
+            return new Rectangle(position + new Point(shrinkSize, shrinkSize + windowBarHeight), size + new Point(-shrinkSize * 2, -shrinkSize*2 - windowBarHeight));
         }
     }
 } 

@@ -85,6 +85,8 @@
 /copy:textures/ui/ports/menu_corner_grab.png
 /copy:textures/ui/ports/window_button_exit.png
 /copy:textures/ui/ports/window_button_exit_pressed.png
+/copy:textures/ui/ports/scrollbar_backdrop.png
+/copy:textures/ui/ports/scrollbar_handle.png
 
 #begin fonts/default.spritefont
 /importer:FontDescriptionImporter
