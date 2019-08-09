@@ -29,7 +29,7 @@ namespace DProject.UI.Element.Ports
             Large = false;
         }
         
-        public void Update(Vector2 mousePosition, ref Rectangle? currentRectangleBeingDragged, ref (object, string)? pressedButton)
+        public void Update(Point mousePosition, ref Rectangle? currentRectangleBeingDragged, ref (object, string)? pressedButton)
         {
             Large = Rectangle.Contains(mousePosition);
             if (Rectangle.Contains(mousePosition))

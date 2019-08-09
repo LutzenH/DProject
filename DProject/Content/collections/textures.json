@@ -173,6 +173,20 @@
 			"border_right": 0.0,
 			"border_top": 0.333333,
 			"border_bottom": 0.333333
+		},
+		"scrollbar_backdrop_h": {
+			"location": "textures/ui/ports/scrollbar_backdrop_h.png",
+			"border_left": 0.333333,
+			"border_right": 0.333333,
+			"border_top": 0.0,
+			"border_bottom": 0.0
+		},
+		"scrollbar_handle_h": {
+			"location": "textures/ui/ports/scrollbar_handle_h.png",
+			"border_left": 0.333333,
+			"border_right": 0.333333,
+			"border_top": 0.0,
+			"border_bottom": 0.0
 		}
 	}
 }

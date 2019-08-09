@@ -30,7 +30,7 @@ namespace DProject.UI
             AddText(_text);
         }
 
-        public void Update(Vector2 mousePosition, ref Rectangle? currentRectangleBeingDragged, ref (object, string)? pressedButtons)
+        public void Update(Point mousePosition, ref Rectangle? currentRectangleBeingDragged, ref (object, string)? pressedButtons)
         {
             _textString = "";
             _lineCount = 0;

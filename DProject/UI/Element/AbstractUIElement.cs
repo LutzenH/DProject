@@ -8,7 +8,7 @@ namespace DProject.UI.Element
     {
         public bool Visible { get; set; }
         
-        public Point Position { get; set; }
+        public virtual Point Position { get; set; }
 
         private readonly List<Sprite> _sprites;
         private readonly List<Text> _texts;
@@ -33,7 +33,7 @@ namespace DProject.UI.Element
             _texts.Add(text);
         }
 
-        public void Draw(SpriteBatch spriteBatch)
+        public virtual void Draw(SpriteBatch spriteBatch)
         {
             if (!Visible) return;
 

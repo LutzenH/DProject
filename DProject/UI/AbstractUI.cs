@@ -29,7 +29,7 @@ namespace DProject.UI
 
         public virtual void Update(GameTime gameTime)
         {
-            var mousePosition = Game1.GetMousePosition();
+            var mousePosition = Game1.GetPointMousePosition();
             PressedButton = null;
 
             foreach (var element in _uiElements)

@@ -1,11 +1,15 @@
 using DProject.UI.Element.Interface;
+using DProject.UI.Element.Ports.WindowContent;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
 namespace DProject.UI.Element.Ports
 {
     public class WindowUIElement : AbstractUIElement, IUpdateableUIElement
     {
+        public AbstractWindowContent WindowContent { get; set; }
+        
         private const int WindowBarHeight = 28;
         private const int ContentBoundsShrinkSize = 4;
         private const int WindowTitleTextYOffset = 4;
@@ -32,7 +36,7 @@ namespace DProject.UI.Element.Ports
 
         public Rectangle ExitButtonRectangle => _buttonExit.Rectangle;
         
-        public WindowUIElement(Point position, string windowTitle, Point size) : base(position)
+        public WindowUIElement(Point position, string windowTitle, Point size, AbstractWindowContent windowContent) : base(position)
         {
             _backdrop = new ResizableSprite(position, size, "ui_elements", "backdrop_list");
             _cornerGrab = new Sprite(new Point(position.X + CornerGrabOffset, position.Y + CornerGrabOffset) + _backdrop.Rectangle.Size, "ui_elements", "menu_corner_grab");
@@ -61,15 +65,18 @@ namespace DProject.UI.Element.Ports
             AddSprite(_buttonExitPressed);
 
             ExitButtonPressed = false;
+
+            WindowContent = windowContent;
+            WindowContent.Bounds = ContentBounds;
         }
         
-        public void Update(Vector2 mousePosition, ref Rectangle? currentRectangleBeingDragged, ref (object, string)? pressedButton)
+        public void Update(Point mousePosition, ref Rectangle? currentRectangleBeingDragged, ref (object, string)? pressedButton)
         {
             if (CornerGrabRectangle.Contains(mousePosition) && currentRectangleBeingDragged == null || currentRectangleBeingDragged == CornerGrabRectangle)
             {
                 if (Mouse.GetState().LeftButton == ButtonState.Pressed)
                 {
-                    Size += mousePosition.ToPoint() - Game1.PreviousMouseState.Position;
+                    Size += mousePosition - Game1.PreviousMouseState.Position;
                     currentRectangleBeingDragged = CornerGrabRectangle;
                 }
             }
@@ -87,10 +94,19 @@ namespace DProject.UI.Element.Ports
             {
                 if (Mouse.GetState().LeftButton == ButtonState.Pressed)
                 {
-                    Position += mousePosition.ToPoint() - Game1.PreviousMouseState.Position;
+                    Position += mousePosition - Game1.PreviousMouseState.Position;
                     currentRectangleBeingDragged = WindowBarRectangle;
                 }
             }
+            
+            WindowContent.Update(mousePosition, ref currentRectangleBeingDragged, ref pressedButton);
+        }
+
+        public override void Draw(SpriteBatch spriteBatch)
+        {
+            base.Draw(spriteBatch);
+            
+            WindowContent.Draw(spriteBatch);
         }
 
         public Point Size
@@ -105,6 +121,7 @@ namespace DProject.UI.Element.Ports
                 ContentBounds = CreateContentBounds(Position, Size, ContentBoundsShrinkSize, WindowBarHeight);
                 WindowBarRectangle = new Rectangle(Position, new Point(_backdrop.Rectangle.Width, WindowBarHeight));
                 _windowTitleText.Bounds = WindowBarRectangle;
+                WindowContent.Bounds = ContentBounds;
             }
         }
 
@@ -121,6 +138,7 @@ namespace DProject.UI.Element.Ports
                 ContentBounds = CreateContentBounds(Position, Size, ContentBoundsShrinkSize, WindowBarHeight);
                 WindowBarRectangle = new Rectangle(value, new Point(_backdrop.Rectangle.Width, WindowBarHeight));
                 _windowTitleText.Bounds = WindowBarRectangle;
+                WindowContent.Bounds = ContentBounds;
             }
         }
         

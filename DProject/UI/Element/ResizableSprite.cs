@@ -26,7 +26,7 @@ namespace DProject.UI.Element
             Visible = true;
             Size = size;
 
-            Rectangle = new Rectangle(new Point(size.X - (int) Origin.X, size.Y - (int) Origin.Y), size);
+            Rectangle = new Rectangle(position, size);
         }
 
         public new Point Position
@@ -36,7 +36,7 @@ namespace DProject.UI.Element
             {
                 base.Position = value;
                 _destinationRectangles = SetDestinationRectangles(value, _size, _sourceRectangles);
-                Rectangle = new Rectangle(new Point(_size.X - (int) Origin.X, _size.Y - (int) Origin.Y), _size);
+                Rectangle = new Rectangle(value, _size);
             }
         }
 
@@ -48,7 +48,7 @@ namespace DProject.UI.Element
                 _size.Y = value.Y >= _minimumSize.Y ? value.Y : _minimumSize.Y;
                 
                 _destinationRectangles = SetDestinationRectangles(Position, _size, _sourceRectangles);
-                Rectangle = new Rectangle(new Point(_size.X - (int) Origin.X, _size.Y - (int) Origin.Y), _size);
+                Rectangle = new Rectangle(Position, _size);
             }
         }
 

@@ -231,6 +231,15 @@ namespace DProject
 #endif
         }
 
+        public static Point GetPointMousePosition()
+        {
+#if EDITOR
+            return new Point(Mouse.GetState().X + WidgetOffsetX, Mouse.GetState().Y + WidgetOffsetY);
+#else
+            return Mouse.GetState().Position;
+#endif
+        }
+
         public EntityManager GetEntityManager()
         {
             return _entityManager;
