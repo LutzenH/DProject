@@ -3,7 +3,6 @@ using DProject.Manager.UI;
 using DProject.UI.Element.Ports;
 using DProject.UI.Element.Ports.WindowContent;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using IUpdateable = DProject.Entity.Interface.IUpdateable;
 
 namespace DProject.UI
@@ -25,7 +24,7 @@ namespace DProject.UI
             SeasonIndicator = new SeasonIndicatorUIElement(new Point(48, 200));
             MapButton = new MapButtonUIElement(new Point(48, 272));
 
-            var windowContent = new AbstractWindowContent();
+            var windowContent = new ListWindowContent();
             
             DebugWindow = new WindowUIElement(new Point(0,320), "Debug Window", new Point(200, 200), windowContent);
 

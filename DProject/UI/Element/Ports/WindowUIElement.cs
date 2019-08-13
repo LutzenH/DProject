@@ -36,6 +36,8 @@ namespace DProject.UI.Element.Ports
 
         public Rectangle ExitButtonRectangle => _buttonExit.Rectangle;
         
+        
+        
         public WindowUIElement(Point position, string windowTitle, Point size, AbstractWindowContent windowContent) : base(position)
         {
             _backdrop = new ResizableSprite(position, size, "ui_elements", "backdrop_list");
@@ -67,7 +69,7 @@ namespace DProject.UI.Element.Ports
             ExitButtonPressed = false;
 
             WindowContent = windowContent;
-            WindowContent.Bounds = ContentBounds;
+            WindowContent.CurrentBounds = ContentBounds;
         }
         
         public void Update(Point mousePosition, ref Rectangle? currentRectangleBeingDragged, ref (object, string)? pressedButton)
@@ -121,7 +123,7 @@ namespace DProject.UI.Element.Ports
                 ContentBounds = CreateContentBounds(Position, Size, ContentBoundsShrinkSize, WindowBarHeight);
                 WindowBarRectangle = new Rectangle(Position, new Point(_backdrop.Rectangle.Width, WindowBarHeight));
                 _windowTitleText.Bounds = WindowBarRectangle;
-                WindowContent.Bounds = ContentBounds;
+                WindowContent.CurrentBounds = ContentBounds;
             }
         }
 
@@ -138,7 +140,7 @@ namespace DProject.UI.Element.Ports
                 ContentBounds = CreateContentBounds(Position, Size, ContentBoundsShrinkSize, WindowBarHeight);
                 WindowBarRectangle = new Rectangle(value, new Point(_backdrop.Rectangle.Width, WindowBarHeight));
                 _windowTitleText.Bounds = WindowBarRectangle;
-                WindowContent.Bounds = ContentBounds;
+                WindowContent.CurrentBounds = ContentBounds;
             }
         }
         

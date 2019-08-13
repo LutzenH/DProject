@@ -1,15 +1,12 @@
+using DProject.List;
 using DProject.UI.Element.Interface;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace DProject.UI.Element.Ports.WindowContent
 {
-    public class AbstractWindowContent : IUpdateableUIElement
+    public abstract class AbstractWindowContent : IUpdateableUIElement
     {
-        public Point MinimumSize { get; set; }
-        public Point MaximumSize { get; set; }
-        public Point PreferredSize { get; set; }
-
         public bool HorizontalScrollbarVisible { get; set; }
         public bool VerticalScrollbarVisible { get; set; }
 
@@ -17,46 +14,64 @@ namespace DProject.UI.Element.Ports.WindowContent
         private readonly ScrollbarUIElement _verticalScrollbar;
 
         private Rectangle _currentBounds;
+        private Rectangle _fullBounds;
         
-        public AbstractWindowContent()
+        public AbstractWindowContent(Point preferredSize)
         {
-            var tempBounds = new Rectangle(0, 0, 200, 200);
+            var tempBounds = new Rectangle(Point.Zero, preferredSize);
             
-            MinimumSize = tempBounds.Size;
-            MaximumSize = tempBounds.Size;
-            PreferredSize = tempBounds.Size;
+            Bounds = tempBounds;
+            
             HorizontalScrollbarVisible = true;
             VerticalScrollbarVisible = true;
 
-            _horizontalScrollbar = new ScrollbarUIElement(tempBounds.Location, tempBounds.Width, true);
-            _verticalScrollbar = new ScrollbarUIElement(tempBounds.Location, tempBounds.Height, false);
+            _horizontalScrollbar = new ScrollbarUIElement(
+                new Point(
+                    tempBounds.X,
+                    tempBounds.Y + tempBounds.Height - Textures.AtlasList["ui_elements"].TextureList["scrollbar_backdrop_h"].YSize),
+                tempBounds.Width, 
+                true);
             
-            Bounds = tempBounds;
+            _verticalScrollbar = new ScrollbarUIElement(
+                new Point(tempBounds.X + tempBounds.Width - Textures.AtlasList["ui_elements"].TextureList["scrollbar_backdrop"].XSize),
+                tempBounds.Height,
+                false);
         }
         
-        public Rectangle Bounds {
+        public Rectangle CurrentBounds {
             get => _currentBounds;
             set
             {
-                var bounds = value;
+                _currentBounds = value;
+                _fullBounds.Location = _currentBounds.Location;
                 
-                bounds.Width = value.Width >= MinimumSize.X ? value.Width : MinimumSize.X;
-                bounds.Height = value.Height >= MinimumSize.Y ? value.Height : MinimumSize.Y;
-                
-                bounds.Width = value.Width <= MaximumSize.X ? value.Width : MaximumSize.X;
-                bounds.Height = value.Height <= MaximumSize.Y ? value.Height : MaximumSize.Y;
-                
-                _currentBounds = bounds;
+                HorizontalScrollbarVisible = _currentBounds.Width < Bounds.Width;
+                VerticalScrollbarVisible = _currentBounds.Height < Bounds.Height;
 
-                _horizontalScrollbar.Position = bounds.Location;
-                _verticalScrollbar.Position = bounds.Location;
+                _horizontalScrollbar.HandleSizeRatio = (float) _currentBounds.Width / Bounds.Width;
+                _verticalScrollbar.HandleSizeRatio = (float) _currentBounds.Height / Bounds.Height;
+                
+                _horizontalScrollbar.Position = new Point(
+                    _currentBounds.X,
+                    _currentBounds.Y + _currentBounds.Height - Textures.AtlasList["ui_elements"].TextureList["scrollbar_backdrop_h"].YSize);
+                
+                _verticalScrollbar.Position = new Point(
+                    _currentBounds.X + _currentBounds.Width - Textures.AtlasList["ui_elements"].TextureList["scrollbar_backdrop"].XSize,
+                    _currentBounds.Y);
                 
                 _horizontalScrollbar.Size = _currentBounds.Width;
                 _verticalScrollbar.Size = _currentBounds.Height;
+
+                OnCurrentBoundsChanged();
             }
         }
+        
+        public Rectangle Bounds {
+            get => _fullBounds;
+            set => _fullBounds = value;
+        }
 
-        public void Update(Point mousePosition, ref Rectangle? currentRectangleBeingDragged, ref (object, string)? pressedButtons)
+        public virtual void Update(Point mousePosition, ref Rectangle? currentRectangleBeingDragged, ref (object, string)? pressedButtons)
         {
             if (HorizontalScrollbarVisible)
                 _horizontalScrollbar.Update(mousePosition, ref currentRectangleBeingDragged, ref pressedButtons);
@@ -65,7 +80,7 @@ namespace DProject.UI.Element.Ports.WindowContent
                 _verticalScrollbar.Update(mousePosition, ref currentRectangleBeingDragged, ref pressedButtons);
         }
         
-        public void Draw(SpriteBatch spriteBatch)
+        public virtual void Draw(SpriteBatch spriteBatch)
         {
             if (HorizontalScrollbarVisible)
                 _horizontalScrollbar.Draw(spriteBatch);
@@ -73,5 +88,7 @@ namespace DProject.UI.Element.Ports.WindowContent
             if(VerticalScrollbarVisible)
                 _verticalScrollbar.Draw(spriteBatch);
         }
+
+        public abstract void OnCurrentBoundsChanged();
     }
 }
