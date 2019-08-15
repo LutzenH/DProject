@@ -1,5 +1,6 @@
 ﻿using System;
 using DProject.List;
+using DProject.Manager;
 using DProject.Manager.World;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -14,6 +15,7 @@ namespace DProject
         private readonly GraphicsDeviceManager _graphics;
         
         private readonly GameWorld _worldBuilder;
+        private readonly ShaderManager _shaderManager;
 
         private static Color _backgroundColor;
         
@@ -38,7 +40,8 @@ namespace DProject
             
             Content.RootDirectory = RootDirectory;
 
-            _worldBuilder = new GameWorld(Content);
+            _shaderManager = new ShaderManager();
+            _worldBuilder = new GameWorld(Content, _shaderManager);
             
             ScreenResolutionX = (int) (GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width/1.5);
             ScreenResolutionY = (int) (GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height/1.5);
@@ -63,6 +66,7 @@ namespace DProject
         {
             Textures.Initialize(GraphicsDevice);
             
+            _shaderManager.Initialize(GraphicsDevice);
             _worldBuilder.World.Initialize();
 
             base.Initialize();
@@ -71,6 +75,8 @@ namespace DProject
         protected override void LoadContent()
         {
             Fonts.LoadFonts(Content);
+            
+            _shaderManager.LoadContent(Content);
             
             base.LoadContent();
         }

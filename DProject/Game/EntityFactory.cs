@@ -1,4 +1,5 @@
 using DProject.Game.Component;
+using DProject.Game.Component.Ports;
 using Microsoft.Xna.Framework;
 using MonoGame.Extended.Entities;
 
@@ -13,7 +14,16 @@ namespace DProject.Game
             _world = world;
         }
 
-        public Entity CreateCamera()
+        public Entity CreateGameTime()
+        {
+            var entity = _world.CreateEntity();
+            
+            entity.Attach(new GameTimeComponent());
+
+            return entity;
+        }
+        
+        public Entity CreateFlyCamera()
         {
             var entity = _world.CreateEntity();
             

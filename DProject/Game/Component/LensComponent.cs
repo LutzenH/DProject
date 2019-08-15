@@ -152,11 +152,14 @@ namespace DProject.Game.Component
 
         private static Matrix CalculateViewMatrix(Vector3 position, Vector3 direction)
         {
+            direction.Normalize();
             return Matrix.CreateLookAt(position, position + direction, Vector3.Up);
         }
         
         private static Matrix CalculateReflectionViewMatrix(Vector3 position, Vector3 direction, float planeHeight)
         {
+            direction.Normalize();
+            
             var distanceFromWater = 2 * position.Y - 4 * planeHeight;
             var underWaterPosition = new Vector3(position.X, position.Y - distanceFromWater, position.Z);
             
