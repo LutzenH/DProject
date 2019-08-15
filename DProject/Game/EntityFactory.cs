@@ -7,6 +7,8 @@ namespace DProject.Game
 {
     public class EntityFactory
     {
+        public const float WaterPlaneHeight = 10f;
+        
         private readonly World _world;
         
         public EntityFactory(World world)
@@ -29,7 +31,8 @@ namespace DProject.Game
             
             entity.Attach(new LensComponent()
             {
-                Position = new Vector3(0, 10, 0)
+                Position = new Vector3(0, 10, 0),
+                ReflectionPlaneHeight = WaterPlaneHeight
             });
             
             entity.Attach(new FlyCameraComponent()
@@ -46,6 +49,19 @@ namespace DProject.Game
             
             entity.Attach(new TransformComponent());
             entity.Attach(new ModelComponent(3));
+
+            return entity;
+        }
+
+        public Entity CreateWaterPlane()
+        {
+            var entity = _world.CreateEntity();
+            
+            entity.Attach(new TransformComponent()
+            {
+                Position = new Vector3(0, WaterPlaneHeight, 0)
+            });
+            entity.Attach(new WaterPlaneComponent());
 
             return entity;
         }

@@ -2,6 +2,7 @@ using DProject.Game;
 using DProject.Manager.System;
 using DProject.Manager.System.Ports;
 using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended.Entities;
 
 namespace DProject.Manager.World
@@ -12,11 +13,13 @@ namespace DProject.Manager.World
 
         public MonoGame.Extended.Entities.World World { get; }
 
-        public GameWorld(ContentManager contentManager, ShaderManager shaderManager)
+        public GameWorld(ContentManager contentManager, ShaderManager shaderManager, GraphicsDevice graphicsDevice)
         {
             AddSystem(new GameTimeSystem());
+            AddSystem(new ModelLoaderSystem(contentManager));
             AddSystem(new CameraSystem());
-            AddSystem(new ModelRenderSystem(contentManager, shaderManager));
+            AddSystem(new WaterRenderSystem(graphicsDevice, shaderManager));
+            AddSystem(new ModelRenderSystem(graphicsDevice, shaderManager));
             
             World = Build();
             
@@ -24,6 +27,7 @@ namespace DProject.Manager.World
             _entityFactory.CreateGameTime();
             _entityFactory.CreateFlyCamera();
             _entityFactory.CreateProp();
+            _entityFactory.CreateWaterPlane();
         }
     }
 }

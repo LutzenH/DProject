@@ -23,7 +23,7 @@ namespace DProject.Manager
         
         public enum RenderTarget { Depth, Reflection, Refraction, Final }
 
-        public static RenderTarget CurrentRenderTarget;
+        public RenderTarget CurrentRenderTarget;
 
         public ShaderManager()
         {

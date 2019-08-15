@@ -56,8 +56,6 @@ namespace DProject.Manager.System.Ports
             };
             
             time.OnTimeChanged(args);
-            
-            Console.WriteLine(time.CurrentSeason + ", " + time.CurrentDay + ", " + time.CurrentTime);
         }
         
         private static void SetNextDay(GameTimeComponent time)

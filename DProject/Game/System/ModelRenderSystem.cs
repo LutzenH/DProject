@@ -1,9 +1,7 @@
 using System.Linq;
 using DProject.Game.Component;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using MonoGame.Extended.Content;
 using MonoGame.Extended.Entities;
 using MonoGame.Extended.Entities.Systems;
 
@@ -11,43 +9,67 @@ namespace DProject.Manager.System
 {
     public class ModelRenderSystem : EntityDrawSystem
     {
-        private readonly ContentManager _contentManager;
         private readonly ShaderManager _shaderManager;
+        private readonly GraphicsDevice _graphicsDevice;
         
-        private ComponentMapper<ModelComponent> _modelMapper;
+        private ComponentMapper<LoadedModelComponent> _modelMapper;
         private ComponentMapper<TransformComponent> _transformMapper;
         
-        public ModelRenderSystem(ContentManager contentManager, ShaderManager shaderManager) : base(Aspect.All(typeof(ModelComponent), typeof(TransformComponent)))
+        public ModelRenderSystem(GraphicsDevice graphicsDevice, ShaderManager shaderManager) : base(Aspect.All(typeof(LoadedModelComponent), typeof(TransformComponent)))
         {
-            _contentManager = contentManager;
+            _graphicsDevice = graphicsDevice;
             _shaderManager = shaderManager;
         }
         
         public override void Initialize(IComponentMapperService mapperService)
         {
-            _modelMapper = mapperService.GetMapper<ModelComponent>();
+            _modelMapper = mapperService.GetMapper<LoadedModelComponent>();
             _transformMapper = mapperService.GetMapper<TransformComponent>();
         }
 
         public override void Draw(GameTime gameTime)
         {
             _shaderManager.SetContinuousShaderInfo(CameraSystem.ActiveLens, 0.5f);
-            
-            foreach (var entity in ActiveEntities)
-            {
-                var model = _modelMapper.Get(entity);
-                var transform = _transformMapper.Get(entity);
-                
-                //Probably shouldn't be done in the Draw method.
-                if (model.Model == null)
-                    model.Model = _contentManager.Load<Model>(model.ModelPath);
 
-                foreach (var mesh in model.Model.Meshes.Where(mesh =>
-                    CameraSystem.ActiveLens.BoundingFrustum.Intersects(mesh.BoundingSphere.Transform(transform.WorldMatrix))))
-                {
-                    _shaderManager.PropEffect.World = transform.WorldMatrix;
-                    DrawMesh(_shaderManager.PropEffect, mesh.MeshParts, _contentManager.GetGraphicsDevice());
-                }
+            switch (_shaderManager.CurrentRenderTarget)
+            {
+                case ShaderManager.RenderTarget.Depth:
+                    foreach (var entity in ActiveEntities)
+                    {
+                        var model = _modelMapper.Get(entity);
+                        var transform = _transformMapper.Get(entity);
+                    
+                        if (model.Model != null)
+                        {
+                            foreach (var mesh in model.Model.Meshes)
+                            {
+                                if (CameraSystem.ActiveLens.BoundingFrustum.Intersects(mesh.BoundingSphere.Transform(transform.WorldMatrix)))
+                                {
+                                    _shaderManager.DepthEffect.World = transform.WorldMatrix;
+                                    DrawMesh(_shaderManager.DepthEffect, mesh.MeshParts, _graphicsDevice);
+                                }
+                            }
+                        }
+                    }
+                    break;
+                case ShaderManager.RenderTarget.Reflection:
+                case ShaderManager.RenderTarget.Refraction:
+                case ShaderManager.RenderTarget.Final:
+                    foreach (var entity in ActiveEntities)
+                    {
+                        var model = _modelMapper.Get(entity);
+                        var transform = _transformMapper.Get(entity);
+
+                        foreach (var mesh in model.Model.Meshes.Where(mesh =>
+                            CameraSystem.ActiveLens.BoundingFrustum.Intersects(mesh.BoundingSphere.Transform(transform.WorldMatrix))))
+                        {
+                            _shaderManager.PropEffect.World = transform.WorldMatrix;
+                            DrawMesh(_shaderManager.PropEffect, mesh.MeshParts, _graphicsDevice);
+                        }
+                    }
+                    break;
+                default:
+                    return;
             }
         }
         
