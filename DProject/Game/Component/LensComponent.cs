@@ -158,9 +158,7 @@ namespace DProject.Game.Component
         
         private static Matrix CalculateReflectionViewMatrix(Vector3 position, Vector3 direction, float planeHeight)
         {
-            direction.Normalize();
-            
-            var distanceFromWater = 2 * position.Y - 4 * planeHeight;
+            var distanceFromWater = 2 * (position.Y - planeHeight);
             var underWaterPosition = new Vector3(position.X, position.Y - distanceFromWater, position.Z);
             
             return Matrix.CreateLookAt(underWaterPosition, underWaterPosition + new Vector3(direction.X, -direction.Y, direction.Z), Vector3.Up);

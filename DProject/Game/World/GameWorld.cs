@@ -17,9 +17,11 @@ namespace DProject.Manager.World
         {
             AddSystem(new GameTimeSystem());
             AddSystem(new ModelLoaderSystem(contentManager));
+            AddSystem(new HeightmapLoaderSystem(graphicsDevice));
             AddSystem(new CameraSystem());
             AddSystem(new WaterRenderSystem(graphicsDevice, shaderManager));
             AddSystem(new ModelRenderSystem(graphicsDevice, shaderManager));
+            AddSystem(new HeightmapRenderSystem(graphicsDevice, shaderManager));
             
             World = Build();
             
@@ -28,6 +30,7 @@ namespace DProject.Manager.World
             _entityFactory.CreateFlyCamera();
             _entityFactory.CreateProp();
             _entityFactory.CreateWaterPlane();
+            _entityFactory.CreateHeightmap();
         }
     }
 }

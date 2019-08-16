@@ -66,13 +66,13 @@ VertexShaderOutput ReflectionVS(in VertexShaderInput input)
 
 float4 ReflectionPS(VertexShaderOutput input) : COLOR
 {
-    clip(input.VertexHeight.x - WaterHeight - WaterHeight);
+    clip(input.VertexHeight.x - WaterHeight);
 	return MainPS(input);
 }
 
 float4 RefractionPS(VertexShaderOutput input) : COLOR
 {
-    clip(WaterHeight - input.VertexHeight.x + WaterHeight);
+    clip(WaterHeight - input.VertexHeight.x);
 	return MainPS(input);
 }
 
