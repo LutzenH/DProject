@@ -29,7 +29,7 @@ namespace DProject.Manager.System
 
         public override void Draw(GameTime gameTime)
         {
-            //This shouldn't be done in the ModelRenderSystem
+            //TODO: This shouldn't be done in the ModelRenderSystem
             _shaderManager.SetContinuousShaderInfo(CameraSystem.ActiveLens, 0.5f);
 
             switch (_shaderManager.CurrentRenderTarget)

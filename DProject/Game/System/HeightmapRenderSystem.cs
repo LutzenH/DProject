@@ -1,5 +1,6 @@
 using DProject.Game.Component;
 using DProject.List;
+using DProject.Type.Rendering;
 using DProject.Type.Rendering.Shaders;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -15,8 +16,9 @@ namespace DProject.Manager.System
         
         private ComponentMapper<LoadedHeightmapComponent> _heightmapMapper;
         private ComponentMapper<TransformComponent> _transformMapper;
+        private ComponentMapper<BoundingBoxComponent> _boundingBoxMapper;
 
-        public HeightmapRenderSystem(GraphicsDevice graphicsDevice, ShaderManager shaderManager) : base(Aspect.All(typeof(LoadedHeightmapComponent), typeof(TransformComponent)))
+        public HeightmapRenderSystem(GraphicsDevice graphicsDevice, ShaderManager shaderManager) : base(Aspect.All(typeof(LoadedHeightmapComponent), typeof(TransformComponent), typeof(BoundingBoxComponent)))
         {
             _shaderManager = shaderManager;
             _graphicsDevice = graphicsDevice;
@@ -26,6 +28,7 @@ namespace DProject.Manager.System
         {
             _heightmapMapper = mapperService.GetMapper<LoadedHeightmapComponent>();
             _transformMapper = mapperService.GetMapper<TransformComponent>();
+            _boundingBoxMapper = mapperService.GetMapper<BoundingBoxComponent>();
         }
 
         public override void Draw(GameTime gameTime)
@@ -34,14 +37,16 @@ namespace DProject.Manager.System
             {
                 var loadedHeightmapComponent = _heightmapMapper.Get(entity);
                 var transformComponent = _transformMapper.Get(entity);
+                var boundingBox = _boundingBoxMapper.Get(entity);
                 
-                Draw(transformComponent, loadedHeightmapComponent, Textures.AtlasList["floor_textures"].AtlasTexture2D,  _shaderManager);
+                if (CameraSystem.ActiveLens.BoundingFrustum.Intersects(boundingBox.BoundingBox))
+                    Draw(transformComponent, loadedHeightmapComponent, Textures.AtlasList["floor_textures"].AtlasTexture2D,  _shaderManager);
             }
         }
         
         public void Draw(TransformComponent transformComponent, LoadedHeightmapComponent loadedHeightmapComponent, Texture2D texture2D, ShaderManager shaderManager)
         {
-            AbstractEffect effect = null;
+            AbstractEffect effect;
             
             switch (shaderManager.CurrentRenderTarget)
             {
@@ -58,9 +63,16 @@ namespace DProject.Manager.System
                 default:
                     return;
             }
+
+            //TODO: Maybe load the vertex-buffer in a different DrawSystem
+            if (loadedHeightmapComponent.VertexBuffer == null)
+            {
+                loadedHeightmapComponent.VertexBuffer = new VertexBuffer(_graphicsDevice, typeof(VertexPositionTextureColorNormal), loadedHeightmapComponent.PrimitiveCount * 3, BufferUsage.WriteOnly);
+                loadedHeightmapComponent.VertexBuffer.SetData(loadedHeightmapComponent.Vertices);
+            }
             
             _graphicsDevice.SetVertexBuffer(loadedHeightmapComponent.VertexBuffer);
-
+            
             foreach (var pass in effect.CurrentTechnique.Passes)
             {
                 pass.Apply();

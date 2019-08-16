@@ -1,7 +1,6 @@
 using DProject.Game.Component;
 using DProject.Game.Component.Ports;
-using DProject.Manager.System;
-using DProject.Type.Rendering;
+using DProject.Type.Serializable.Chunk;
 using Microsoft.Xna.Framework;
 using MonoGame.Extended.Entities;
 
@@ -10,17 +9,12 @@ namespace DProject.Game
     public class EntityFactory
     {
         public const float WaterPlaneHeight = 5f;
-        
-        private readonly World _world;
-        
-        public EntityFactory(World world)
-        {
-            _world = world;
-        }
 
+        public World World { get; set; }
+        
         public Entity CreateGameTime()
         {
-            var entity = _world.CreateEntity();
+            var entity = World.CreateEntity();
             
             entity.Attach(new GameTimeComponent());
 
@@ -29,7 +23,7 @@ namespace DProject.Game
         
         public Entity CreateFlyCamera()
         {
-            var entity = _world.CreateEntity();
+            var entity = World.CreateEntity();
             
             entity.Attach(new LensComponent()
             {
@@ -47,7 +41,7 @@ namespace DProject.Game
 
         public Entity CreateProp()
         {
-            var entity = _world.CreateEntity();
+            var entity = World.CreateEntity();
             
             entity.Attach(new TransformComponent());
             entity.Attach(new ModelComponent(3));
@@ -57,7 +51,7 @@ namespace DProject.Game
 
         public Entity CreateWaterPlane()
         {
-            var entity = _world.CreateEntity();
+            var entity = World.CreateEntity();
             
             entity.Attach(new TransformComponent()
             {
@@ -68,14 +62,26 @@ namespace DProject.Game
             return entity;
         }
 
-        public Entity CreateHeightmap()
+        public Entity CreateHeightmap(Vector3 position, Vertex[,] heightmap)
         {
-            var entity = _world.CreateEntity();
+            var entity = World.CreateEntity();
             
-            entity.Attach(new TransformComponent());
+            entity.Attach(new TransformComponent()
+            {
+                Position = position
+            });
             entity.Attach(new HeightmapComponent()
             {
-                Heightmap = HeightmapLoaderSystem.GenerateVertexMap(Noise.GenerateNoiseMap(64, 64, 0, 0, 25f))
+                Heightmap = heightmap
+            });
+            entity.Attach(new BoundingBoxComponent()
+            {
+                BoundingBox = new BoundingBox(
+                    position,
+                    new Vector3(
+                        position.X + heightmap.GetLength(0) - 1,
+                        float.MaxValue, 
+                        position.Z + heightmap.GetLength(1) - 1))
             });
 
             return entity;

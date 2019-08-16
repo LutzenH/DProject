@@ -1,11 +1,11 @@
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using DProject.Game.Component;
 using DProject.List;
 using DProject.Type.Rendering;
 using DProject.Type.Serializable.Chunk;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended.Entities;
 using MonoGame.Extended.Entities.Systems;
 
@@ -14,16 +14,11 @@ namespace DProject.Manager.System
     public class HeightmapLoaderSystem : EntityUpdateSystem
     {
         public const float IncrementsPerHeightUnit = 256f;
-
-        private readonly GraphicsDevice _graphicsDevice;
         
         private ComponentMapper<HeightmapComponent> _heightmapMapper;
         private ComponentMapper<LoadedHeightmapComponent> _loadedHeightmapMapper;
 
-        public HeightmapLoaderSystem(GraphicsDevice graphicsDevice) : base(Aspect.All(typeof(HeightmapComponent)))
-        {
-            _graphicsDevice = graphicsDevice;
-        }
+        public HeightmapLoaderSystem() : base(Aspect.All(typeof(HeightmapComponent))) { }
 
         public override void Initialize(IComponentMapperService mapperService)
         {
@@ -33,19 +28,19 @@ namespace DProject.Manager.System
 
         public override void Update(GameTime gameTime)
         {
-            foreach (var entity in ActiveEntities)
+            Parallel.ForEach(ActiveEntities, entity =>
             {
                 var heightmap = _heightmapMapper.Get(entity);
 
                 var loadedHeightmapComponent = new LoadedHeightmapComponent();
-                LoadHeightmap(heightmap.Heightmap, loadedHeightmapComponent, _graphicsDevice);
+                LoadHeightmap(heightmap.Heightmap, loadedHeightmapComponent);
 
                 _loadedHeightmapMapper.Put(entity, loadedHeightmapComponent);
                 _heightmapMapper.Delete(entity);
-            }
+            });
         }
         
-        private static void LoadHeightmap(Vertex[,] heightmap, LoadedHeightmapComponent loadedHeightmapComponent, GraphicsDevice graphicsDevice)
+        private static void LoadHeightmap(Vertex[,] heightmap, LoadedHeightmapComponent loadedHeightmapComponent)
         {
             loadedHeightmapComponent.Size = new Point(heightmap.GetLength(0), heightmap.GetLength(1));
             
@@ -135,8 +130,7 @@ namespace DProject.Manager.System
             
             Array.Resize(ref vertexPositions, loadedHeightmapComponent.PrimitiveCount * 3);
             
-            loadedHeightmapComponent.VertexBuffer = new DynamicVertexBuffer(graphicsDevice, typeof(VertexPositionTextureColorNormal), loadedHeightmapComponent.PrimitiveCount * 3, BufferUsage.WriteOnly);
-            loadedHeightmapComponent.VertexBuffer.SetData(vertexPositions);
+            loadedHeightmapComponent.Vertices = vertexPositions;
         }
 
         private static Vector3[,] GenerateNormalMap(Vertex[,] heightMap, Point size)

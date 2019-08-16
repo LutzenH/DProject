@@ -15,22 +15,33 @@ namespace DProject.Manager.World
 
         public GameWorld(ContentManager contentManager, ShaderManager shaderManager, GraphicsDevice graphicsDevice)
         {
+            _entityFactory = new EntityFactory();
+
+            //Game
             AddSystem(new GameTimeSystem());
-            AddSystem(new ModelLoaderSystem(contentManager));
-            AddSystem(new HeightmapLoaderSystem(graphicsDevice));
+            
+            //Camera
             AddSystem(new CameraSystem());
-            AddSystem(new WaterRenderSystem(graphicsDevice, shaderManager));
+
+            //Models
+            AddSystem(new ModelLoaderSystem(contentManager));
             AddSystem(new ModelRenderSystem(graphicsDevice, shaderManager));
+            
+            //Terrain
+            AddSystem(new ChunkLoaderSystem(_entityFactory));
+            AddSystem(new HeightmapLoaderSystem());
             AddSystem(new HeightmapRenderSystem(graphicsDevice, shaderManager));
+
+            //Water
+            AddSystem(new WaterRenderSystem(graphicsDevice, shaderManager));
             
             World = Build();
-            
-            _entityFactory = new EntityFactory(World);
+
+            _entityFactory.World = World;
             _entityFactory.CreateGameTime();
             _entityFactory.CreateFlyCamera();
             _entityFactory.CreateProp();
             _entityFactory.CreateWaterPlane();
-            _entityFactory.CreateHeightmap();
         }
     }
 }

@@ -13,6 +13,8 @@ namespace DProject.Game.Component
         public ushort LowestHeightValue { get; set; }
         public ushort HighestHeightValue { get; set; }
         
-        public DynamicVertexBuffer VertexBuffer { get; set; }
+        public VertexPositionTextureColorNormal[] Vertices { get; set; }
+
+        public VertexBuffer VertexBuffer { get; set; }
     }
 }
