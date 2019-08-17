@@ -40,6 +40,8 @@ namespace DProject.Manager.System
             });
         }
         
+        #region Heightmap Creation & Loading
+        
         private static void LoadHeightmap(Vertex[,] heightmap, LoadedHeightmapComponent loadedHeightmapComponent)
         {
             loadedHeightmapComponent.Size = new Point(heightmap.GetLength(0), heightmap.GetLength(1));
@@ -209,5 +211,7 @@ namespace DProject.Manager.System
         {
             return Vector3.Distance(a, c) < Vector3.Distance(b, d);
         }
+        
+        #endregion
     }
 }

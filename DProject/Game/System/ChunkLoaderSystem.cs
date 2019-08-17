@@ -1,12 +1,18 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using DProject.Game;
+using DProject.List;
+using DProject.Type.Enum;
 using DProject.Type.Rendering;
+using DProject.Type.Serializable.Chunk;
+using MessagePack;
 using Microsoft.Xna.Framework;
 using MonoGame.Extended.Entities;
 using MonoGame.Extended.Entities.Systems;
+using Object = System.Object;
 
 namespace DProject.Manager.System
 {
@@ -120,9 +126,46 @@ namespace DProject.Manager.System
             {
                 var xPos = chunk.Item1 * ChunkSize;
                 var yPos = chunk.Item2 * ChunkSize;
-                _loadedChunks[chunk] = _entityFactory.CreateHeightmap(new Vector3(xPos, 0, yPos), HeightmapLoaderSystem.GenerateVertexMap(Noise.GenerateNoiseMap(ChunkSize, ChunkSize, xPos, yPos, 25f)));
+                _loadedChunks[chunk] = _entityFactory.CreateHeightmap(new Vector3(xPos, 0, yPos), GenerateChunkData(chunk.Item1, chunk.Item2).VertexMap);
             }
 
+        }
+        
+        public static ChunkData GenerateChunkData(int x, int y)
+        {
+            var path = "Content/chunks/chunk_" + x + "_" + y + ".dat";
+            ChunkData chunkData;
+            
+            if (File.Exists(path))
+            {
+                Stream stream = File.Open(path, FileMode.Open);
+                var bytes = stream;
+                
+                chunkData = LZ4MessagePackSerializer.Deserialize<ChunkData>(bytes);
+                stream.Close();
+
+                chunkData.ChunkStatus = ChunkStatus.Current;
+            }
+            else
+            {                   
+                var shortMap = Noise.GenerateNoiseMap(ChunkSize, ChunkSize, x * ChunkSize, y * ChunkSize, 50f);
+                var vertices = HeightmapLoaderSystem.GenerateVertexMap(shortMap);
+                
+                chunkData = new ChunkData()
+                {
+                    ChunkPositionX = x,
+                    ChunkPositionY = y,
+                    VertexMap = vertices,
+                    
+                    Objects = new List<Type.Serializable.Chunk.Object>(),
+                    
+                    SkyId = Skies.GetDefaultSkyId(),
+                    
+                    ChunkStatus = ChunkStatus.Unserialized
+                };
+            }
+
+            return chunkData;
         }
 
         #endregion

@@ -10,6 +10,7 @@ namespace DProject
 {
     public class Game1 : Microsoft.Xna.Framework.Game
     {
+        public const int MaxFps = 120;
         public const string RootDirectory = "Content/";
 
         private readonly GraphicsDeviceManager _graphics;
@@ -48,11 +49,14 @@ namespace DProject
             _graphics.PreferredBackBufferWidth = ScreenResolutionX;
             _graphics.PreferredBackBufferHeight = ScreenResolutionY;
 
-            _backgroundColor = Color.Black;
+            _backgroundColor = Color.DarkGray;
 
             //VSYNC
             _graphics.SynchronizeWithVerticalRetrace = false;
-            IsFixedTimeStep = false;
+            
+            //Max FPS
+            IsFixedTimeStep = true;
+            TargetElapsedTime = TimeSpan.FromTicks(10000000L / MaxFps);
 
             Window.AllowUserResizing = true;
             Window.ClientSizeChanged += (sender, args) => SetScreenResolution(Window.ClientBounds.Width, Window.ClientBounds.Height);
@@ -130,7 +134,7 @@ namespace DProject
                     GraphicsDevice.BlendState = BlendState.Opaque;
 
                     // Clear the screen
-                    GraphicsDevice.Clear(Color.Transparent);
+                    GraphicsDevice.Clear(Color.White);
                     break;
                 case ShaderManager.RenderTarget.Reflection:
                     //Setup Shaders
