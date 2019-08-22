@@ -2,6 +2,7 @@ using DProject.Game.Component;
 using DProject.Game.Component.Ports;
 using DProject.Type.Serializable.Chunk;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended.Entities;
 
 namespace DProject.Game
@@ -68,7 +69,7 @@ namespace DProject.Game
             return entity;
         }
 
-        public Entity CreateHeightmap(Vector3 position, Vertex[,] heightmap)
+        public Entity CreateHeightmap(Vector3 position, Vertex[,] heightmap, VertexBuffer recycledVertexBuffer = null)
         {
             var entity = World.CreateEntity();
             
@@ -78,7 +79,8 @@ namespace DProject.Game
             });
             entity.Attach(new HeightmapComponent()
             {
-                Heightmap = heightmap
+                Heightmap = heightmap,
+                RecycledVertexBuffer = recycledVertexBuffer
             });
             entity.Attach(new BoundingBoxComponent()
             {

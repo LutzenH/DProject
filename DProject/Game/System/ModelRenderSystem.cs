@@ -1,4 +1,3 @@
-using System.Linq;
 using DProject.Game.Component;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;

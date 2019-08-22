@@ -17,6 +17,8 @@ namespace DProject
         
         private GameWorld _worldBuilder;
         private readonly ShaderManager _shaderManager;
+        
+        private SpriteBatch _spriteBatch;
 
         private static Color _backgroundColor;
         
@@ -72,6 +74,8 @@ namespace DProject
             
             _worldBuilder = new GameWorld(Content, _shaderManager, GraphicsDevice);
 
+            _spriteBatch = new SpriteBatch(GraphicsDevice);
+            
             _shaderManager.Initialize(GraphicsDevice);
             _worldBuilder.World.Initialize();
 

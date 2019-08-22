@@ -4,22 +4,24 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using DProject.Game;
+using DProject.Game.Component;
 using DProject.List;
 using DProject.Type.Enum;
 using DProject.Type.Rendering;
 using DProject.Type.Serializable.Chunk;
 using MessagePack;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using MonoGame.Extended.Entities;
 using MonoGame.Extended.Entities.Systems;
-using Object = System.Object;
 
 namespace DProject.Manager.System
 {
     public class ChunkLoaderSystem : UpdateSystem
     {
         private const int DefaultLoadDistance = 8;
-        private const int ChunkSize = 64;
+        public const int ChunkSize = 64;
         
         private readonly EntityFactory _entityFactory;
         private readonly ConcurrentDictionary<(int, int), Entity> _loadedChunks;
@@ -27,7 +29,7 @@ namespace DProject.Manager.System
         private (int, int) _previousChunkPosition;
         private (int, int) _chunkPosition;
 
-        private readonly int _loadDistance;
+        private uint _loadDistance;
         
         public ChunkLoaderSystem(EntityFactory entityFactory)
         {
@@ -44,10 +46,21 @@ namespace DProject.Manager.System
         public override void Update(GameTime gameTime)
         {
             _chunkPosition = CalculateChunkPosition(CameraSystem.ActiveLens.Position);
-            
-            if (!_chunkPosition.Equals(_previousChunkPosition))
-                LoadChunks(_chunkPosition);
 
+            //TODO: Move the ability to change the render distance somewhere else.
+            if (Keyboard.GetState().IsKeyUp(Keys.OemMinus) && Game1.PreviousKeyboardState.IsKeyDown(Keys.OemMinus))
+            {
+                _loadDistance--;
+                LoadChunks(_chunkPosition);
+            }
+            else if (Keyboard.GetState().IsKeyUp(Keys.OemPlus) && Game1.PreviousKeyboardState.IsKeyDown(Keys.OemPlus))
+            {
+                _loadDistance++;
+                LoadChunks(_chunkPosition);
+            }
+            else if (!_chunkPosition.Equals(_previousChunkPosition))
+                LoadChunks(_chunkPosition);
+            
             _previousChunkPosition = _chunkPosition;
         }
         
@@ -89,7 +102,7 @@ namespace DProject.Manager.System
             int x, y, dx, dy;
             x = y = dx =0;
             dy = -1;
-            var t = Math.Max(_loadDistance, _loadDistance);
+            var t = (int) _loadDistance;
             var maxI = t * t;
             for(var i = 0; i < maxI; i++){
                 if (-_loadDistance/2 <= x 
@@ -115,10 +128,17 @@ namespace DProject.Manager.System
             }
             
             var deadChunks = _loadedChunks.Keys.Except(oldChunkPositions).ToArray();
-
+            var reusableVertexBufferList = new Stack<VertexBuffer>();
+            
             foreach (var chunk in deadChunks)
             {
                 _loadedChunks.TryRemove(chunk, out var entity);
+                
+                var heightmap = entity.Get<LoadedHeightmapComponent>();
+
+                if (heightmap?.VertexBuffer != null)
+                    reusableVertexBufferList.Push(heightmap.VertexBuffer);
+                
                 entity.Destroy();
             }
 
@@ -126,7 +146,13 @@ namespace DProject.Manager.System
             {
                 var xPos = chunk.Item1 * ChunkSize;
                 var yPos = chunk.Item2 * ChunkSize;
-                _loadedChunks[chunk] = _entityFactory.CreateHeightmap(new Vector3(xPos, 0, yPos), GenerateChunkData(chunk.Item1, chunk.Item2).VertexMap);
+
+                VertexBuffer vertexBuffer = null;
+                
+                if(reusableVertexBufferList.Count != 0)
+                    vertexBuffer = reusableVertexBufferList.Pop();
+                
+                _loadedChunks[chunk] = _entityFactory.CreateHeightmap(new Vector3(xPos, 0, yPos), GenerateChunkData(chunk.Item1, chunk.Item2).VertexMap, vertexBuffer);
             }
 
         }
@@ -166,6 +192,21 @@ namespace DProject.Manager.System
             }
 
             return chunkData;
+        }
+        
+        public static void Serialize(ChunkData chunkData)
+        {
+            chunkData.ChunkStatus = ChunkStatus.Current;
+
+            Stream stream = File.Open("Content/chunks/chunk_" + chunkData.ChunkPositionX + "_" + chunkData.ChunkPositionY + ".dat", FileMode.Create);
+            var bytes = LZ4MessagePackSerializer.Serialize(chunkData);
+            stream.Write(bytes, 0, bytes.Length);
+        }
+        
+        public static void SerializeChunkDataList(List<ChunkData> chunkData)
+        {
+            foreach (var chunk in chunkData) 
+                Serialize(chunk);
         }
 
         #endregion

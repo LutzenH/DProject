@@ -6,6 +6,7 @@ using DProject.List;
 using DProject.Type.Rendering;
 using DProject.Type.Serializable.Chunk;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended.Entities;
 using MonoGame.Extended.Entities.Systems;
 
@@ -18,7 +19,12 @@ namespace DProject.Manager.System
         private ComponentMapper<HeightmapComponent> _heightmapMapper;
         private ComponentMapper<LoadedHeightmapComponent> _loadedHeightmapMapper;
 
-        public HeightmapLoaderSystem() : base(Aspect.All(typeof(HeightmapComponent))) { }
+        private GraphicsDevice _graphicsDevice;
+        
+        public HeightmapLoaderSystem(GraphicsDevice graphicsDevice) : base(Aspect.All(typeof(HeightmapComponent)))
+        {
+            _graphicsDevice = graphicsDevice;
+        }
 
         public override void Initialize(IComponentMapperService mapperService)
         {
@@ -28,31 +34,50 @@ namespace DProject.Manager.System
 
         public override void Update(GameTime gameTime)
         {
-            Parallel.ForEach(ActiveEntities, entity =>
+#if EDITOR
+            foreach(var entity in ActiveEntities)
             {
                 var heightmap = _heightmapMapper.Get(entity);
 
                 var loadedHeightmapComponent = new LoadedHeightmapComponent();
-                LoadHeightmap(heightmap.Heightmap, loadedHeightmapComponent);
+                
+                LoadHeightmap(heightmap, loadedHeightmapComponent, _graphicsDevice);
 
                 _loadedHeightmapMapper.Put(entity, loadedHeightmapComponent);
                 _heightmapMapper.Delete(entity);
-            });
+            }
+#else
+            foreach (var entity in ActiveEntities)
+            {
+                var heightmap = _heightmapMapper.Get(entity);
+
+                var loadedHeightmapComponent = new LoadedHeightmapComponent();
+                
+                Task.Run(() =>
+                {
+                    LoadHeightmap(heightmap, loadedHeightmapComponent, _graphicsDevice);
+                });
+
+                _loadedHeightmapMapper.Put(entity, loadedHeightmapComponent);
+                _heightmapMapper.Delete(entity);
+            }
+#endif
+
+
         }
         
         #region Heightmap Creation & Loading
         
-        private static void LoadHeightmap(Vertex[,] heightmap, LoadedHeightmapComponent loadedHeightmapComponent)
+        private static void LoadHeightmap(HeightmapComponent heightmap, LoadedHeightmapComponent loadedHeightmapComponent, GraphicsDevice graphicsDevice)
         {
-            loadedHeightmapComponent.Size = new Point(heightmap.GetLength(0), heightmap.GetLength(1));
-            
+            loadedHeightmapComponent.Size = new Point(heightmap.Heightmap.GetLength(0), heightmap.Heightmap.GetLength(1));
             loadedHeightmapComponent.LowestHeightValue = ushort.MaxValue;
             loadedHeightmapComponent.HighestHeightValue = ushort.MinValue;
 
-            var width = heightmap.GetLength(0);
-            var height = heightmap.GetLength(1);
+            var width = heightmap.Heightmap.GetLength(0);
+            var height = heightmap.Heightmap.GetLength(1);
 
-            var normals = GenerateNormalMap(heightmap, loadedHeightmapComponent.Size);
+            var normals = GenerateNormalMap(heightmap.Heightmap, loadedHeightmapComponent.Size);
             loadedHeightmapComponent.PrimitiveCount = loadedHeightmapComponent.Size.X * loadedHeightmapComponent.Size.Y * 2;
             
             var vertexPositions = new VertexPositionTextureColorNormal[loadedHeightmapComponent.PrimitiveCount * 3];
@@ -62,24 +87,24 @@ namespace DProject.Manager.System
             {
                 for (var y = 0; y < height - 1; y++)
                 {
-                    var vertexTextureId = heightmap[x,y].TextureId;
+                    var vertexTextureId = heightmap.Heightmap[x,y].TextureId;
                     
                     if (vertexTextureId != null)
                     {
-                        var topLeft = new Vector3(x,  heightmap[x,y].Height / IncrementsPerHeightUnit, y);
-                        var topRight = new Vector3(x + 1,  heightmap[x + 1, y].Height / IncrementsPerHeightUnit, y);
-                        var bottomLeft = new Vector3(x, heightmap[x, y + 1].Height / IncrementsPerHeightUnit, y + 1);
-                        var bottomRight = new Vector3(x + 1, heightmap[x + 1, y + 1].Height / IncrementsPerHeightUnit, y + 1);
+                        var topLeft = new Vector3(x,  heightmap.Heightmap[x,y].Height / IncrementsPerHeightUnit, y);
+                        var topRight = new Vector3(x + 1,  heightmap.Heightmap[x + 1, y].Height / IncrementsPerHeightUnit, y);
+                        var bottomLeft = new Vector3(x, heightmap.Heightmap[x, y + 1].Height / IncrementsPerHeightUnit, y + 1);
+                        var bottomRight = new Vector3(x + 1, heightmap.Heightmap[x + 1, y + 1].Height / IncrementsPerHeightUnit, y + 1);
 
-                        if (heightmap[x, y].Height < loadedHeightmapComponent.LowestHeightValue)
-                            loadedHeightmapComponent.LowestHeightValue = heightmap[x, y].Height;
-                        if (heightmap[x, y].Height > loadedHeightmapComponent.HighestHeightValue)
-                            loadedHeightmapComponent.HighestHeightValue = heightmap[x, y].Height;
+                        if (heightmap.Heightmap[x, y].Height < loadedHeightmapComponent.LowestHeightValue)
+                            loadedHeightmapComponent.LowestHeightValue = heightmap.Heightmap[x, y].Height;
+                        if (heightmap.Heightmap[x, y].Height > loadedHeightmapComponent.HighestHeightValue)
+                            loadedHeightmapComponent.HighestHeightValue = heightmap.Heightmap[x, y].Height;
                     
-                        var colorTopLeft = Colors.ColorList[heightmap[x, y].ColorId].Color;
-                        var colorTopRight = Colors.ColorList[heightmap[x + 1, y].ColorId].Color;
-                        var colorBottomLeft = Colors.ColorList[heightmap[x, y + 1].ColorId].Color;
-                        var colorBottomRight = Colors.ColorList[heightmap[x + 1, y + 1].ColorId].Color;
+                        var colorTopLeft = Colors.ColorList[heightmap.Heightmap[x, y].ColorId].Color;
+                        var colorTopRight = Colors.ColorList[heightmap.Heightmap[x + 1, y].ColorId].Color;
+                        var colorBottomLeft = Colors.ColorList[heightmap.Heightmap[x, y + 1].ColorId].Color;
+                        var colorBottomRight = Colors.ColorList[heightmap.Heightmap[x + 1, y + 1].ColorId].Color;
                             
                         Vector3 normal;
 
@@ -133,6 +158,22 @@ namespace DProject.Manager.System
             Array.Resize(ref vertexPositions, loadedHeightmapComponent.PrimitiveCount * 3);
             
             loadedHeightmapComponent.Vertices = vertexPositions;
+
+            SetVertexBufferData(heightmap, loadedHeightmapComponent, graphicsDevice);
+        }
+        
+        private static void SetVertexBufferData(HeightmapComponent heightmap, LoadedHeightmapComponent loadedHeightmapComponent, GraphicsDevice graphicsDevice)
+        {
+            if (heightmap.RecycledVertexBuffer == null)
+            {
+                loadedHeightmapComponent.VertexBuffer = new VertexBuffer(graphicsDevice, typeof(VertexPositionTextureColorNormal), loadedHeightmapComponent.PrimitiveCount * 3, BufferUsage.WriteOnly);
+                loadedHeightmapComponent.VertexBuffer.SetData(loadedHeightmapComponent.Vertices);
+            }
+            else
+            {
+                loadedHeightmapComponent.VertexBuffer = heightmap.RecycledVertexBuffer;
+                loadedHeightmapComponent.VertexBuffer.SetData(loadedHeightmapComponent.Vertices);
+            }
         }
 
         private static Vector3[,] GenerateNormalMap(Vertex[,] heightMap, Point size)
@@ -185,15 +226,6 @@ namespace DProject.Manager.System
 
                     if (splatMap != null)
                         color = splatMap[x,y];
-                    else
-                    {
-                        if (height < 2)
-                            color = 6;
-                        else if (height < 8)
-                            color = 7;
-                        else
-                            color = 8;
-                    }
 
                     tempHeightMap[x,y] = new Vertex()
                     {

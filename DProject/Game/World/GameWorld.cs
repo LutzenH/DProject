@@ -30,7 +30,7 @@ namespace DProject.Manager.World
             
             //Terrain
             AddSystem(new ChunkLoaderSystem(_entityFactory));
-            AddSystem(new HeightmapLoaderSystem());
+            AddSystem(new HeightmapLoaderSystem(graphicsDevice));
             AddSystem(new HeightmapRenderSystem(graphicsDevice, shaderManager));
 
             //Water
@@ -42,15 +42,8 @@ namespace DProject.Manager.World
             _entityFactory.CreateGameTime();
             _entityFactory.CreateFlyCamera();
             
+            _entityFactory.CreateProp(new Vector3(0, 5, 0), 10);
 
-            for (int x = 0; x < 25; x++)
-            {
-                for (int y = 0; y < 25; y++)
-                {
-                    _entityFactory.CreateProp(new Vector3(x * 2, 5, y * 2), (ushort) ((x*y+x+y)%11+2));
-                }
-            }
-            
             _entityFactory.CreateWaterPlane();
         }
     }

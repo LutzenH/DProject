@@ -153,7 +153,6 @@ namespace DProject.Manager
             _waterEffect.MaximumFoamDistance = 0.1f;
             
             //FXAA
-            const float inverseSharpnessN = 0.40f;
             var viewport = new Viewport(0, 0, PreFinalBuffer.Width, PreFinalBuffer.Height);
             var projection = Matrix.CreateOrthographicOffCenter(0, viewport.Width, viewport.Height, 0, 0, 1);
             var halfPixelOffset = Matrix.CreateTranslation(-0.5f, -0.5f, 0);

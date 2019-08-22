@@ -1,6 +1,5 @@
 using DProject.Game.Component;
 using DProject.List;
-using DProject.Type.Rendering;
 using DProject.Type.Rendering.Shaders;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -46,39 +45,35 @@ namespace DProject.Manager.System
         
         public void Draw(TransformComponent transformComponent, LoadedHeightmapComponent loadedHeightmapComponent, Texture2D texture2D, ShaderManager shaderManager)
         {
-            AbstractEffect effect;
-            
-            switch (shaderManager.CurrentRenderTarget)
+            if (loadedHeightmapComponent.VertexBuffer != null)
             {
-                case ShaderManager.RenderTarget.Depth:
-                    effect = shaderManager.DepthEffect;
-                    effect.World = transformComponent.WorldMatrix;
-                    break;
-                case ShaderManager.RenderTarget.Refraction:
-                case ShaderManager.RenderTarget.Reflection:
-                case ShaderManager.RenderTarget.Final:
-                    effect = shaderManager.TerrainEffect;
-                    effect.World = transformComponent.WorldMatrix;
-                    break;
-                default:
-                    return;
-            }
+                AbstractEffect effect;
+            
+                switch (shaderManager.CurrentRenderTarget)
+                {
+                    case ShaderManager.RenderTarget.Depth:
+                        effect = shaderManager.DepthEffect;
+                        effect.World = transformComponent.WorldMatrix;
+                        break;
+                    case ShaderManager.RenderTarget.Refraction:
+                    case ShaderManager.RenderTarget.Reflection:
+                    case ShaderManager.RenderTarget.Final:
+                        effect = shaderManager.TerrainEffect;
+                        effect.World = transformComponent.WorldMatrix;
+                        break;
+                    default:
+                        return;
+                }
 
-            //TODO: Maybe load the vertex-buffer in a different DrawSystem
-            if (loadedHeightmapComponent.VertexBuffer == null)
-            {
-                loadedHeightmapComponent.VertexBuffer = new VertexBuffer(_graphicsDevice, typeof(VertexPositionTextureColorNormal), loadedHeightmapComponent.PrimitiveCount * 3, BufferUsage.WriteOnly);
-                loadedHeightmapComponent.VertexBuffer.SetData(loadedHeightmapComponent.Vertices);
-            }
-            
-            _graphicsDevice.SetVertexBuffer(loadedHeightmapComponent.VertexBuffer);
-            
-            foreach (var pass in effect.CurrentTechnique.Passes)
-            {
-                pass.Apply();
+                _graphicsDevice.SetVertexBuffer(loadedHeightmapComponent.VertexBuffer);
+        
+                foreach (var pass in effect.CurrentTechnique.Passes)
+                {
+                    pass.Apply();
 
-                if (loadedHeightmapComponent.PrimitiveCount != 0)
-                    _graphicsDevice.DrawPrimitives(PrimitiveType.TriangleList, 0, loadedHeightmapComponent.PrimitiveCount);
+                    if (loadedHeightmapComponent.PrimitiveCount != 0)
+                        _graphicsDevice.DrawPrimitives(PrimitiveType.TriangleList, 0, loadedHeightmapComponent.PrimitiveCount);
+                }
             }
         }
     }
