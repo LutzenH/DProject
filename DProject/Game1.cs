@@ -55,11 +55,12 @@ namespace DProject
             _graphics.SynchronizeWithVerticalRetrace = false;
             
             //Max FPS
-            IsFixedTimeStep = true;
+            IsFixedTimeStep = false;
             TargetElapsedTime = TimeSpan.FromTicks(10000000L / MaxFps);
 
             Window.AllowUserResizing = true;
             Window.ClientSizeChanged += (sender, args) => SetScreenResolution(Window.ClientBounds.Width, Window.ClientBounds.Height);
+            Window.ClientSizeChanged += (sender, args) => _shaderManager.CreateBuffers(GraphicsDevice, true);
             
             //Mouse
             IsMouseVisible = true;
@@ -96,9 +97,7 @@ namespace DProject
                 _fps = 0;
                 _last = DateTime.Now;
             }
-            else
-                _fps++;
-            
+
             _worldBuilder.World.Update(gameTime);
 
             PreviousKeyboardState = Keyboard.GetState();
@@ -118,7 +117,24 @@ namespace DProject
 #endif
             DrawSceneToRenderTarget(ShaderManager.RenderTarget.Final, gameTime);
             
+            //TODO: Make FXAA Work on DirectX based-platforms.
+#if LINUX
+            GraphicsDevice.SetRenderTarget(null);
+
+            try
+            {
+                _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, SamplerState.LinearClamp, DepthStencilState.None, null, _shaderManager.FXAAEffect, Matrix.Identity);
+                _spriteBatch.Draw(_shaderManager.PreFinalBuffer, GraphicsDevice.Viewport.Bounds, Color.White);
+            }
+            finally
+            {
+                _spriteBatch.End();
+            }
+#endif
+            
             base.Draw(gameTime);
+            
+            _fps++;
         }
         
         private void DrawSceneToRenderTarget(ShaderManager.RenderTarget renderTarget, GameTime gameTime)
@@ -170,7 +186,11 @@ namespace DProject
                     _shaderManager.PropEffect.CurrentTechnique = _shaderManager.PropEffect.Techniques[0];
 
                     // Set the render target
+#if LINUX
+                    GraphicsDevice.SetRenderTarget(_shaderManager.PreFinalBuffer);
+#else
                     GraphicsDevice.SetRenderTarget(null);
+#endif
                     GraphicsDevice.BlendState = BlendState.Opaque;
                     GraphicsDevice.DepthStencilState = DepthStencilState.Default;
                     GraphicsDevice.SamplerStates[0] = SamplerState.PointWrap;

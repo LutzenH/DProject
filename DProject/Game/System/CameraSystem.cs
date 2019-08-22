@@ -50,16 +50,26 @@ namespace DProject.Manager.System
                 translation -= new Vector3(0, moveSpeed, 0);
 
             lens.Position += translation;
-            
-            if (Keyboard.GetState().IsKeyDown(Keys.Left))
-                angleX -= moveSpeed * 6;
-            if (Keyboard.GetState().IsKeyDown(Keys.Right))
-                angleX += moveSpeed * 6;
-            if (Keyboard.GetState().IsKeyDown(Keys.Up))
-                angleY += moveSpeed * 6;
-            if (Keyboard.GetState().IsKeyDown(Keys.Down))
-                angleY -= moveSpeed * 6;
-            
+
+            if (Mouse.GetState().MiddleButton == ButtonState.Pressed)
+            {
+                var mousePositionDifference = Game1.PreviousMouseState.Position - Mouse.GetState().Position;
+                
+                angleX -= mousePositionDifference.X * moveSpeed * 3;
+                angleY += mousePositionDifference.Y * moveSpeed * 3;
+            }
+            else
+            {
+                if (Keyboard.GetState().IsKeyDown(Keys.Left))
+                    angleX -= moveSpeed * 6;
+                if (Keyboard.GetState().IsKeyDown(Keys.Right))
+                    angleX += moveSpeed * 6;
+                if (Keyboard.GetState().IsKeyDown(Keys.Up))
+                    angleY += moveSpeed * 6;
+                if (Keyboard.GetState().IsKeyDown(Keys.Down))
+                    angleY -= moveSpeed * 6;
+            }
+
             var cameraUpPerpendicular = Vector3.Cross(Vector3.Up, lens.Direction);
             cameraUpPerpendicular.Normalize();
         

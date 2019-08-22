@@ -8,6 +8,7 @@ namespace DProject.Game.Component
         private bool _viewIsDirty;
         private bool _reflectionViewIsDirty;
         private bool _boundingFrustumIsDirty;
+        private bool _reflectionBoundingFrustumIsDirty;
 
         private Vector3 _position;
         private Vector3 _direction;
@@ -22,6 +23,7 @@ namespace DProject.Game.Component
         private Matrix _reflectionViewMatrix;
 
         private BoundingFrustum _boundingFrustum;
+        private BoundingFrustum _reflectionBoundingFrustum;
         
         public LensComponent()
         {
@@ -36,6 +38,7 @@ namespace DProject.Game.Component
             _viewIsDirty = true;
             _reflectionViewIsDirty = true;
             _boundingFrustumIsDirty = true;
+            _reflectionBoundingFrustumIsDirty = true;
         }
 
         #region Projection
@@ -76,6 +79,7 @@ namespace DProject.Game.Component
                     _projectMatrix = CalculateProjectionMatrix(_fieldOfView, _nearPlaneDistance, _farPlaneDistance);
                     _projectionIsDirty = false;
                     _boundingFrustumIsDirty = true;
+                    _reflectionBoundingFrustumIsDirty = true;
                 }
 
                 return _projectMatrix;
@@ -144,6 +148,7 @@ namespace DProject.Game.Component
                 {
                     _reflectionViewMatrix = CalculateReflectionViewMatrix(_position, _direction, _reflectionPlaneHeight);
                     _reflectionViewIsDirty = false;
+                    _reflectionBoundingFrustumIsDirty = true;
                 }
 
                 return _reflectionViewMatrix;
@@ -179,6 +184,20 @@ namespace DProject.Game.Component
                 }
 
                 return _boundingFrustum;
+            }
+        }
+        
+        public BoundingFrustum ReflectionBoundingFrustum
+        {
+            get
+            {
+                if (_reflectionBoundingFrustumIsDirty)
+                {
+                    _reflectionBoundingFrustum = CalculateBoundingFrustum(_reflectionViewMatrix, _projectMatrix);
+                    _reflectionBoundingFrustumIsDirty = false;
+                }
+
+                return _reflectionBoundingFrustum;
             }
         }
 

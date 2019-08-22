@@ -1,8 +1,9 @@
+using DProject.Type.Rendering.Shaders.Interface;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace DProject.Type.Rendering.Shaders
 {
-    public class DepthEffect : AbstractEffect
+    public class DepthEffect : AbstractEffect, INeedClipPlanes
     {
         public DepthEffect(Effect cloneSource) : base(cloneSource) { }
 

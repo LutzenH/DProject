@@ -54,6 +54,21 @@ namespace DProject.Manager.System
                     }
                     break;
                 case ShaderManager.RenderTarget.Reflection:
+                    foreach (var entity in ActiveEntities)
+                    {
+                        var model = _modelMapper.Get(entity);
+                        var transform = _transformMapper.Get(entity);
+
+                        foreach (var mesh in model.Model.Meshes)
+                        {
+                            if (CameraSystem.ActiveLens.ReflectionBoundingFrustum.Intersects(mesh.BoundingSphere.Transform(transform.WorldMatrix)))
+                            {
+                                _shaderManager.PropEffect.World = transform.WorldMatrix;
+                                DrawMesh(_shaderManager.PropEffect, mesh.MeshParts, _graphicsDevice);
+                            }
+                        }
+                    }
+                    break;
                 case ShaderManager.RenderTarget.Refraction:
                 case ShaderManager.RenderTarget.Final:
                     foreach (var entity in ActiveEntities)
@@ -61,11 +76,13 @@ namespace DProject.Manager.System
                         var model = _modelMapper.Get(entity);
                         var transform = _transformMapper.Get(entity);
 
-                        foreach (var mesh in model.Model.Meshes.Where(mesh =>
-                            CameraSystem.ActiveLens.BoundingFrustum.Intersects(mesh.BoundingSphere.Transform(transform.WorldMatrix))))
+                        foreach (var mesh in model.Model.Meshes)
                         {
-                            _shaderManager.PropEffect.World = transform.WorldMatrix;
-                            DrawMesh(_shaderManager.PropEffect, mesh.MeshParts, _graphicsDevice);
+                            if (CameraSystem.ActiveLens.BoundingFrustum.Intersects(mesh.BoundingSphere.Transform(transform.WorldMatrix)))
+                            {
+                                _shaderManager.PropEffect.World = transform.WorldMatrix;
+                                DrawMesh(_shaderManager.PropEffect, mesh.MeshParts, _graphicsDevice);
+                            }
                         }
                     }
                     break;
@@ -73,7 +90,7 @@ namespace DProject.Manager.System
                     return;
             }
         }
-        
+
         private static void DrawMesh(Effect effect, ModelMeshPartCollection meshParts, GraphicsDevice graphicsDevice)
         {
             foreach (var meshPart in meshParts)

@@ -51,6 +51,15 @@ $if platform=DesktopGL
 /processorParam:DebugMode=Auto
 /build:shaders/WaterShader.fx
 
+#begin shaders/FXAAShader.fx
+/importer:EffectImporter
+/processor:RemoteEffectProcessor
+/processorParam:RemoteAddress=192.168.1.108
+/processorParam:RemotePort=8001
+/processorParam:Protocol=http
+/processorParam:DebugMode=Auto
+/build:shaders/FXAAShader.fx
+
 $endif
 
 $if platform=Windows
@@ -78,6 +87,12 @@ $if platform=Windows
 /processor:EffectProcessor
 /processorParam:DebugMode=Auto
 /build:shaders/WaterShader.fx
+
+#begin shaders/FXAAShader.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:shaders/FXAAShader.fx
 
 $endif
 

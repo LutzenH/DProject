@@ -1,6 +1,7 @@
 using DProject.Game;
 using DProject.Manager.System;
 using DProject.Manager.System.Ports;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended.Entities;
@@ -40,7 +41,16 @@ namespace DProject.Manager.World
             _entityFactory.World = World;
             _entityFactory.CreateGameTime();
             _entityFactory.CreateFlyCamera();
-            _entityFactory.CreateProp();
+            
+
+            for (int x = 0; x < 25; x++)
+            {
+                for (int y = 0; y < 25; y++)
+                {
+                    _entityFactory.CreateProp(new Vector3(x * 2, 5, y * 2), (ushort) ((x*y+x+y)%11+2));
+                }
+            }
+            
             _entityFactory.CreateWaterPlane();
         }
     }
