@@ -48,7 +48,9 @@ namespace DProject.Manager.World
             
             _entityFactory.CreateProp(new Vector3(0, 5, 0), 10);
 
-            //_entityFactory.CreateWaterPlane();
+            _entityFactory.CreateWaterPlane(Vector2.Zero, new Vector2(4096, 4096));
+            _entityFactory.CreateWaterPlane(new Vector2(-4096, 0), new Vector2(4096, 4096));
+
             _entityFactory.CreateTerrainEntity();
         }
     }

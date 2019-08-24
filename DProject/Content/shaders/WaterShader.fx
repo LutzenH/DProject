@@ -3,8 +3,8 @@
 	#define VS_SHADERMODEL vs_3_0
 	#define PS_SHADERMODEL ps_3_0
 #else
-	#define VS_SHADERMODEL vs_4_0_level_9_3
-	#define PS_SHADERMODEL ps_4_0_level_9_3
+	#define VS_SHADERMODEL vs_4_0
+	#define PS_SHADERMODEL ps_4_0
 #endif
 
 float4x4 World;
@@ -114,6 +114,10 @@ float4 MainPS(VertexShaderOutput input) : COLOR
     float2 reflectionndc = float2(ndc.x, ndc.y);
     
     float2 regularndc = float2(ndc.x, -ndc.y);
+    
+    float visibilitystencil = tex2D(refractionSampler, regularndc).a - 0.001;
+    clip(visibilitystencil);
+    
     float2 refractionndc = regularndc;
         
     float2 distortion = (tex2D(dudvSampler, float2(input.TextureCoordinate.x + RelativeGameTime * WaterSpeed,  input.TextureCoordinate.y)).rg * 2.0 - 1.0) * DistortionIntensity;
@@ -146,7 +150,7 @@ float4 MainPS(VertexShaderOutput input) : COLOR
     float waterEdgeFactor = smoothstep(0.0, 1.0, waterDepthFactor / foamDistance);
 
     color = lerp(float4(1,1,1,1), color, waterEdgeFactor);
-
+    
 	return color;
 }
 

@@ -122,3 +122,8 @@ $endif
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:shaders/water_dudv.png
+
+#begin textures/terrain/*
+/copy:textures/terrain/terrain-diffuse.png
+/copy:textures/terrain/terrain-height.png
+/copy:textures/terrain/terrain-normal.png

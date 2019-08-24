@@ -10,7 +10,7 @@ namespace DProject.Game
 {
     public class EntityFactory
     {
-        public const float WaterPlaneHeight = 3f;
+        public const float WaterPlaneHeight = 96f;
 
         public World World { get; set; }
         
@@ -54,17 +54,17 @@ namespace DProject.Game
             return entity;
         }
 
-        public Entity CreateWaterPlane()
+        public Entity CreateWaterPlane(Vector2 position, Vector2 size)
         {
             var entity = World.CreateEntity();
             
             entity.Attach(new TransformComponent()
             {
-                Position = new Vector3(0, WaterPlaneHeight, 0)
+                Position = new Vector3(position.X, WaterPlaneHeight, position.Y)
             });
             entity.Attach(new WaterPlaneComponent()
             {
-                Size = new Vector2(1024, 1024)
+                Size = size
             });
 
             return entity;

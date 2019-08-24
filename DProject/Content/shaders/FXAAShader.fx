@@ -37,8 +37,8 @@ THE SOFTWARE.
 	#define PS_SHADERMODEL ps_3_0
 	#define FXAA_HLSL_3 1
 #else
-	#define VS_SHADERMODEL vs_4_0_level_9_3
-	#define PS_SHADERMODEL ps_4_0_level_9_3
+	#define VS_SHADERMODEL vs_4_0
+	#define PS_SHADERMODEL ps_4_0
 	#define FXAA_HLSL_3 1
 #endif
 

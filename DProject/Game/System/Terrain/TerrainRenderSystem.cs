@@ -28,6 +28,7 @@ namespace DProject.Manager.System.Terrain
 
         //TODO: Remove this, obviously
         private readonly RasterizerState _rasterizerState;
+        private readonly RasterizerState _rasterizerState2;
 
         private Vector3 cameraPosition;
         
@@ -39,6 +40,9 @@ namespace DProject.Manager.System.Terrain
             _rasterizerState = new RasterizerState();
             _rasterizerState.FillMode = FillMode.WireFrame;
             
+            _rasterizerState2 = new RasterizerState();
+            _rasterizerState2.FillMode = FillMode.Solid;
+            
             cameraPosition = Vector3.Zero;
         }
 
@@ -49,10 +53,15 @@ namespace DProject.Manager.System.Terrain
 
         public override void Draw(GameTime gameTime)
         {
-            if(!Keyboard.GetState().IsKeyDown(Keys.LeftControl))
+            if (!Keyboard.GetState().IsKeyDown(Keys.LeftControl))
+            {
                 cameraPosition = CameraSystem.ActiveLens.Position;
+            }
 
-            _graphicsDevice.RasterizerState = _rasterizerState;
+            if (Keyboard.GetState().IsKeyDown(Keys.Tab))
+                _graphicsDevice.RasterizerState = _rasterizerState;
+            else
+                _graphicsDevice.RasterizerState = _rasterizerState2;
 
             foreach (var entity in ActiveEntities)
             {
@@ -62,8 +71,21 @@ namespace DProject.Manager.System.Terrain
 
                 switch (_shaderManager.CurrentRenderTarget)
                 {
+                    case ShaderManager.RenderTarget.Depth:
+                        effect = _shaderManager.ClipMapTerrainEffect;
+                        effect.CurrentTechnique = _shaderManager.ClipMapTerrainEffect.Techniques["Depth"];
+                        break;
+                    case ShaderManager.RenderTarget.Reflection:
+                        effect = _shaderManager.ClipMapTerrainEffect;
+                        effect.CurrentTechnique = _shaderManager.ClipMapTerrainEffect.Techniques["Reflection"];
+                        break;
+                    case ShaderManager.RenderTarget.Refraction:
+                        effect = _shaderManager.ClipMapTerrainEffect;
+                        effect.CurrentTechnique = _shaderManager.ClipMapTerrainEffect.Techniques["Refraction"];
+                        break;
                     case ShaderManager.RenderTarget.Final:
                         effect = _shaderManager.ClipMapTerrainEffect;
+                        effect.CurrentTechnique = _shaderManager.ClipMapTerrainEffect.Techniques["BasicColorDrawing"];
                         break;
                     default:
                         return;

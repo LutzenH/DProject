@@ -27,8 +27,8 @@ namespace DProject.Game.Component
         
         public LensComponent()
         {
-            _nearPlaneDistance = 0.1f;
-            _farPlaneDistance = 180f;
+            _nearPlaneDistance = 1f;
+            _farPlaneDistance = 6000f;
             _fieldOfView = 80f;
             
             _position = Vector3.Zero;

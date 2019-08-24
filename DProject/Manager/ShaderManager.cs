@@ -1,4 +1,7 @@
 using System.Collections.Generic;
+using System.IO;
+using System.Drawing;
+using System.Drawing.Imaging;
 using DProject.Game.Component;
 using DProject.Type.Rendering.Shaders;
 using DProject.Type.Rendering.Shaders.Interface;
@@ -32,6 +35,8 @@ namespace DProject.Manager
 
         public RenderTarget CurrentRenderTarget;
 
+        private GraphicsDevice _graphicsDevice;
+
         public ShaderManager()
         {
             _effects = new List<Effect>();
@@ -39,6 +44,7 @@ namespace DProject.Manager
 
         public void Initialize(GraphicsDevice graphicsDevice)
         {
+            _graphicsDevice = graphicsDevice;
             CreateBuffers(graphicsDevice, false);
         }
 
@@ -97,6 +103,9 @@ namespace DProject.Manager
             _effects.Add(_clipMapTerrainEffect);
             _effects.Add(_fxaaEffect);
             
+            _clipMapTerrainEffect.Diffuse = ConvertToTexture(new Bitmap(Game1.RootDirectory + "textures/terrain/terrain-diffuse.png"), _graphicsDevice);
+            _clipMapTerrainEffect.Heightmap = ConvertToTexture(new Bitmap(Game1.RootDirectory + "textures/terrain/terrain-height.png"), _graphicsDevice);
+            _clipMapTerrainEffect.NormalMap = ConvertToTexture(new Bitmap(Game1.RootDirectory + "textures/terrain/terrain-normal.png"), _graphicsDevice);
             _waterEffect.DuDvTexture = content.Load<Texture2D>("shaders/water_dudv");
             
             SetInitiateShaderInfo();
@@ -170,6 +179,10 @@ namespace DProject.Manager
             _fxaaEffect.EdgeThreshold = 0.166f;
             _fxaaEffect.EdgeThresholdMin = 0f;
             _fxaaEffect.CurrentTechnique = _fxaaEffect.Techniques["FXAA"];
+
+            _clipMapTerrainEffect.TextureDimension = new Vector2(1024f, 1024f);
+            _clipMapTerrainEffect.ClipMapOffset = new Vector2(512f,512f);
+            _clipMapTerrainEffect.ClipMapScale = 0.125f;
         }
 
         //Mesh based
@@ -181,5 +194,19 @@ namespace DProject.Manager
         
         //Screen based
         public FXAAEffect FXAAEffect => _fxaaEffect ?? throw new ContentLoadException("The FXAAEffect shader has not been loaded yet.");
+        
+        private static Texture2D ConvertToTexture(Bitmap bitmap, GraphicsDevice graphicsDevice)
+        {
+            Texture2D texture2D;
+            
+            using (var memoryStream = new MemoryStream())
+            {
+                bitmap.Save(memoryStream, ImageFormat.Png);
+                memoryStream.Seek(0, SeekOrigin.Begin);
+                texture2D = Texture2D.FromStream(graphicsDevice, memoryStream);
+            }
+            
+            return texture2D;
+        }
     }
 } 

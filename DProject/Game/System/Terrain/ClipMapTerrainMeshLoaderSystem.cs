@@ -337,9 +337,9 @@ namespace DProject.Manager.System.Terrain
             var n = 0;
             
             for(var i = 0; i < clipMapVertResolution * 4; i += 2 ) {
-                indices[ n++ ] = i + 1;
-                indices[ n++ ] = i;
-                indices[ n++ ] = i + 2;
+                indices[n++] = i + 1;
+                indices[n++] = i;
+                indices[n++] = i + 2;
             }
 
             indices[indices.Length - 1 ] = 0;

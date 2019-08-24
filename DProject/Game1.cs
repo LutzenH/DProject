@@ -50,6 +50,7 @@ namespace DProject
             
             _graphics.PreferredBackBufferWidth = ScreenResolutionX;
             _graphics.PreferredBackBufferHeight = ScreenResolutionY;
+            _graphics.GraphicsProfile = GraphicsProfile.HiDef;
 
             _backgroundColor = Color.DarkGray;
 
@@ -182,7 +183,7 @@ namespace DProject
                     GraphicsDevice.SamplerStates[0] = SamplerState.PointWrap;
                     
                     //Clear the screen
-                    GraphicsDevice.Clear(_backgroundColor);
+                    GraphicsDevice.Clear(Color.Transparent);
                     break;
                 case ShaderManager.RenderTarget.Final:
                     //Setup Shaders
