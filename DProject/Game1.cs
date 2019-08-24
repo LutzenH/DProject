@@ -57,7 +57,7 @@ namespace DProject
             _graphics.SynchronizeWithVerticalRetrace = false;
             
             //Max FPS
-            IsFixedTimeStep = false;
+            IsFixedTimeStep = true;
             TargetElapsedTime = TimeSpan.FromTicks(10000000L / MaxFps);
 
             Window.AllowUserResizing = true;

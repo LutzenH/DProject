@@ -135,17 +135,15 @@ float4 MainPS(VertexShaderOutput input) : COLOR
     float4 depthbufferColor = tex2D(depthSampler, regularndc);
 
     float depth = depthbufferColor.a - distanceToWater;
-    float waterDepthFactor = clamp(depth / MaxWaterDepth, 0.0, 1.0);
+    float waterDepthFactor = clamp(depth / (MaxWaterDepth / FarClip), 0.0, 1.0);
     
     refractionColor = lerp(refractionColor, float4(WaterColor, 1), waterDepthFactor/1.1);
         
     float4 color = lerp(refractionColor, reflectionColor, refractiveFactor);
 
-    float normalDot = clamp(dot(depthbufferColor.xyz, input.Normal), 0.0, 1.0);
+    float foamDistance = lerp(MinimumFoamDistance, MaximumFoamDistance, depthbufferColor.xyz);
 
-    float foamDistance = lerp(MinimumFoamDistance, MaximumFoamDistance, normalDot);
-
-    float waterEdgeFactor = clamp(waterDepthFactor / foamDistance, 0.0, 1.0) > 0.5 ? 1 : 0;
+    float waterEdgeFactor = smoothstep(0.0, 1.0, waterDepthFactor / foamDistance);
 
     color = lerp(float4(1,1,1,1), color, waterEdgeFactor);
 

@@ -17,6 +17,7 @@ namespace DProject.Manager
         private WaterEffect _waterEffect;
         private DepthEffect _depthEffect;
         private PropEffect _propEffect;
+        private ClipMapTerrainEffect _clipMapTerrainEffect;
         
         //Screen based
         private FXAAEffect _fxaaEffect;
@@ -85,12 +86,15 @@ namespace DProject.Manager
             _depthEffect = new DepthEffect(content.Load<Effect>("shaders/DepthShader"));
             _terrainEffect = new TerrainEffect(content.Load<Effect>("shaders/TerrainShader"));
             _propEffect = new PropEffect(content.Load<Effect>("shaders/PropShader"));
+            _clipMapTerrainEffect = new ClipMapTerrainEffect(content.Load<Effect>("shaders/ClipMapTerrainShader"));
+            
             _fxaaEffect = new FXAAEffect(content.Load<Effect>("shaders/FXAAShader"));
             
             _effects.Add(_depthEffect);
             _effects.Add(_terrainEffect);
             _effects.Add(_propEffect);
             _effects.Add(_waterEffect);
+            _effects.Add(_clipMapTerrainEffect);
             _effects.Add(_fxaaEffect);
             
             _waterEffect.DuDvTexture = content.Load<Texture2D>("shaders/water_dudv");
@@ -142,7 +146,7 @@ namespace DProject.Manager
         public void SetInitiateShaderInfo()
         {
             //Water
-            _waterEffect.MaxWaterDepth = 0.05f;
+            _waterEffect.MaxWaterDepth = 50f;
             _waterEffect.DuDvTiling = 20.0f;
             _waterEffect.DistortionIntensity = 0.03f;
             _waterEffect.FresnelIntensity = 2.0f;
@@ -173,7 +177,8 @@ namespace DProject.Manager
         public WaterEffect WaterEffect => _waterEffect ?? throw new ContentLoadException("The WaterEffect shader has not been loaded yet.");
         public DepthEffect DepthEffect => _depthEffect ?? throw new ContentLoadException("The DepthEffect shader has not been loaded yet.");
         public PropEffect PropEffect => _propEffect ?? throw new ContentLoadException("The TerrainEffect shader has not been loaded yet.");
-
+        public ClipMapTerrainEffect ClipMapTerrainEffect => _clipMapTerrainEffect ?? throw new ContentLoadException("The ClipMapTerrainEffect shader has not been loaded yet.");
+        
         //Screen based
         public FXAAEffect FXAAEffect => _fxaaEffect ?? throw new ContentLoadException("The FXAAEffect shader has not been loaded yet.");
     }

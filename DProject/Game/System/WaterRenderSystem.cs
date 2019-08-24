@@ -1,4 +1,5 @@
 using DProject.Game.Component;
+using DProject.Manager.System.Terrain;
 using DProject.Type.Rendering;
 using DProject.Type.Rendering.Shaders;
 using Microsoft.Xna.Framework;
@@ -51,7 +52,9 @@ namespace DProject.Manager.System
                         return;
                 }
 
+                //TODO: This only needs to happen once and not every draw-call.
                 _vertexBuffer.SetData(waterPlane.VertexList);
+                
                 _graphicsDevice.SetVertexBuffer(_vertexBuffer);
                 
                 foreach (var pass in effect.CurrentTechnique.Passes)

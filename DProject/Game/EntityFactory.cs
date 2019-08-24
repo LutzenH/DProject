@@ -1,5 +1,6 @@
 using DProject.Game.Component;
 using DProject.Game.Component.Ports;
+using DProject.Game.Component.Terrain;
 using DProject.Type.Serializable.Chunk;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -91,6 +92,15 @@ namespace DProject.Game
                         float.MaxValue, 
                         position.Z + heightmap.GetLength(1) - 1))
             });
+
+            return entity;
+        }
+
+        public Entity CreateTerrainEntity()
+        {
+            var entity = World.CreateEntity();
+            
+            entity.Attach(new ClipMapTerrainComponent());
 
             return entity;
         }

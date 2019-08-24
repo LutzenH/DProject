@@ -1,6 +1,7 @@
 using DProject.Game;
 using DProject.Manager.System;
 using DProject.Manager.System.Ports;
+using DProject.Manager.System.Terrain;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -29,10 +30,13 @@ namespace DProject.Manager.World
             AddSystem(new ModelRenderSystem(graphicsDevice, shaderManager));
             
             //Terrain
-            AddSystem(new ChunkLoaderSystem(_entityFactory));
-            AddSystem(new HeightmapLoaderSystem(graphicsDevice));
-            AddSystem(new HeightmapRenderSystem(graphicsDevice, shaderManager));
+            //AddSystem(new ChunkLoaderSystem(_entityFactory));
+            //AddSystem(new HeightmapLoaderSystem(graphicsDevice));
+            //AddSystem(new HeightmapRenderSystem(graphicsDevice, shaderManager));
 
+            AddSystem(new ClipMapTerrainMeshLoaderSystem(graphicsDevice));
+            AddSystem(new TerrainRenderSystem(graphicsDevice, shaderManager));
+            
             //Water
             AddSystem(new WaterRenderSystem(graphicsDevice, shaderManager));
             
@@ -44,7 +48,8 @@ namespace DProject.Manager.World
             
             _entityFactory.CreateProp(new Vector3(0, 5, 0), 10);
 
-            _entityFactory.CreateWaterPlane();
+            //_entityFactory.CreateWaterPlane();
+            _entityFactory.CreateTerrainEntity();
         }
     }
 }

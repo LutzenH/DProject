@@ -61,7 +61,7 @@ namespace DProject.Game.Component
             }
         }
 
-        private static Matrix CalculateWorldMatrix(Vector3 position, Vector3 scale, Quaternion rotation)
+        public static Matrix CalculateWorldMatrix(Vector3 position, Vector3 scale, Quaternion rotation)
         {
             return Matrix.CreateFromQuaternion(rotation) * Matrix.CreateScale(scale) * Matrix.CreateTranslation(position);
         }
