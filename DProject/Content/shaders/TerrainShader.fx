@@ -3,8 +3,8 @@
 	#define VS_SHADERMODEL vs_3_0
 	#define PS_SHADERMODEL ps_3_0
 #else
-	#define VS_SHADERMODEL vs_4_0_level_9_3
-	#define PS_SHADERMODEL ps_4_0_level_9_3
+	#define VS_SHADERMODEL vs_4_0
+	#define PS_SHADERMODEL ps_4_0
 #endif
 
 float4x4 World;
@@ -71,13 +71,13 @@ VertexShaderOutput ReflectionVS(in VertexShaderInput input)
 
 float4 ReflectionPS(VertexShaderOutput input) : COLOR
 {
-    clip(input.VertexHeight.x - WaterHeight - WaterHeight);
+    clip(input.VertexHeight.x - WaterHeight);
 	return MainPS(input);
 }
 
 float4 RefractionPS(VertexShaderOutput input) : COLOR
 {
-    clip(WaterHeight - input.VertexHeight.x + WaterHeight);
+    clip(WaterHeight - input.VertexHeight.x);
 	return MainPS(input);
 }
 

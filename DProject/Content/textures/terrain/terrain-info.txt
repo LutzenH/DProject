@@ -1,0 +1,5 @@
+The following files are required:
+
+terrain-diffuse.png (4K)
+terrain-height.png (4K)
+terrain-normal.png (8K)

@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace DProject.Type.Rendering.Shaders
 {
-    public class WaterEffect : AbstractEffect, IReflective
+    public class WaterEffect : AbstractEffect, IReflective, INeedClipPlanes
     {
         public WaterEffect(Effect cloneSource) : base(cloneSource) { }
 

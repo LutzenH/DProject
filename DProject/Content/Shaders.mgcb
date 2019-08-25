@@ -51,6 +51,24 @@ $if platform=DesktopGL
 /processorParam:DebugMode=Auto
 /build:shaders/WaterShader.fx
 
+#begin shaders/FXAAShader.fx
+/importer:EffectImporter
+/processor:RemoteEffectProcessor
+/processorParam:RemoteAddress=192.168.1.108
+/processorParam:RemotePort=8001
+/processorParam:Protocol=http
+/processorParam:DebugMode=Auto
+/build:shaders/FXAAShader.fx
+
+#begin shaders/ClipMapTerrainShader.fx
+/importer:EffectImporter
+/processor:RemoteEffectProcessor
+/processorParam:RemoteAddress=192.168.1.108
+/processorParam:RemotePort=8001
+/processorParam:Protocol=http
+/processorParam:DebugMode=Auto
+/build:shaders/ClipMapTerrainShader.fx
+
 $endif
 
 $if platform=Windows
@@ -79,6 +97,18 @@ $if platform=Windows
 /processorParam:DebugMode=Auto
 /build:shaders/WaterShader.fx
 
+#begin shaders/FXAAShader.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:shaders/FXAAShader.fx
+
+#begin shaders/ClipMapTerrainShader.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:shaders/ClipMapTerrainShader.fx
+
 $endif
 
 #begin shaders/water_dudv.png
@@ -92,3 +122,8 @@ $endif
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:shaders/water_dudv.png
+
+#begin textures/terrain/*
+/copy:textures/terrain/terrain-diffuse.png
+/copy:textures/terrain/terrain-height.png
+/copy:textures/terrain/terrain-normal.png

@@ -2,10 +2,9 @@ using System;
 using System.Drawing;
 using System.Collections.Generic;
 using BitMiracle.LibTiff.Classic;
-using DProject.Entity.Chunk;
 using DProject.List;
+using DProject.Manager.System;
 using DProject.Type.Enum;
-using DProject.Type.Rendering;
 using DProject.Type.Serializable.Chunk;
 using Microsoft.Xna.Framework;
 using Object = DProject.Type.Serializable.Chunk.Object;
@@ -35,21 +34,21 @@ namespace DProject.Type
             var width = heightMap.GetLength(0);
             var height = heightMap.GetLength(1);
             
-            if (width % ChunkLoaderEntity.ChunkSize == 1 
-                && height % ChunkLoaderEntity.ChunkSize == 1)
+            if (width % ChunkLoaderSystem.ChunkSize == 1 
+                && height % ChunkLoaderSystem.ChunkSize == 1)
             {
-                for (var chunkX = 0; chunkX < (width - 1) / ChunkLoaderEntity.ChunkSize; chunkX++)
+                for (var chunkX = 0; chunkX < (width - 1) / ChunkLoaderSystem.ChunkSize; chunkX++)
                 {
-                    for (var chunkY = 0; chunkY < (height - 1) / ChunkLoaderEntity.ChunkSize; chunkY++)
+                    for (var chunkY = 0; chunkY < (height - 1) / ChunkLoaderSystem.ChunkSize; chunkY++)
                     {
-                        var subHeightMap = new ushort[ChunkLoaderEntity.ChunkSize + 1, ChunkLoaderEntity.ChunkSize + 1];
+                        var subHeightMap = new ushort[ChunkLoaderSystem.ChunkSize + 1, ChunkLoaderSystem.ChunkSize + 1];
                         
-                        for (var xPix = 0; xPix < ChunkLoaderEntity.ChunkSize + 1; xPix++)
+                        for (var xPix = 0; xPix < ChunkLoaderSystem.ChunkSize + 1; xPix++)
                         {
-                            for (var yPix = 0; yPix < ChunkLoaderEntity.ChunkSize + 1; yPix++)
+                            for (var yPix = 0; yPix < ChunkLoaderSystem.ChunkSize + 1; yPix++)
                             {
-                                var xPixel = xPix + ChunkLoaderEntity.ChunkSize * chunkX;
-                                var yPixel = yPix + ChunkLoaderEntity.ChunkSize * chunkY;
+                                var xPixel = xPix + ChunkLoaderSystem.ChunkSize * chunkX;
+                                var yPixel = yPix + ChunkLoaderSystem.ChunkSize * chunkY;
                                 
                                 subHeightMap[xPix, yPix] = heightMap[xPixel, yPixel];
                             }
@@ -59,19 +58,19 @@ namespace DProject.Type
 
                         if (hasSplatInfo)
                         {
-                            var splatMap = new ushort[ChunkLoaderEntity.ChunkSize + 1, ChunkLoaderEntity.ChunkSize + 1];
+                            var splatMap = new ushort[ChunkLoaderSystem.ChunkSize + 1, ChunkLoaderSystem.ChunkSize + 1];
 
                             var color1 = (ushort) splatColor1Id;
                             var color2 = (ushort) splatColor2Id;
                             var color3 = (ushort) splatColor3Id;
                             var color4 = (ushort) splatColor4Id;
                             
-                            for (var xPix = 0; xPix < ChunkLoaderEntity.ChunkSize + 1; xPix++)
+                            for (var xPix = 0; xPix < ChunkLoaderSystem.ChunkSize + 1; xPix++)
                             {
-                                for (var yPix = 0; yPix < ChunkLoaderEntity.ChunkSize + 1; yPix++)
+                                for (var yPix = 0; yPix < ChunkLoaderSystem.ChunkSize + 1; yPix++)
                                 {
-                                    var xPixel = xPix + ChunkLoaderEntity.ChunkSize * chunkX;
-                                    var yPixel = yPix + ChunkLoaderEntity.ChunkSize * chunkY;
+                                    var xPixel = xPix + ChunkLoaderSystem.ChunkSize * chunkX;
+                                    var yPixel = yPix + ChunkLoaderSystem.ChunkSize * chunkY;
 
                                     var pixel = splat.GetPixel(xPixel, yPixel);
                                     
@@ -96,10 +95,10 @@ namespace DProject.Type
                                 }
                             }
                             
-                            vertexMap = HeightMap.GenerateVertexMap(subHeightMap, splatMap);
+                            vertexMap = HeightmapLoaderSystem.GenerateVertexMap(subHeightMap, splatMap);
                         }
                         else
-                            vertexMap = HeightMap.GenerateVertexMap(subHeightMap);
+                            vertexMap = HeightmapLoaderSystem.GenerateVertexMap(subHeightMap);
 
                         var chunkData = new ChunkData()
                         {

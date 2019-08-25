@@ -1,5 +1,4 @@
 ﻿using System;
-using DProject.Manager.Entity;
 
 namespace DProject
 {
@@ -8,7 +7,7 @@ namespace DProject
         [STAThread]
         public static void Main(string[] args)
         {
-            using (var game = new Game1(new GameEntityManager()))
+            using (var game = new Game1())
                 game.Run();
         }
     }

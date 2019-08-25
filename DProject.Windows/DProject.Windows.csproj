@@ -32,6 +32,8 @@
     <PackageReference Include="LibNoise" Version="0.2.0" />
     <PackageReference Include="MessagePack" Version="1.7.3.4" />
     <PackageReference Include="MonoGame.Content.Builder" Version="3.7.0.9" />
+    <PackageReference Include="MonoGame.Extended" Version="3.6.0-beta0001" />
+    <PackageReference Include="MonoGame.Extended.Entities" Version="3.6.0-beta0001" />
     <PackageReference Include="MonoGame.Framework.WindowsDX" Version="3.7.1.189" />
   </ItemGroup>
 
