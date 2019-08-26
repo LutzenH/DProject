@@ -102,7 +102,7 @@ namespace DProject.Manager.System.Terrain
                 foreach (var pass in effect.CurrentTechnique.Passes)
                 {
                     pass.Apply();
-                    _graphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, terrain.CrossIndexBuffer.IndexCount);
+                    _graphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0,  terrain.CrossIndexBuffer.IndexCount/3);
                 }
                 
                 for(var l = 0; l < ClipMapLevels; l++ ) {
@@ -136,7 +136,7 @@ namespace DProject.Manager.System.Terrain
                             foreach (var pass in effect.CurrentTechnique.Passes)
                             {
                                 pass.Apply();
-                                _graphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, terrain.TileIndexBuffer.IndexCount);
+                                _graphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0,  terrain.TileIndexBuffer.IndexCount/3);
                             }
                         }
                     }
@@ -148,7 +148,7 @@ namespace DProject.Manager.System.Terrain
                     foreach (var pass in effect.CurrentTechnique.Passes)
                     {
                         pass.Apply();
-                        _graphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, terrain.FillerIndexBuffer.IndexCount);
+                        _graphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0,  terrain.FillerIndexBuffer.IndexCount/3);
                     }
                     
                     if(l != ClipMapLevels - 1 ) {
@@ -166,7 +166,7 @@ namespace DProject.Manager.System.Terrain
                         foreach (var pass in effect.CurrentTechnique.Passes)
                         {
                             pass.Apply();
-                            _graphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, terrain.SeamIndexBuffer.IndexCount);
+                            _graphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0,  terrain.SeamIndexBuffer.IndexCount/3);
                         }
 
                         // +0.5 because the mesh is offset by half a unit to make rotations simpler
@@ -185,7 +185,7 @@ namespace DProject.Manager.System.Terrain
                         foreach (var pass in effect.CurrentTechnique.Passes)
                         {
                             pass.Apply();
-                            _graphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, terrain.TrimIndexBuffer.IndexCount);
+                            _graphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0,  terrain.TrimIndexBuffer.IndexCount/3);
                         }
                     }
                 }
