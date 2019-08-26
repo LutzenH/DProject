@@ -13,61 +13,13 @@
 
 $if platform=DesktopGL
 
-/reference:../../../../../.nuget/packages/infinitespacestudios.pipeline/1.0.9/tools/InfinitespaceStudios.Pipeline.dll
-
-#begin shaders/DepthShader.fx
-/importer:EffectImporter
-/processor:RemoteEffectProcessor
-/processorParam:RemoteAddress=192.168.1.108
-/processorParam:RemotePort=8001
-/processorParam:Protocol=http
-/processorParam:DebugMode=Auto
-/build:shaders/DepthShader.fx
-
-#begin shaders/PropShader.fx
-/importer:EffectImporter
-/processor:RemoteEffectProcessor
-/processorParam:RemoteAddress=192.168.1.108
-/processorParam:RemotePort=8001
-/processorParam:Protocol=http
-/processorParam:DebugMode=Auto
-/build:shaders/PropShader.fx
-
-#begin shaders/TerrainShader.fx
-/importer:EffectImporter
-/processor:RemoteEffectProcessor
-/processorParam:RemoteAddress=192.168.1.108
-/processorParam:RemotePort=8001
-/processorParam:Protocol=http
-/processorParam:DebugMode=Auto
-/build:shaders/TerrainShader.fx
-
-#begin shaders/WaterShader.fx
-/importer:EffectImporter
-/processor:RemoteEffectProcessor
-/processorParam:RemoteAddress=192.168.1.108
-/processorParam:RemotePort=8001
-/processorParam:Protocol=http
-/processorParam:DebugMode=Auto
-/build:shaders/WaterShader.fx
-
-#begin shaders/FXAAShader.fx
-/importer:EffectImporter
-/processor:RemoteEffectProcessor
-/processorParam:RemoteAddress=192.168.1.108
-/processorParam:RemotePort=8001
-/processorParam:Protocol=http
-/processorParam:DebugMode=Auto
-/build:shaders/FXAAShader.fx
-
-#begin shaders/ClipMapTerrainShader.fx
-/importer:EffectImporter
-/processor:RemoteEffectProcessor
-/processorParam:RemoteAddress=192.168.1.108
-/processorParam:RemotePort=8001
-/processorParam:Protocol=http
-/processorParam:DebugMode=Auto
-/build:shaders/ClipMapTerrainShader.fx
+#begin shaders/*
+/copy:shaders/ClipMapTerrainShader
+/copy:shaders/DepthShader
+/copy:shaders/FXAAShader
+/copy:shaders/PropShader
+/copy:shaders/TerrainShader
+/copy:shaders/WaterShader
 
 $endif
 

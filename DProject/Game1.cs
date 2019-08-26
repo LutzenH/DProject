@@ -12,6 +12,8 @@ namespace DProject
     {
         public const int MaxFps = 120;
         public const string RootDirectory = "Content/";
+        
+        private static bool _enableFXAA = false;
 
         private readonly GraphicsDeviceManager _graphics;
         
@@ -123,20 +125,21 @@ namespace DProject
             DrawSceneToRenderTarget(ShaderManager.RenderTarget.Final, gameTime);
             
             //TODO: Make FXAA Work on DirectX based-platforms.
-#if LINUX
-            GraphicsDevice.SetRenderTarget(null);
+            if (_enableFXAA)
+            {
+                GraphicsDevice.SetRenderTarget(null);
 
-            try
-            {
-                _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, SamplerState.LinearClamp, DepthStencilState.None, null, _shaderManager.FXAAEffect, Matrix.Identity);
-                _spriteBatch.Draw(_shaderManager.PreFinalBuffer, GraphicsDevice.Viewport.Bounds, Color.White);
+                try
+                {
+                    _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, SamplerState.LinearClamp, DepthStencilState.None, null, _shaderManager.FXAAEffect, Matrix.Identity);
+                    _spriteBatch.Draw(_shaderManager.PreFinalBuffer, GraphicsDevice.Viewport.Bounds, Color.White);
+                }
+                finally
+                {
+                    _spriteBatch.End();
+                }
             }
-            finally
-            {
-                _spriteBatch.End();
-            }
-#endif
-            
+
             base.Draw(gameTime);
             
             _fps++;
@@ -191,11 +194,8 @@ namespace DProject
                     _shaderManager.PropEffect.CurrentTechnique = _shaderManager.PropEffect.Techniques[0];
 
                     // Set the render target
-#if LINUX
-                    GraphicsDevice.SetRenderTarget(_shaderManager.PreFinalBuffer);
-#else
-                    GraphicsDevice.SetRenderTarget(null);
-#endif
+                    GraphicsDevice.SetRenderTarget(_enableFXAA ? _shaderManager.PreFinalBuffer : null);
+                    
                     GraphicsDevice.BlendState = BlendState.Opaque;
                     GraphicsDevice.DepthStencilState = DepthStencilState.Default;
                     GraphicsDevice.SamplerStates[0] = SamplerState.PointWrap;
