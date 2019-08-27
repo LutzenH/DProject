@@ -321,8 +321,8 @@ namespace DProject.Manager.System.Terrain
             for(var i = 0; i < clipMapVertResolution; i++) {
                 vertices[clipMapVertResolution * 0 + i] = new VertexPosition(new Vector3(i, 0, 0));
                 vertices[clipMapVertResolution * 1 + i] = new VertexPosition(new Vector3(clipMapVertResolution, 0, i));
-                vertices[clipMapVertResolution * 2 + i] = new VertexPosition(new Vector3(clipMapVertResolution - 1, 0, clipMapVertResolution));
-                vertices[clipMapVertResolution * 3 + i] = new VertexPosition(new Vector3(0, 0, clipMapVertResolution - 1));
+                vertices[clipMapVertResolution * 2 + i] = new VertexPosition(new Vector3(clipMapVertResolution - i, 0, clipMapVertResolution));
+                vertices[clipMapVertResolution * 3 + i] = new VertexPosition(new Vector3(0, 0, clipMapVertResolution - i));
             }
 
             return vertices;
