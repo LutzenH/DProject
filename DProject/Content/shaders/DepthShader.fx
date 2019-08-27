@@ -1,12 +1,3 @@
-﻿#if OPENGL
-	#define SV_POSITION POSITION
-	#define VS_SHADERMODEL vs_3_0
-	#define PS_SHADERMODEL ps_3_0
-#else
-	#define VS_SHADERMODEL vs_4_0
-	#define PS_SHADERMODEL ps_4_0
-#endif
-
 float4x4 World;
 float4x4 View;
 float4x4 Projection;
@@ -53,7 +44,7 @@ technique BasicColorDrawing
 {
 	pass P0
 	{
-		VertexShader = compile VS_SHADERMODEL MainVS();
-		PixelShader = compile PS_SHADERMODEL MainPS();
+		VertexShader = compile vs_3_0 MainVS();
+		PixelShader = compile ps_3_0 MainPS();
 	}
 };
