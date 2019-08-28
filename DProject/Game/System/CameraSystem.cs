@@ -49,6 +49,9 @@ namespace DProject.Manager.System
             if (Keyboard.GetState().IsKeyDown(Keys.E))
                 translation -= new Vector3(0, moveSpeed, 0);
 
+            if (!lens.CustomAspectRatio)
+                lens.AspectRatio = LensComponent.CalculateAspectRatio(Game1.ScreenResolutionX, Game1.ScreenResolutionY);
+                
             lens.Position += translation;
 
             if (Mouse.GetState().MiddleButton == ButtonState.Pressed)

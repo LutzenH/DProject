@@ -63,7 +63,7 @@ namespace DProject.Manager
                 graphicsDevice.PresentationParameters.BackBufferWidth,
                 graphicsDevice.PresentationParameters.BackBufferHeight,
                 false,
-                graphicsDevice.PresentationParameters.BackBufferFormat,
+                SurfaceFormat.Color,
                 DepthFormat.Depth24);
             
             RefractionBuffer = new RenderTarget2D(
@@ -71,7 +71,7 @@ namespace DProject.Manager
                 graphicsDevice.PresentationParameters.BackBufferWidth,
                 graphicsDevice.PresentationParameters.BackBufferHeight,
                 false,
-                graphicsDevice.PresentationParameters.BackBufferFormat,
+                SurfaceFormat.Color,
                 DepthFormat.Depth24);
             
             PreFinalBuffer = new RenderTarget2D(
@@ -79,7 +79,7 @@ namespace DProject.Manager
                 graphicsDevice.PresentationParameters.BackBufferWidth,
                 graphicsDevice.PresentationParameters.BackBufferHeight,
                 false,
-                graphicsDevice.PresentationParameters.BackBufferFormat,
+                SurfaceFormat.Color,
                 DepthFormat.Depth24);
             
             if(updateShaders)
