@@ -23,9 +23,6 @@ namespace DProject
         private SpriteBatch _spriteBatch;
 
         private static Color _backgroundColor;
-        
-        public static KeyboardState PreviousKeyboardState;
-        public static MouseState PreviousMouseState;
 
         public static int ScreenResolutionX;
         public static int ScreenResolutionY;
@@ -96,6 +93,8 @@ namespace DProject
 
         protected override void Update(GameTime gameTime)
         {
+            InputManager.Update();
+            
             if ((DateTime.Now - _last).TotalMilliseconds >= 1000)
             {
                 _lastRecordedFps = _fps;
@@ -107,9 +106,6 @@ namespace DProject
 
             _worldBuilder.World.Update(gameTime);
 
-            PreviousKeyboardState = Keyboard.GetState();
-            PreviousMouseState = Mouse.GetState();
-            
             base.Update(gameTime);
         }
 

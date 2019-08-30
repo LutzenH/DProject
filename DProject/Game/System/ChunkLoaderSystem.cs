@@ -48,12 +48,12 @@ namespace DProject.Manager.System
             _chunkPosition = CalculateChunkPosition(CameraSystem.ActiveLens.Position);
 
             //TODO: Move the ability to change the render distance somewhere else.
-            if (Keyboard.GetState().IsKeyUp(Keys.OemMinus) && Game1.PreviousKeyboardState.IsKeyDown(Keys.OemMinus))
+            if (InputManager.IsInputPressed(Input.DebugDecreaseViewDistance))
             {
                 _loadDistance--;
                 LoadChunks(_chunkPosition);
             }
-            else if (Keyboard.GetState().IsKeyUp(Keys.OemPlus) && Game1.PreviousKeyboardState.IsKeyDown(Keys.OemPlus))
+            else if (InputManager.IsInputPressed(Input.DebugIncreaseViewDistance))
             {
                 _loadDistance++;
                 LoadChunks(_chunkPosition);
