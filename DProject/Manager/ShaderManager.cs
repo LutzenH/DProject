@@ -3,6 +3,7 @@ using System.IO;
 using System.Drawing;
 using System.Drawing.Imaging;
 using DProject.Game.Component;
+using DProject.Type.Rendering;
 using DProject.Type.Rendering.Shaders;
 using DProject.Type.Rendering.Shaders.Interface;
 using Microsoft.Xna.Framework;
@@ -24,6 +25,7 @@ namespace DProject.Manager
         
         //Screen based
         private FXAAEffect _fxaaEffect;
+        private ClipMapEffect _clipMapEffect;
 
         //Rendertargets
         public RenderTarget2D DepthBuffer;
@@ -31,11 +33,13 @@ namespace DProject.Manager
         public RenderTarget2D RefractionBuffer;
         public RenderTarget2D PreFinalBuffer;
         
-        public enum RenderTarget { Depth, Reflection, Refraction, Final }
+        public enum RenderTarget { ClipMap, Depth, Reflection, Refraction, Final }
 
         public RenderTarget CurrentRenderTarget;
 
         private GraphicsDevice _graphicsDevice;
+
+        private FullscreenQuad _fullscreenQuad;
 
         public ShaderManager()
         {
@@ -45,6 +49,8 @@ namespace DProject.Manager
         public void Initialize(GraphicsDevice graphicsDevice)
         {
             _graphicsDevice = graphicsDevice;
+            _fullscreenQuad = new FullscreenQuad(graphicsDevice);
+            
             CreateBuffers(graphicsDevice, false);
         }
 
@@ -95,13 +101,16 @@ namespace DProject.Manager
             _clipMapTerrainEffect = new ClipMapTerrainEffect(content.Load<Effect>("shaders/ClipMapTerrainShader"));
             
             _fxaaEffect = new FXAAEffect(content.Load<Effect>("shaders/FXAAShader"));
+            _clipMapEffect = new ClipMapEffect(content.Load<Effect>("shaders/ClipMapShader"));
             
             _effects.Add(_depthEffect);
             _effects.Add(_terrainEffect);
             _effects.Add(_propEffect);
             _effects.Add(_waterEffect);
             _effects.Add(_clipMapTerrainEffect);
+            
             _effects.Add(_fxaaEffect);
+            _effects.Add(_clipMapEffect);
             
             _clipMapTerrainEffect.Diffuse = ConvertToTexture(new Bitmap(Game1.RootDirectory + "textures/terrain/terrain-diffuse.png"), _graphicsDevice);
             _clipMapTerrainEffect.Heightmap = ConvertToTexture(new Bitmap(Game1.RootDirectory + "textures/terrain/terrain-height.png"), _graphicsDevice);
@@ -180,9 +189,9 @@ namespace DProject.Manager
             _fxaaEffect.EdgeThresholdMin = 0f;
             _fxaaEffect.CurrentTechnique = _fxaaEffect.Techniques["FXAA"];
 
-            _clipMapTerrainEffect.TextureDimension = new Vector2(1024f, 1024f);
-            _clipMapTerrainEffect.ClipMapOffset = new Vector2(512f,512f);
-            _clipMapTerrainEffect.ClipMapScale = 0.125f;
+            _clipMapTerrainEffect.TextureDimension = new Vector2(4096f, 4096f);
+            _clipMapTerrainEffect.ClipMapOffset = new Vector2(2048f, 2048f);
+            _clipMapTerrainEffect.ClipMapScale = 1.0f;
         }
 
         //Mesh based
@@ -194,9 +203,19 @@ namespace DProject.Manager
         
         //Screen based
         public FXAAEffect FXAAEffect => _fxaaEffect ?? throw new ContentLoadException("The FXAAEffect shader has not been loaded yet.");
+        public ClipMapEffect ClipMapEffect => _clipMapEffect ?? throw new ContentLoadException("The ClipMapEffect shader has not been loaded yet.");
+
+        public void DrawFullscreenQuad(Effect effect)
+        {
+            _fullscreenQuad.Draw(effect);
+        }
         
+        //TODO: Remove when ClipMapping is finished.
         private static Texture2D ConvertToTexture(Bitmap bitmap, GraphicsDevice graphicsDevice)
         {
+            if (bitmap == null)
+                return null;
+            
             Texture2D texture2D;
             
             using (var memoryStream = new MemoryStream())

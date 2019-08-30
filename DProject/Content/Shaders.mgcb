@@ -20,6 +20,7 @@ $if platform=DesktopGL
 /copy:shaders/PropShader
 /copy:shaders/TerrainShader
 /copy:shaders/WaterShader
+/copy:shaders/ClipMapShader
 
 $endif
 
@@ -60,6 +61,12 @@ $if platform=Windows
 /processor:EffectProcessor
 /processorParam:DebugMode=Auto
 /build:shaders/ClipMapTerrainShader.fx
+
+#begin shaders/ClipMapShader.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:shaders/ClipMapShader.fx
 
 $endif
 

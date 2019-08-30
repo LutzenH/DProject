@@ -1,6 +1,8 @@
 ﻿using System;
 using DProject.List;
 using DProject.Manager;
+using DProject.Manager.System.Terrain;
+using DProject.Manager.System.Terrain.ClipMap;
 using DProject.Manager.World;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -114,6 +116,7 @@ namespace DProject
             GraphicsDevice.Clear(_backgroundColor);
 
 #if !EDITOR
+            DrawSceneToRenderTarget(ShaderManager.RenderTarget.ClipMap, gameTime);
             DrawSceneToRenderTarget(ShaderManager.RenderTarget.Depth, gameTime);
             DrawSceneToRenderTarget(ShaderManager.RenderTarget.Reflection, gameTime);
             DrawSceneToRenderTarget(ShaderManager.RenderTarget.Refraction, gameTime);      
@@ -136,6 +139,18 @@ namespace DProject
                 }
             }
 
+            try
+            {
+                _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, SamplerState.LinearClamp, DepthStencilState.None, null, null, Matrix.Identity);
+
+                for (var l = 0; l < TerrainRenderSystem.ClipMapLevels; l++)
+                    _spriteBatch.Draw(ClipMapRenderSystem.VisibleRenderTarget[l], new Rectangle(128*l, 0, 128, 128), Color.White);
+            }
+            finally
+            {
+                _spriteBatch.End();
+            }
+            
             base.Draw(gameTime);
             
             _fps++;
@@ -147,6 +162,8 @@ namespace DProject
 
             switch (_shaderManager.CurrentRenderTarget)
             {
+                case ShaderManager.RenderTarget.ClipMap:
+                    break;
                 case ShaderManager.RenderTarget.Depth:
                     // Set the render target
                     GraphicsDevice.SetRenderTarget(_shaderManager.DepthBuffer);

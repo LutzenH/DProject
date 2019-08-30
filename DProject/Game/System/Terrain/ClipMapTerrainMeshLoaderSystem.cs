@@ -8,7 +8,7 @@ namespace DProject.Manager.System.Terrain
 {
     public class ClipMapTerrainMeshLoaderSystem : EntityProcessingSystem
     {
-        public const int MeshSize = 48;
+        public const int MeshSize = 64;
 
         private readonly GraphicsDevice _graphicsDevice;
 

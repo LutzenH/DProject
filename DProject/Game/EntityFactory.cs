@@ -1,6 +1,7 @@
 using DProject.Game.Component;
 using DProject.Game.Component.Ports;
 using DProject.Game.Component.Terrain;
+using DProject.Game.Component.Terrain.ClipMap;
 using DProject.Type.Serializable.Chunk;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -23,13 +24,13 @@ namespace DProject.Game
             return entity;
         }
         
-        public Entity CreateFlyCamera()
+        public Entity CreateFlyCamera(Vector3 position)
         {
             var entity = World.CreateEntity();
             
             entity.Attach(new LensComponent()
             {
-                Position = new Vector3(0, 10, 0),
+                Position = position,
                 ReflectionPlaneHeight = WaterPlaneHeight
             });
             
@@ -101,6 +102,18 @@ namespace DProject.Game
             var entity = World.CreateEntity();
             
             entity.Attach(new ClipMapTerrainComponent());
+
+            return entity;
+        }
+
+        public Entity CreateClipMap(ClipMapType type)
+        {
+            var entity = World.CreateEntity();
+            
+            entity.Attach(new ClipMapComponent()
+            {
+                Type = type
+            });
 
             return entity;
         }

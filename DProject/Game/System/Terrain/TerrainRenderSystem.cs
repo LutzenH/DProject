@@ -12,7 +12,7 @@ namespace DProject.Manager.System.Terrain
 {
     public class TerrainRenderSystem : EntityDrawSystem
     {
-        private const int ClipMapLevels = 7;
+        public const int ClipMapLevels = 6;
         
         private static readonly Matrix[] Rotations = {
             Matrix.CreateRotationY(MathHelper.ToRadians(0)),
@@ -54,9 +54,7 @@ namespace DProject.Manager.System.Terrain
         public override void Draw(GameTime gameTime)
         {
             if (!Keyboard.GetState().IsKeyDown(Keys.LeftControl))
-            {
                 cameraPosition = CameraSystem.ActiveLens.Position;
-            }
 
             if (Keyboard.GetState().IsKeyDown(Keys.Tab))
                 _graphicsDevice.RasterizerState = _rasterizerState;
