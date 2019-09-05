@@ -1,3 +1,4 @@
+using DProject.Manager.System.Terrain.ClipMap;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -14,9 +15,14 @@ namespace DProject.Type.Rendering.Terrain
 
         public void Dispose()
         {
-            Diffuse?.Dispose();
-            Height?.Dispose();
-            Normal?.Dispose();
+            if(Diffuse != ClipMapTileLoaderSystem.DiffuseTilePlaceHolder)
+                Diffuse?.Dispose();
+            
+            if(Height != ClipMapTileLoaderSystem.HeightTilePlaceHolder)
+                Height?.Dispose();
+            
+            if(Normal != ClipMapTileLoaderSystem.NormalTilePlaceHolder)
+                Normal?.Dispose();
         }
     }
 }

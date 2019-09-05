@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using DProject.Game.Component.Terrain.ClipMap;
 using DProject.Type.Rendering.Terrain;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -21,6 +22,10 @@ namespace DProject.Manager.System.Terrain.ClipMap
 
         private GraphicsDevice _graphicsDevice;
 
+        public static Texture2D DiffuseTilePlaceHolder;
+        public static Texture2D HeightTilePlaceHolder;
+        public static Texture2D NormalTilePlaceHolder;
+
         public ClipMapTileLoaderSystem(GraphicsDevice graphicsDevice)
         {
             _loadedTiles = new ConcurrentDictionary<(int, int), ClipMapTerrainTile>[TerrainRenderSystem.ClipMapLevels];
@@ -32,6 +37,10 @@ namespace DProject.Manager.System.Terrain.ClipMap
             _lensPosition = new Vector2[TerrainRenderSystem.ClipMapLevels];
 
             _graphicsDevice = graphicsDevice;
+
+            DiffuseTilePlaceHolder = ConvertToTexture(new Bitmap(Game1.RootDirectory + "chunks/diffuse/unloaded.png"), graphicsDevice);
+            HeightTilePlaceHolder = ConvertToTexture(new Bitmap(Game1.RootDirectory + "chunks/height/unloaded.png"), graphicsDevice);
+            NormalTilePlaceHolder = ConvertToTexture(new Bitmap(Game1.RootDirectory + "chunks/normal/unloaded.png"), graphicsDevice);
         }
 
         public override void Update(GameTime gameTime)
@@ -52,11 +61,12 @@ namespace DProject.Manager.System.Terrain.ClipMap
 
         private void LoadTiles(Vector2 lensPosition, int clipMapLevel)
         {
-            var posX = lensPosition.X / (256 * (clipMapLevel+1));
-            var posY = lensPosition.Y / (256 * (clipMapLevel+1));
+            var scale = 256 << clipMapLevel;
+            
+            var posX = lensPosition.X;
+            var posY = lensPosition.Y;
             
             var nearbyChunks = new (int, int)[4];
-            
             nearbyChunks[0] = ((int)Math.Round(posX)-1, (int)Math.Round(posY)-1);
             nearbyChunks[1] = ((int)Math.Round(posX), (int)Math.Round(posY)-1);
             nearbyChunks[2] = ((int)Math.Round(posX)-1, (int)Math.Round(posY));
@@ -77,18 +87,18 @@ namespace DProject.Manager.System.Terrain.ClipMap
 
                 try
                 {
-                    var diffuse = diffuseExists ? new Bitmap(filePathDiffuse) : null;
-                    var height = heightExists ? new Bitmap(filePathHeight) : null;
-                    var normal = normalExists ? new Bitmap(filePathNormal) : null;
+                    var diffuse = diffuseExists ? ConvertToTexture(new Bitmap(filePathDiffuse), _graphicsDevice) : DiffuseTilePlaceHolder;
+                    var height = heightExists ? ConvertToTexture(new Bitmap(filePathHeight), _graphicsDevice) : HeightTilePlaceHolder;
+                    var normal = normalExists ? ConvertToTexture(new Bitmap(filePathNormal), _graphicsDevice) : NormalTilePlaceHolder;
 
-                    _loadedTiles[clipMapLevel][(nearbyChunks[i].Item1, nearbyChunks[i].Item2)] = new ClipMapTerrainTile()
+                    _loadedTiles[clipMapLevel][(nearbyChunks[i].Item1, nearbyChunks[i].Item2)] = new ClipMapTerrainTile
                     {
-                        Origin = new Vector2(nearbyChunks[i].Item1 * 256, nearbyChunks[i].Item2 * 256),
-                        Size = new Vector2(256),
+                        Origin = new Vector2(nearbyChunks[i].Item1 * scale, nearbyChunks[i].Item2 * scale),
+                        Size = new Vector2(scale),
                         
-                        Diffuse = ConvertToTexture(diffuse, _graphicsDevice),
-                        Height = ConvertToTexture(height, _graphicsDevice),
-                        Normal = ConvertToTexture(normal, _graphicsDevice)
+                        Diffuse = diffuse,
+                        Height = height,
+                        Normal = normal
                     };
                 }
                 catch (Exception e)
@@ -113,6 +123,29 @@ namespace DProject.Manager.System.Terrain.ClipMap
                 throw new ArgumentOutOfRangeException($"The given value {clipMapLevel} is higher than the amount of clipMapLevels: {TerrainRenderSystem.ClipMapLevels}");
             
             return _loadedTiles[clipMapLevel].Values;
+        }
+
+        public static Texture2D GetFirstTextureInClipMapLevel(int clipMapLevel, ClipMapType type)
+        {
+            if(clipMapLevel > TerrainRenderSystem.ClipMapLevels)
+                throw new ArgumentOutOfRangeException($"The given value {clipMapLevel} is higher than the amount of clipMapLevels: {TerrainRenderSystem.ClipMapLevels}");
+
+            if (_loadedTiles[clipMapLevel].Values.Count > 0)
+            {
+                switch (type)
+                {
+                    case ClipMapType.Height:
+                        return _loadedTiles[clipMapLevel].Values.Last().Height;
+                    case ClipMapType.Normal:
+                        return _loadedTiles[clipMapLevel].Values.Last().Normal;
+                    case ClipMapType.Diffuse:
+                        return _loadedTiles[clipMapLevel].Values.Last().Diffuse;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(type), type, "The type given does not exist.");
+                }
+            }
+            
+            return null;
         }
 
         private static Texture2D ConvertToTexture(Bitmap bitmap, GraphicsDevice graphicsDevice)

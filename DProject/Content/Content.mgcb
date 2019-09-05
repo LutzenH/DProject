@@ -14,8 +14,10 @@
 
 #---------------------------------- Content ---------------------------------#
 
-#begin chunks/herebechunks.txt
-/copy:chunks/herebechunks.txt
+#begin chunks/*
+/copy:chunks/diffuse/unloaded.png
+/copy:chunks/height/unloaded.png
+/copy:chunks/normal/unloaded.png
 
 #begin collections/colors.json
 /copy:collections/colors.json

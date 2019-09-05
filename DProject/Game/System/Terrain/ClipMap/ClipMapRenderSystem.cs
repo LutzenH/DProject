@@ -20,6 +20,8 @@ namespace DProject.Manager.System.Terrain.ClipMap
 
         private int positionx;
         private int positiony;
+
+        private static RasterizerState _rasterizerState;
         
         public ClipMapRenderSystem(GraphicsDevice graphicsDevice, ShaderManager shaderManager) : base(Aspect.All(typeof(LoadedClipMapComponent)))
         {
@@ -29,6 +31,12 @@ namespace DProject.Manager.System.Terrain.ClipMap
             VisibleRenderTarget = new RenderTarget2D[TerrainRenderSystem.ClipMapLevels];
             
             _spriteBatch = new SpriteBatch(graphicsDevice);
+            
+            _rasterizerState = new RasterizerState()
+            {
+                CullMode = CullMode.CullClockwiseFace,
+                ScissorTestEnable = true
+            };
         }
 
         public override void Initialize(IComponentMapperService mapperService)
@@ -67,11 +75,12 @@ namespace DProject.Manager.System.Terrain.ClipMap
                     
                     _shaderManager.ClipMapEffect.TerrainTileOrigin = new Vector2(0, 0);
                     _shaderManager.ClipMapEffect.TerrainTileSize = new Vector2(tileSize);
+                    _shaderManager.ClipMapEffect.TerrainTileTexture = ClipMapTileLoaderSystem.GetFirstTextureInClipMapLevel(l, ClipMapType.Diffuse);
                     //_shaderManager.ClipMapEffect.TerrainClipMapLevel = 0;
                     
                     var effect = _shaderManager.ClipMapEffect;
                     
-                    DrawClipMapQuad(_graphicsDevice, new Vector2(positionx, positiony), new Vector2(256, 256), effect);
+                    DrawClipMapQuad(_graphicsDevice, new Vector2(0, 0), new Vector2(256, 256), effect);
                     
                     VisibleRenderTarget[l] = clipMap.ClipMap[l];
                 }
@@ -82,9 +91,9 @@ namespace DProject.Manager.System.Terrain.ClipMap
 
         private static void DrawClipMapQuad(GraphicsDevice graphicsDevice, Vector2 position, Vector2 size, Effect effect)
         {
-            var previousCullMode = graphicsDevice.RasterizerState.CullMode;
+            var previousRasterizer = graphicsDevice.RasterizerState;
 
-            graphicsDevice.RasterizerState.CullMode = CullMode.CullClockwiseFace;
+            graphicsDevice.RasterizerState = _rasterizerState;
 
             foreach (var pass in effect.CurrentTechnique.Passes)
             {
@@ -105,7 +114,7 @@ namespace DProject.Manager.System.Terrain.ClipMap
                 graphicsDevice.DrawUserIndexedPrimitives(PrimitiveType.TriangleList, vertices, 0, 4, indices, 0, 2);
             }
 
-            graphicsDevice.RasterizerState.CullMode = previousCullMode;
+            graphicsDevice.RasterizerState = previousRasterizer;
         }
     }
 }
