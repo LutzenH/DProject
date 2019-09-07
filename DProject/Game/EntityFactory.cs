@@ -1,4 +1,5 @@
 using DProject.Game.Component;
+using DProject.Game.Component.Lighting;
 using DProject.Game.Component.Ports;
 using DProject.Game.Component.Terrain;
 using DProject.Game.Component.Terrain.ClipMap;
@@ -71,32 +72,6 @@ namespace DProject.Game
             return entity;
         }
 
-        public Entity CreateHeightmap(Vector3 position, Vertex[,] heightmap, VertexBuffer recycledVertexBuffer = null)
-        {
-            var entity = World.CreateEntity();
-            
-            entity.Attach(new TransformComponent()
-            {
-                Position = position
-            });
-            entity.Attach(new HeightmapComponent()
-            {
-                Heightmap = heightmap,
-                RecycledVertexBuffer = recycledVertexBuffer
-            });
-            entity.Attach(new BoundingBoxComponent()
-            {
-                BoundingBox = new BoundingBox(
-                    position,
-                    new Vector3(
-                        position.X + heightmap.GetLength(0) - 1,
-                        float.MaxValue, 
-                        position.Z + heightmap.GetLength(1) - 1))
-            });
-
-            return entity;
-        }
-
         public Entity CreateTerrainEntity()
         {
             var entity = World.CreateEntity();
@@ -113,6 +88,34 @@ namespace DProject.Game
             entity.Attach(new ClipMapComponent()
             {
                 Type = type
+            });
+
+            return entity;
+        }
+
+        public Entity CreateDirectionalLight(Vector3 direction, Color color)
+        {
+            var entity = World.CreateEntity();
+            
+            entity.Attach(new DirectionalLightComponent()
+            {
+                Direction = direction,
+                Color = color.ToVector3()
+            });
+
+            return entity;
+        }
+        
+        public Entity CreatePointLight(Vector3 position, Color color, float radius, float intensity)
+        {
+            var entity = World.CreateEntity();
+            
+            entity.Attach(new PointLightComponent()
+            {
+                Position = position,
+                Color = color.ToVector3(),
+                Radius = radius,
+                Intensity = MathHelper.Clamp(intensity, 0f, 1f)
             });
 
             return entity;

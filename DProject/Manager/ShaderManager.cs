@@ -4,211 +4,206 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using DProject.Game.Component;
 using DProject.Type.Rendering;
+using DProject.Type.Rendering.Primitives;
 using DProject.Type.Rendering.Shaders;
 using DProject.Type.Rendering.Shaders.Interface;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using PrimitiveType = DProject.Type.Rendering.Primitives.PrimitiveType;
 
 namespace DProject.Manager
 {
     public class ShaderManager
     {
-        private readonly List<Effect> _effects;
-        
-        //Mesh based
-        private TerrainEffect _terrainEffect;
-        private WaterEffect _waterEffect;
-        private DepthEffect _depthEffect;
-        private PropEffect _propEffect;
-        private ClipMapTerrainEffect _clipMapTerrainEffect;
-        
-        //Screen based
-        private FXAAEffect _fxaaEffect;
-        private ClipMapEffect _clipMapEffect;
-
-        //Rendertargets
-        public RenderTarget2D DepthBuffer;
-        public RenderTarget2D ReflectionBuffer;
-        public RenderTarget2D RefractionBuffer;
-        public RenderTarget2D PreFinalBuffer;
-        
-        public enum RenderTarget { ClipMap, Depth, Reflection, Refraction, Final }
-
-        public RenderTarget CurrentRenderTarget;
-
         private GraphicsDevice _graphicsDevice;
 
+        private ClipMapTerrainEffect _clipMapTerrainEffect;
+        private GBufferEffect _gBufferEffect;
+        
+        private ClearGBufferEffect _clearGBufferEffect;
+        private DirectionalLightEffect _directionalLightEffect;
+        private PointLightEffect _pointLightEffect;
+        private CombineFinalEffect _combineFinalEffect;
+
+        // Render-targets (G-Buffer)
+        private readonly RenderTargetBinding[] _renderTargetBindings = new RenderTargetBinding[3];
+        
+        // Color + Specular Intensity
+        public RenderTarget2D Color;
+        
+        // Normal + Specular Power.
+        public RenderTarget2D Normal; 
+        
+        // Depth
+        public RenderTarget2D Depth;
+        
+        // Lights
+        public RenderTarget2D Lights;
+        
         private FullscreenQuad _fullscreenQuad;
+        private Primitives _primitives;
 
         public ShaderManager()
         {
-            _effects = new List<Effect>();
+            _primitives = new Primitives();
+            //_effects = new List<Effect>();
         }
 
         public void Initialize(GraphicsDevice graphicsDevice)
         {
             _graphicsDevice = graphicsDevice;
             _fullscreenQuad = new FullscreenQuad(graphicsDevice);
+            _primitives.Initialize(graphicsDevice);
             
-            CreateBuffers(graphicsDevice, false);
+            CreateGBuffer(false);
         }
 
-        public void CreateBuffers(GraphicsDevice graphicsDevice, bool updateShaders)
+        public void CreateGBuffer(bool updateShaders)
         {
-            DepthBuffer = new RenderTarget2D(
-                graphicsDevice,
-                graphicsDevice.PresentationParameters.BackBufferWidth,
-                graphicsDevice.PresentationParameters.BackBufferHeight,
-                false,
-                SurfaceFormat.HdrBlendable,
-                DepthFormat.Depth24);
-            
-            ReflectionBuffer = new RenderTarget2D(
-                graphicsDevice,
-                graphicsDevice.PresentationParameters.BackBufferWidth,
-                graphicsDevice.PresentationParameters.BackBufferHeight,
+            Color = new RenderTarget2D(
+                _graphicsDevice,
+                _graphicsDevice.PresentationParameters.BackBufferWidth,
+                _graphicsDevice.PresentationParameters.BackBufferHeight,
                 false,
                 SurfaceFormat.Color,
                 DepthFormat.Depth24);
             
-            RefractionBuffer = new RenderTarget2D(
-                graphicsDevice,
-                graphicsDevice.PresentationParameters.BackBufferWidth,
-                graphicsDevice.PresentationParameters.BackBufferHeight,
+            Normal = new RenderTarget2D(
+                _graphicsDevice,
+                _graphicsDevice.PresentationParameters.BackBufferWidth,
+                _graphicsDevice.PresentationParameters.BackBufferHeight,
                 false,
                 SurfaceFormat.Color,
                 DepthFormat.Depth24);
             
-            PreFinalBuffer = new RenderTarget2D(
-                graphicsDevice,
-                graphicsDevice.PresentationParameters.BackBufferWidth,
-                graphicsDevice.PresentationParameters.BackBufferHeight,
+            Depth = new RenderTarget2D(
+                _graphicsDevice,
+                _graphicsDevice.PresentationParameters.BackBufferWidth,
+                _graphicsDevice.PresentationParameters.BackBufferHeight,
+                false,
+                SurfaceFormat.Single,
+                DepthFormat.Depth24);
+            
+            Lights = new RenderTarget2D(
+                _graphicsDevice,
+                _graphicsDevice.PresentationParameters.BackBufferWidth,
+                _graphicsDevice.PresentationParameters.BackBufferHeight,
                 false,
                 SurfaceFormat.Color,
                 DepthFormat.Depth24);
-            
+
+            _renderTargetBindings[0] = new RenderTargetBinding(Color);
+            _renderTargetBindings[1] = new RenderTargetBinding(Normal);
+            _renderTargetBindings[2] = new RenderTargetBinding(Depth);
+
             if(updateShaders)
                 SetInitiateShaderInfo();
         }
 
+        public void SetGBuffer()
+        {
+            _graphicsDevice.SetRenderTargets(_renderTargetBindings);
+        }
+
+        public void ClearGBuffer()
+        {
+            DrawFullscreenQuad(ClearBufferEffect);
+        }
+        
+        public void ResolveGBuffer()
+        {
+            _graphicsDevice.SetRenderTargets(null);
+        }
+
         public void LoadContent(ContentManager content)
         {
-            _waterEffect = new WaterEffect(content.Load<Effect>("shaders/WaterShader"));
-            _depthEffect = new DepthEffect(content.Load<Effect>("shaders/DepthShader"));
-            _terrainEffect = new TerrainEffect(content.Load<Effect>("shaders/TerrainShader"));
-            _propEffect = new PropEffect(content.Load<Effect>("shaders/PropShader"));
             _clipMapTerrainEffect = new ClipMapTerrainEffect(content.Load<Effect>("shaders/ClipMapTerrainShader"));
-            
-            _fxaaEffect = new FXAAEffect(content.Load<Effect>("shaders/FXAAShader"));
-            _clipMapEffect = new ClipMapEffect(content.Load<Effect>("shaders/ClipMapShader"));
-            
-            _effects.Add(_depthEffect);
-            _effects.Add(_terrainEffect);
-            _effects.Add(_propEffect);
-            _effects.Add(_waterEffect);
-            _effects.Add(_clipMapTerrainEffect);
-            
-            _effects.Add(_fxaaEffect);
-            _effects.Add(_clipMapEffect);
-            
+            _gBufferEffect = new GBufferEffect(content.Load<Effect>("shaders/gbuffer/RenderGBuffer"));
+            _clearGBufferEffect = new ClearGBufferEffect(content.Load<Effect>("shaders/gbuffer/ClearGBuffer"));
+            _directionalLightEffect = new DirectionalLightEffect(content.Load<Effect>("shaders/gbuffer/DirectionalLight"));
+            _pointLightEffect = new PointLightEffect(content.Load<Effect>("shaders/gbuffer/PointLight"));
+            _combineFinalEffect = new CombineFinalEffect(content.Load<Effect>("shaders/gbuffer/CombineFinal"));
+
             _clipMapTerrainEffect.Diffuse = ConvertToTexture(new Bitmap(Game1.RootDirectory + "textures/terrain/terrain-diffuse.png"), _graphicsDevice);
-            _clipMapTerrainEffect.Heightmap = ConvertToTexture(new Bitmap(Game1.RootDirectory + "textures/terrain/terrain-height.png"), _graphicsDevice);
-            _clipMapTerrainEffect.NormalMap = ConvertToTexture(new Bitmap(Game1.RootDirectory + "textures/terrain/terrain-normal.png"), _graphicsDevice);
-            _waterEffect.DuDvTexture = content.Load<Texture2D>("shaders/water_dudv");
+            _clipMapTerrainEffect.Height = ConvertToTexture(new Bitmap(Game1.RootDirectory + "textures/terrain/terrain-height.png"), _graphicsDevice);
+            _clipMapTerrainEffect.Normal = ConvertToTexture(new Bitmap(Game1.RootDirectory + "textures/terrain/terrain-normal.png"), _graphicsDevice);
+            
+            _primitives.LoadPrimitives(content);
             
             SetInitiateShaderInfo();
         }
 
-        //TODO: This method is temporary until it will be replaces by a proper shader-information handler.
+        // TODO: This method is temporary until it will be replaces by a proper shader-information handler.
         public void SetContinuousShaderInfo(LensComponent lens, float relativeGameTime)
         {
-            SetContinuousShaderInfo(lens.View, lens.Projection, lens.ReflectionView, lens.Position, relativeGameTime, lens.ReflectionPlaneHeight, lens.NearPlaneDistance, lens.FarPlaneDistance);
-        }
-        
-        public void SetContinuousShaderInfo(Matrix view, Matrix projection, Matrix reflectionView, Vector3 cameraPosition, float relativeGameTime, float waterHeight, float nearPlaneDistance, float farPlaneDistance)
-        {
-            foreach (var effect in _effects)
-            {
-                if (effect is AbstractEffect abstractEffect && effect.GetType() != typeof(FXAAEffect))
-                {
-                    abstractEffect.View = view;
-                    abstractEffect.Projection = projection;
-                }
+            _clipMapTerrainEffect.View = lens.View;
+            _clipMapTerrainEffect.Projection = lens.Projection;
+            
+            _gBufferEffect.View = lens.View;
+            _gBufferEffect.Projection = lens.Projection;
 
-                if (effect is IReflected reflectedEffect)
-                {
-                    reflectedEffect.ReflectionView = reflectionView;
-                    reflectedEffect.WaterHeight = waterHeight;
-                }
-                
-                if (effect is IReflective reflectiveEffect)
-                {
-                    reflectiveEffect.CameraPosition = cameraPosition;
-                    reflectiveEffect.ReflectionBuffer = ReflectionBuffer;
-                    reflectiveEffect.RefractionBuffer = RefractionBuffer;
-                }
+            _directionalLightEffect.CameraPosition = lens.Position;
+            _directionalLightEffect.ColorMap = Color;
+            _directionalLightEffect.NormalMap = Normal;
+            _directionalLightEffect.DepthMap = Depth;
+            _directionalLightEffect.InvertViewProjection = Matrix.Invert(lens.View * lens.Projection);
 
-                if (effect is INeedClipPlanes clipPlanedEffect)
-                {
-                    clipPlanedEffect.NearClipPlane = nearPlaneDistance;
-                    clipPlanedEffect.FarClipPlane = farPlaneDistance;
-                }
-            }
+            _pointLightEffect.View = lens.View;
+            _pointLightEffect.Projection = lens.Projection;
+            _pointLightEffect.CameraPosition = lens.Position;
+            _pointLightEffect.InvertViewProjection = Matrix.Invert(lens.View * lens.Projection);
+            _pointLightEffect.ColorMap = Color;
+            _pointLightEffect.DepthMap = Depth;
+            _pointLightEffect.NormalMap = Normal;
 
-            _waterEffect.DepthBuffer = DepthBuffer;
-            _waterEffect.RelativeGameTime = relativeGameTime;
+            _combineFinalEffect.ColorMap = Color;
+            _combineFinalEffect.LightMap = Lights;
         }
         
         //TODO: This method is temporary until it will be replaces by a proper shader-information handler.
         public void SetInitiateShaderInfo()
         {
-            //Water
-            _waterEffect.MaxWaterDepth = 50f;
-            _waterEffect.DuDvTiling = 20.0f;
-            _waterEffect.DistortionIntensity = 0.03f;
-            _waterEffect.FresnelIntensity = 2.0f;
-            _waterEffect.WaterSpeed = 8.0f;
-            _waterEffect.WaterColor = new Vector3(0.12f, 0.19f, 0.37f);
-            _waterEffect.DeepWaterColor = new Vector3(0f, 1f, 1f);
-            _waterEffect.MinimumFoamDistance = 0.05f;
-            _waterEffect.MaximumFoamDistance = 0.1f;
+            _clipMapTerrainEffect.SpecularIntensity = 0.0f;
+            _clipMapTerrainEffect.SpecularPower = 0.0f;
             
-            //FXAA
-            var viewport = new Viewport(0, 0, PreFinalBuffer.Width, PreFinalBuffer.Height);
-            var projection = Matrix.CreateOrthographicOffCenter(0, viewport.Width, viewport.Height, 0, 0, 1);
-            var halfPixelOffset = Matrix.CreateTranslation(-0.5f, -0.5f, 0);
+            _gBufferEffect.SpecularIntensity = 0.8f;
+            _gBufferEffect.SpecularPower = 0.5f;
             
-            _fxaaEffect.World = Matrix.Identity;
-            _fxaaEffect.View = Matrix.Identity;
-            _fxaaEffect.Projection = halfPixelOffset * projection;
-            _fxaaEffect.InverseViewportSize = new Vector2(1f / viewport.Width, 1f / viewport.Height);
-
-            _fxaaEffect.SubPixelAliasingRemoval = 0.75f;
-            _fxaaEffect.EdgeThreshold = 0.166f;
-            _fxaaEffect.EdgeThresholdMin = 0f;
-            _fxaaEffect.CurrentTechnique = _fxaaEffect.Techniques["FXAA"];
-
             _clipMapTerrainEffect.TextureDimension = new Vector2(4096f, 4096f);
-            _clipMapTerrainEffect.ClipMapOffset = new Vector2(2048f, 2048f);
+            _clipMapTerrainEffect.ClipMapOffset = new Vector2(-2048f, -2048f);
             _clipMapTerrainEffect.ClipMapScale = 1.0f;
         }
 
-        //Mesh based
-        public TerrainEffect TerrainEffect => _terrainEffect ?? throw new ContentLoadException("The TerrainEffect shader has not been loaded yet.");
-        public WaterEffect WaterEffect => _waterEffect ?? throw new ContentLoadException("The WaterEffect shader has not been loaded yet.");
-        public DepthEffect DepthEffect => _depthEffect ?? throw new ContentLoadException("The DepthEffect shader has not been loaded yet.");
-        public PropEffect PropEffect => _propEffect ?? throw new ContentLoadException("The TerrainEffect shader has not been loaded yet.");
-        public ClipMapTerrainEffect ClipMapTerrainEffect => _clipMapTerrainEffect ?? throw new ContentLoadException("The ClipMapTerrainEffect shader has not been loaded yet.");
-        
-        //Screen based
-        public FXAAEffect FXAAEffect => _fxaaEffect ?? throw new ContentLoadException("The FXAAEffect shader has not been loaded yet.");
-        public ClipMapEffect ClipMapEffect => _clipMapEffect ?? throw new ContentLoadException("The ClipMapEffect shader has not been loaded yet.");
+        #region Draw Primitives
 
         public void DrawFullscreenQuad(Effect effect)
         {
             _fullscreenQuad.Draw(effect);
         }
+
+        public void DrawPrimitive(Effect effect, PrimitiveType type)
+        {
+            _primitives.Draw(effect, type);
+        }
+        
+        #endregion
+
+        #region GBuffer Effects
+
+        public ClearGBufferEffect ClearBufferEffect => _clearGBufferEffect ?? throw new ContentLoadException("The ClearGBufferEffect shader has not been loaded yet.");
+        
+        public ClipMapTerrainEffect ClipMapTerrainEffect => _clipMapTerrainEffect ?? throw new ContentLoadException("The ClipMapTerrainEffect shader has not been loaded yet.");
+        
+        public GBufferEffect GBufferEffect => _gBufferEffect ?? throw new ContentLoadException("The GBufferEffect shader has not been loaded yet.");
+        
+        public DirectionalLightEffect DirectionalLightEffect => _directionalLightEffect ?? throw new ContentLoadException("The DirectionalLightEffect shader has not been loaded yet.");
+
+        public PointLightEffect PointLightEffect => _pointLightEffect ?? throw new ContentLoadException("The PointLightEffect shader has not been loaded yet.");
+        
+        public CombineFinalEffect CombineFinalEffect => _combineFinalEffect ?? throw new ContentLoadException("The CombineFinalEffect shader has not been loaded yet.");
+
+        #endregion
         
         //TODO: Remove when ClipMapping is finished.
         private static Texture2D ConvertToTexture(Bitmap bitmap, GraphicsDevice graphicsDevice)

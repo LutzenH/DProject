@@ -1,12 +1,9 @@
 float4x4 World;
 float4x4 View;
-float4x4 ReflectionView;
 float4x4 Projection;
 
-float WaterHeight;
-
-float NearClip;
-float FarClip;
+float SpecularIntensity;
+float SpecularPower;
 
 texture diffuseTexture;
 sampler2D diffuseSampler = sampler_state
@@ -44,132 +41,68 @@ float ClipMapScale;
 
 struct VertexShaderInput
 {
-	float4 Position : POSITION0;
+    float4 Position : POSITION0;
 };
 
 struct VertexShaderOutput
 {
-	float4 Position : SV_POSITION;
-    float2 UV : TEXCOORD0;
-    float2 HeightSample : TEXCOORD1;
-    float4 ViewPositionVS : TEXCOORD2;
+    float4 Position : POSITION0;
+    float2 TexCoord : TEXCOORD0;
+    float2 Depth : TEXCOORD1;
 };
 
-VertexShaderOutput MainVS(in VertexShaderInput input)
+VertexShaderOutput VertexShaderFunction(VertexShaderInput input)
 {
-	VertexShaderOutput output = (VertexShaderOutput)0;
-	
+    VertexShaderOutput output;
+
 	float2 xy = ClipMapOffset + mul(input.Position, World).xz * ClipMapScale;
-	float2 uv = (xy + 0.5) / TextureDimension;
-	
-	float2 heightSample = tex2Dlod(heightmapSampler, float4(uv, 0, 0)).rg;
+	float2 texCoord = -xy / TextureDimension;
+
+	float2 heightSample = tex2Dlod(heightmapSampler, float4(texCoord, 0, 0)).rg;
 	float ScaledHeightSample = 512 * heightSample.r + heightSample.g * 2;
-	
+
 	float4 elevatedPos = float4(input.Position.x, ScaledHeightSample, input.Position.z, input.Position.w);
-	
+
     float4 worldPosition = mul(elevatedPos, World);
     float4 viewPosition = mul(worldPosition, View);
-    
+
     output.Position = mul(viewPosition, Projection);
-    output.UV = uv;
-    output.HeightSample = heightSample;
-    output.ViewPositionVS = output.Position;
 
-	return output;
+    output.TexCoord = texCoord;
+
+    output.Depth.x = output.Position.z;
+    output.Depth.y = output.Position.w;
+
+    return output;
 }
 
-VertexShaderOutput ReflectionVS(in VertexShaderInput input)
+struct PixelShaderOutput
 {
-	VertexShaderOutput output = (VertexShaderOutput)0;
-	
-	float2 xy = ClipMapOffset + mul(input.Position, World).xz * ClipMapScale;
-	float2 uv = (xy + 0.5) / TextureDimension;
-	
-	float2 heightSample = tex2Dlod(heightmapSampler, float4(uv, 0, 0)).rg;
-	float ScaledHeightSample = 512 * heightSample.r + heightSample.g * 2;
-	
-	float4 elevatedPos = float4(input.Position.x, ScaledHeightSample, input.Position.z, input.Position.w);
-	
-    float4 worldPosition = mul(elevatedPos, World);
-    float4 viewPosition = mul(worldPosition, ReflectionView);
-    
-    output.Position = mul(viewPosition, Projection);
-    output.UV = uv;
-    output.HeightSample = heightSample;
-    output.ViewPositionVS = output.Position;
-
-	return output;
-}
-
-float4 DepthPS(VertexShaderOutput input) : COLOR
-{   
-    float depth = (input.ViewPositionVS.w + NearClip) / FarClip;
-    
-    float3 normal = tex2D(normalSampler, input.UV).rgb;
-    
-	return float4(normal.xyz, depth);
-}
-
-float4 MainPS(VertexShaderOutput input) : COLOR
-{
-    float3 normal = tex2D(normalSampler, input.UV).rgb;
-    
-    float4 color = tex2D(diffuseSampler, input.UV);
-    
-    float normalIntensity = lerp(normal.y, normal.z, 0.5);
-    color = mul(color, normalIntensity);
-    
-	return color;
-}
-
-float4 ReflectionPS(VertexShaderOutput input) : COLOR
-{
-    float height = 512 * input.HeightSample.x + input.HeightSample.y * 2;
-
-    clip(height - WaterHeight);
-	return MainPS(input);
-}
-
-float4 RefractionPS(VertexShaderOutput input) : COLOR
-{
-    float height = 512 * input.HeightSample.x + input.HeightSample.y * 2;
-
-    clip(WaterHeight - height);
-	return MainPS(input);
-}
-
-technique Depth
-{
-	pass P0
-	{
-		VertexShader = compile vs_3_0 MainVS();
-		PixelShader = compile ps_3_0 DepthPS();
-	}
+    half4 Color : COLOR0;
+    half4 Normal : COLOR1;
+    half4 Depth : COLOR2;
 };
 
-technique BasicColorDrawing
+PixelShaderOutput PixelShaderFunction(VertexShaderOutput input)
 {
-	pass P0
-	{
-		VertexShader = compile vs_3_0 MainVS();
-		PixelShader = compile ps_3_0 MainPS();
-	}
-};
+    PixelShaderOutput output;
 
-technique Reflection
-{
-	pass P0
-	{
-		VertexShader = compile vs_3_0 ReflectionVS();
-		PixelShader = compile ps_3_0 ReflectionPS();
-	}
+    output.Color = tex2D(diffuseSampler, input.TexCoord);
+    output.Color.a = SpecularIntensity;
+
+    output.Normal.rgb = tex2D(normalSampler, input.TexCoord).rbg;
+    output.Normal.a = SpecularPower;
+
+    output.Depth = input.Depth.x / input.Depth.y;
+
+    return output;
 }
 
-technique Refraction
+technique RenderGBuffer
 {
     pass P0
     {
-        VertexShader = compile vs_3_0 MainVS();
-        PixelShader = compile ps_3_0 RefractionPS();
+        VertexShader = compile vs_3_0 VertexShaderFunction();
+        PixelShader = compile ps_3_0 PixelShaderFunction();
     }
 }

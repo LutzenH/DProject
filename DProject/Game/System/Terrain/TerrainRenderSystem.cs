@@ -43,36 +43,17 @@ namespace DProject.Manager.System.Terrain
 
         public override void Draw(GameTime gameTime)
         {
+            //TODO: This shouldn't be done in the TerrainRenderSystem
+            _shaderManager.SetContinuousShaderInfo(CameraSystem.ActiveLens, 0.5f);
+            
             if (!Keyboard.GetState().IsKeyDown(Keys.LeftControl))
                 _cameraPosition = CameraSystem.ActiveLens.Position;
 
             foreach (var entity in ActiveEntities)
             {
                 var terrain = _loadedClipMapTerrainMapper.Get(entity);
-                
-                AbstractEffect effect;
 
-                switch (_shaderManager.CurrentRenderTarget)
-                {
-                    case ShaderManager.RenderTarget.Depth:
-                        effect = _shaderManager.ClipMapTerrainEffect;
-                        effect.CurrentTechnique = _shaderManager.ClipMapTerrainEffect.Techniques["Depth"];
-                        break;
-                    case ShaderManager.RenderTarget.Reflection:
-                        effect = _shaderManager.ClipMapTerrainEffect;
-                        effect.CurrentTechnique = _shaderManager.ClipMapTerrainEffect.Techniques["Reflection"];
-                        break;
-                    case ShaderManager.RenderTarget.Refraction:
-                        effect = _shaderManager.ClipMapTerrainEffect;
-                        effect.CurrentTechnique = _shaderManager.ClipMapTerrainEffect.Techniques["Refraction"];
-                        break;
-                    case ShaderManager.RenderTarget.Final:
-                        effect = _shaderManager.ClipMapTerrainEffect;
-                        effect.CurrentTechnique = _shaderManager.ClipMapTerrainEffect.Techniques["BasicColorDrawing"];
-                        break;
-                    default:
-                        return;
-                }
+                var effect = _shaderManager.ClipMapTerrainEffect;
                 
                 var snappedPosition = new Vector2(
                     (float) Math.Floor(_cameraPosition.X),

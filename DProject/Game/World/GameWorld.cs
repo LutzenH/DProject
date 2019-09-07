@@ -1,9 +1,8 @@
 using DProject.Game;
-using DProject.Game.Component.Terrain.ClipMap;
 using DProject.Manager.System;
+using DProject.Manager.System.Lighting;
 using DProject.Manager.System.Ports;
 using DProject.Manager.System.Terrain;
-using DProject.Manager.System.Terrain.ClipMap;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -26,37 +25,30 @@ namespace DProject.Manager.World
             
             //Camera
             AddSystem(new CameraSystem());
-
+            
+            AddSystem(new ClipMapTerrainMeshLoaderSystem(graphicsDevice));
+            AddSystem(new TerrainRenderSystem(graphicsDevice, shaderManager));
+            
             //Models
             AddSystem(new ModelLoaderSystem(contentManager));
             AddSystem(new ModelRenderSystem(graphicsDevice, shaderManager));
             
-            //Terrain
-            //AddSystem(new ChunkLoaderSystem(_entityFactory));
-            //AddSystem(new HeightmapLoaderSystem(graphicsDevice));
-            //AddSystem(new HeightmapRenderSystem(graphicsDevice, shaderManager));
+            //Lighting
+            AddSystem(new LightingRenderSystem(graphicsDevice, shaderManager));
 
-            AddSystem(new ClipMapTileLoaderSystem(graphicsDevice));
-            AddSystem(new ClipMapLoaderSystem(graphicsDevice));
-            AddSystem(new ClipMapRenderSystem(graphicsDevice, shaderManager));
-            AddSystem(new ClipMapTerrainMeshLoaderSystem(graphicsDevice));
-            AddSystem(new TerrainRenderSystem(graphicsDevice, shaderManager));
-            
-            //Water
-            AddSystem(new WaterRenderSystem(graphicsDevice, shaderManager));
-            
             World = Build();
 
             _entityFactory.World = World;
-            _entityFactory.CreateGameTime();
-            _entityFactory.CreateFlyCamera(new Vector3(0, 10, 0));
             
-            _entityFactory.CreateProp(new Vector3(0, 0, 0), 10);
+            _entityFactory.CreateGameTime();
+            
+            _entityFactory.CreateFlyCamera(new Vector3(0, 1, 5));
+            
+            _entityFactory.CreateProp(new Vector3(0, 50, -400), 10);
+            _entityFactory.CreateProp(new Vector3(-2, 50, -400), 9);
 
-            _entityFactory.CreateWaterPlane(Vector2.Zero, new Vector2(4096, 4096));
-            _entityFactory.CreateWaterPlane(new Vector2(-4096, 0), new Vector2(4096, 4096));
-
-            _entityFactory.CreateClipMap(ClipMapType.Diffuse);
+            _entityFactory.CreateDirectionalLight(Vector3.Down, new Color(0.8f, 0.8f, 0.8f));
+            _entityFactory.CreatePointLight(new Vector3(-0, 48, -400), Color.Red, 25f, 1f);
 
             _entityFactory.CreateTerrainEntity();
         }
