@@ -1,0 +1,8 @@
+[submodule "DProject.Dependencies/FNA"]
+	path = DProject.Dependencies/FNA
+	url = https://github.com/LutzenH/FNA.git
+	branch = DProject
+[submodule "DProject.Dependencies/MonoGame.Extended"]
+	path = DProject.Dependencies/MonoGame.Extended
+	url = https://github.com/LutzenH/MonoGame.Extended.git
+	branch = FNA

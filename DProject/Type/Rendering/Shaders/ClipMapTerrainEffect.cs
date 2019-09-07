@@ -1,10 +1,9 @@
-using DProject.Type.Rendering.Shaders.Interface;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace DProject.Type.Rendering.Shaders
 {
-    public class ClipMapTerrainEffect : AbstractEffect, INeedClipPlanes, IReflected
+    public class ClipMapTerrainEffect : GBufferEffect
     {
         public ClipMapTerrainEffect(Effect cloneSource) : base(cloneSource) { }
         
@@ -14,13 +13,13 @@ namespace DProject.Type.Rendering.Shaders
             set => Parameters["diffuseTexture"].SetValue(value);
         }
         
-        public Texture2D Heightmap
+        public Texture2D Height
         {
             get => Parameters["heightmapTexture"].GetValueTexture2D();
             set => Parameters["heightmapTexture"].SetValue(value);
         }
         
-        public Texture2D NormalMap
+        public Texture2D Normal
         {
             get => Parameters["normalTexture"].GetValueTexture2D();
             set => Parameters["normalTexture"].SetValue(value);
@@ -42,30 +41,6 @@ namespace DProject.Type.Rendering.Shaders
         {
             get => Parameters["ClipMapScale"].GetValueSingle();
             set => Parameters["ClipMapScale"].SetValue(value);
-        }
-
-        public float NearClipPlane
-        {
-            get => Parameters["NearClip"].GetValueSingle();
-            set => Parameters["NearClip"].SetValue(value);
-        }
-        
-        public float FarClipPlane
-        {
-            get => Parameters["FarClip"].GetValueSingle();
-            set => Parameters["FarClip"].SetValue(value);
-        }
-
-        public Matrix ReflectionView
-        {
-            get => Parameters["ReflectionView"].GetValueMatrix();
-            set => Parameters["ReflectionView"].SetValue(value);
-        }
-
-        public float WaterHeight
-        {
-            get => Parameters["WaterHeight"].GetValueSingle();
-            set => Parameters["WaterHeight"].SetValue(value);
         }
     }
 }

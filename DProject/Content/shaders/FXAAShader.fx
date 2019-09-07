@@ -31,16 +31,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#if OPENGL
-	#define SV_POSITION POSITION
-	#define VS_SHADERMODEL vs_3_0
-	#define PS_SHADERMODEL ps_3_0
-	#define FXAA_HLSL_3 1
-#else
-	#define VS_SHADERMODEL vs_4_0
-	#define PS_SHADERMODEL ps_4_0
-	#define FXAA_HLSL_3 1
-#endif
+#define VS_SHADERMODEL vs_3_0
+#define PS_SHADERMODEL ps_3_0
+#define FXAA_HLSL_3 1
 
 float4x4 World;
 float4x4 View;

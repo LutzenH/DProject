@@ -12,7 +12,7 @@ namespace DProject.Manager.System.Terrain
 {
     public class TerrainRenderSystem : EntityDrawSystem
     {
-        private const int ClipMapLevels = 7;
+        public const int ClipMapLevels = 6;
         
         private static readonly Matrix[] Rotations = {
             Matrix.CreateRotationY(MathHelper.ToRadians(0)),
@@ -26,24 +26,14 @@ namespace DProject.Manager.System.Terrain
         
         private ComponentMapper<LoadedClipMapTerrainComponent> _loadedClipMapTerrainMapper;
 
-        //TODO: Remove this, obviously
-        private readonly RasterizerState _rasterizerState;
-        private readonly RasterizerState _rasterizerState2;
-
-        private Vector3 cameraPosition;
+        private Vector3 _cameraPosition;
         
         public TerrainRenderSystem(GraphicsDevice graphicsDevice, ShaderManager shaderManager) : base(Aspect.All(typeof(LoadedClipMapTerrainComponent)))
         {
             _graphicsDevice = graphicsDevice;
             _shaderManager = shaderManager;
-            
-            _rasterizerState = new RasterizerState();
-            _rasterizerState.FillMode = FillMode.WireFrame;
-            
-            _rasterizerState2 = new RasterizerState();
-            _rasterizerState2.FillMode = FillMode.Solid;
-            
-            cameraPosition = Vector3.Zero;
+
+            _cameraPosition = Vector3.Zero;
         }
 
         public override void Initialize(IComponentMapperService mapperService)
@@ -53,47 +43,21 @@ namespace DProject.Manager.System.Terrain
 
         public override void Draw(GameTime gameTime)
         {
+            //TODO: This shouldn't be done in the TerrainRenderSystem
+            _shaderManager.SetContinuousShaderInfo(CameraSystem.ActiveLens, 0.5f);
+            
             if (!Keyboard.GetState().IsKeyDown(Keys.LeftControl))
-            {
-                cameraPosition = CameraSystem.ActiveLens.Position;
-            }
-
-            if (Keyboard.GetState().IsKeyDown(Keys.Tab))
-                _graphicsDevice.RasterizerState = _rasterizerState;
-            else
-                _graphicsDevice.RasterizerState = _rasterizerState2;
+                _cameraPosition = CameraSystem.ActiveLens.Position;
 
             foreach (var entity in ActiveEntities)
             {
                 var terrain = _loadedClipMapTerrainMapper.Get(entity);
-                
-                AbstractEffect effect;
 
-                switch (_shaderManager.CurrentRenderTarget)
-                {
-                    case ShaderManager.RenderTarget.Depth:
-                        effect = _shaderManager.ClipMapTerrainEffect;
-                        effect.CurrentTechnique = _shaderManager.ClipMapTerrainEffect.Techniques["Depth"];
-                        break;
-                    case ShaderManager.RenderTarget.Reflection:
-                        effect = _shaderManager.ClipMapTerrainEffect;
-                        effect.CurrentTechnique = _shaderManager.ClipMapTerrainEffect.Techniques["Reflection"];
-                        break;
-                    case ShaderManager.RenderTarget.Refraction:
-                        effect = _shaderManager.ClipMapTerrainEffect;
-                        effect.CurrentTechnique = _shaderManager.ClipMapTerrainEffect.Techniques["Refraction"];
-                        break;
-                    case ShaderManager.RenderTarget.Final:
-                        effect = _shaderManager.ClipMapTerrainEffect;
-                        effect.CurrentTechnique = _shaderManager.ClipMapTerrainEffect.Techniques["BasicColorDrawing"];
-                        break;
-                    default:
-                        return;
-                }
+                var effect = _shaderManager.ClipMapTerrainEffect;
                 
                 var snappedPosition = new Vector2(
-                    (float) Math.Floor(cameraPosition.X),
-                    (float) Math.Floor(cameraPosition.Z));
+                    (float) Math.Floor(_cameraPosition.X),
+                    (float) Math.Floor(_cameraPosition.Z));
                 
                 effect.World = TransformComponent.CalculateWorldMatrix(new Vector3(snappedPosition.X, 0, snappedPosition.Y), Vector3.One, Quaternion.Identity);
                 _graphicsDevice.SetVertexBuffer(terrain.CrossVertexBuffer);
@@ -112,8 +76,8 @@ namespace DProject.Manager.System.Terrain
                     // base is the bottom left corner of the bottom left tile
                     float scale = 1 << l;
                     snappedPosition = new Vector2(
-                        (float) (Math.Floor(cameraPosition.X / scale) * scale),
-                        (float) (Math.Floor(cameraPosition.Z / scale) * scale));
+                        (float) (Math.Floor(_cameraPosition.X / scale) * scale),
+                        (float) (Math.Floor(_cameraPosition.Z / scale) * scale));
 
                     // draw tiles
                     var tileSize = new Vector2(ClipMapTerrainMeshLoaderSystem.MeshSize << l);
@@ -154,8 +118,8 @@ namespace DProject.Manager.System.Terrain
                     if(l != ClipMapLevels - 1 ) {
                         var nextScale = scale * 2.0f;
                         var nextSnappedPos = new Vector2(
-                            (float) (Math.Floor(cameraPosition.X / nextScale) * nextScale),
-                            (float) (Math.Floor(cameraPosition.Z / nextScale) * nextScale));
+                            (float) (Math.Floor(_cameraPosition.X / nextScale) * nextScale),
+                            (float) (Math.Floor(_cameraPosition.Z / nextScale) * nextScale));
 
                         var nextBase = nextSnappedPos - new Vector2(ClipMapTerrainMeshLoaderSystem.MeshSize << (l + 1));
 
@@ -173,7 +137,7 @@ namespace DProject.Manager.System.Terrain
                         // and we want it to lie on the grid when we draw it
                         var tileCentre = snappedPosition + new Vector2(scale * 0.5f);
 
-                        var d = new Vector2(cameraPosition.X, cameraPosition.Z) - nextSnappedPos;
+                        var d = new Vector2(_cameraPosition.X, _cameraPosition.Z) - nextSnappedPos;
                         var r = 0;
                         r |= d.X >= scale ? 0 : 2;
                         r |= d.Y >= scale ? 0 : 1;

@@ -13,89 +13,26 @@
 
 $if platform=DesktopGL
 
-/reference:../../../../../.nuget/packages/infinitespacestudios.pipeline/1.0.9/tools/InfinitespaceStudios.Pipeline.dll
-
-#begin shaders/DepthShader.fx
-/importer:EffectImporter
-/processor:RemoteEffectProcessor
-/processorParam:RemoteAddress=192.168.1.108
-/processorParam:RemotePort=8001
-/processorParam:Protocol=http
-/processorParam:DebugMode=Auto
-/build:shaders/DepthShader.fx
-
-#begin shaders/PropShader.fx
-/importer:EffectImporter
-/processor:RemoteEffectProcessor
-/processorParam:RemoteAddress=192.168.1.108
-/processorParam:RemotePort=8001
-/processorParam:Protocol=http
-/processorParam:DebugMode=Auto
-/build:shaders/PropShader.fx
-
-#begin shaders/TerrainShader.fx
-/importer:EffectImporter
-/processor:RemoteEffectProcessor
-/processorParam:RemoteAddress=192.168.1.108
-/processorParam:RemotePort=8001
-/processorParam:Protocol=http
-/processorParam:DebugMode=Auto
-/build:shaders/TerrainShader.fx
-
-#begin shaders/WaterShader.fx
-/importer:EffectImporter
-/processor:RemoteEffectProcessor
-/processorParam:RemoteAddress=192.168.1.108
-/processorParam:RemotePort=8001
-/processorParam:Protocol=http
-/processorParam:DebugMode=Auto
-/build:shaders/WaterShader.fx
-
-#begin shaders/FXAAShader.fx
-/importer:EffectImporter
-/processor:RemoteEffectProcessor
-/processorParam:RemoteAddress=192.168.1.108
-/processorParam:RemotePort=8001
-/processorParam:Protocol=http
-/processorParam:DebugMode=Auto
-/build:shaders/FXAAShader.fx
-
-#begin shaders/ClipMapTerrainShader.fx
-/importer:EffectImporter
-/processor:RemoteEffectProcessor
-/processorParam:RemoteAddress=192.168.1.108
-/processorParam:RemotePort=8001
-/processorParam:Protocol=http
-/processorParam:DebugMode=Auto
-/build:shaders/ClipMapTerrainShader.fx
+#begin shaders/*
+/copy:shaders/ClipMapTerrainShader
+/copy:shaders/FXAAShader
+/copy:shaders/WaterShader
+/copy:shaders/ClipMapShader
+/copy:shaders/gbuffer/ClearGBuffer
+/copy:shaders/gbuffer/RenderGBuffer
+/copy:shaders/gbuffer/DirectionalLight
+/copy:shaders/gbuffer/PointLight
+/copy:shaders/gbuffer/CombineFinal
 
 $endif
 
 $if platform=Windows
 
-#begin shaders/DepthShader.fx
+#begin shaders/ClipMapTerrainShader.fx
 /importer:EffectImporter
 /processor:EffectProcessor
 /processorParam:DebugMode=Auto
-/build:shaders/DepthShader.fx
-
-#begin shaders/PropShader.fx
-/importer:EffectImporter
-/processor:EffectProcessor
-/processorParam:DebugMode=Auto
-/build:shaders/PropShader.fx
-
-#begin shaders/TerrainShader.fx
-/importer:EffectImporter
-/processor:EffectProcessor
-/processorParam:DebugMode=Auto
-/build:shaders/TerrainShader.fx
-
-#begin shaders/WaterShader.fx
-/importer:EffectImporter
-/processor:EffectProcessor
-/processorParam:DebugMode=Auto
-/build:shaders/WaterShader.fx
+/build:shaders/ClipMapTerrainShader.fx
 
 #begin shaders/FXAAShader.fx
 /importer:EffectImporter
@@ -103,11 +40,47 @@ $if platform=Windows
 /processorParam:DebugMode=Auto
 /build:shaders/FXAAShader.fx
 
-#begin shaders/ClipMapTerrainShader.fx
+#begin shaders/WaterShader.fx
 /importer:EffectImporter
 /processor:EffectProcessor
 /processorParam:DebugMode=Auto
-/build:shaders/ClipMapTerrainShader.fx
+/build:shaders/WaterShader.fx
+
+#begin shaders/ClipMapShader.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:shaders/ClipMapShader.fx
+
+#begin shaders/gbuffer/ClearGBuffer.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:shaders/gbuffer/ClearGBuffer.fx
+
+#begin shaders/gbuffer/RenderGBuffer.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:shaders/gbuffer/RenderGBuffer.fx
+
+#begin shaders/gbuffer/DirectionalLight.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:shaders/gbuffer/DirectionalLight.fx
+
+#begin shaders/gbuffer/PointLight.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:shaders/gbuffer/PointLight.fx
+
+#begin shaders/gbuffer/CombineFinal.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:shaders/gbuffer/CombineFinal.fx
 
 $endif
 

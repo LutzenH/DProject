@@ -17,6 +17,8 @@ namespace DProject.Game.Component
         private float _farPlaneDistance;
         private float _fieldOfView;
         private float _reflectionPlaneHeight;
+
+        private float _aspectRatio;
         
         private Matrix _projectMatrix;
         private Matrix _viewMatrix;
@@ -25,11 +27,16 @@ namespace DProject.Game.Component
         private BoundingFrustum _boundingFrustum;
         private BoundingFrustum _reflectionBoundingFrustum;
         
+        public bool CustomAspectRatio { get; set; }
+
         public LensComponent()
         {
             _nearPlaneDistance = 1f;
             _farPlaneDistance = 6000f;
             _fieldOfView = 80f;
+            _aspectRatio = 1/2f;
+
+            CustomAspectRatio = false;
             
             _position = Vector3.Zero;
             _direction = Vector3.Forward;
@@ -76,7 +83,7 @@ namespace DProject.Game.Component
             {
                 if (_projectionIsDirty)
                 {
-                    _projectMatrix = CalculateProjectionMatrix(_fieldOfView, _nearPlaneDistance, _farPlaneDistance);
+                    _projectMatrix = CalculateProjectionMatrix(_fieldOfView, _aspectRatio, _nearPlaneDistance, _farPlaneDistance);
                     _projectionIsDirty = false;
                     _boundingFrustumIsDirty = true;
                     _reflectionBoundingFrustumIsDirty = true;
@@ -86,9 +93,24 @@ namespace DProject.Game.Component
             }
         }
 
-        private static Matrix CalculateProjectionMatrix(float fieldOfView, float nearPlaneDistance, float farPlaneDistance)
+        private static Matrix CalculateProjectionMatrix(float fieldOfView, float aspectRatio, float nearPlaneDistance, float farPlaneDistance)
         {
-            return Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(fieldOfView),Game1.ScreenResolutionX / (float) Game1.ScreenResolutionY, nearPlaneDistance, farPlaneDistance);
+            return Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(fieldOfView), aspectRatio, nearPlaneDistance, farPlaneDistance);
+        }
+
+        public float AspectRatio
+        {
+            get => _aspectRatio;
+            set
+            {
+                _aspectRatio = value;
+                _projectionIsDirty = true;
+            }
+        }
+        
+        public static float CalculateAspectRatio(int screenResolutionX, int screenResolutionY)
+        {
+            return screenResolutionX / (float) screenResolutionY;
         }
 
         #endregion

@@ -1,6 +1,5 @@
 using DProject.Game.Component;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
 using MonoGame.Extended.Entities;
 using MonoGame.Extended.Entities.Systems;
 
@@ -32,41 +31,44 @@ namespace DProject.Manager.System
             var angleX = 0f;
             var angleY = 0f;
 
-            var moveSpeed = (float) ((Keyboard.GetState().IsKeyDown(Keys.LeftShift) ? fly.Speed * 2 : fly.Speed) * gameTime.ElapsedGameTime.TotalSeconds);
+            var moveSpeed = (float) ((InputManager.IsInputDown(Input.CameraIncreasedSpeed) ? fly.Speed * 2 : fly.Speed) * gameTime.ElapsedGameTime.TotalSeconds);
         
             var translation = new Vector3(0,0,0);
             
-            if (Keyboard.GetState().IsKeyDown(Keys.W))
+            if (InputManager.IsInputDown(Input.CameraMoveForward))
                 translation += lens.Direction * moveSpeed;
-            if (Keyboard.GetState().IsKeyDown(Keys.S))
+            if (InputManager.IsInputDown(Input.CameraMoveBackwards))
                 translation -= lens.Direction * moveSpeed;
-            if (Keyboard.GetState().IsKeyDown(Keys.A))
+            if (InputManager.IsInputDown(Input.CameraMoveLeft))
                 translation += Vector3.Cross(Vector3.Up, lens.Direction) * moveSpeed;
-            if (Keyboard.GetState().IsKeyDown(Keys.D))
+            if (InputManager.IsInputDown(Input.CameraMoveRight))
                 translation -= Vector3.Cross(Vector3.Up, lens.Direction) * moveSpeed;
-            if (Keyboard.GetState().IsKeyDown(Keys.Q))
+            if (InputManager.IsInputDown(Input.CameraMoveUp))
                 translation += new Vector3(0, moveSpeed, 0);
-            if (Keyboard.GetState().IsKeyDown(Keys.E))
+            if (InputManager.IsInputDown(Input.CameraMoveDown))
                 translation -= new Vector3(0, moveSpeed, 0);
 
+            if (!lens.CustomAspectRatio)
+                lens.AspectRatio = LensComponent.CalculateAspectRatio(Game1.ScreenResolutionX, Game1.ScreenResolutionY);
+                
             lens.Position += translation;
 
-            if (Mouse.GetState().MiddleButton == ButtonState.Pressed)
+            if (InputManager.IsInputDown(Input.CameraFreeRotation))
             {
-                var mousePositionDifference = Game1.PreviousMouseState.Position - Mouse.GetState().Position;
+                var mousePositionDifference = InputManager.CameraLookVector;
                 
                 angleX -= mousePositionDifference.X * moveSpeed * 3;
                 angleY += mousePositionDifference.Y * moveSpeed * 3;
             }
             else
             {
-                if (Keyboard.GetState().IsKeyDown(Keys.Left))
+                if (InputManager.IsInputDown(Input.CameraLookLeft))
                     angleX -= moveSpeed * 6;
-                if (Keyboard.GetState().IsKeyDown(Keys.Right))
+                if (InputManager.IsInputDown(Input.CameraLookRight))
                     angleX += moveSpeed * 6;
-                if (Keyboard.GetState().IsKeyDown(Keys.Up))
+                if (InputManager.IsInputDown(Input.CameraLookUp))
                     angleY += moveSpeed * 6;
-                if (Keyboard.GetState().IsKeyDown(Keys.Down))
+                if (InputManager.IsInputDown(Input.CameraLookDown))
                     angleY -= moveSpeed * 6;
             }
 

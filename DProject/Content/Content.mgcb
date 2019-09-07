@@ -14,8 +14,10 @@
 
 #---------------------------------- Content ---------------------------------#
 
-#begin chunks/herebechunks.txt
-/copy:chunks/herebechunks.txt
+#begin chunks/*
+/copy:chunks/diffuse/unloaded.png
+/copy:chunks/height/unloaded.png
+/copy:chunks/normal/unloaded.png
 
 #begin collections/colors.json
 /copy:collections/colors.json
@@ -350,4 +352,23 @@
 /processorParam:SwapWindingOrder=False
 /processorParam:TextureFormat=Compressed
 /build:models/camera.fbx
+
+#begin models/primitives/sphere.fbx
+/importer:FbxImporter
+/processor:ModelProcessor
+/processorParam:ColorKeyColor=0,0,0,0
+/processorParam:ColorKeyEnabled=True
+/processorParam:DefaultEffect=BasicEffect
+/processorParam:GenerateMipmaps=False
+/processorParam:GenerateTangentFrames=False
+/processorParam:PremultiplyTextureAlpha=True
+/processorParam:PremultiplyVertexColors=True
+/processorParam:ResizeTexturesToPowerOfTwo=False
+/processorParam:RotationX=-90
+/processorParam:RotationY=90
+/processorParam:RotationZ=-90
+/processorParam:Scale=1
+/processorParam:SwapWindingOrder=False
+/processorParam:TextureFormat=Compressed
+/build:models/primitives/sphere.fbx
 
