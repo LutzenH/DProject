@@ -13,7 +13,7 @@ namespace DProject
         public const int MaxFps = 120;
         public const string RootDirectory = "Content/";
         
-        private static bool _enableFXAA = false;
+        private static bool _enableFXAA = true;
 
         private readonly GraphicsDeviceManager _graphics;
         
@@ -117,8 +117,27 @@ namespace DProject
             GraphicsDevice.Clear(ClearOptions.DepthBuffer, Color.White, 1, 0);
             
             _worldBuilder.World.Draw(gameTime);
+            
+            GraphicsDevice.SetRenderTarget(null);
+            GraphicsDevice.Clear(ClearOptions.DepthBuffer, Color.White, 1, 0);
+            
+            try
+            {
+                _spriteBatch.Begin(
+                    SpriteSortMode.Deferred,
+                    BlendState.Opaque,
+                    SamplerState.LinearClamp,
+                    DepthStencilState.Default,
+                    null,
+                    _enableFXAA ? _shaderManager.FXAAEffect : null,
+                    Matrix.Identity);
 
-            _fps++;
+                _spriteBatch.Draw(_shaderManager.CombineFinal, GraphicsDevice.Viewport.Bounds, Color.White);
+            }
+            finally
+            {
+                _spriteBatch.End();
+            }
             
             try
             {
@@ -128,12 +147,14 @@ namespace DProject
                 _spriteBatch.Draw(_shaderManager.Depth, new Rectangle(0, 180, 320, 180), Color.White);
                 _spriteBatch.Draw(_shaderManager.Normal, new Rectangle(0, 360, 320, 180), Color.White);
                 _spriteBatch.Draw(_shaderManager.Lights, new Rectangle(0, 540, 320, 180), Color.White);
+                _spriteBatch.Draw(_shaderManager.CombineFinal, new Rectangle(0, 720, 320, 180), Color.White);
             }
             finally
             {
                 _spriteBatch.End();
             }
             
+            _fps++;
             base.Draw(gameTime);
         }
 

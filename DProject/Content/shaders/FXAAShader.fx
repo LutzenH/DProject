@@ -119,23 +119,9 @@ float4 PixelShaderFunction_FXAA(in float2 texCoords : TEXCOORD0) : COLOR0
 	return value;
 }
 
-float4 PixelShaderFunction_Standard(in float2 texCoords : TEXCOORD0) : COLOR0
-{
-	return tex2D(TheSampler, texCoords);
-}
-
-technique Standard
-{
-	pass Pass1
-	{
-		VertexShader = compile VS_SHADERMODEL VertexShaderFunction();
-		PixelShader = compile PS_SHADERMODEL PixelShaderFunction_Standard();
-	}
-}
-
 technique FXAA
 {
-	pass Pass1
+	pass P0
 	{
 		VertexShader = compile VS_SHADERMODEL VertexShaderFunction();
 		PixelShader = compile PS_SHADERMODEL PixelShaderFunction_FXAA();

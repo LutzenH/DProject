@@ -35,7 +35,7 @@ namespace DProject.Manager.System.Lighting
             _graphicsDevice.Clear(Color.Transparent);
             
             _graphicsDevice.BlendState = BlendState.AlphaBlend;
-            _graphicsDevice.BlendState.AlphaBlendFunction = BlendFunction.Max;
+            _graphicsDevice.BlendState.AlphaBlendFunction = BlendFunction.Add;
             _graphicsDevice.BlendState.AlphaSourceBlend = Blend.One;
             _graphicsDevice.BlendState.AlphaDestinationBlend = Blend.One;
             
@@ -71,17 +71,10 @@ namespace DProject.Manager.System.Lighting
 
             _graphicsDevice.RasterizerState.CullMode = previousCullMode;
             _graphicsDevice.SetRenderTarget(_shaderManager.CombineFinal);
-            
-            _shaderManager.DrawFullscreenQuad(_shaderManager.CombineFinalEffect);
-            _shaderManager.DrawFullscreenQuad(_shaderManager.SkyEffect);
-            
-            _graphicsDevice.SetRenderTarget(null);
-            
-            // TODO: Unnecessary to draw it twice
-            _shaderManager.DrawFullscreenQuad(_shaderManager.CombineFinalEffect);
-            _shaderManager.DrawFullscreenQuad(_shaderManager.SkyEffect);
-            
             _graphicsDevice.BlendState = BlendState.Opaque;
+            
+            _shaderManager.DrawFullscreenQuad(_shaderManager.CombineFinalEffect);
+            _shaderManager.DrawFullscreenQuad(_shaderManager.SkyEffect);
         }
     }
 }

@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.IO;
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -6,7 +5,6 @@ using DProject.Game.Component;
 using DProject.Type.Rendering;
 using DProject.Type.Rendering.Primitives;
 using DProject.Type.Rendering.Shaders;
-using DProject.Type.Rendering.Shaders.Interface;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -31,6 +29,9 @@ namespace DProject.Manager
         
         // Skybox Effect
         private SkyEffect _skyEffect;
+        
+        // FXAA Effect
+        private FXAAEffect _fxaaEffect;
 
         // Render-targets (G-Buffer)
         private readonly RenderTargetBinding[] _renderTargetBindings = new RenderTargetBinding[3];
@@ -52,7 +53,6 @@ namespace DProject.Manager
         public ShaderManager()
         {
             _primitives = new Primitives();
-            //_effects = new List<Effect>();
         }
 
         public void Initialize(GraphicsDevice graphicsDevice)
@@ -143,6 +143,8 @@ namespace DProject.Manager
             
             _skyEffect = new SkyEffect(content.Load<Effect>("shaders/SkyShader"));
             
+            _fxaaEffect = new FXAAEffect(content.Load<Effect>("shaders/FXAAShader"));
+            
             _clipMapTerrainEffect.Diffuse = ConvertToTexture(new Bitmap(Game1.RootDirectory + "textures/terrain/terrain-diffuse.png"), _graphicsDevice);
             _clipMapTerrainEffect.Height = ConvertToTexture(new Bitmap(Game1.RootDirectory + "textures/terrain/terrain-height.png"), _graphicsDevice);
             _clipMapTerrainEffect.Normal = ConvertToTexture(new Bitmap(Game1.RootDirectory + "textures/terrain/terrain-normal.png"), _graphicsDevice);
@@ -179,6 +181,7 @@ namespace DProject.Manager
             _combineFinalEffect.LightMap = Lights;
 
             _waterEffect.RefractionBuffer = CombineFinal;
+            _waterEffect.ReflectionBuffer = CombineFinal;
             _waterEffect.DepthBuffer = Depth;
             _waterEffect.RelativeGameTime = relativeGameTime;
             _waterEffect.View = lens.View;
@@ -214,6 +217,20 @@ namespace DProject.Manager
             _waterEffect.MaximumFoamDistance = 0.1f;
             
             _skyEffect.ViewportResolution = new Vector2(_graphicsDevice.Viewport.Width, _graphicsDevice.Viewport.Height);
+            
+            _fxaaEffect.World = Matrix.Identity;
+            _fxaaEffect.View = Matrix.Identity;
+            
+            var viewport = new Viewport(0, 0, CombineFinal.Width, CombineFinal.Height);
+            var projection = Matrix.CreateOrthographicOffCenter(0, viewport.Width, viewport.Height, 0, 0, 1);
+
+            _fxaaEffect.Projection = projection;
+            _fxaaEffect.InverseViewportSize = new Vector2(1f / viewport.Width, 1f / viewport.Height);
+            
+            _fxaaEffect.SubPixelAliasingRemoval = 0.75f;
+            _fxaaEffect.EdgeThreshold = 0.166f;
+            _fxaaEffect.EdgeThresholdMin = 0f;
+            _fxaaEffect.CurrentTechnique = _fxaaEffect.Techniques["FXAA"];
         }
 
         #region Draw Primitives
@@ -251,6 +268,8 @@ namespace DProject.Manager
         public WaterEffect WaterEffect => _waterEffect ?? throw new ContentLoadException("The WaterEffect shader has not been loaded yet.");
 
         public SkyEffect SkyEffect => _skyEffect ?? throw new ContentLoadException("The SkyboxEffect shader has not been loaded yet.");
+        
+        public FXAAEffect FXAAEffect => _fxaaEffect ?? throw new ContentLoadException("The FXAAEffect shader has not been loaded yet.");
         
         #endregion
         
