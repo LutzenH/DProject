@@ -1,22 +1,17 @@
 float4x4 World;
 float4x4 View;
 float4x4 Projection;
-float3 CameraPosition;
 
+float3 CameraPosition;
 float NearClip;
 float FarClip;
-float MaxWaterDepth;
 
+float MaxWaterDepth;
 float3 WaterColor;
 float3 DeepWaterColor;
 
 float MinimumFoamDistance;
 float MaximumFoamDistance;
-
-texture reflectionTexture;
-texture refractionTexture;
-texture depthTexture;
-texture dudvTexture;
 
 float RelativeGameTime;
 float Tiling;
@@ -24,6 +19,7 @@ float DistortionIntensity;
 float FresnelIntensity;
 float WaterSpeed;
 
+texture reflectionTexture;
 sampler2D reflectionSampler = sampler_state
 {
 	Texture = <reflectionTexture>;
@@ -33,6 +29,7 @@ sampler2D reflectionSampler = sampler_state
 	MINFILTER = LINEAR;
 };
 
+texture refractionTexture;
 sampler2D refractionSampler = sampler_state
 {
 	Texture = <refractionTexture>;
@@ -42,6 +39,7 @@ sampler2D refractionSampler = sampler_state
 	MINFILTER = LINEAR;
 };
 
+texture depthTexture;
 sampler2D depthSampler = sampler_state
 {
 	Texture = <depthTexture>;
@@ -51,6 +49,7 @@ sampler2D depthSampler = sampler_state
 	MINFILTER = LINEAR;
 };
 
+texture dudvTexture;
 sampler2D dudvSampler = sampler_state
 {
 	Texture = <dudvTexture>;
@@ -74,6 +73,7 @@ struct VertexShaderOutput
     float2 TextureCoordinate : TEXCOORD1;
     float3 toCameraVector : TEXCOORD2;
     float4 ClipSpace : TEXCOORD3;
+    float2 Depth : TEXCOORD4;
 };
 
 VertexShaderOutput MainVS(in VertexShaderInput input)
@@ -89,6 +89,8 @@ VertexShaderOutput MainVS(in VertexShaderInput input)
     output.Normal = input.Normal;
     
     output.ClipSpace = output.Position;
+    output.Depth.x = output.Position.z;
+    output.Depth.y = output.Position.w;
 
     output.toCameraVector = CameraPosition - worldPosition.xyz;
     
@@ -97,18 +99,18 @@ VertexShaderOutput MainVS(in VertexShaderInput input)
 
 float4 MainPS(VertexShaderOutput input) : COLOR
 {
-    float3 viewVector = normalize(input.toCameraVector);
-    float refractiveFactor = 1-dot(viewVector, input.Normal);
-    refractiveFactor = pow(refractiveFactor, FresnelIntensity);
-
-    float2 ndc = (input.ClipSpace.xy/input.ClipSpace.w) / 2 + 0.5f;
+    float2 ndc = (input.ClipSpace.xy / input.ClipSpace.w) / 2 + 0.5f;
     float2 reflectionndc = float2(ndc.x, ndc.y);
-    
     float2 regularndc = float2(ndc.x, -ndc.y);
-    
-    float visibilitystencil = tex2D(refractionSampler, regularndc).a - 0.001;
-    clip(visibilitystencil);
-    
+
+    float depthbuffer = tex2D(depthSampler, regularndc).r;
+    float waterDepth = depthbuffer - input.Depth.x / input.Depth.y;
+    clip(waterDepth);
+
+    float3 viewVector = normalize(input.toCameraVector);
+    float refractiveFactor = 1 - dot(viewVector, input.Normal);
+    refractiveFactor = pow(refractiveFactor, FresnelIntensity);
+        
     float2 refractionndc = regularndc;
         
     float2 distortion = (tex2D(dudvSampler, float2(input.TextureCoordinate.x + RelativeGameTime * WaterSpeed,  input.TextureCoordinate.y)).rg * 2.0 - 1.0) * DistortionIntensity;
@@ -125,21 +127,14 @@ float4 MainPS(VertexShaderOutput input) : COLOR
 
     refractionColor = lerp(float4(DeepWaterColor, 1), refractionColor, 0.5);
 
-    float distanceToWater = (input.ClipSpace.w + NearClip) / FarClip;
-
-    float4 depthbufferColor = tex2D(depthSampler, regularndc);
-
-    float depth = depthbufferColor.a - distanceToWater;
-    float waterDepthFactor = clamp(depth / (MaxWaterDepth / FarClip), 0.0, 1.0);
+    float waterDepthFactor = clamp((waterDepth * input.ClipSpace.w)*2, 0.0, 1.0);
     
-    refractionColor = lerp(refractionColor, float4(WaterColor, 1), waterDepthFactor/1.1);
+    refractionColor = lerp(refractionColor, float4(WaterColor, 1), waterDepthFactor);
         
     float4 color = lerp(refractionColor, reflectionColor, refractiveFactor);
 
-    float foamDistance = lerp(MinimumFoamDistance, MaximumFoamDistance, depthbufferColor.xyz);
-
-    float waterEdgeFactor = smoothstep(0.0, 1.0, waterDepthFactor / foamDistance);
-
+    float foamDistance = lerp(MinimumFoamDistance, MaximumFoamDistance, 0.1);
+    float waterEdgeFactor = smoothstep(0.0, 0.001, waterDepthFactor / foamDistance);
     color = lerp(float4(1,1,1,1), color, waterEdgeFactor);
     
 	return color;

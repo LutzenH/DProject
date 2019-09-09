@@ -18,28 +18,33 @@ namespace DProject.Manager
     {
         private GraphicsDevice _graphicsDevice;
 
-        private ClipMapTerrainEffect _clipMapTerrainEffect;
+        // GBuffer Effects
         private GBufferEffect _gBufferEffect;
-        
+        private ClipMapTerrainEffect _clipMapTerrainEffect;
         private ClearGBufferEffect _clearGBufferEffect;
         private DirectionalLightEffect _directionalLightEffect;
         private PointLightEffect _pointLightEffect;
         private CombineFinalEffect _combineFinalEffect;
+        
+        // Water Effect
+        private WaterEffect _waterEffect;
+        
+        // Skybox Effect
+        private SkyEffect _skyEffect;
 
         // Render-targets (G-Buffer)
         private readonly RenderTargetBinding[] _renderTargetBindings = new RenderTargetBinding[3];
         
         // Color + Specular Intensity
         public RenderTarget2D Color;
-        
         // Normal + Specular Power.
-        public RenderTarget2D Normal; 
-        
+        public RenderTarget2D Normal;
         // Depth
         public RenderTarget2D Depth;
-        
         // Lights
         public RenderTarget2D Lights;
+        // Final
+        public RenderTarget2D CombineFinal;
         
         private FullscreenQuad _fullscreenQuad;
         private Primitives _primitives;
@@ -92,6 +97,14 @@ namespace DProject.Manager
                 false,
                 SurfaceFormat.Color,
                 DepthFormat.Depth24);
+            
+            CombineFinal = new RenderTarget2D(
+                _graphicsDevice,
+                _graphicsDevice.PresentationParameters.BackBufferWidth,
+                _graphicsDevice.PresentationParameters.BackBufferHeight,
+                false,
+                SurfaceFormat.Color,
+                DepthFormat.Depth24);
 
             _renderTargetBindings[0] = new RenderTargetBinding(Color);
             _renderTargetBindings[1] = new RenderTargetBinding(Normal);
@@ -125,6 +138,11 @@ namespace DProject.Manager
             _pointLightEffect = new PointLightEffect(content.Load<Effect>("shaders/gbuffer/PointLight"));
             _combineFinalEffect = new CombineFinalEffect(content.Load<Effect>("shaders/gbuffer/CombineFinal"));
 
+            _waterEffect = new WaterEffect(content.Load<Effect>("shaders/WaterShader"));
+            _waterEffect.DuDvTexture = content.Load<Texture2D>("shaders/water_dudv");
+            
+            _skyEffect = new SkyEffect(content.Load<Effect>("shaders/SkyShader"));
+            
             _clipMapTerrainEffect.Diffuse = ConvertToTexture(new Bitmap(Game1.RootDirectory + "textures/terrain/terrain-diffuse.png"), _graphicsDevice);
             _clipMapTerrainEffect.Height = ConvertToTexture(new Bitmap(Game1.RootDirectory + "textures/terrain/terrain-height.png"), _graphicsDevice);
             _clipMapTerrainEffect.Normal = ConvertToTexture(new Bitmap(Game1.RootDirectory + "textures/terrain/terrain-normal.png"), _graphicsDevice);
@@ -159,20 +177,43 @@ namespace DProject.Manager
 
             _combineFinalEffect.ColorMap = Color;
             _combineFinalEffect.LightMap = Lights;
+
+            _waterEffect.RefractionBuffer = CombineFinal;
+            _waterEffect.DepthBuffer = Depth;
+            _waterEffect.RelativeGameTime = relativeGameTime;
+            _waterEffect.View = lens.View;
+            _waterEffect.Projection = lens.Projection;
+            _waterEffect.NearClipPlane = lens.NearPlaneDistance;
+            _waterEffect.FarClipPlane = lens.FarPlaneDistance;
+            _waterEffect.CameraPosition = lens.Position;
+
+            _skyEffect.Depth = Depth;
         }
         
         //TODO: This method is temporary until it will be replaces by a proper shader-information handler.
         public void SetInitiateShaderInfo()
         {
-            _clipMapTerrainEffect.SpecularIntensity = 0.0f;
-            _clipMapTerrainEffect.SpecularPower = 0.0f;
-            
             _gBufferEffect.SpecularIntensity = 0.8f;
             _gBufferEffect.SpecularPower = 0.5f;
             
+            _clipMapTerrainEffect.SpecularIntensity = 0.0f;
+            _clipMapTerrainEffect.SpecularPower = 0.0f;
             _clipMapTerrainEffect.TextureDimension = new Vector2(4096f, 4096f);
-            _clipMapTerrainEffect.ClipMapOffset = new Vector2(-2048f, -2048f);
+            _clipMapTerrainEffect.ClipMapOffset = new Vector2(2048f, -2048f);
             _clipMapTerrainEffect.ClipMapScale = 1.0f;
+
+            //Water
+            _waterEffect.MaxWaterDepth = 50f;
+            _waterEffect.DuDvTiling = 20.0f;
+            _waterEffect.DistortionIntensity = 0.03f;
+            _waterEffect.FresnelIntensity = 2.0f;
+            _waterEffect.WaterSpeed = 8.0f;
+            _waterEffect.WaterColor = new Vector3(0.12f, 0.19f, 0.37f);
+            _waterEffect.DeepWaterColor = new Vector3(0f, 1f, 1f);
+            _waterEffect.MinimumFoamDistance = 0.05f;
+            _waterEffect.MaximumFoamDistance = 0.1f;
+            
+            _skyEffect.ViewportResolution = new Vector2(_graphicsDevice.Viewport.Width, _graphicsDevice.Viewport.Height);
         }
 
         #region Draw Primitives
@@ -203,6 +244,14 @@ namespace DProject.Manager
         
         public CombineFinalEffect CombineFinalEffect => _combineFinalEffect ?? throw new ContentLoadException("The CombineFinalEffect shader has not been loaded yet.");
 
+        #endregion
+
+        #region Other Effects
+
+        public WaterEffect WaterEffect => _waterEffect ?? throw new ContentLoadException("The WaterEffect shader has not been loaded yet.");
+
+        public SkyEffect SkyEffect => _skyEffect ?? throw new ContentLoadException("The SkyboxEffect shader has not been loaded yet.");
+        
         #endregion
         
         //TODO: Remove when ClipMapping is finished.

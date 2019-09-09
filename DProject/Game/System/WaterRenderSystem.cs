@@ -35,22 +35,15 @@ namespace DProject.Manager.System
 
         public override void Draw(GameTime gameTime)
         {
+            _graphicsDevice.Clear(ClearOptions.DepthBuffer, Color.White, 1, 0);
+
             foreach (var entity in ActiveEntities)
             {
                 var transform = _transformMapper.Get(entity);
                 var waterPlane = _waterPlaneMapper.Get(entity);
 
-                AbstractEffect effect;
-
-                switch (_shaderManager.CurrentRenderTarget)
-                {
-                    case ShaderManager.RenderTarget.Final:
-                        effect = _shaderManager.WaterEffect;
-                        effect.World = transform.WorldMatrix;
-                        break;
-                    default:
-                        return;
-                }
+                var effect = _shaderManager.WaterEffect;
+                effect.World = transform.WorldMatrix;
 
                 //TODO: This only needs to happen once and not every draw-call.
                 _vertexBuffer.SetData(waterPlane.VertexList);

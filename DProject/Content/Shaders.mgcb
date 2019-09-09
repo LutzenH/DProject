@@ -23,6 +23,7 @@ $if platform=DesktopGL
 /copy:shaders/gbuffer/DirectionalLight
 /copy:shaders/gbuffer/PointLight
 /copy:shaders/gbuffer/CombineFinal
+/copy:shaders/SkyShader
 
 $endif
 
@@ -81,6 +82,12 @@ $if platform=Windows
 /processor:EffectProcessor
 /processorParam:DebugMode=Auto
 /build:shaders/gbuffer/CombineFinal.fx
+
+#begin shaders/SkyShader.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:shaders/SkyShader.fx
 
 $endif
 

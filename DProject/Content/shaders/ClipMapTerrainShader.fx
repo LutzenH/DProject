@@ -56,7 +56,7 @@ VertexShaderOutput VertexShaderFunction(VertexShaderInput input)
     VertexShaderOutput output;
 
 	float2 xy = ClipMapOffset + mul(input.Position, World).xz * ClipMapScale;
-	float2 texCoord = -xy / TextureDimension;
+	float2 texCoord = float2(xy.x, 1-xy.y) / TextureDimension;
 
 	float2 heightSample = tex2Dlod(heightmapSampler, float4(texCoord, 0, 0)).rg;
 	float ScaledHeightSample = 512 * heightSample.r + heightSample.g * 2;

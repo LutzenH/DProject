@@ -32,9 +32,12 @@ namespace DProject.Manager.World
             //Models
             AddSystem(new ModelLoaderSystem(contentManager));
             AddSystem(new ModelRenderSystem(graphicsDevice, shaderManager));
-            
+
             //Lighting
             AddSystem(new LightingRenderSystem(graphicsDevice, shaderManager));
+            
+            //Water
+            AddSystem(new WaterRenderSystem(graphicsDevice, shaderManager));
 
             World = Build();
 
@@ -44,12 +47,20 @@ namespace DProject.Manager.World
             
             _entityFactory.CreateFlyCamera(new Vector3(0, 1, 5));
             
-            _entityFactory.CreateProp(new Vector3(0, 50, -400), 10);
-            _entityFactory.CreateProp(new Vector3(-2, 50, -400), 9);
+            _entityFactory.CreateProp(new Vector3(0, 35, -400), 10);
+            _entityFactory.CreateProp(new Vector3(-2, 35, -400), 9);
+            _entityFactory.CreateProp(new Vector3(-4, 35, -400), 8);
+            _entityFactory.CreateProp(new Vector3(-6, 35, -400), 7);
+            _entityFactory.CreateProp(new Vector3(-8, 35, -400), 6);
 
-            _entityFactory.CreateDirectionalLight(Vector3.Down, new Color(0.8f, 0.8f, 0.8f));
-            _entityFactory.CreatePointLight(new Vector3(-0, 48, -400), Color.Red, 25f, 1f);
+            _entityFactory.CreateDirectionalLight(Vector3.Forward + Vector3.Down, new Color(0.8f, 0.8f, 0.8f));
+            _entityFactory.CreateDirectionalLight(Vector3.Left, Color.LightSkyBlue);
+            
+            _entityFactory.CreatePointLight(new Vector3(-0, 35, -400), Color.Red, 25f, 1f);
 
+            _entityFactory.CreateWaterPlane(new Vector2(0, -4096), new Vector2(4096, 4096));
+            _entityFactory.CreateWaterPlane(new Vector2(-4096, -4096), new Vector2(4096, 4096));
+            
             _entityFactory.CreateTerrainEntity();
         }
     }

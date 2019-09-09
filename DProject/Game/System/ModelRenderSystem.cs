@@ -45,9 +45,6 @@ namespace DProject.Manager.System
                     }
                 }
             }
-            
-            //TODO: This shouldn't be done in the ModelRenderSystem
-            _shaderManager.ResolveGBuffer();
         }
 
         private static void DrawMesh(Effect effect, ModelMeshPartCollection meshParts, GraphicsDevice graphicsDevice)
