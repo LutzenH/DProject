@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended.Entities;
+using PrimitiveType = DProject.Type.Rendering.Primitives.PrimitiveType;
 
 namespace DProject.Manager.World
 {
@@ -25,6 +26,9 @@ namespace DProject.Manager.World
             AddSystem(new ModelLoaderSystem(contentManager));
             AddSystem(new ModelRenderSystem(graphicsDevice, shaderManager));
 
+            //Primitives
+            AddSystem(new PrimitiveRenderSystem(graphicsDevice, shaderManager));
+            
             //Lighting
             AddSystem(new LightingRenderSystem(graphicsDevice, shaderManager));
             
@@ -42,6 +46,8 @@ namespace DProject.Manager.World
             _entityFactory.CreateProp(new Vector3(-6, 0, 0), 7);
             _entityFactory.CreateProp(new Vector3(-8, 0, 0), 6);
             
+            _entityFactory.CreatePrimitive(Vector3.Zero, new Vector3(4, 4, 4), PrimitiveType.Cube);
+
             //Lights
             _entityFactory.CreateDirectionalLight(Vector3.Forward + Vector3.Down, new Color(0.8f, 0.8f, 0.8f));
             _entityFactory.CreateDirectionalLight(Vector3.Left, Color.LightSkyBlue);

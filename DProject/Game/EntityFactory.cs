@@ -1,5 +1,7 @@
+using System;
 using DProject.Game.Component;
 using DProject.Game.Component.Lighting;
+using DProject.Type.Rendering.Primitives;
 using Microsoft.Xna.Framework;
 using MonoGame.Extended.Entities;
 
@@ -22,6 +24,41 @@ namespace DProject.Game
             entity.Attach(new FlyCameraComponent()
             {
                 Speed = 60f
+            });
+
+            return entity;
+        }
+
+        public Entity CreatePrimitive(Vector3 position, Vector3 scale, Quaternion rotation, PrimitiveType type)
+        {
+            var entity = World.CreateEntity();
+
+            entity.Attach(new PrimitiveComponent()
+            {
+                Position = position,
+                Scale = scale,
+                Rotation = rotation,
+                Type = type
+            });
+
+            return entity;
+        }
+        
+        public Entity CreatePrimitive(Vector3 fromPosition, Vector3 toPosition, PrimitiveType type)
+        {
+            var entity = World.CreateEntity();
+
+            var position = (fromPosition + toPosition) / 2;
+            var scale = new Vector3(Math.Abs(fromPosition.X - toPosition.X),
+                                    Math.Abs(fromPosition.Y - toPosition.Y),
+                                    Math.Abs(fromPosition.Z - toPosition.Z));
+            
+            entity.Attach(new PrimitiveComponent()
+            {
+                Position = position,
+                Scale = scale,
+                Rotation = Quaternion.Identity,
+                Type = type
             });
 
             return entity;
