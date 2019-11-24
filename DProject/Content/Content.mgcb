@@ -14,11 +14,6 @@
 
 #---------------------------------- Content ---------------------------------#
 
-#begin chunks/*
-/copy:chunks/diffuse/unloaded.png
-/copy:chunks/height/unloaded.png
-/copy:chunks/normal/unloaded.png
-
 #begin collections/colors.json
 /copy:collections/colors.json
 
@@ -53,44 +48,6 @@
 /copy:textures/tiles/sidewalk_tile_1.png
 /copy:textures/tiles/sidewalk_tile_2.png
 /copy:textures/tiles/tile_white.png
-
-#begin textures/ui/ports/*
-/copy:textures/ui/ports/clock_frame.png
-/copy:textures/ui/ports/clock_sky.png
-/copy:textures/ui/ports/compass.png
-/copy:textures/ui/ports/frame_simple.png
-/copy:textures/ui/ports/map_large.png
-/copy:textures/ui/ports/map_small.png
-/copy:textures/ui/ports/map_disabled.png
-/copy:textures/ui/ports/season_autumnal.png
-/copy:textures/ui/ports/season_estival.png
-/copy:textures/ui/ports/season_hibernal.png
-/copy:textures/ui/ports/season_prevernal.png
-/copy:textures/ui/ports/season_serotinal.png
-/copy:textures/ui/ports/season_vernal.png
-/copy:textures/ui/ports/timer_backdrop_disabled.png
-/copy:textures/ui/ports/timer_backdrop.png
-/copy:textures/ui/ports/timer_end_clicked.png
-/copy:textures/ui/ports/timer_end_disabled.png
-/copy:textures/ui/ports/timer_end.png
-/copy:textures/ui/ports/timer_pause_clicked.png
-/copy:textures/ui/ports/timer_pause_disabled.png
-/copy:textures/ui/ports/timer_pause.png
-/copy:textures/ui/ports/timer_play_clicked.png
-/copy:textures/ui/ports/timer_play_disabled.png
-/copy:textures/ui/ports/timer_play.png
-/copy:textures/ui/ports/timer_speedup_clicked.png
-/copy:textures/ui/ports/timer_speedup_disabled.png
-/copy:textures/ui/ports/timer_speedup.png
-/copy:textures/ui/ports/backdrop_list.png
-/copy:textures/ui/ports/backdrop_list_item.png
-/copy:textures/ui/ports/menu_corner_grab.png
-/copy:textures/ui/ports/window_button_exit.png
-/copy:textures/ui/ports/window_button_exit_pressed.png
-/copy:textures/ui/ports/scrollbar_backdrop.png
-/copy:textures/ui/ports/scrollbar_handle.png
-/copy:textures/ui/ports/scrollbar_backdrop_h.png
-/copy:textures/ui/ports/scrollbar_handle_h.png
 
 #begin fonts/default.spritefont
 /importer:FontDescriptionImporter

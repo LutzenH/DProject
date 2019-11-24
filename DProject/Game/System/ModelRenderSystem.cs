@@ -28,6 +28,9 @@ namespace DProject.Manager.System
 
         public override void Draw(GameTime gameTime)
         {
+            //TODO: This probably shouldn't be done in the ModelRenderSystem
+            _shaderManager.SetContinuousShaderInfo(CameraSystem.ActiveLens, 0.5f);
+            
             foreach (var entity in ActiveEntities)
             {
                 var model = _modelMapper.Get(entity);

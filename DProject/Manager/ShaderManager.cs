@@ -18,7 +18,6 @@ namespace DProject.Manager
 
         // GBuffer Effects
         private GBufferEffect _gBufferEffect;
-        private ClipMapTerrainEffect _clipMapTerrainEffect;
         private ClearGBufferEffect _clearGBufferEffect;
         private DirectionalLightEffect _directionalLightEffect;
         private PointLightEffect _pointLightEffect;
@@ -131,7 +130,6 @@ namespace DProject.Manager
 
         public void LoadContent(ContentManager content)
         {
-            _clipMapTerrainEffect = new ClipMapTerrainEffect(content.Load<Effect>("shaders/ClipMapTerrainShader"));
             _gBufferEffect = new GBufferEffect(content.Load<Effect>("shaders/gbuffer/RenderGBuffer"));
             _clearGBufferEffect = new ClearGBufferEffect(content.Load<Effect>("shaders/gbuffer/ClearGBuffer"));
             _directionalLightEffect = new DirectionalLightEffect(content.Load<Effect>("shaders/gbuffer/DirectionalLight"));
@@ -144,11 +142,7 @@ namespace DProject.Manager
             _skyEffect = new SkyEffect(content.Load<Effect>("shaders/SkyShader"));
             
             _fxaaEffect = new FXAAEffect(content.Load<Effect>("shaders/FXAAShader"));
-            
-            _clipMapTerrainEffect.Diffuse = ConvertToTexture(new Bitmap(Game1.RootDirectory + "textures/terrain/terrain-diffuse.png"), _graphicsDevice);
-            _clipMapTerrainEffect.Height = ConvertToTexture(new Bitmap(Game1.RootDirectory + "textures/terrain/terrain-height.png"), _graphicsDevice);
-            _clipMapTerrainEffect.Normal = ConvertToTexture(new Bitmap(Game1.RootDirectory + "textures/terrain/terrain-normal.png"), _graphicsDevice);
-            
+
             _primitives.LoadPrimitives(content);
             
             SetInitiateShaderInfo();
@@ -157,9 +151,6 @@ namespace DProject.Manager
         // TODO: This method is temporary until it will be replaces by a proper shader-information handler.
         public void SetContinuousShaderInfo(LensComponent lens, float relativeGameTime)
         {
-            _clipMapTerrainEffect.View = lens.View;
-            _clipMapTerrainEffect.Projection = lens.Projection;
-            
             _gBufferEffect.View = lens.View;
             _gBufferEffect.Projection = lens.Projection;
 
@@ -198,12 +189,6 @@ namespace DProject.Manager
         {
             _gBufferEffect.SpecularIntensity = 0.8f;
             _gBufferEffect.SpecularPower = 0.5f;
-            
-            _clipMapTerrainEffect.SpecularIntensity = 0.0f;
-            _clipMapTerrainEffect.SpecularPower = 0.0f;
-            _clipMapTerrainEffect.TextureDimension = new Vector2(4096f, 4096f);
-            _clipMapTerrainEffect.ClipMapOffset = new Vector2(2048f, -2048f);
-            _clipMapTerrainEffect.ClipMapScale = 1.0f;
 
             //Water
             _waterEffect.MaxWaterDepth = 50f;
@@ -251,8 +236,6 @@ namespace DProject.Manager
 
         public ClearGBufferEffect ClearBufferEffect => _clearGBufferEffect ?? throw new ContentLoadException("The ClearGBufferEffect shader has not been loaded yet.");
         
-        public ClipMapTerrainEffect ClipMapTerrainEffect => _clipMapTerrainEffect ?? throw new ContentLoadException("The ClipMapTerrainEffect shader has not been loaded yet.");
-        
         public GBufferEffect GBufferEffect => _gBufferEffect ?? throw new ContentLoadException("The GBufferEffect shader has not been loaded yet.");
         
         public DirectionalLightEffect DirectionalLightEffect => _directionalLightEffect ?? throw new ContentLoadException("The DirectionalLightEffect shader has not been loaded yet.");
@@ -272,23 +255,5 @@ namespace DProject.Manager
         public FXAAEffect FXAAEffect => _fxaaEffect ?? throw new ContentLoadException("The FXAAEffect shader has not been loaded yet.");
         
         #endregion
-        
-        //TODO: Remove when ClipMapping is finished.
-        private static Texture2D ConvertToTexture(Bitmap bitmap, GraphicsDevice graphicsDevice)
-        {
-            if (bitmap == null)
-                return null;
-            
-            Texture2D texture2D;
-            
-            using (var memoryStream = new MemoryStream())
-            {
-                bitmap.Save(memoryStream, ImageFormat.Png);
-                memoryStream.Seek(0, SeekOrigin.Begin);
-                texture2D = Texture2D.FromStream(graphicsDevice, memoryStream);
-            }
-            
-            return texture2D;
-        }
     }
 } 

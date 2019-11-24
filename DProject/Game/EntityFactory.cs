@@ -1,30 +1,14 @@
 using DProject.Game.Component;
 using DProject.Game.Component.Lighting;
-using DProject.Game.Component.Ports;
-using DProject.Game.Component.Terrain;
-using DProject.Game.Component.Terrain.ClipMap;
-using DProject.Type.Serializable.Chunk;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended.Entities;
 
 namespace DProject.Game
 {
     public class EntityFactory
     {
-        public const float WaterPlaneHeight = 96f;
-
         public World World { get; set; }
-        
-        public Entity CreateGameTime()
-        {
-            var entity = World.CreateEntity();
-            
-            entity.Attach(new GameTimeComponent());
 
-            return entity;
-        }
-        
         public Entity CreateFlyCamera(Vector3 position)
         {
             var entity = World.CreateEntity();
@@ -32,7 +16,7 @@ namespace DProject.Game
             entity.Attach(new LensComponent()
             {
                 Position = position,
-                ReflectionPlaneHeight = WaterPlaneHeight
+                ReflectionPlaneHeight = position.Y
             });
             
             entity.Attach(new FlyCameraComponent()
@@ -56,38 +40,17 @@ namespace DProject.Game
             return entity;
         }
 
-        public Entity CreateWaterPlane(Vector2 position, Vector2 size)
+        public Entity CreateWaterPlane(Vector3 position, Vector2 size)
         {
             var entity = World.CreateEntity();
             
             entity.Attach(new TransformComponent()
             {
-                Position = new Vector3(position.X, WaterPlaneHeight, position.Y)
+                Position = new Vector3(position.X, position.Y, position.Z)
             });
             entity.Attach(new WaterPlaneComponent()
             {
                 Size = size
-            });
-
-            return entity;
-        }
-
-        public Entity CreateTerrainEntity()
-        {
-            var entity = World.CreateEntity();
-            
-            entity.Attach(new ClipMapTerrainComponent());
-
-            return entity;
-        }
-
-        public Entity CreateClipMap(ClipMapType type)
-        {
-            var entity = World.CreateEntity();
-            
-            entity.Attach(new ClipMapComponent()
-            {
-                Type = type
             });
 
             return entity;
