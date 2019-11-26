@@ -12,8 +12,9 @@ namespace DProject.Manager.System
         private readonly GraphicsDevice _graphicsDevice;
         
         private ComponentMapper<PrimitiveComponent> _primitiveMapper;
+        private ComponentMapper<TransformComponent> _transformMapper;
 
-        public PrimitiveRenderSystem(GraphicsDevice graphicsDevice, ShaderManager shaderManager) : base(Aspect.All(typeof(PrimitiveComponent)))
+        public PrimitiveRenderSystem(GraphicsDevice graphicsDevice, ShaderManager shaderManager) : base(Aspect.All(typeof(PrimitiveComponent), typeof(TransformComponent)))
         {
             _graphicsDevice = graphicsDevice;
             _shaderManager = shaderManager;
@@ -22,6 +23,7 @@ namespace DProject.Manager.System
         public override void Initialize(IComponentMapperService mapperService)
         {
             _primitiveMapper = mapperService.GetMapper<PrimitiveComponent>();
+            _transformMapper = mapperService.GetMapper<TransformComponent>();
         }
 
         public override void Draw(GameTime gameTime)
@@ -29,8 +31,9 @@ namespace DProject.Manager.System
             foreach (var entity in ActiveEntities)
             {
                 var primitive = _primitiveMapper.Get(entity);
-
-                _shaderManager.GBufferEffect.World = primitive.WorldMatrix;
+                var transform = _transformMapper.Get(entity);
+                
+                _shaderManager.GBufferEffect.World = transform.WorldMatrix;
                 _shaderManager.DrawPrimitive(_shaderManager.GBufferEffect, primitive.Type);
             }
         }

@@ -26,6 +26,11 @@ namespace DProject.Manager.World
             AddSystem(new ModelLoaderSystem(contentManager));
             AddSystem(new ModelRenderSystem(graphicsDevice, shaderManager));
 
+            //Physics
+            var physicsSystem = new PhysicsSystem();
+            AddSystem(physicsSystem);
+            AddSystem(new PhysicsSyncSystem(physicsSystem.GetSimulation()));
+            
             //Primitives
             AddSystem(new PrimitiveRenderSystem(graphicsDevice, shaderManager));
             
@@ -37,7 +42,14 @@ namespace DProject.Manager.World
 
             World = Build();
             _entityFactory.World = World;
-            
+
+            _entityFactory.CreatePhysicsStaticPrimitive(new Vector3(-250, 0, -250), new Vector3(250, -1, 250), PrimitiveType.Cube);
+
+            for (var i = 0; i < 400; i++)
+            {
+                _entityFactory.CreatePhysicsDynamicPrimitive(new Vector3(i%3/3f, i, i%4/3f), Vector3.One, Quaternion.Identity, PrimitiveType.Sphere);
+            }
+
             //Entities
             _entityFactory.CreateFlyCamera(new Vector3(0, 0, 0));
             _entityFactory.CreateProp(new Vector3(0, 0, 0), 10);

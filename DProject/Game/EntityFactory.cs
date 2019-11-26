@@ -1,6 +1,8 @@
 using System;
+using BepuPhysics.Collidables;
 using DProject.Game.Component;
 using DProject.Game.Component.Lighting;
+using DProject.Game.Component.Physics;
 using DProject.Type.Rendering.Primitives;
 using Microsoft.Xna.Framework;
 using MonoGame.Extended.Entities;
@@ -29,15 +31,21 @@ namespace DProject.Game
             return entity;
         }
 
+        #region Primitives
+
         public Entity CreatePrimitive(Vector3 position, Vector3 scale, Quaternion rotation, PrimitiveType type)
         {
             var entity = World.CreateEntity();
 
-            entity.Attach(new PrimitiveComponent()
+            entity.Attach(new TransformComponent()
             {
                 Position = position,
                 Scale = scale,
                 Rotation = rotation,
+            });
+            
+            entity.Attach(new PrimitiveComponent()
+            {
                 Type = type
             });
 
@@ -53,16 +61,105 @@ namespace DProject.Game
                                     Math.Abs(fromPosition.Y - toPosition.Y),
                                     Math.Abs(fromPosition.Z - toPosition.Z));
             
-            entity.Attach(new PrimitiveComponent()
+            entity.Attach(new TransformComponent()
             {
                 Position = position,
                 Scale = scale,
                 Rotation = Quaternion.Identity,
+            });
+            
+            entity.Attach(new PrimitiveComponent()
+            {
                 Type = type
             });
 
             return entity;
         }
+
+        public Entity CreatePhysicsStaticPrimitive(Vector3 fromPosition, Vector3 toPosition, PrimitiveType type)
+        {
+            var entity = World.CreateEntity();
+            
+            var position = (fromPosition + toPosition) / 2;
+            var scale = new Vector3(Math.Abs(fromPosition.X - toPosition.X),
+                Math.Abs(fromPosition.Y - toPosition.Y),
+                Math.Abs(fromPosition.Z - toPosition.Z));
+            
+            entity.Attach(new TransformComponent()
+            {
+                Position = position,
+                Scale = scale,
+                Rotation = Quaternion.Identity,
+            });
+            
+            entity.Attach(new PrimitiveComponent()
+            {
+                Type = type
+            });
+
+            IConvexShape shape;
+            switch (type)
+            {
+                case PrimitiveType.Sphere:
+                    shape = new Sphere(scale.Length()/2);
+                    break;
+                case PrimitiveType.Cube:
+                default:
+                    shape = new Box(scale.X, scale.Y, scale.Z);
+                    break;
+            }
+            
+            entity.Attach(new PhysicsComponent()
+            {
+                StartPosition = new System.Numerics.Vector3(position.X, position.Y, position.Z),
+                Shape = shape,
+                SpeculativeMargin = 0.1f
+            });
+
+            return entity;
+        }
+        
+        public Entity CreatePhysicsDynamicPrimitive(Vector3 position, Vector3 scale, Quaternion rotation, PrimitiveType type)
+        {
+            var entity = World.CreateEntity();
+
+            entity.Attach(new TransformComponent()
+            {
+                Position = position,
+                Scale = scale,
+                Rotation = rotation,
+            });
+            
+            entity.Attach(new PrimitiveComponent()
+            {
+                Type = type
+            });
+            
+            IConvexShape shape;
+            switch (type)
+            {
+                case PrimitiveType.Sphere:
+                    shape = new Sphere(scale.Length()/2);
+                    break;
+                case PrimitiveType.Cube:
+                default:
+                    shape = new Box(scale.X, scale.Y, scale.Z);
+                    break;
+            }
+            
+            entity.Attach(new PhysicsBodyComponent()
+            {
+                SleepTreshold = 0.01f,
+                Mass = 1f,
+                StartPosition = new System.Numerics.Vector3(position.X, position.Y, position.Z),
+                Shape = shape,
+                SpeculativeMargin = 0.1f
+            });
+
+            return entity;
+        }
+        
+        #endregion
 
         public Entity CreateProp(Vector3 position, ushort id)
         {
@@ -93,6 +190,8 @@ namespace DProject.Game
             return entity;
         }
 
+        #region Lights
+        
         public Entity CreateDirectionalLight(Vector3 direction, Color color)
         {
             var entity = World.CreateEntity();
@@ -120,5 +219,7 @@ namespace DProject.Game
 
             return entity;
         }
+        
+        #endregion
     }
 }
