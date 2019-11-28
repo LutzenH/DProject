@@ -89,5 +89,47 @@
         "default_scale_x":1.00,
         "default_scale_y":1.00,
         "default_scale_z":1.00
+    },
+    {
+        "name":"red_brick_building_window",
+        "path":"models/city/red_brick_building/red_brick_building_window",
+        "default_scale_x":1.00,
+        "default_scale_y":1.00,
+        "default_scale_z":1.00
+    },
+    {
+        "name":"red_brick_building_ground_floor_door",
+        "path":"models/city/red_brick_building/red_brick_building_ground_floor_door",
+        "default_scale_x":1.00,
+        "default_scale_y":1.00,
+        "default_scale_z":1.00
+    },
+    {
+        "name":"red_brick_building_ground_floor_window",
+        "path":"models/city/red_brick_building/red_brick_building_ground_floor_window",
+        "default_scale_x":1.00,
+        "default_scale_y":1.00,
+        "default_scale_z":1.00
+    },
+    {
+        "name":"red_brick_building_column",
+        "path":"models/city/red_brick_building/red_brick_building_column",
+        "default_scale_x":1.00,
+        "default_scale_y":1.00,
+        "default_scale_z":1.00
+    },
+    {
+        "name":"red_brick_building_rows",
+        "path":"models/city/red_brick_building/red_brick_building_rows",
+        "default_scale_x":1.00,
+        "default_scale_y":1.00,
+        "default_scale_z":1.00
+    },
+    {
+        "name":"red_brick_building_parapet_side",
+        "path":"models/city/red_brick_building/red_brick_building_parapet_side",
+        "default_scale_x":1.00,
+        "default_scale_y":1.00,
+        "default_scale_z":1.00
     }
 ]} 

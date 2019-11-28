@@ -50,6 +50,9 @@ namespace DProject.Manager.World
                 _entityFactory.CreatePhysicsDynamicPrimitive(new Vector3(i%3/3f, i, i%4/3f), Vector3.One, Quaternion.Identity, PrimitiveType.Sphere);
             }
 
+            CreateRedBrickBuilding();
+            CreateCityBlock();
+
             //Entities
             _entityFactory.CreateFlyCamera(new Vector3(0, 0, 0));
             _entityFactory.CreateProp(new Vector3(0, 0, 0), 10);
@@ -57,13 +60,48 @@ namespace DProject.Manager.World
             _entityFactory.CreateProp(new Vector3(-4, 0, 0), 8);
             _entityFactory.CreateProp(new Vector3(-6, 0, 0), 7);
             _entityFactory.CreateProp(new Vector3(-8, 0, 0), 6);
-            
-            _entityFactory.CreatePrimitive(Vector3.Zero, new Vector3(4, 4, 4), PrimitiveType.Cube);
 
             //Lights
             _entityFactory.CreateDirectionalLight(Vector3.Forward + Vector3.Down, new Color(0.8f, 0.8f, 0.8f));
             _entityFactory.CreateDirectionalLight(Vector3.Left, Color.LightSkyBlue);
             _entityFactory.CreatePointLight(new Vector3(-0, 2, 0), Color.Red, 25f, 1f);
+        }
+
+        private void CreateRedBrickBuilding()
+        {
+            for (var i = 0; i < 5; i++)
+            {
+                _entityFactory.CreateProp(new Vector3(-18, 0.3f, -7.8f + (i*3.9f)), "models/city/red_brick_building/red_brick_building_window");
+                
+                if(i == 2)
+                    _entityFactory.CreateProp(new Vector3(-18, 0.3f, -7.8f + (i*3.9f)), "models/city/red_brick_building/red_brick_building_ground_floor_door");
+                else
+                    _entityFactory.CreateProp(new Vector3(-18, 0.3f, -7.8f + (i*3.9f)), "models/city/red_brick_building/red_brick_building_ground_floor_window");
+                
+                
+                _entityFactory.CreateProp(new Vector3(-18, 0.3f, -7.8f + (i*3.9f)), "models/city/red_brick_building/red_brick_building_rows");
+                _entityFactory.CreateProp(new Vector3(-18, 0.3f, -7.8f + (i*3.9f)), "models/city/red_brick_building/red_brick_building_parapet_side");
+            }
+            for (var i = 0; i < 6; i++)
+                _entityFactory.CreateProp(new Vector3(-18, 0.3f, -9.75f + (i*3.9f)), "models/city/red_brick_building/red_brick_building_column");
+        }
+
+        private void CreateCityBlock()
+        {
+            _entityFactory.CreatePrimitive(new Vector3(-212f, 0.3f, 60f), new Vector3(212.0f, -3.4f, 36f), PrimitiveType.Cube);
+            _entityFactory.CreatePrimitive(new Vector3(-212f, 0.0f, 36f), new Vector3(212.0f, -4f, 20f), PrimitiveType.Cube);
+            _entityFactory.CreatePrimitive(new Vector3(-8f, 0.0f, 20f), new Vector3(8.0f, -4f, -140f), PrimitiveType.Cube);
+            _entityFactory.CreatePrimitive(new Vector3(-212f, 0.3f, 20f), new Vector3(-8.0f, -3.4f, 10f), PrimitiveType.Cube);
+            _entityFactory.CreatePrimitive(new Vector3(8, 0.3f, 20f), new Vector3(212.0f, -3.4f, 10f), PrimitiveType.Cube);
+            _entityFactory.CreatePrimitive(new Vector3(-18, 0.3f, 10f), new Vector3(-8.0f, -3.4f, -140f), PrimitiveType.Cube);
+            _entityFactory.CreatePrimitive(new Vector3(8, 0.3f, 10f), new Vector3(18.0f, -3.4f, -140f), PrimitiveType.Cube);
+            _entityFactory.CreatePrimitive(new Vector3(-18, 19f, -10f), new Vector3(-86.0f, 0.3f, -28f), PrimitiveType.Cube);
+            _entityFactory.CreatePrimitive(new Vector3(-26, 19f, -28), new Vector3(-36.0f, 5f, -32), PrimitiveType.Cube);
+            _entityFactory.CreatePrimitive(new Vector3(-18, 21f, -32), new Vector3(-86.0f, 0.3f, -56), PrimitiveType.Cube);
+            _entityFactory.CreatePrimitive(new Vector3(18, 18f, 10), new Vector3(94.0f, 0.3f, -54), PrimitiveType.Cube);
+            _entityFactory.CreatePrimitive(new Vector3(-18,  0.3f, -56), new Vector3(-212.0f, -3.4f, -62), PrimitiveType.Cube);
+            _entityFactory.CreatePrimitive(new Vector3(18,  0.3f, -54), new Vector3(212.0f, -3.4f, -62), PrimitiveType.Cube);
+            _entityFactory.CreatePrimitive(new Vector3(18,  13f, -62), new Vector3(56.0f, 0.3f, -126), PrimitiveType.Cube);
         }
     }
 }

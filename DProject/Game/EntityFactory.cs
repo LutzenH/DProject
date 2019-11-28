@@ -173,6 +173,19 @@ namespace DProject.Game
 
             return entity;
         }
+        
+        public Entity CreateProp(Vector3 position, string path)
+        {
+            var entity = World.CreateEntity();
+            
+            entity.Attach(new TransformComponent()
+            {
+                Position = position
+            });
+            entity.Attach(new ModelComponent(path));
+
+            return entity;
+        }
 
         public Entity CreateWaterPlane(Vector3 position, Vector2 size)
         {
