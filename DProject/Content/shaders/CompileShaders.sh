@@ -6,3 +6,4 @@ wine64 "C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Utilities\bin\x
 wine64 "C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Utilities\bin\x64\fxc.exe" /Tfx_2_0 "gbuffer/PointLight.fx" /Fo
 wine64 "C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Utilities\bin\x64\fxc.exe" /Tfx_2_0 "gbuffer/CombineFinal.fx" /Fo
 wine64 "C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Utilities\bin\x64\fxc.exe" /Tfx_2_0 "SkyShader.fx" /Fo
+wine64 "C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Utilities\bin\x64\fxc.exe" /Tfx_2_0 "SSAOShader.fx" /Fo

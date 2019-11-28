@@ -24,6 +24,7 @@ $if platform=DesktopGL
 /copy:shaders/gbuffer/PointLight
 /copy:shaders/gbuffer/CombineFinal
 /copy:shaders/SkyShader
+/copy:shaders/SSAOShader
 
 $endif
 
@@ -89,6 +90,12 @@ $if platform=Windows
 /processorParam:DebugMode=Auto
 /build:shaders/SkyShader.fx
 
+#begin shaders/SSAOShader.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:shaders/SSAOShader.fx
+
 $endif
 
 #begin shaders/water_dudv.png
@@ -102,6 +109,18 @@ $endif
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:shaders/water_dudv.png
+
+#begin shaders/noise.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:shaders/noise.png
 
 #begin textures/terrain/*
 /copy:textures/terrain/terrain-diffuse.png

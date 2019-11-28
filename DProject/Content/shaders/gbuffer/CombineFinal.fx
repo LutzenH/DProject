@@ -20,6 +20,17 @@ sampler LightSampler = sampler_state
     Mipfilter = LINEAR;
 };
 
+texture SSAOMap;
+sampler SSAOSampler = sampler_state
+{
+    Texture = (SSAOMap);
+    AddressU = CLAMP;
+    AddressV = CLAMP;
+    MagFilter = LINEAR;
+    MinFilter = LINEAR;
+    Mipfilter = LINEAR;
+};
+
 struct VertexShaderInput
 {
     float3 Position : POSITION0;
@@ -46,11 +57,12 @@ float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
 {
     float3 diffuseColor = tex2D(ColorSampler, input.TexCoord).rgb;
     float4 light = tex2D(LightSampler, input.TexCoord);
+    float ssao = tex2D(SSAOSampler, input.TexCoord);
 
     float3 diffuseLight = light.rgb;
     float specularLight = light.a;
 
-    return float4((diffuseColor * diffuseLight + specularLight), 1);
+    return float4((diffuseColor * diffuseLight + specularLight) * ssao, 1);
 }
 
 technique CombineFinal

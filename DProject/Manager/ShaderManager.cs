@@ -31,6 +31,9 @@ namespace DProject.Manager
         
         // FXAA Effect
         private FXAAEffect _fxaaEffect;
+        
+        // SSAO Effect
+        private SSAOEffect _ssaoEffect;
 
         // Render-targets (G-Buffer)
         private readonly RenderTargetBinding[] _renderTargetBindings = new RenderTargetBinding[3];
@@ -43,6 +46,8 @@ namespace DProject.Manager
         public RenderTarget2D Depth;
         // Lights
         public RenderTarget2D Lights;
+        // SSAO
+        public RenderTarget2D SSAO;
         // Final
         public RenderTarget2D CombineFinal;
         
@@ -97,6 +102,14 @@ namespace DProject.Manager
                 SurfaceFormat.Color,
                 DepthFormat.Depth24);
             
+            SSAO = new RenderTarget2D(
+                _graphicsDevice,
+                _graphicsDevice.PresentationParameters.BackBufferWidth,
+                _graphicsDevice.PresentationParameters.BackBufferHeight,
+                false,
+                SurfaceFormat.Single,
+                DepthFormat.Depth24);
+            
             CombineFinal = new RenderTarget2D(
                 _graphicsDevice,
                 _graphicsDevice.PresentationParameters.BackBufferWidth,
@@ -142,6 +155,8 @@ namespace DProject.Manager
             _skyEffect = new SkyEffect(content.Load<Effect>("shaders/SkyShader"));
             
             _fxaaEffect = new FXAAEffect(content.Load<Effect>("shaders/FXAAShader"));
+            _ssaoEffect = new SSAOEffect(content.Load<Effect>("shaders/SSAOShader"));
+            _ssaoEffect.Noise = content.Load<Texture2D>("shaders/noise");
 
             _primitives.LoadPrimitives(content);
             
@@ -170,6 +185,7 @@ namespace DProject.Manager
 
             _combineFinalEffect.ColorMap = Color;
             _combineFinalEffect.LightMap = Lights;
+            _combineFinalEffect.SSAOMap = SSAO;
 
             _waterEffect.RefractionBuffer = CombineFinal;
             _waterEffect.ReflectionBuffer = CombineFinal;
@@ -181,6 +197,9 @@ namespace DProject.Manager
             _waterEffect.FarClipPlane = lens.FarPlaneDistance;
             _waterEffect.CameraPosition = lens.Position;
 
+            _ssaoEffect.NormalMap = Normal;
+            _ssaoEffect.DepthMap = Depth;
+            
             _skyEffect.Depth = Depth;
         }
         
@@ -216,6 +235,12 @@ namespace DProject.Manager
             _fxaaEffect.EdgeThreshold = 0.166f;
             _fxaaEffect.EdgeThresholdMin = 0f;
             _fxaaEffect.CurrentTechnique = _fxaaEffect.Techniques["FXAA"];
+
+            _ssaoEffect.TotalStrength = 0.5f;
+            _ssaoEffect.Strength = 0.07f;
+            _ssaoEffect.Offset = 18.0f;
+            _ssaoEffect.Falloff = 0.25f;
+            _ssaoEffect.Rad = 0.003f;
         }
 
         #region Draw Primitives
@@ -253,7 +278,9 @@ namespace DProject.Manager
         public SkyEffect SkyEffect => _skyEffect ?? throw new ContentLoadException("The SkyboxEffect shader has not been loaded yet.");
         
         public FXAAEffect FXAAEffect => _fxaaEffect ?? throw new ContentLoadException("The FXAAEffect shader has not been loaded yet.");
-        
+
+        public SSAOEffect SSAOEffect => _ssaoEffect ?? throw new ContentLoadException("The SSAOEffect shader has not been loaded yet.");
+
         #endregion
     }
 } 

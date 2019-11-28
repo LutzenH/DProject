@@ -147,7 +147,8 @@ namespace DProject
                 _spriteBatch.Draw(_shaderManager.Depth, new Rectangle(0, 180, 320, 180), Color.White);
                 _spriteBatch.Draw(_shaderManager.Normal, new Rectangle(0, 360, 320, 180), Color.White);
                 _spriteBatch.Draw(_shaderManager.Lights, new Rectangle(0, 540, 320, 180), Color.White);
-                _spriteBatch.Draw(_shaderManager.CombineFinal, new Rectangle(0, 720, 320, 180), Color.White);
+                _spriteBatch.Draw(_shaderManager.SSAO, new Rectangle(0, 720, 320, 180), Color.White);
+                _spriteBatch.Draw(_shaderManager.CombineFinal, new Rectangle(0, 900, 320, 180), Color.White);
             }
             finally
             {

@@ -70,6 +70,11 @@ namespace DProject.Manager.System.Lighting
             }
 
             _graphicsDevice.RasterizerState.CullMode = previousCullMode;
+            _graphicsDevice.SetRenderTarget(_shaderManager.SSAO);
+            _shaderManager.DrawFullscreenQuad(_shaderManager.SSAOEffect);
+            _graphicsDevice.BlendState = BlendState.Opaque;
+            
+            _graphicsDevice.RasterizerState.CullMode = previousCullMode;
             _graphicsDevice.SetRenderTarget(_shaderManager.CombineFinal);
             _graphicsDevice.BlendState = BlendState.Opaque;
             
