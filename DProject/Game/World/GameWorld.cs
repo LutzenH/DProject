@@ -55,6 +55,7 @@ namespace DProject.Manager.World
             }
 
             CreateRedBrickBuilding();
+            CreateWhiteMarbleBuilding();
             CreateCityBlock();
 
             //Entities
@@ -66,8 +67,8 @@ namespace DProject.Manager.World
             _entityFactory.CreateProp(new Vector3(-8, 0, 0), 6);
 
             //Lights
-            _entityFactory.CreateDirectionalLight(Vector3.Forward + Vector3.Down, new Color(0.8f, 0.8f, 0.8f));
-            _entityFactory.CreateDirectionalLight(Vector3.Left, Color.LightSkyBlue);
+            _entityFactory.CreateDirectionalLight(Vector3.Forward + Vector3.Down, Color.White);
+            _entityFactory.CreateDirectionalLight(Vector3.Left, Color.White);
             _entityFactory.CreatePointLight(new Vector3(-0, 2, 0), Color.Red, 25f, 1f);
         }
 
@@ -90,6 +91,19 @@ namespace DProject.Manager.World
                 _entityFactory.CreateProp(new Vector3(-18, 0.3f, -9.75f + (i*3.9f)), "models/city/red_brick_building/red_brick_building_column");
         }
 
+        private void CreateWhiteMarbleBuilding()
+        {
+            _entityFactory.CreateProp(new Vector3(-18, 0.3f, -18.5f), "models/city/white_marble_building/white_marble_building_ground_wall");
+            _entityFactory.CreateProp(new Vector3(-18, 0.3f, -18.5f), "models/city/white_marble_building/white_marble_building_ground_pillars");
+
+            _entityFactory.CreateProp(new Vector3(-18, 5.6f, -18.5f), "models/city/white_marble_building/white_marble_building_storey");
+            _entityFactory.CreateProp(new Vector3(-18, 5.6f+3.2f, -18.5f), "models/city/white_marble_building/white_marble_building_storey");
+            _entityFactory.CreateProp(new Vector3(-18, 5.6f+3.2f*2, -18.5f), "models/city/white_marble_building/white_marble_building_storey");
+            _entityFactory.CreateProp(new Vector3(-18, 5.6f+3.2f*3, -18.5f), "models/city/white_marble_building/white_marble_building_storey");
+
+            _entityFactory.CreateProp(new Vector3(-18, 5.6f+3.2f*4, -18.5f), "models/city/white_marble_building/white_marble_building_roof");
+        }
+
         private void CreateCityBlock()
         {
             _entityFactory.CreatePrimitive(new Vector3(-212f, 0.3f, 60f), new Vector3(212.0f, -3.4f, 36f), PrimitiveType.Cube);
@@ -99,7 +113,7 @@ namespace DProject.Manager.World
             _entityFactory.CreatePrimitive(new Vector3(8, 0.3f, 20f), new Vector3(212.0f, -3.4f, 10f), PrimitiveType.Cube);
             _entityFactory.CreatePrimitive(new Vector3(-18, 0.3f, 10f), new Vector3(-8.0f, -3.4f, -140f), PrimitiveType.Cube);
             _entityFactory.CreatePrimitive(new Vector3(8, 0.3f, 10f), new Vector3(18.0f, -3.4f, -140f), PrimitiveType.Cube);
-            _entityFactory.CreatePrimitive(new Vector3(-18, 19f, -10f), new Vector3(-86.0f, 0.3f, -28f), PrimitiveType.Cube);
+            _entityFactory.CreatePhysicsStaticPrimitive(new Vector3(-19, 19f, -10f), new Vector3(-86.0f, 0.3f, -28f), PrimitiveType.Cube);
             _entityFactory.CreatePrimitive(new Vector3(-26, 19f, -28), new Vector3(-36.0f, 5f, -32), PrimitiveType.Cube);
             _entityFactory.CreatePrimitive(new Vector3(-18, 21f, -32), new Vector3(-86.0f, 0.3f, -56), PrimitiveType.Cube);
             _entityFactory.CreatePrimitive(new Vector3(18, 18f, 10), new Vector3(94.0f, 0.3f, -54), PrimitiveType.Cube);

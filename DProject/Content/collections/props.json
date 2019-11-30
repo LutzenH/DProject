@@ -131,5 +131,33 @@
         "default_scale_x":1.00,
         "default_scale_y":1.00,
         "default_scale_z":1.00
+    },
+    {
+        "name":"white_marble_building_storey",
+        "path":"models/city/white_marble_building/white_marble_building_storey",
+        "default_scale_x":1.00,
+        "default_scale_y":1.00,
+        "default_scale_z":1.00
+    },
+    {
+        "name":"white_marble_building_ground_wall",
+        "path":"models/city/white_marble_building/white_marble_building_ground_wall",
+        "default_scale_x":1.00,
+        "default_scale_y":1.00,
+        "default_scale_z":1.00
+    },
+    {
+        "name":"white_marble_building_ground_pillars",
+        "path":"models/city/white_marble_building/white_marble_building_ground_pillars",
+        "default_scale_x":1.00,
+        "default_scale_y":1.00,
+        "default_scale_z":1.00
+    },
+    {
+        "name":"white_marble_building_roof",
+        "path":"models/city/white_marble_building/white_marble_building_roof",
+        "default_scale_x":1.00,
+        "default_scale_y":1.00,
+        "default_scale_z":1.00
     }
 ]} 
