@@ -27,11 +27,6 @@ namespace DProject
         public static int ScreenResolutionX;
         public static int ScreenResolutionY;
 
-#if EDITOR
-        public static int WidgetOffsetX;
-        public static int WidgetOffsetY;
-#endif
-        
         private DateTime _last = DateTime.Now;
         private int _fps;
         private int _lastRecordedFps;
@@ -138,23 +133,6 @@ namespace DProject
             {
                 _spriteBatch.End();
             }
-            
-            try
-            {
-                _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, SamplerState.LinearClamp, DepthStencilState.Default, RasterizerState.CullCounterClockwise, null, Matrix.Identity);
-
-                _spriteBatch.Draw(_shaderManager.Color, new Rectangle(0, 0, 320, 180), Color.White);
-                _spriteBatch.Draw(_shaderManager.Depth, new Rectangle(0, 180, 320, 180), Color.White);
-                _spriteBatch.Draw(_shaderManager.Normal, new Rectangle(0, 360, 320, 180), Color.White);
-                _spriteBatch.Draw(_shaderManager.Lights, new Rectangle(0, 540, 320, 180), Color.White);
-                _spriteBatch.Draw(_shaderManager.SSAO, new Rectangle(0, 720, 320, 180), Color.White);
-                _spriteBatch.Draw(_shaderManager.CombineFinal, new Rectangle(0, 900, 320, 180), Color.White);
-            }
-            finally
-            {
-                _spriteBatch.End();
-            }
-            
             _fps++;
             base.Draw(gameTime);
         }
@@ -172,30 +150,15 @@ namespace DProject
             _graphics.PreferredBackBufferWidth = ScreenResolutionX;
             _graphics.PreferredBackBufferHeight = ScreenResolutionY;
         }
-
-#if EDITOR
-        public void SetWidgetOffset(int x, int y)
-        {
-            WidgetOffsetX = x;
-            WidgetOffsetY = y;
-        }
-#endif
+        
         public static Vector2 GetMousePosition()
         {
-#if EDITOR
-            return new Vector2(Mouse.GetState().X + WidgetOffsetX, Mouse.GetState().Y + WidgetOffsetY);
-#else
             return Mouse.GetState().Position.ToVector2();
-#endif
         }
 
         public static Point GetPointMousePosition()
         {
-#if EDITOR
-            return new Point(Mouse.GetState().X + WidgetOffsetX, Mouse.GetState().Y + WidgetOffsetY);
-#else
             return Mouse.GetState().Position;
-#endif
         }
 
         public int GetFps()

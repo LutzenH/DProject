@@ -39,6 +39,10 @@ namespace DProject.Manager.World
             
             //Water
             AddSystem(new WaterRenderSystem(graphicsDevice, shaderManager));
+            
+#if EDITOR
+            AddSystem(new DebugUIRenderSystem(graphicsDevice, shaderManager));            
+#endif
 
             World = Build();
             _entityFactory.World = World;
