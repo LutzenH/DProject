@@ -7,7 +7,8 @@ namespace DProject
         [STAThread]
         public static void Main(string[] args)
         {
-            var window = new EditorWindow(args);
+            using (var game = new Game1())
+                game.Run();
         }
     }
 }
