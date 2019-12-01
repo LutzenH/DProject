@@ -9,6 +9,7 @@ using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended.Entities;
 using MonoGame.Extended.Entities.Systems;
 using Num = System.Numerics;
+using PrimitiveType = DProject.Type.Rendering.Primitives.PrimitiveType;
 
 namespace DProject.Manager.System
 {
@@ -160,8 +161,48 @@ namespace DProject.Manager.System
             {
                 foreach (var property in component.GetType().GetProperties())
                 {
-                    ImGui.Text(property.Name + ":");
-                    ImGui.Text(property.GetValue(component, null).ToString());
+                    var propertyValue = property.GetValue(component, null);
+
+                    if (ImGui.TreeNode(property.Name))
+                    {
+                        if (propertyValue is Vector3 vector)
+                        {
+                            ImGui.InputFloat("x###" + vector.X.GetHashCode(), ref vector.X);
+                            ImGui.InputFloat("y###" + vector.Y.GetHashCode(), ref vector.Y);
+                            ImGui.InputFloat("z###" + vector.Z.GetHashCode(), ref vector.Z);
+                        }
+                        else if (propertyValue is Quaternion quaternion)
+                        {
+                            ImGui.InputFloat("x###" + quaternion.X.GetHashCode(), ref quaternion.X);
+                            ImGui.InputFloat("y###" + quaternion.Y.GetHashCode(), ref quaternion.Y);
+                            ImGui.InputFloat("z###" + quaternion.Z.GetHashCode(), ref quaternion.Z);
+                            ImGui.InputFloat("w###" + quaternion.W.GetHashCode(), ref quaternion.W);
+                        }
+                        else if (propertyValue is PrimitiveType type)
+                        {
+                            var intType = (int) type;
+                            ImGui.SliderInt("Type###PropertyPrimitiveType", ref intType, 0, 1, type.ToString());
+                            
+                            propertyValue = (PrimitiveType) intType;
+                            property.SetValue(component, propertyValue);
+                        }
+                        else if (propertyValue is Color color)
+                        {
+                            var vec4Color = color.ToVector4();
+                            var inColor = new global::System.Numerics.Vector4(vec4Color.X, vec4Color.Y, vec4Color.Z, vec4Color.W);
+
+                            ImGui.ColorEdit4("Color###PropertyColor", ref inColor);
+                            
+                            propertyValue = new Color(inColor.X, inColor.Y, inColor.Z, inColor.W);
+                            property.SetValue(component, propertyValue);
+                        }
+                        else
+                        {
+                            ImGui.Text(propertyValue.ToString());
+                        }
+
+                        ImGui.TreePop();
+                    }
                 }   
             }
         }
