@@ -1,7 +1,8 @@
 namespace DProject.Game.Component.Physics
 {
-    public class ActivePhysicsComponent
+    public class StaticPhysicsComponent
     {
         public int? Handle { get; set; }
     }
 }
+ 

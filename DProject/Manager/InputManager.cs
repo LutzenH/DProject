@@ -26,7 +26,8 @@ namespace DProject.Manager
         DebugShowClipMaps,
         //Debug World
         DebugIncreaseViewDistance,
-        DebugDecreaseViewDistance
+        DebugDecreaseViewDistance,
+        PickupPhysicsBody
     }
 
     public class InputManager
@@ -46,7 +47,7 @@ namespace DProject.Manager
             _currentMouseState = Mouse.GetState();
 
             _previousInput = _input;
-            _input.Clear();
+            _input = new HashSet<Input>();
             
             var pressedKeys = Keyboard.GetState().GetPressedKeys();
 
@@ -107,6 +108,8 @@ namespace DProject.Manager
 
             if (_currentMouseState.MiddleButton == ButtonState.Pressed)
                 _input.Add(Input.CameraFreeRotation);
+            if (_currentMouseState.RightButton == ButtonState.Pressed)
+                _input.Add(Input.PickupPhysicsBody);
 
             CameraLookVector = _previousMouseState.Position.ToVector2() - _currentMouseState.Position.ToVector2();
         }

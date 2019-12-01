@@ -82,6 +82,7 @@ namespace DProject.Manager.System
         private ComponentMapper<PhysicsBodyComponent> _physicsBodyMapper;
         
         private ComponentMapper<ActivePhysicsComponent> _activePhysicsMapper;
+        private ComponentMapper<StaticPhysicsComponent> _staticPhysicsMapper;
 
         private readonly Simulation _simulation;
         private readonly BufferPool _bufferPool;
@@ -92,9 +93,6 @@ namespace DProject.Manager.System
         {
             _bufferPool = new BufferPool();
             _simulation = Simulation.Create(_bufferPool, new SelfContainedSimulation.NarrowPhaseCallbacks(), new SelfContainedSimulation.PoseIntegratorCallbacks(new global::System.Numerics.Vector3(0, -10, 0)));
-            
-            //_simulation.Bodies.Add(BodyDescription.CreateDynamic(new global::System.Numerics.Vector3(0, 5, 0), sphereInertia, new CollidableDescription(_simulation.Shapes.Add(sphere), 0.1f), new BodyActivityDescription(0.01f)));
-            //_simulation.Statics.Add(new StaticDescription(new global::System.Numerics.Vector3(0, 0, 0), new CollidableDescription(_simulation.Shapes.Add(new Box(500, 1, 500)), 0.1f)));
 
             _threadDispatcher = new SimpleThreadDispatcher(Environment.ProcessorCount);
         }
@@ -102,9 +100,10 @@ namespace DProject.Manager.System
         public override void Initialize(IComponentMapperService mapperService)
         {
             _physicsMapper = mapperService.GetMapper<PhysicsComponent>();
-            _activePhysicsMapper = mapperService.GetMapper<ActivePhysicsComponent>();
-            
             _physicsBodyMapper = mapperService.GetMapper<PhysicsBodyComponent>();
+
+            _activePhysicsMapper = mapperService.GetMapper<ActivePhysicsComponent>();
+            _staticPhysicsMapper = mapperService.GetMapper<StaticPhysicsComponent>();
         }
 
         public override void Update(GameTime gameTime)
@@ -121,7 +120,7 @@ namespace DProject.Manager.System
                         componentHandle = _simulation.Statics.Add(new StaticDescription(physicsComponent.StartPosition, new CollidableDescription(_simulation.Shapes.Add((Sphere) physicsComponent.Shape), physicsComponent.SpeculativeMargin)));
                     
                     _physicsMapper.Delete(entity);
-                    _activePhysicsMapper.Put(entity, new ActivePhysicsComponent() { BodyType = BodyType.Static, ComponentHandle = componentHandle});   
+                    _staticPhysicsMapper.Put(entity, new StaticPhysicsComponent() { Handle = componentHandle });   
                 }
                 else if (_physicsBodyMapper.Has(entity))
                 {
@@ -136,7 +135,7 @@ namespace DProject.Manager.System
                         componentHandle = _simulation.Bodies.Add(BodyDescription.CreateDynamic(physicsBodyComponent.StartPosition, bodyInertia, new CollidableDescription(_simulation.Shapes.Add((Sphere) physicsBodyComponent.Shape), physicsBodyComponent.SpeculativeMargin), new BodyActivityDescription(physicsBodyComponent.SleepTreshold)));
                     
                     _physicsBodyMapper.Delete(entity);
-                    _activePhysicsMapper.Put(entity, new ActivePhysicsComponent() { BodyType = BodyType.Body, ComponentHandle = componentHandle});   
+                    _activePhysicsMapper.Put(entity, new ActivePhysicsComponent() { Handle = componentHandle });   
                 }
             }
 

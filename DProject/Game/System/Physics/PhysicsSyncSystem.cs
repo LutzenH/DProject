@@ -1,4 +1,3 @@
-using System;
 using BepuPhysics;
 using DProject.Game.Component;
 using DProject.Game.Component.Physics;
@@ -33,15 +32,12 @@ namespace DProject.Manager.System
                 var physicsComponent = _physicsMapper.Get(entity);
                 var transformComponent = _transformMapper.Get(entity);
 
-                if (physicsComponent.ComponentHandle != null)
+                if (physicsComponent.Handle != null)
                 {
-                    if (physicsComponent.BodyType == BodyType.Body)
-                    {
-                        var pose = _simulation.Bodies.GetBodyReference((int) physicsComponent.ComponentHandle).Pose;
+                    var pose = _simulation.Bodies.GetBodyReference((int) physicsComponent.Handle).Pose;
 
-                        transformComponent.Position = new Vector3(pose.Position.X, pose.Position.Y, pose.Position.Z);
-                        transformComponent.Rotation = new Quaternion(pose.Orientation.X, pose.Orientation.Y, pose.Orientation.Z, pose.Orientation.W);
-                    }
+                    transformComponent.Position = new Vector3(pose.Position.X, pose.Position.Y, pose.Position.Z);
+                    transformComponent.Rotation = new Quaternion(pose.Orientation.X, pose.Orientation.Y, pose.Orientation.Z, pose.Orientation.W);
                 }
             }
         }

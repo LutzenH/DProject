@@ -1,14 +1,18 @@
 using System;
+using DProject.Game.Component;
+using DProject.Game.Component.Lighting;
+using DProject.Game.Component.Physics;
 using DProject.Type.Rendering;
 using ImGuiNET;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Extended.Entities;
 using MonoGame.Extended.Entities.Systems;
 using Num = System.Numerics;
 
 namespace DProject.Manager.System
 {
-    public class DebugUIRenderSystem : DrawSystem
+    public class DebugUIRenderSystem : EntityDrawSystem
     {
         private readonly ShaderManager _shaderManager;
         private readonly GraphicsDevice _graphicsDevice;
@@ -19,7 +23,7 @@ namespace DProject.Manager.System
         private bool _showTestWindow;
         private bool _showRenderBufferWindow;
         
-        public DebugUIRenderSystem(GraphicsDevice graphicsDevice, ShaderManager shaderManager)
+        public DebugUIRenderSystem(GraphicsDevice graphicsDevice, ShaderManager shaderManager) : base(Aspect.Exclude())
         {
             _shaderManager = shaderManager;
             _graphicsDevice = graphicsDevice;
@@ -82,6 +86,86 @@ namespace DProject.Manager.System
                 ImGui.SetNextWindowPos(new Num.Vector2(650, 20), ImGuiCond.FirstUseEver);
                 ImGui.ShowDemoWindow(ref _showTestWindow);
             }
+
+            if (PhysicsMouseObjectDetectSystem.SelectedEntity != null)
+                BuildComponentListWindow((int) PhysicsMouseObjectDetectSystem.SelectedEntity);
         }
+
+        private void BuildComponentListWindow(int selectedEntity)
+        {
+            ImGui.SetNextWindowSize(new Num.Vector2(200, 300), ImGuiCond.Appearing);
+            ImGui.Begin($"Selected Entity: {selectedEntity.ToString()}");
+
+            var entity = GetEntity(selectedEntity);
+
+            #region ComponentListBuilder
+            
+            //TODO: Find another way to loop over every possible Component. 
+            if (entity.Has<TransformComponent>())
+            {
+                var component = entity.Get<TransformComponent>();
+                BuildComponentPropertiesList(component);
+            }
+
+            if (entity.Has<ActivePhysicsComponent>())
+            {
+                var component = entity.Get<ActivePhysicsComponent>();
+                BuildComponentPropertiesList(component);
+            }
+            
+            if (entity.Has<StaticPhysicsComponent>())
+            {
+                var component = entity.Get<StaticPhysicsComponent>();
+                BuildComponentPropertiesList(component);
+            }
+            
+            if (entity.Has<LoadedModelComponent>())
+            {
+                var component = entity.Get<LoadedModelComponent>();
+                BuildComponentPropertiesList(component);
+            }
+            
+            if (entity.Has<PrimitiveComponent>())
+            {
+                var component = entity.Get<PrimitiveComponent>();
+                BuildComponentPropertiesList(component);
+            }
+            
+            if (entity.Has<LensComponent>())
+            {
+                var component = entity.Get<LensComponent>();
+                BuildComponentPropertiesList(component);
+            }
+            
+            if (entity.Has<DirectionalLightComponent>())
+            {
+                var component = entity.Get<DirectionalLightComponent>();
+                BuildComponentPropertiesList(component);
+            }
+            
+            if (entity.Has<PointLightComponent>())
+            {
+                var component = entity.Get<PointLightComponent>();
+                BuildComponentPropertiesList(component);
+            }
+
+            #endregion
+
+            ImGui.End();
+        }
+
+        private static void BuildComponentPropertiesList(object component)
+        {
+            if (component != null && ImGui.CollapsingHeader(component.GetType().Name))
+            {
+                foreach (var property in component.GetType().GetProperties())
+                {
+                    ImGui.Text(property.Name + ":");
+                    ImGui.Text(property.GetValue(component, null).ToString());
+                }   
+            }
+        }
+
+        public override void Initialize(IComponentMapperService mapperService) { }
     }
 }

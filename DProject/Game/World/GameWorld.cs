@@ -30,6 +30,7 @@ namespace DProject.Manager.World
             var physicsSystem = new PhysicsSystem();
             AddSystem(physicsSystem);
             AddSystem(new PhysicsSyncSystem(physicsSystem.GetSimulation()));
+            AddSystem(new PhysicsMouseObjectDetectSystem(physicsSystem.GetSimulation()));
             
             //Primitives
             AddSystem(new PrimitiveRenderSystem(graphicsDevice, shaderManager));
@@ -46,9 +47,7 @@ namespace DProject.Manager.World
 
             World = Build();
             _entityFactory.World = World;
-
-            _entityFactory.CreatePhysicsStaticPrimitive(new Vector3(-250, 0, -250), new Vector3(250, -1, 250), PrimitiveType.Cube);
-
+            
             for (var i = 0; i < 400; i++)
             {
                 _entityFactory.CreatePhysicsDynamicPrimitive(new Vector3(i%3/3f, i, i%4/3f), Vector3.One, Quaternion.Identity, PrimitiveType.Sphere);
@@ -106,20 +105,22 @@ namespace DProject.Manager.World
 
         private void CreateCityBlock()
         {
-            _entityFactory.CreatePrimitive(new Vector3(-212f, 0.3f, 60f), new Vector3(212.0f, -3.4f, 36f), PrimitiveType.Cube);
-            _entityFactory.CreatePrimitive(new Vector3(-212f, 0.0f, 36f), new Vector3(212.0f, -4f, 20f), PrimitiveType.Cube);
-            _entityFactory.CreatePrimitive(new Vector3(-8f, 0.0f, 20f), new Vector3(8.0f, -4f, -140f), PrimitiveType.Cube);
-            _entityFactory.CreatePrimitive(new Vector3(-212f, 0.3f, 20f), new Vector3(-8.0f, -3.4f, 10f), PrimitiveType.Cube);
-            _entityFactory.CreatePrimitive(new Vector3(8, 0.3f, 20f), new Vector3(212.0f, -3.4f, 10f), PrimitiveType.Cube);
-            _entityFactory.CreatePrimitive(new Vector3(-18, 0.3f, 10f), new Vector3(-8.0f, -3.4f, -140f), PrimitiveType.Cube);
-            _entityFactory.CreatePrimitive(new Vector3(8, 0.3f, 10f), new Vector3(18.0f, -3.4f, -140f), PrimitiveType.Cube);
+            _entityFactory.CreatePhysicsStaticPrimitive(new Vector3(-250, 0, -250), new Vector3(250, -1, 250), PrimitiveType.Cube);
+
+            _entityFactory.CreatePhysicsStaticPrimitive(new Vector3(-212f, 0.3f, 60f), new Vector3(212.0f, -3.4f, 36f), PrimitiveType.Cube);
+            _entityFactory.CreatePhysicsStaticPrimitive(new Vector3(-212f, 0.0f, 36f), new Vector3(212.0f, -4f, 20f), PrimitiveType.Cube);
+            _entityFactory.CreatePhysicsStaticPrimitive(new Vector3(-8f, 0.0f, 20f), new Vector3(8.0f, -4f, -140f), PrimitiveType.Cube);
+            _entityFactory.CreatePhysicsStaticPrimitive(new Vector3(-212f, 0.3f, 20f), new Vector3(-8.0f, -3.4f, 10f), PrimitiveType.Cube);
+            _entityFactory.CreatePhysicsStaticPrimitive(new Vector3(8, 0.3f, 20f), new Vector3(212.0f, -3.4f, 10f), PrimitiveType.Cube);
+            _entityFactory.CreatePhysicsStaticPrimitive(new Vector3(-18, 0.3f, 10f), new Vector3(-8.0f, -3.4f, -140f), PrimitiveType.Cube);
+            _entityFactory.CreatePhysicsStaticPrimitive(new Vector3(8, 0.3f, 10f), new Vector3(18.0f, -3.4f, -140f), PrimitiveType.Cube);
             _entityFactory.CreatePhysicsStaticPrimitive(new Vector3(-19, 19f, -10f), new Vector3(-86.0f, 0.3f, -28f), PrimitiveType.Cube);
-            _entityFactory.CreatePrimitive(new Vector3(-26, 19f, -28), new Vector3(-36.0f, 5f, -32), PrimitiveType.Cube);
-            _entityFactory.CreatePrimitive(new Vector3(-18, 21f, -32), new Vector3(-86.0f, 0.3f, -56), PrimitiveType.Cube);
-            _entityFactory.CreatePrimitive(new Vector3(18, 18f, 10), new Vector3(94.0f, 0.3f, -54), PrimitiveType.Cube);
-            _entityFactory.CreatePrimitive(new Vector3(-18,  0.3f, -56), new Vector3(-212.0f, -3.4f, -62), PrimitiveType.Cube);
-            _entityFactory.CreatePrimitive(new Vector3(18,  0.3f, -54), new Vector3(212.0f, -3.4f, -62), PrimitiveType.Cube);
-            _entityFactory.CreatePrimitive(new Vector3(18,  13f, -62), new Vector3(56.0f, 0.3f, -126), PrimitiveType.Cube);
+            _entityFactory.CreatePhysicsStaticPrimitive(new Vector3(-26, 19f, -28), new Vector3(-36.0f, 5f, -32), PrimitiveType.Cube);
+            _entityFactory.CreatePhysicsStaticPrimitive(new Vector3(-18, 21f, -32), new Vector3(-86.0f, 0.3f, -56), PrimitiveType.Cube);
+            _entityFactory.CreatePhysicsStaticPrimitive(new Vector3(18, 18f, 10), new Vector3(94.0f, 0.3f, -54), PrimitiveType.Cube);
+            _entityFactory.CreatePhysicsStaticPrimitive(new Vector3(-18,  0.3f, -56), new Vector3(-212.0f, -3.4f, -62), PrimitiveType.Cube);
+            _entityFactory.CreatePhysicsStaticPrimitive(new Vector3(18,  0.3f, -54), new Vector3(212.0f, -3.4f, -62), PrimitiveType.Cube);
+            _entityFactory.CreatePhysicsStaticPrimitive(new Vector3(18,  13f, -62), new Vector3(56.0f, 0.3f, -126), PrimitiveType.Cube);
         }
     }
 }
