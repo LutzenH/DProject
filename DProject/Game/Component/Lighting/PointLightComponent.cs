@@ -16,7 +16,7 @@ namespace DProject.Game.Component.Lighting
             _worldMatrixIsDirty = true;
         }
 
-        public Vector3 Color { get; set; }
+        public Color Color { get; set; }
         public float Intensity { get; set; }
         
         public float Radius {

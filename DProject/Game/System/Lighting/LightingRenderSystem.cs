@@ -46,7 +46,7 @@ namespace DProject.Manager.System.Lighting
                     var light = _directionalLightMapper.Get(entity);
 
                     _shaderManager.DirectionalLightEffect.LightDirection = light.Direction;
-                    _shaderManager.DirectionalLightEffect.LightColor = light.Color;
+                    _shaderManager.DirectionalLightEffect.LightColor = light.Color.ToVector3();
                 
                     _shaderManager.DrawFullscreenQuad(_shaderManager.DirectionalLightEffect);
                 }
@@ -55,7 +55,7 @@ namespace DProject.Manager.System.Lighting
                 {
                     var light = _pointLightMapper.Get(entity);
 
-                    _shaderManager.PointLightEffect.LightColor = light.Color;
+                    _shaderManager.PointLightEffect.LightColor = light.Color.ToVector3();
                     _shaderManager.PointLightEffect.LightIntensity = light.Intensity;
                     _shaderManager.PointLightEffect.LightPosition = light.Position;
                     _shaderManager.PointLightEffect.LightRadius = light.Radius;

@@ -16,8 +16,6 @@ namespace DProject.Manager.System
 
         private ComponentMapper<ActivePhysicsComponent> _activePhysicsMapper;
         private ComponentMapper<StaticPhysicsComponent> _staticPhysicsMapper;
-
-        public static int? SelectedEntity;
         
         public PhysicsMouseObjectDetectSystem(Simulation simulation) : base(Aspect.One(typeof(ActivePhysicsComponent), typeof(StaticPhysicsComponent)))
         {
@@ -32,8 +30,10 @@ namespace DProject.Manager.System
         
         public override void Update(GameTime gameTime)
         {
+#if EDITOR
             if (InputManager.IsInputPressed(Input.PickupPhysicsBody))
-                SelectedEntity = GetEntityAtMouse();
+                DebugUIRenderSystem.SelectedEntity = GetEntityAtMouse();
+#endif
         }
 
         private int? GetEntityAtMouse()

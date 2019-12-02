@@ -212,7 +212,7 @@ namespace DProject.Game
             entity.Attach(new DirectionalLightComponent()
             {
                 Direction = direction,
-                Color = color.ToVector3()
+                Color = color
             });
 
             return entity;
@@ -225,7 +225,7 @@ namespace DProject.Game
             entity.Attach(new PointLightComponent()
             {
                 Position = position,
-                Color = color.ToVector3(),
+                Color = color,
                 Radius = radius,
                 Intensity = MathHelper.Clamp(intensity, 0f, 1f)
             });

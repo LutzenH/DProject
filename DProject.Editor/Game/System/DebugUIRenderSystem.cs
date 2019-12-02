@@ -15,6 +15,8 @@ namespace DProject.Manager.System
 {
     public class DebugUIRenderSystem : EntityDrawSystem
     {
+        public static int? SelectedEntity;
+
         private readonly ShaderManager _shaderManager;
         private readonly GraphicsDevice _graphicsDevice;
      
@@ -23,6 +25,7 @@ namespace DProject.Manager.System
 
         private bool _showTestWindow;
         private bool _showRenderBufferWindow;
+        private bool _showEntityListWindow;
         
         public DebugUIRenderSystem(GraphicsDevice graphicsDevice, ShaderManager shaderManager) : base(Aspect.Exclude())
         {
@@ -61,6 +64,7 @@ namespace DProject.Manager.System
         {
             if (ImGui.Button("Test Window")) _showTestWindow = !_showTestWindow;
             if (ImGui.Button("Render Buffers")) _showRenderBufferWindow = !_showRenderBufferWindow;
+            if (ImGui.Button("Entity List")) _showEntityListWindow = !_showEntityListWindow;
             ImGui.Text($"Application average {1000f / ImGui.GetIO().Framerate:F3} ms/frame ({ImGui.GetIO().Framerate:F1} FPS)");
 
             if (_showRenderBufferWindow)
@@ -88,16 +92,46 @@ namespace DProject.Manager.System
                 ImGui.ShowDemoWindow(ref _showTestWindow);
             }
 
-            if (PhysicsMouseObjectDetectSystem.SelectedEntity != null)
-                BuildComponentListWindow((int) PhysicsMouseObjectDetectSystem.SelectedEntity);
+            if (_showEntityListWindow)
+            {
+                var windowTitle = "Entity List";
+
+                if (SelectedEntity != null)
+                    windowTitle += " - Selected Entity: " + SelectedEntity;
+
+                windowTitle += "###SelectedEntity";
+                
+                ImGui.SetNextWindowSize(new Num.Vector2(200, 100), ImGuiCond.FirstUseEver);
+                ImGui.Begin(windowTitle, ref _showRenderBufferWindow);
+
+                ImGui.Columns(2);
+
+                ImGui.BeginChild("Entities###SelectedEntityList");
+                
+                foreach (var entity in ActiveEntities)
+                {
+                    if (ImGui.Selectable(entity.ToString(), entity == SelectedEntity))
+                        SelectedEntity = entity;
+                }
+
+                ImGui.EndChild();
+                
+                ImGui.NextColumn();
+
+                ImGui.BeginChild("Properties###SelectedEntityProperties");
+
+                if (SelectedEntity != null)
+                    BuildComponentListWindow((int) SelectedEntity);
+                
+                ImGui.EndChild();
+
+                ImGui.End();
+            }
         }
 
         private void BuildComponentListWindow(int selectedEntity)
         {
-            ImGui.SetNextWindowSize(new Num.Vector2(200, 300), ImGuiCond.Appearing);
-            ImGui.Begin($"Selected Entity: {selectedEntity.ToString()}");
-
-            var entity = GetEntity(selectedEntity);
+            var entity = GetEntity((int) SelectedEntity);
 
             #region ComponentListBuilder
             
@@ -167,16 +201,31 @@ namespace DProject.Manager.System
                     {
                         if (propertyValue is Vector3 vector)
                         {
-                            ImGui.InputFloat("x###" + vector.X.GetHashCode(), ref vector.X);
-                            ImGui.InputFloat("y###" + vector.Y.GetHashCode(), ref vector.Y);
-                            ImGui.InputFloat("z###" + vector.Z.GetHashCode(), ref vector.Z);
+                            var x = vector.X;
+                            var y = vector.Y;
+                            var z = vector.Z;
+                            
+                            ImGui.InputFloat("x###" + "PropertyVector3X", ref x);
+                            ImGui.InputFloat("y###" + "PropertyVector3Y", ref y);
+                            ImGui.InputFloat("z###" + "PropertyVector3Z", ref z);
+                            
+                            propertyValue = new Vector3(x, y, z);
+                            property.SetValue(component, propertyValue);
                         }
                         else if (propertyValue is Quaternion quaternion)
                         {
-                            ImGui.InputFloat("x###" + quaternion.X.GetHashCode(), ref quaternion.X);
-                            ImGui.InputFloat("y###" + quaternion.Y.GetHashCode(), ref quaternion.Y);
-                            ImGui.InputFloat("z###" + quaternion.Z.GetHashCode(), ref quaternion.Z);
-                            ImGui.InputFloat("w###" + quaternion.W.GetHashCode(), ref quaternion.W);
+                            var x = quaternion.X;
+                            var y = quaternion.Y;
+                            var z = quaternion.Z;
+                            var w = quaternion.W;
+                            
+                            ImGui.InputFloat("x###" + "PropertyQuaternionX", ref x);
+                            ImGui.InputFloat("y###" + "PropertyQuaternionY", ref y);
+                            ImGui.InputFloat("z###" + "PropertyQuaternionZ", ref z);
+                            ImGui.InputFloat("w###" + "PropertyQuaternionW", ref w);
+                            
+                            propertyValue = new Quaternion(x, y, z, w);
+                            property.SetValue(component, propertyValue);
                         }
                         else if (propertyValue is PrimitiveType type)
                         {
@@ -195,6 +244,20 @@ namespace DProject.Manager.System
                             
                             propertyValue = new Color(inColor.X, inColor.Y, inColor.Z, inColor.W);
                             property.SetValue(component, propertyValue);
+                        }
+                        else if (propertyValue is float value)
+                        {
+                            var floatValue = value;
+                            
+                            ImGui.InputFloat("value###" + "PropertyFloatValue", ref floatValue);
+
+                            propertyValue = floatValue;
+                            property.SetValue(component, propertyValue);
+                        }
+                        else if (propertyValue is Model model)
+                        {
+                            ImGui.Text("Root: " + model.Root.Name);
+                            ImGui.Text("Hash: " + model.GetHashCode());
                         }
                         else
                         {
