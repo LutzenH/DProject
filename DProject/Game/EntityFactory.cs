@@ -3,6 +3,7 @@ using BepuPhysics.Collidables;
 using DProject.Game.Component;
 using DProject.Game.Component.Lighting;
 using DProject.Game.Component.Physics;
+using DProject.Manager.System;
 using DProject.Type.Rendering.Primitives;
 using Microsoft.Xna.Framework;
 using MonoGame.Extended.Entities;
@@ -15,7 +16,7 @@ namespace DProject.Game
 
         public Entity CreateFlyCamera(Vector3 position)
         {
-            var entity = World.CreateEntity();
+            var entity = CreateEntity("Fly Camera");
             
             entity.Attach(new LensComponent()
             {
@@ -35,7 +36,7 @@ namespace DProject.Game
 
         public Entity CreatePrimitive(Vector3 position, Vector3 scale, Quaternion rotation, PrimitiveType type)
         {
-            var entity = World.CreateEntity();
+            var entity = CreateEntity("Primitive");
 
             entity.Attach(new TransformComponent()
             {
@@ -54,7 +55,7 @@ namespace DProject.Game
         
         public Entity CreatePrimitive(Vector3 fromPosition, Vector3 toPosition, PrimitiveType type)
         {
-            var entity = World.CreateEntity();
+            var entity = CreateEntity("Primitive");
 
             var position = (fromPosition + toPosition) / 2;
             var scale = new Vector3(Math.Abs(fromPosition.X - toPosition.X),
@@ -78,7 +79,7 @@ namespace DProject.Game
 
         public Entity CreatePhysicsStaticPrimitive(Vector3 fromPosition, Vector3 toPosition, PrimitiveType type)
         {
-            var entity = World.CreateEntity();
+            var entity = CreateEntity("Physics Static Primitive");
             
             var position = (fromPosition + toPosition) / 2;
             var scale = new Vector3(Math.Abs(fromPosition.X - toPosition.X),
@@ -121,7 +122,7 @@ namespace DProject.Game
         
         public Entity CreatePhysicsDynamicPrimitive(Vector3 position, Vector3 scale, Quaternion rotation, PrimitiveType type)
         {
-            var entity = World.CreateEntity();
+            var entity = CreateEntity("Physics Dynamic Primitive");
 
             entity.Attach(new TransformComponent()
             {
@@ -163,7 +164,7 @@ namespace DProject.Game
 
         public Entity CreateProp(Vector3 position, ushort id)
         {
-            var entity = World.CreateEntity();
+            var entity = CreateEntity("Prop");
             
             entity.Attach(new TransformComponent()
             {
@@ -176,7 +177,7 @@ namespace DProject.Game
         
         public Entity CreateProp(Vector3 position, string path)
         {
-            var entity = World.CreateEntity();
+            var entity = CreateEntity("Prop");
             
             entity.Attach(new TransformComponent()
             {
@@ -189,7 +190,7 @@ namespace DProject.Game
 
         public Entity CreateWaterPlane(Vector3 position, Vector2 size)
         {
-            var entity = World.CreateEntity();
+            var entity = CreateEntity("Water Plane");
             
             entity.Attach(new TransformComponent()
             {
@@ -207,7 +208,7 @@ namespace DProject.Game
         
         public Entity CreateDirectionalLight(Vector3 direction, Color color)
         {
-            var entity = World.CreateEntity();
+            var entity = CreateEntity("Directional Light");
             
             entity.Attach(new DirectionalLightComponent()
             {
@@ -220,7 +221,7 @@ namespace DProject.Game
         
         public Entity CreatePointLight(Vector3 position, Color color, float radius, float intensity)
         {
-            var entity = World.CreateEntity();
+            var entity = CreateEntity("Point Light");
             
             entity.Attach(new PointLightComponent()
             {
@@ -234,5 +235,16 @@ namespace DProject.Game
         }
         
         #endregion
+
+        private Entity CreateEntity(string identifier)
+        {
+            var entity = World.CreateEntity();
+
+#if EDITOR
+            DebugUIRenderSystem.EntityIdentifiers[entity.Id] = identifier;
+#endif
+
+            return entity;
+        }
     }
 }

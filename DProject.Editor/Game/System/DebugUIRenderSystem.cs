@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using DProject.Game.Component;
 using DProject.Game.Component.Lighting;
 using DProject.Game.Component.Physics;
@@ -26,6 +27,8 @@ namespace DProject.Manager.System
         private bool _showTestWindow;
         private bool _showRenderBufferWindow;
         private bool _showEntityListWindow;
+
+        public static Dictionary<int, string> EntityIdentifiers = new Dictionary<int, string>();
         
         public DebugUIRenderSystem(GraphicsDevice graphicsDevice, ShaderManager shaderManager) : base(Aspect.Exclude())
         {
@@ -110,7 +113,12 @@ namespace DProject.Manager.System
                 
                 foreach (var entity in ActiveEntities)
                 {
-                    if (ImGui.Selectable(entity.ToString(), entity == SelectedEntity))
+                    var itemName = entity.ToString();
+
+                    if (EntityIdentifiers.ContainsKey(entity))
+                        itemName += " - " + EntityIdentifiers[entity];
+                    
+                    if (ImGui.Selectable(itemName, entity == SelectedEntity))
                         SelectedEntity = entity;
                 }
 
