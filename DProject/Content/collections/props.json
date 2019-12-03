@@ -159,5 +159,12 @@
         "default_scale_x":1.00,
         "default_scale_y":1.00,
         "default_scale_z":1.00
+    },
+    {
+        "name":"companion_cube",
+        "path":"models/primitives/companion_cube",
+        "default_scale_x":1.00,
+        "default_scale_y":1.00,
+        "default_scale_z":1.00
     }
 ]} 

@@ -105,7 +105,7 @@ namespace DProject.Manager.System
                 windowTitle += "###SelectedEntity";
                 
                 ImGui.SetNextWindowSize(new Num.Vector2(200, 100), ImGuiCond.FirstUseEver);
-                ImGui.Begin(windowTitle, ref _showRenderBufferWindow);
+                ImGui.Begin(windowTitle, ref _showEntityListWindow);
 
                 ImGui.Columns(2);
 

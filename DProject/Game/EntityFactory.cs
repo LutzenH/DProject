@@ -187,6 +187,29 @@ namespace DProject.Game
 
             return entity;
         }
+        
+        public Entity CreatePhysicsProp(Vector3 position, Vector3 boundingBoxScale, string path)
+        {
+            var entity = CreateEntity("Physics Prop");
+            
+            entity.Attach(new TransformComponent()
+            {
+                Position = position
+            });
+            
+            entity.Attach(new ModelComponent(path));
+            
+            entity.Attach(new PhysicsBodyComponent()
+            {
+                SleepTreshold = 0.01f,
+                Mass = 1f,
+                StartPosition = new System.Numerics.Vector3(position.X, position.Y, position.Z),
+                Shape = new Box(boundingBoxScale.X, boundingBoxScale.Y, boundingBoxScale.Z),
+                SpeculativeMargin = 0.1f
+            });
+            
+            return entity;
+        }
 
         public Entity CreateWaterPlane(Vector3 position, Vector2 size)
         {
