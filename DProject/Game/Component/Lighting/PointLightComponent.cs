@@ -2,7 +2,7 @@ using Microsoft.Xna.Framework;
 
 namespace DProject.Game.Component.Lighting
 {
-    public class PointLightComponent
+    public class PointLightComponent : IComponent
     {
         private bool _worldMatrixIsDirty;
 

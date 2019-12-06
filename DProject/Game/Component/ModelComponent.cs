@@ -2,7 +2,7 @@ using DProject.List;
 
 namespace DProject.Game.Component
 {
-    public class ModelComponent
+    public class ModelComponent : IComponent
     {
         public string ModelPath { get; set; }
 

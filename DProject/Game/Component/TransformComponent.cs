@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework;
 
 namespace DProject.Game.Component
 {
-    public class TransformComponent : ITransform, IRotatable, IScalable
+    public class TransformComponent : IComponent, ITransform, IRotatable, IScalable
     {
         private bool _worldMatrixIsDirty;
         

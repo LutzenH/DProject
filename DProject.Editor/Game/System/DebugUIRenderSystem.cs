@@ -1,8 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using DProject.Game.Component;
-using DProject.Game.Component.Lighting;
-using DProject.Game.Component.Physics;
 using DProject.Type.Rendering;
 using ImGuiNET;
 using Microsoft.Xna.Framework;
@@ -28,7 +27,8 @@ namespace DProject.Manager.System
         private bool _showRenderBufferWindow;
         private bool _showEntityListWindow;
 
-        public static Dictionary<int, string> EntityIdentifiers = new Dictionary<int, string>();
+        public static readonly Dictionary<int, string> EntityIdentifiers = new Dictionary<int, string>();
+        private readonly IEnumerable<global::System.Type> _componentTypes;
         
         public DebugUIRenderSystem(GraphicsDevice graphicsDevice, ShaderManager shaderManager) : base(Aspect.Exclude())
         {
@@ -37,6 +37,9 @@ namespace DProject.Manager.System
             
             _imGuiRenderer = new ImGuiRenderer(_graphicsDevice);
             _imGuiRenderer.RebuildFontAtlas();
+            
+            _componentTypes = typeof(IComponent).Assembly.GetTypes().Where(
+                t => typeof(IComponent).IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract);
         }
 
         public override void Draw(GameTime gameTime)
@@ -141,65 +144,39 @@ namespace DProject.Manager.System
         {
             var entity = GetEntity((int) SelectedEntity);
 
+            var entityIdentifier = (string) EntityIdentifiers[selectedEntity].Clone();
+            ImGui.InputText("Identifier", ref entityIdentifier, 128);
+            EntityIdentifiers[selectedEntity] = entityIdentifier;
+            
+            ImGui.Text("Components: ");
+            
             #region ComponentListBuilder
             
-            //TODO: Find another way to loop over every possible Component. 
-            if (entity.Has<TransformComponent>())
+            foreach (var componentType in _componentTypes)
             {
-                var component = entity.Get<TransformComponent>();
-                BuildComponentPropertiesList(component);
-            }
-
-            if (entity.Has<ActivePhysicsComponent>())
-            {
-                var component = entity.Get<ActivePhysicsComponent>();
-                BuildComponentPropertiesList(component);
-            }
-            
-            if (entity.Has<StaticPhysicsComponent>())
-            {
-                var component = entity.Get<StaticPhysicsComponent>();
-                BuildComponentPropertiesList(component);
+                var hasMethod = typeof (Entity).GetMethod("Has");
+                var hasGenericMethod = hasMethod.MakeGenericMethod(componentType);
+                var entityHasComponent = hasGenericMethod.Invoke(entity, null);
+                
+                if ((bool) entityHasComponent)
+                {
+                    var getMethod = typeof (Entity).GetMethod("Get");
+                    var getGenericMethod = getMethod.MakeGenericMethod(componentType);
+                    var entityGetComponent = getGenericMethod.Invoke(entity, null);
+                    
+                    BuildComponentPropertiesList((IComponent) entityGetComponent, entity);
+                }
             }
             
-            if (entity.Has<LoadedModelComponent>())
-            {
-                var component = entity.Get<LoadedModelComponent>();
-                BuildComponentPropertiesList(component);
-            }
-            
-            if (entity.Has<PrimitiveComponent>())
-            {
-                var component = entity.Get<PrimitiveComponent>();
-                BuildComponentPropertiesList(component);
-            }
-            
-            if (entity.Has<LensComponent>())
-            {
-                var component = entity.Get<LensComponent>();
-                BuildComponentPropertiesList(component);
-            }
-            
-            if (entity.Has<DirectionalLightComponent>())
-            {
-                var component = entity.Get<DirectionalLightComponent>();
-                BuildComponentPropertiesList(component);
-            }
-            
-            if (entity.Has<PointLightComponent>())
-            {
-                var component = entity.Get<PointLightComponent>();
-                BuildComponentPropertiesList(component);
-            }
-
             #endregion
 
             ImGui.End();
         }
 
-        private static void BuildComponentPropertiesList(object component)
+        private static void BuildComponentPropertiesList(IComponent component, Entity entity)
         {
-            if (component != null && ImGui.CollapsingHeader(component.GetType().Name))
+            var isAlive = true;
+            if (component != null && ImGui.CollapsingHeader(component.GetType().Name, ref isAlive))
             {
                 foreach (var property in component.GetType().GetProperties())
                 {
@@ -268,13 +245,18 @@ namespace DProject.Manager.System
                             ImGui.Text("Hash: " + model.GetHashCode());
                         }
                         else
-                        {
                             ImGui.Text(propertyValue.ToString());
-                        }
 
                         ImGui.TreePop();
                     }
                 }   
+            }
+
+            if (!isAlive)
+            {
+                var detachMethod = typeof (Entity).GetMethod("Detach");
+                var detachGenericMethod = detachMethod.MakeGenericMethod(component.GetType());
+                detachGenericMethod.Invoke(entity, null);
             }
         }
 

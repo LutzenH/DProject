@@ -2,7 +2,7 @@ using Microsoft.Xna.Framework;
 
 namespace DProject.Game.Component
 {
-    public class LensComponent
+    public class LensComponent : IComponent
     {
         private bool _projectionIsDirty;
         private bool _viewIsDirty;

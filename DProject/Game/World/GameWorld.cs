@@ -64,7 +64,7 @@ namespace DProject.Manager.World
             _entityFactory.CreateProp(new Vector3(-4, 0, 0), 8);
             _entityFactory.CreateProp(new Vector3(-6, 0, 0), 7);
             _entityFactory.CreateProp(new Vector3(-8, 0, 0), 6);
-g
+
             _entityFactory.CreatePhysicsProp(new Vector3(0f, 10f, 0f), Vector3.One, "models/primitives/companion_cube");
 
             //Lights

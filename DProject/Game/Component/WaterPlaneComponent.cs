@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework;
 
 namespace DProject.Game.Component
 {
-    public class WaterPlaneComponent
+    public class WaterPlaneComponent : IComponent
     {
         private Vector2 _size;
         public VertexPositionTextureColorNormal[] VertexList { get; private set; }
