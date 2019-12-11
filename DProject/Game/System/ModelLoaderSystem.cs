@@ -46,7 +46,7 @@ namespace DProject.Manager.System
         #region Format Converter
         public static (VertexBuffer, IndexBuffer, int) ConvertDProjectModelFormatToModel(string pathToFile, GraphicsDevice graphicsDevice)
         {
-            var fileStream = new FileStream(pathToFile, FileMode.Open);
+            var fileStream = new FileStream(Game1.RootDirectory + pathToFile, FileMode.Open);
             var binaryReader = new BinaryReader(fileStream);
 
             var objectName = binaryReader.ReadString();

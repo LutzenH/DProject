@@ -36,12 +36,14 @@ namespace DProject.Manager
         private SSAOEffect _ssaoEffect;
 
         // Render-targets (G-Buffer)
-        private readonly RenderTargetBinding[] _renderTargetBindings = new RenderTargetBinding[3];
+        private readonly RenderTargetBinding[] _renderTargetBindings = new RenderTargetBinding[4];
         
-        // Color + Specular Intensity
+        // Color
         public RenderTarget2D Color;
-        // Normal + Specular Power.
+        // Normal
         public RenderTarget2D Normal;
+        // Specular Intensity + Specular Power + Emission
+        public RenderTarget2D LightInfo;
         // Depth
         public RenderTarget2D Depth;
         // Lights
@@ -86,6 +88,14 @@ namespace DProject.Manager
                 SurfaceFormat.Color,
                 DepthFormat.Depth24);
             
+            LightInfo = new RenderTarget2D(
+                _graphicsDevice,
+                _graphicsDevice.PresentationParameters.BackBufferWidth,
+                _graphicsDevice.PresentationParameters.BackBufferHeight,
+                false,
+                SurfaceFormat.Color,
+                DepthFormat.Depth24);
+            
             Depth = new RenderTarget2D(
                 _graphicsDevice,
                 _graphicsDevice.PresentationParameters.BackBufferWidth,
@@ -121,6 +131,7 @@ namespace DProject.Manager
             _renderTargetBindings[0] = new RenderTargetBinding(Color);
             _renderTargetBindings[1] = new RenderTargetBinding(Normal);
             _renderTargetBindings[2] = new RenderTargetBinding(Depth);
+            _renderTargetBindings[3] = new RenderTargetBinding(LightInfo);
 
             if(updateShaders)
                 SetInitiateShaderInfo();
@@ -170,7 +181,7 @@ namespace DProject.Manager
             _gBufferEffect.Projection = lens.Projection;
 
             _directionalLightEffect.CameraPosition = lens.Position;
-            _directionalLightEffect.ColorMap = Color;
+            _directionalLightEffect.LightInfoMap = LightInfo;
             _directionalLightEffect.NormalMap = Normal;
             _directionalLightEffect.DepthMap = Depth;
             _directionalLightEffect.InvertViewProjection = Matrix.Invert(lens.View * lens.Projection);
@@ -179,12 +190,13 @@ namespace DProject.Manager
             _pointLightEffect.Projection = lens.Projection;
             _pointLightEffect.CameraPosition = lens.Position;
             _pointLightEffect.InvertViewProjection = Matrix.Invert(lens.View * lens.Projection);
-            _pointLightEffect.ColorMap = Color;
+            _pointLightEffect.LightInfoMap = LightInfo;
             _pointLightEffect.DepthMap = Depth;
             _pointLightEffect.NormalMap = Normal;
 
             _combineFinalEffect.ColorMap = Color;
             _combineFinalEffect.LightMap = Lights;
+            _combineFinalEffect.LightInfoMap = LightInfo;
             _combineFinalEffect.SSAOMap = SSAO;
 
             _waterEffect.RefractionBuffer = CombineFinal;
@@ -206,9 +218,6 @@ namespace DProject.Manager
         //TODO: This method is temporary until it will be replaces by a proper shader-information handler.
         public void SetInitiateShaderInfo()
         {
-            _gBufferEffect.SpecularIntensity = 0.8f;
-            _gBufferEffect.SpecularPower = 0.5f;
-
             //Water
             _waterEffect.MaxWaterDepth = 50f;
             _waterEffect.DuDvTiling = 20.0f;

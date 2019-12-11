@@ -42,7 +42,7 @@ namespace DProject.Type.Rendering.Shaders
             set => Parameters["LightRadius"].SetValue(value);
         }
         
-        public float LightIntensity // = 1.0f
+        public float LightIntensity
         {
             get => Parameters["LightIntensity"].GetValueSingle();
             set => Parameters["LightIntensity"].SetValue(value);
@@ -60,10 +60,10 @@ namespace DProject.Type.Rendering.Shaders
             set => Parameters["InvertViewProjection"].SetValue(value);
         }
         
-        public Texture2D ColorMap
+        public Texture2D LightInfoMap
         {
-            get => Parameters["ColorMap"].GetValueTexture2D();
-            set => Parameters["ColorMap"].SetValue(value);
+            get => Parameters["LightInfoMap"].GetValueTexture2D();
+            set => Parameters["LightInfoMap"].SetValue(value);
         }
         
         public Texture2D DepthMap

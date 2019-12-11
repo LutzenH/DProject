@@ -156,14 +156,14 @@ PS_OUTPUT RenderScenePS0(float2 uv: TEXCOORD0)
 	float3 fres = normalize((tex2D(rnm, uv*offset).xyz*2.0) - 1.0f);
 
 	// RGBに法線が、aに0〜1のデプスが入っている
-	float4 currentPixelSample = tex2D(normalMap, uv);
+	float3 currentPixelSample = tex2D(normalMap, uv).rgb;
 	float4 currentDepthSample = tex2D(depthMap, uv);
 
 	float currentPixelDepth = currentDepthSample.r;
 
 	// get the normal of current fragment
 	// 現在フラグメントの法線
-	float3 norm = currentPixelSample.xyz * 2.0f - 1.0f;
+	float3 norm = currentPixelSample * 2.0f - 1.0f;
 
 
 	float bl = 0.0;
@@ -191,16 +191,16 @@ PS_OUTPUT RenderScenePS0(float2 uv: TEXCOORD0)
 
 		// get the depth of the occluder fragment
 		// 遮蔽するフラグメントを取得
-		float4 occluderFragment = tex2D(normalMap, se.xy);
+		float3 occluderFragment = tex2D(normalMap, se.xy).rgb;
 
 		// get the normal of the occluder fragment
 		// 遮蔽するフラグメントの法線を取得
-		occNorm = occluderFragment.xyz * 2.0f - 1.0f;
+		occNorm = occluderFragment * 2.0f - 1.0f;
 
 		// if depthDifference is negative = occluder is behind current fragment
 		// 正：遮蔽フラグメントは現在のフラグメントより前 →遮蔽されてる
 		// 負：遮蔽フラグメントは現在のフラグメントより奥 →遮蔽されてない
-		depthDifference = currentPixelDepth - occluderFragment.a;
+		depthDifference = currentPixelDepth - 0.5f;
 
 		// calculate the difference between the normals as a weight
 		// 遮蔽フラグメントと現在フラグメントでの法線の角度の差を計算

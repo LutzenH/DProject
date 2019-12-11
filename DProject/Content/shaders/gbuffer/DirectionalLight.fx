@@ -4,11 +4,11 @@ float3 LightColor;
 float3 CameraPosition; 
 float4x4 InvertViewProjection;
 
-// Diffuse color, and SpecularIntensity in the alpha channel
-texture ColorMap; 
-sampler ColorSampler = sampler_state
+// SpecularPower, SpecularIntensity, Emission
+texture LightInfoMap; 
+sampler LightInfoSampler = sampler_state
 {
-    Texture = (ColorMap);
+    Texture = (LightInfoMap);
     AddressU = CLAMP;
     AddressV = CLAMP;
     MagFilter = LINEAR;
@@ -70,10 +70,11 @@ float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
     float4 normalData = tex2D(NormalSampler,input.TexCoord);
     // Tranform normal back into [-1,1] range
     float3 normal = 2.0f * normalData.xyz - 1.0f;
-    // Get specular power, and get it into [0,255] range]
-    float specularPower = normalData.a * 255;
-    // Get specular intensity from the colorMap
-    float specularIntensity = tex2D(ColorSampler, input.TexCoord).a;
+    
+    // Retrieve specular-info from LightInfoSampler
+    float3 lightingInfo = tex2D(LightInfoSampler, input.TexCoord).rgb;
+    float specularPower = lightingInfo.r * 255;
+    float specularIntensity = lightingInfo.g;
     
     // Read depth
     float depthVal = tex2D(DepthSampler,input.TexCoord).r;

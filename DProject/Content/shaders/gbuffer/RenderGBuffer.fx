@@ -2,21 +2,20 @@ float4x4 World;
 float4x4 View;
 float4x4 Projection;
 
-float SpecularIntensity;
-float SpecularPower;
-
 struct VertexShaderInput
 {
     float4 Position : POSITION0;
-    float4 Color : COLOR0;
     float3 Normal : NORMAL0;
     float2 TexCoord : TEXCOORD0;
+    float4 Color : COLOR0;
+    float4 LightingInfo : COLOR1;
 };
 
 struct VertexShaderOutput
 {
     float4 Position : POSITION0;
     float4 Color : COLOR0;
+    float4 LightingInfo : COLOR1;
     float2 TexCoord : TEXCOORD0;
     float3 Normal : TEXCOORD1;
     float2 Depth : TEXCOORD2;
@@ -32,6 +31,7 @@ VertexShaderOutput VertexShaderFunction(VertexShaderInput input)
     output.Position = mul(viewPosition, Projection);
 
     output.Color = input.Color;
+    output.LightingInfo = input.LightingInfo;
 
     output.TexCoord = input.TexCoord;
 
@@ -48,6 +48,7 @@ struct PixelShaderOutput
     half4 Color : COLOR0;
     half4 Normal : COLOR1;
     half4 Depth : COLOR2;
+    half4 Light : COLOR3;
 };
 
 PixelShaderOutput PixelShaderFunction(VertexShaderOutput input)
@@ -55,12 +56,9 @@ PixelShaderOutput PixelShaderFunction(VertexShaderOutput input)
     PixelShaderOutput output;
 
     output.Color = input.Color;
-    output.Color.a = SpecularIntensity;
-
-    output.Normal.rgb = 0.5f * (normalize(input.Normal) + 1.0f);
-    output.Normal.a = SpecularPower;
-
+    output.Normal = float4(0.5f * (normalize(input.Normal) + 1.0f), 1.0f);
     output.Depth = input.Depth.x / input.Depth.y;
+    output.Light = float4(input.LightingInfo.rgb, 1.0f);
 
     return output;
 }

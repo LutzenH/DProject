@@ -21,7 +21,7 @@ namespace DProject.Manager.System
         private readonly GraphicsDevice _graphicsDevice;
      
         private readonly ImGuiRenderer _imGuiRenderer;
-        private readonly IntPtr[] _imGuiTexture = { IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero };
+        private readonly IntPtr[] _imGuiTexture = { IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero };
 
         private bool _showTestWindow;
         private bool _showRenderBufferWindow;
@@ -46,9 +46,10 @@ namespace DProject.Manager.System
         {
             _imGuiTexture[0] = _imGuiRenderer.BindTexture(_shaderManager.Color);
             _imGuiTexture[1] = _imGuiRenderer.BindTexture(_shaderManager.Depth);
-            _imGuiTexture[2] = _imGuiRenderer.BindTexture(_shaderManager.Normal);
-            _imGuiTexture[3] = _imGuiRenderer.BindTexture(_shaderManager.Lights);
-            _imGuiTexture[4] = _imGuiRenderer.BindTexture(_shaderManager.SSAO);
+            _imGuiTexture[2] = _imGuiRenderer.BindTexture(_shaderManager.LightInfo);
+            _imGuiTexture[3] = _imGuiRenderer.BindTexture(_shaderManager.Normal);
+            _imGuiTexture[4] = _imGuiRenderer.BindTexture(_shaderManager.Lights);
+            _imGuiTexture[5] = _imGuiRenderer.BindTexture(_shaderManager.SSAO);
 
             // Call BeforeLayout first to set things up
             _imGuiRenderer.BeforeLayout(gameTime);
@@ -64,6 +65,7 @@ namespace DProject.Manager.System
             _imGuiRenderer.UnbindTexture(_imGuiTexture[2]);
             _imGuiRenderer.UnbindTexture(_imGuiTexture[3]);
             _imGuiRenderer.UnbindTexture(_imGuiTexture[4]);
+            _imGuiRenderer.UnbindTexture(_imGuiTexture[5]);
         }
 
         protected virtual void ImGuiLayout()
@@ -82,12 +84,14 @@ namespace DProject.Manager.System
                 ImGui.Image(_imGuiTexture[0], new Num.Vector2(300, 150), Num.Vector2.Zero, Num.Vector2.One, Num.Vector4.One, Num.Vector4.One);
                 ImGui.Text("Depth");
                 ImGui.Image(_imGuiTexture[1], new Num.Vector2(300, 150), Num.Vector2.Zero, Num.Vector2.One, Num.Vector4.One, Num.Vector4.One);
-                ImGui.Text("Normal");
+                ImGui.Text("Light Info");
                 ImGui.Image(_imGuiTexture[2], new Num.Vector2(300, 150), Num.Vector2.Zero, Num.Vector2.One, Num.Vector4.One, Num.Vector4.One);
-                ImGui.Text("Lights");
+                ImGui.Text("Normal");
                 ImGui.Image(_imGuiTexture[3], new Num.Vector2(300, 150), Num.Vector2.Zero, Num.Vector2.One, Num.Vector4.One, Num.Vector4.One);
-                ImGui.Text("SSAO");
+                ImGui.Text("Lights");
                 ImGui.Image(_imGuiTexture[4], new Num.Vector2(300, 150), Num.Vector2.Zero, Num.Vector2.One, Num.Vector4.One, Num.Vector4.One);
+                ImGui.Text("SSAO");
+                ImGui.Image(_imGuiTexture[5], new Num.Vector2(300, 150), Num.Vector2.Zero, Num.Vector2.One, Num.Vector4.One, Num.Vector4.One);
                 
                 ImGui.End();
             }
@@ -215,7 +219,7 @@ namespace DProject.Manager.System
                         else if (propertyValue is PrimitiveType type)
                         {
                             var intType = (int) type;
-                            ImGui.SliderInt("Type###PropertyPrimitiveType", ref intType, 0, 1, type.ToString());
+                            ImGui.SliderInt("Type###PropertyPrimitiveType", ref intType, 0, 2, type.ToString());
                             
                             propertyValue = (PrimitiveType) intType;
                             property.SetValue(component, propertyValue);
