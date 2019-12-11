@@ -14,10 +14,8 @@
 $if platform=DesktopGL
 
 #begin shaders/*
-/copy:shaders/ClipMapTerrainShader
 /copy:shaders/FXAAShader
 /copy:shaders/WaterShader
-/copy:shaders/ClipMapShader
 /copy:shaders/gbuffer/ClearGBuffer
 /copy:shaders/gbuffer/RenderGBuffer
 /copy:shaders/gbuffer/DirectionalLight
@@ -30,12 +28,6 @@ $endif
 
 $if platform=Windows
 
-#begin shaders/ClipMapTerrainShader.fx
-/importer:EffectImporter
-/processor:EffectProcessor
-/processorParam:DebugMode=Auto
-/build:shaders/ClipMapTerrainShader.fx
-
 #begin shaders/FXAAShader.fx
 /importer:EffectImporter
 /processor:EffectProcessor
@@ -47,12 +39,6 @@ $if platform=Windows
 /processor:EffectProcessor
 /processorParam:DebugMode=Auto
 /build:shaders/WaterShader.fx
-
-#begin shaders/ClipMapShader.fx
-/importer:EffectImporter
-/processor:EffectProcessor
-/processorParam:DebugMode=Auto
-/build:shaders/ClipMapShader.fx
 
 #begin shaders/gbuffer/ClearGBuffer.fx
 /importer:EffectImporter
@@ -121,8 +107,3 @@ $endif
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:shaders/noise.png
-
-#begin textures/terrain/*
-/copy:textures/terrain/terrain-diffuse.png
-/copy:textures/terrain/terrain-height.png
-/copy:textures/terrain/terrain-normal.png

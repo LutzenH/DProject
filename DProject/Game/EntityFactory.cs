@@ -102,7 +102,7 @@ namespace DProject.Game
             switch (type)
             {
                 case PrimitiveType.Sphere:
-                    shape = new Sphere(scale.Length()/2);
+                    shape = new Sphere(scale.Length()/3);
                     break;
                 case PrimitiveType.Cube:
                 default:
@@ -140,7 +140,7 @@ namespace DProject.Game
             switch (type)
             {
                 case PrimitiveType.Sphere:
-                    shape = new Sphere(scale.Length()/2);
+                    shape = new Sphere(scale.Length()/4);
                     break;
                 case PrimitiveType.Cube:
                 default:

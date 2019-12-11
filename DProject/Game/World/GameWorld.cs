@@ -23,7 +23,7 @@ namespace DProject.Manager.World
             AddSystem(new CameraSystem());
 
             //Models
-            AddSystem(new ModelLoaderSystem(contentManager));
+            AddSystem(new ModelLoaderSystem(graphicsDevice, contentManager));
             AddSystem(new ModelRenderSystem(graphicsDevice, shaderManager));
 
             //Physics

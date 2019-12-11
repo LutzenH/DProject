@@ -1,14 +1,21 @@
 {"props": [
     {
-        "name":"camera",
-        "path":"models/camera",
+        "name":"cube",
+        "path":"models/primitives/cube",
         "default_scale_x":1.00,
         "default_scale_y":1.00,
         "default_scale_z":1.00
     },
     {
-        "name":"human",
-        "path":"models/human",
+        "name":"sphere",
+        "path":"models/primitives/sphere",
+        "default_scale_x":1.00,
+        "default_scale_y":1.00,
+        "default_scale_z":1.00
+    },
+    {
+        "name":"companion_cube",
+        "path":"models/primitives/companion_cube",
         "default_scale_x":1.00,
         "default_scale_y":1.00,
         "default_scale_z":1.00
@@ -156,13 +163,6 @@
     {
         "name":"white_marble_building_roof",
         "path":"models/city/white_marble_building/white_marble_building_roof",
-        "default_scale_x":1.00,
-        "default_scale_y":1.00,
-        "default_scale_z":1.00
-    },
-    {
-        "name":"companion_cube",
-        "path":"models/primitives/companion_cube",
         "default_scale_x":1.00,
         "default_scale_y":1.00,
         "default_scale_z":1.00

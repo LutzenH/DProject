@@ -43,7 +43,7 @@ namespace DProject.Game.Component.Lighting
             {
                 if (_worldMatrixIsDirty)
                 {
-                    _worldMatrix = Matrix.CreateScale(new Vector3(_radius)) * Matrix.CreateTranslation(_position);
+                    _worldMatrix = Matrix.CreateScale(new Vector3(_radius*2)) * Matrix.CreateTranslation(_position);
                     _worldMatrixIsDirty = false;
                 }
 

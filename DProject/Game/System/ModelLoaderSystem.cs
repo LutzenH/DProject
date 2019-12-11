@@ -12,13 +12,15 @@ namespace DProject.Manager.System
     public class ModelLoaderSystem : EntityUpdateSystem
     {
         private readonly ContentManager _contentManager;
+        private readonly GraphicsDevice _graphicsDevice;
         
         private ComponentMapper<ModelComponent> _modelMapper;
         private ComponentMapper<LoadedModelComponent> _loadedModelMapper;
 
-        public ModelLoaderSystem(ContentManager contentManager) : base(Aspect.All(typeof(ModelComponent)))
+        public ModelLoaderSystem(GraphicsDevice graphicsDevice, ContentManager contentManager) : base(Aspect.All(typeof(ModelComponent)))
         {
             _contentManager = contentManager;
+            _graphicsDevice = graphicsDevice;
         }
 
         public override void Initialize(IComponentMapperService mapperService)
@@ -32,10 +34,14 @@ namespace DProject.Manager.System
             foreach (var entity in ActiveEntities)
             {
                 var modelComponent = _modelMapper.Get(entity);
+
+                var (vertexBuffer, indexBuffer, primitiveCount) = ConvertDProjectModelFormatToModel(modelComponent.ModelPath, _graphicsDevice);
                 
                 var loadedModelComponent = new LoadedModelComponent()
                 {
-                    Model = _contentManager.Load<Model>(modelComponent.ModelPath)
+                    VertexBuffer = vertexBuffer,
+                    IndexBuffer = indexBuffer,
+                    PrimitiveCount = primitiveCount
                 };
                 
                 _loadedModelMapper.Put(entity, loadedModelComponent);
@@ -46,7 +52,7 @@ namespace DProject.Manager.System
         #region Format Converter
         public static (VertexBuffer, IndexBuffer, int) ConvertDProjectModelFormatToModel(string pathToFile, GraphicsDevice graphicsDevice)
         {
-            var fileStream = new FileStream(Game1.RootDirectory + pathToFile, FileMode.Open);
+            var fileStream = new FileStream(Game1.RootDirectory + pathToFile + ".dpm", FileMode.Open);
             var binaryReader = new BinaryReader(fileStream);
 
             var objectName = binaryReader.ReadString();
@@ -139,6 +145,9 @@ namespace DProject.Manager.System
                 indexBuffer = new IndexBuffer(graphicsDevice, IndexElementSize.SixteenBits, (int) indexCount, BufferUsage.WriteOnly);
                 indexBuffer.SetData(indicies);
             }
+            
+            binaryReader.Close();
+            fileStream.Close();
             
             return (vertexBuffer, indexBuffer, (int) indexCount/3);
         }
