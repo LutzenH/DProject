@@ -156,15 +156,15 @@ namespace DProject.Manager.System
             {
                 var hasMethod = typeof (Entity).GetMethod("Has");
                 var hasGenericMethod = hasMethod.MakeGenericMethod(componentType);
-                var entityHasComponent = hasGenericMethod.Invoke(entity, null);
+                var entityHasComponent = (bool) hasGenericMethod.Invoke(entity, null);
                 
-                if ((bool) entityHasComponent)
+                if (entityHasComponent)
                 {
                     var getMethod = typeof (Entity).GetMethod("Get");
                     var getGenericMethod = getMethod.MakeGenericMethod(componentType);
-                    var entityGetComponent = getGenericMethod.Invoke(entity, null);
+                    var entityGetComponent = (IComponent) getGenericMethod.Invoke(entity, null);
                     
-                    BuildComponentPropertiesList((IComponent) entityGetComponent, entity);
+                    BuildComponentPropertiesList(entityGetComponent, entity);
                 }
             }
             
@@ -236,13 +236,18 @@ namespace DProject.Manager.System
                             
                             ImGui.InputFloat("value###" + "PropertyFloatValue", ref floatValue);
 
-                            propertyValue = floatValue;
-                            property.SetValue(component, propertyValue);
+                            property.SetValue(component, floatValue);
                         }
                         else if (propertyValue is Model model)
                         {
                             ImGui.Text("Root: " + model.Root.Name);
                             ImGui.Text("Hash: " + model.GetHashCode());
+                        }
+                        else if (propertyValue is bool boolean)
+                        {
+                            var boolValue = boolean;
+                            ImGui.Checkbox("###PropertyBooleanValue", ref boolValue);
+                            property.SetValue(component, boolValue);
                         }
                         else
                             ImGui.Text(propertyValue.ToString());
