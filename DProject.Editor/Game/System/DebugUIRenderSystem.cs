@@ -253,6 +253,12 @@ namespace DProject.Manager.System
                             ImGui.Checkbox("###PropertyBooleanValue", ref boolValue);
                             property.SetValue(component, boolValue);
                         }
+                        else if (propertyValue is DPModel dpModel)
+                        {
+                            ImGui.Text("Name: " + dpModel.Name);
+                            ImGui.Text("Triangle Count: " + dpModel.PrimitiveCount);
+                            ImGui.Text("BoundingSphere: " + dpModel.BoundingSphere);
+                        }
                         else
                             ImGui.Text(propertyValue.ToString());
 

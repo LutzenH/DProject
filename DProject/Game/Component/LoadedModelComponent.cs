@@ -4,6 +4,6 @@ namespace DProject.Game.Component
 {
     public class LoadedModelComponent : IComponent
     {
-        public DPModel Model;
+        public DPModel Model { get; set; }
     }
 }
