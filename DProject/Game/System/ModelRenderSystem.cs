@@ -1,4 +1,5 @@
 using DProject.Game.Component;
+using DProject.Type.Rendering;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended.Entities;
@@ -33,7 +34,7 @@ namespace DProject.Manager.System
             
             foreach (var entity in ActiveEntities)
             {
-                var model = _modelMapper.Get(entity);
+                var model = _modelMapper.Get(entity).Model;
                 var transform = _transformMapper.Get(entity);
 
                 if (model.VertexBuffer != null && model.IndexBuffer != null & model.PrimitiveCount != 0)
@@ -47,7 +48,7 @@ namespace DProject.Manager.System
             }
         }
 
-        private static void DrawMesh(Effect effect, LoadedModelComponent model, GraphicsDevice graphicsDevice)
+        private static void DrawMesh(Effect effect, DPModel model, GraphicsDevice graphicsDevice)
         {
             graphicsDevice.SetVertexBuffer(model.VertexBuffer);
             graphicsDevice.Indices = model.IndexBuffer;

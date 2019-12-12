@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.IO;
 using DProject.Game.Component;
 using DProject.Type.Rendering;
@@ -17,10 +18,14 @@ namespace DProject.Manager.System
         private ComponentMapper<ModelComponent> _modelMapper;
         private ComponentMapper<LoadedModelComponent> _loadedModelMapper;
 
+        private readonly Dictionary<string, DPModel> _loadedModels;
+        
         public ModelLoaderSystem(GraphicsDevice graphicsDevice, ContentManager contentManager) : base(Aspect.All(typeof(ModelComponent)))
         {
             _contentManager = contentManager;
             _graphicsDevice = graphicsDevice;
+            
+            _loadedModels = new Dictionary<string, DPModel>();
         }
 
         public override void Initialize(IComponentMapperService mapperService)
@@ -35,13 +40,18 @@ namespace DProject.Manager.System
             {
                 var modelComponent = _modelMapper.Get(entity);
 
-                var (vertexBuffer, indexBuffer, primitiveCount) = ConvertDProjectModelFormatToModel(modelComponent.ModelPath, _graphicsDevice);
+                DPModel model;
+                if (_loadedModels.ContainsKey(modelComponent.ModelPath))
+                    model = _loadedModels[modelComponent.ModelPath];
+                else
+                {
+                    model = ConvertDProjectModelFormatToModel(modelComponent.ModelPath, _graphicsDevice);
+                    _loadedModels.Add(modelComponent.ModelPath, model);
+                }
                 
                 var loadedModelComponent = new LoadedModelComponent()
                 {
-                    VertexBuffer = vertexBuffer,
-                    IndexBuffer = indexBuffer,
-                    PrimitiveCount = primitiveCount
+                    Model = model
                 };
                 
                 _loadedModelMapper.Put(entity, loadedModelComponent);
@@ -50,7 +60,7 @@ namespace DProject.Manager.System
         }
         
         #region Format Converter
-        public static (VertexBuffer, IndexBuffer, int) ConvertDProjectModelFormatToModel(string pathToFile, GraphicsDevice graphicsDevice)
+        public static DPModel ConvertDProjectModelFormatToModel(string pathToFile, GraphicsDevice graphicsDevice)
         {
             var fileStream = new FileStream(Game1.RootDirectory + pathToFile + ".dpm", FileMode.Open);
             var binaryReader = new BinaryReader(fileStream);
@@ -67,6 +77,8 @@ namespace DProject.Manager.System
             var useSpecularIntensity = (vertexDeclarationMask & (1 << 3)) != 0;
             var useEmission = (vertexDeclarationMask & (1 << 4)) != 0;
 
+            var pointList = new Vector3[vertexCount];
+            
             var vertices = new VertexPositionNormalTextureColorLight[vertexCount];
             for (var i = 0; i < vertexCount; i++)
             {
@@ -76,6 +88,7 @@ namespace DProject.Manager.System
                 var y = binaryReader.ReadSingle();
                 var z = binaryReader.ReadSingle();
                 vertex.Position = new Vector3(x, y, z);
+                pointList[i] = vertex.Position;
                 
                 var nx = binaryReader.ReadSingle();
                 var ny = binaryReader.ReadSingle();
@@ -149,7 +162,9 @@ namespace DProject.Manager.System
             binaryReader.Close();
             fileStream.Close();
             
-            return (vertexBuffer, indexBuffer, (int) indexCount/3);
+            var model = new DPModel(objectName, vertexBuffer, indexBuffer, (int)indexCount/3, BoundingSphere.CreateFromPoints(pointList));
+            
+            return model;
         }
         #endregion
     }

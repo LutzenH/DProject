@@ -11,9 +11,9 @@ namespace DProject.Type.Rendering.Primitives
     {
         private GraphicsDevice _graphicsDevice;
         
-        private (VertexBuffer, IndexBuffer, int) _sphere;
-        private (VertexBuffer, IndexBuffer, int) _cube;
-        private (VertexBuffer, IndexBuffer, int) _companionCube;
+        private DPModel _sphere;
+        private DPModel _cube;
+        private DPModel _companionCube;
 
         public Primitives() { }
 
@@ -36,19 +36,19 @@ namespace DProject.Type.Rendering.Primitives
             switch (type)
             {
                 case PrimitiveType.Sphere:
-                    _graphicsDevice.SetVertexBuffer(_sphere.Item1);
-                    _graphicsDevice.Indices = _sphere.Item2;
-                    primitiveCount = _sphere.Item3;
+                    _graphicsDevice.SetVertexBuffer(_sphere.VertexBuffer);
+                    _graphicsDevice.Indices = _sphere.IndexBuffer;
+                    primitiveCount = _sphere.PrimitiveCount;
                     break;
                 case PrimitiveType.Cube:
-                    _graphicsDevice.SetVertexBuffer(_cube.Item1);
-                    _graphicsDevice.Indices = _cube.Item2;
-                    primitiveCount = _cube.Item3;
+                    _graphicsDevice.SetVertexBuffer(_cube.VertexBuffer);
+                    _graphicsDevice.Indices = _cube.IndexBuffer;
+                    primitiveCount = _cube.PrimitiveCount;
                     break;
                 case PrimitiveType.CompanionCube:
-                    _graphicsDevice.SetVertexBuffer(_companionCube.Item1);
-                    _graphicsDevice.Indices = _companionCube.Item2;
-                    primitiveCount = _companionCube.Item3;
+                    _graphicsDevice.SetVertexBuffer(_companionCube.VertexBuffer);
+                    _graphicsDevice.Indices = _companionCube.IndexBuffer;
+                    primitiveCount = _companionCube.PrimitiveCount;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(type), type, "The given PrimitiveType does not exist.");
