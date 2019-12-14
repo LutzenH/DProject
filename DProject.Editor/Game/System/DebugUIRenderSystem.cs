@@ -80,18 +80,12 @@ namespace DProject.Manager.System
                 ImGui.SetNextWindowSize(new Num.Vector2(200, 100), ImGuiCond.FirstUseEver);
                 ImGui.Begin("Render Buffers", ref _showRenderBufferWindow);
                 
-                ImGui.Text("Color");
-                ImGui.Image(_imGuiTexture[0], new Num.Vector2(300, 150), Num.Vector2.Zero, Num.Vector2.One, Num.Vector4.One, Num.Vector4.One);
-                ImGui.Text("Depth");
-                ImGui.Image(_imGuiTexture[1], new Num.Vector2(300, 150), Num.Vector2.Zero, Num.Vector2.One, Num.Vector4.One, Num.Vector4.One);
-                ImGui.Text("Light Info");
-                ImGui.Image(_imGuiTexture[2], new Num.Vector2(300, 150), Num.Vector2.Zero, Num.Vector2.One, Num.Vector4.One, Num.Vector4.One);
-                ImGui.Text("Normal");
-                ImGui.Image(_imGuiTexture[3], new Num.Vector2(300, 150), Num.Vector2.Zero, Num.Vector2.One, Num.Vector4.One, Num.Vector4.One);
-                ImGui.Text("Lights");
-                ImGui.Image(_imGuiTexture[4], new Num.Vector2(300, 150), Num.Vector2.Zero, Num.Vector2.One, Num.Vector4.One, Num.Vector4.One);
-                ImGui.Text("SSAO");
-                ImGui.Image(_imGuiTexture[5], new Num.Vector2(300, 150), Num.Vector2.Zero, Num.Vector2.One, Num.Vector4.One, Num.Vector4.One);
+                DisplayImageWithTooltip(_imGuiTexture[0], "Color", new Num.Vector2(300, 150));
+                DisplayImageWithTooltip(_imGuiTexture[1], "Depth", new Num.Vector2(300, 150));
+                DisplayImageWithTooltip(_imGuiTexture[2], "Light Info", new Num.Vector2(300, 150));
+                DisplayImageWithTooltip(_imGuiTexture[3], "Normal", new Num.Vector2(300, 150));
+                DisplayImageWithTooltip(_imGuiTexture[4], "Lights", new Num.Vector2(300, 150));
+                DisplayImageWithTooltip(_imGuiTexture[5], "SSAO", new Num.Vector2(300, 150));
                 
                 ImGui.End();
             }
@@ -272,6 +266,46 @@ namespace DProject.Manager.System
                 var detachMethod = typeof (Entity).GetMethod("Detach");
                 var detachGenericMethod = detachMethod.MakeGenericMethod(component.GetType());
                 detachGenericMethod.Invoke(entity, null);
+            }
+        }
+
+        private static void DisplayImageWithTooltip(IntPtr texturePointer, string name, Num.Vector2 size)
+        {
+            var io = ImGui.GetIO();
+            
+            ImGui.Text(name);
+            ImGui.Image(texturePointer, size, Num.Vector2.Zero, Num.Vector2.One, Num.Vector4.One, Num.Vector4.One);
+            var pos = ImGui.GetCursorScreenPos();
+            if (ImGui.IsItemHovered())
+            {
+                ImGui.BeginTooltip();
+
+                const float regionSize = 48.0f;
+                
+                var regionX = io.MousePos.X - pos.X - regionSize * 0.5f;
+                if (regionX < 0.0f)
+                    regionX = 0.0f;
+                else if (regionX > size.X - regionSize)
+                    regionX = size.X - regionSize;
+                
+                var regionY = (io.MousePos.Y - pos.Y + 156) - regionSize * 0.5f;
+                if (regionY < 0.0f)
+                    regionY = 0.0f;
+                else if (regionY > size.Y - regionSize)
+                    regionY = size.Y - regionSize;
+                
+                var zoom = Game1.ScreenResolutionX / size.X;
+                
+                var uv0 = new Num.Vector2((regionX) / size.X, (regionY) / size.Y);
+                var uv1 = new Num.Vector2((regionX + regionSize) / size.X, (regionY + regionSize) / size.Y);
+                
+                ImGui.Image(texturePointer, 
+                    new Num.Vector2(regionSize * zoom, regionSize * zoom),
+                    uv0, uv1,
+                    new Num.Vector4(1.0f, 1.0f, 1.0f, 1.0f),
+                    new Num.Vector4(1.0f, 1.0f, 1.0f, 0.5f));
+                
+                ImGui.EndTooltip();
             }
         }
 
