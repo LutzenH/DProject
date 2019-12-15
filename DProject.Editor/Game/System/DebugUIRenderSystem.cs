@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using DProject.Game;
 using DProject.Game.Component;
 using DProject.Type.Rendering;
 using ImGuiNET;
@@ -75,6 +76,29 @@ namespace DProject.Manager.System
             if (ImGui.Button("Entity List")) _showEntityListWindow = !_showEntityListWindow;
             ImGui.Text($"Application average {1000f / ImGui.GetIO().Framerate:F3} ms/frame ({ImGui.GetIO().Framerate:F1} FPS)");
 
+            ImGui.Separator();
+
+            ImGui.Text("Graphics Settings:");
+            
+            ImGui.Separator();
+
+            var graphicsSettingsEnableFxaa = Game1.GraphicsSettings.EnableFXAA;
+            ImGui.Checkbox("FXAA", ref graphicsSettingsEnableFxaa);
+            Game1.GraphicsSettings.EnableFXAA = graphicsSettingsEnableFxaa;
+
+            var graphicsSettingsEnableSsao = Game1.GraphicsSettings.EnableSSAO;
+            ImGui.Checkbox("SSAO", ref graphicsSettingsEnableSsao);
+            Game1.GraphicsSettings.EnableSSAO = graphicsSettingsEnableSsao;
+
+            var graphicsSettingsEnableLights = Game1.GraphicsSettings.EnableLights;
+            ImGui.Checkbox("Lights", ref graphicsSettingsEnableLights);
+            Game1.GraphicsSettings.EnableLights = graphicsSettingsEnableLights;
+
+            var graphicsSettingsEnableSky = Game1.GraphicsSettings.EnableSky;
+            ImGui.Checkbox("Sky", ref graphicsSettingsEnableSky);
+            Game1.GraphicsSettings.EnableSky = graphicsSettingsEnableSky;
+            
+
             if (_showRenderBufferWindow)
             {
                 ImGui.SetNextWindowSize(new Num.Vector2(200, 100), ImGuiCond.FirstUseEver);
@@ -82,10 +106,13 @@ namespace DProject.Manager.System
                 
                 DisplayImageWithTooltip(_imGuiTexture[0], "Color", new Num.Vector2(300, 150));
                 DisplayImageWithTooltip(_imGuiTexture[1], "Depth", new Num.Vector2(300, 150));
-                DisplayImageWithTooltip(_imGuiTexture[2], "Light Info", new Num.Vector2(300, 150));
+                if(Game1.GraphicsSettings.EnableLights)
+                    DisplayImageWithTooltip(_imGuiTexture[2], "Light Info", new Num.Vector2(300, 150));
                 DisplayImageWithTooltip(_imGuiTexture[3], "Normal", new Num.Vector2(300, 150));
-                DisplayImageWithTooltip(_imGuiTexture[4], "Lights", new Num.Vector2(300, 150));
-                DisplayImageWithTooltip(_imGuiTexture[5], "SSAO", new Num.Vector2(300, 150));
+                if(Game1.GraphicsSettings.EnableLights)
+                    DisplayImageWithTooltip(_imGuiTexture[4], "Lights", new Num.Vector2(300, 150));
+                if(Game1.GraphicsSettings.EnableSSAO)
+                    DisplayImageWithTooltip(_imGuiTexture[5], "SSAO", new Num.Vector2(300, 150));
                 
                 ImGui.End();
             }

@@ -1,6 +1,3 @@
-using System.IO;
-using System.Drawing;
-using System.Drawing.Imaging;
 using DProject.Game.Component;
 using DProject.Type.Rendering;
 using DProject.Type.Rendering.Primitives;
@@ -180,24 +177,30 @@ namespace DProject.Manager
             _gBufferEffect.View = lens.View;
             _gBufferEffect.Projection = lens.Projection;
 
-            _directionalLightEffect.CameraPosition = lens.Position;
-            _directionalLightEffect.LightInfoMap = LightInfo;
-            _directionalLightEffect.NormalMap = Normal;
-            _directionalLightEffect.DepthMap = Depth;
-            _directionalLightEffect.InvertViewProjection = Matrix.Invert(lens.View * lens.Projection);
-
-            _pointLightEffect.View = lens.View;
-            _pointLightEffect.Projection = lens.Projection;
-            _pointLightEffect.CameraPosition = lens.Position;
-            _pointLightEffect.InvertViewProjection = Matrix.Invert(lens.View * lens.Projection);
-            _pointLightEffect.LightInfoMap = LightInfo;
-            _pointLightEffect.DepthMap = Depth;
-            _pointLightEffect.NormalMap = Normal;
-
             _combineFinalEffect.ColorMap = Color;
-            _combineFinalEffect.LightMap = Lights;
-            _combineFinalEffect.LightInfoMap = LightInfo;
-            _combineFinalEffect.SSAOMap = SSAO;
+
+            if (Game1.GraphicsSettings.EnableLights)
+            {
+                _directionalLightEffect.CameraPosition = lens.Position;
+                _directionalLightEffect.LightInfoMap = LightInfo;
+                _directionalLightEffect.NormalMap = Normal;
+                _directionalLightEffect.DepthMap = Depth;
+                _directionalLightEffect.InvertViewProjection = Matrix.Invert(lens.View * lens.Projection);
+
+                _pointLightEffect.View = lens.View;
+                _pointLightEffect.Projection = lens.Projection;
+                _pointLightEffect.CameraPosition = lens.Position;
+                _pointLightEffect.InvertViewProjection = Matrix.Invert(lens.View * lens.Projection);
+                _pointLightEffect.LightInfoMap = LightInfo;
+                _pointLightEffect.DepthMap = Depth;
+                _pointLightEffect.NormalMap = Normal;
+                
+                _combineFinalEffect.LightMap = Lights;
+                _combineFinalEffect.LightInfoMap = LightInfo;
+            }
+            
+            if(Game1.GraphicsSettings.EnableSSAO)
+                _combineFinalEffect.SSAOMap = SSAO;
 
             _waterEffect.RefractionBuffer = CombineFinal;
             _waterEffect.ReflectionBuffer = CombineFinal;
@@ -209,10 +212,14 @@ namespace DProject.Manager
             _waterEffect.FarClipPlane = lens.FarPlaneDistance;
             _waterEffect.CameraPosition = lens.Position;
 
-            _ssaoEffect.NormalMap = Normal;
-            _ssaoEffect.DepthMap = Depth;
-            
-            _skyEffect.Depth = Depth;
+            if (Game1.GraphicsSettings.EnableSSAO)
+            {
+                _ssaoEffect.NormalMap = Normal;
+                _ssaoEffect.DepthMap = Depth;   
+            }
+
+            if(Game1.GraphicsSettings.EnableSky)
+                _skyEffect.Depth = Depth;
         }
         
         //TODO: This method is temporary until it will be replaces by a proper shader-information handler.

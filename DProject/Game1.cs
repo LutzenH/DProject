@@ -1,4 +1,5 @@
 ﻿using System;
+using DProject.Game;
 using DProject.List;
 using DProject.Manager;
 using DProject.Manager.World;
@@ -13,12 +14,12 @@ namespace DProject
         public const int MaxFps = 120;
         public const string RootDirectory = "Content/";
         
-        private static bool _enableFXAA = true;
-
         private readonly GraphicsDeviceManager _graphics;
         
         private GameWorld _worldBuilder;
         private readonly ShaderManager _shaderManager;
+
+        public static GraphicsSettings GraphicsSettings;
         
         private SpriteBatch _spriteBatch;
 
@@ -61,6 +62,8 @@ namespace DProject
             
             //Mouse
             IsMouseVisible = true;
+            
+            GraphicsSettings = new GraphicsSettings(_shaderManager);
         }
 
         protected override void Initialize()
@@ -82,6 +85,7 @@ namespace DProject
             Fonts.LoadFonts(Content);
             
             _shaderManager.LoadContent(Content);
+            GraphicsSettings.UpdateCombineFinalEffectTechnique();
             
             base.LoadContent();
         }
@@ -124,7 +128,7 @@ namespace DProject
                     SamplerState.LinearClamp,
                     DepthStencilState.Default,
                     null,
-                    _enableFXAA ? _shaderManager.FXAAEffect : null,
+                    GraphicsSettings.EnableFXAA ? _shaderManager.FXAAEffect : null,
                     Matrix.Identity);
 
                 _spriteBatch.Draw(_shaderManager.CombineFinal, GraphicsDevice.Viewport.Bounds, Color.White);
