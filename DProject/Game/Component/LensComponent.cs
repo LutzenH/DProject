@@ -31,8 +31,8 @@ namespace DProject.Game.Component
 
         public LensComponent()
         {
-            _nearPlaneDistance = 1f;
-            _farPlaneDistance = 6000f;
+            _nearPlaneDistance = 0.1f;
+            _farPlaneDistance = 600f;
             _fieldOfView = 80f;
             _aspectRatio = 1/2f;
 

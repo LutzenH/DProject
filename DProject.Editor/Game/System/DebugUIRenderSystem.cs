@@ -225,97 +225,107 @@ namespace DProject.Manager.System
 
                     if (ImGui.TreeNode(property.Name))
                     {
-                        if (propertyValue is Vector3 vector)
+                        if (property.CanWrite)
                         {
-                            var x = vector.X;
-                            var y = vector.Y;
-                            var z = vector.Z;
-                            
-                            ImGui.InputFloat("x###" + "PropertyVector3X", ref x);
-                            ImGui.InputFloat("y###" + "PropertyVector3Y", ref y);
-                            ImGui.InputFloat("z###" + "PropertyVector3Z", ref z);
-                            
-                            propertyValue = new Vector3(x, y, z);
-                            property.SetValue(component, propertyValue);
-                        }
-                        else if (propertyValue is Quaternion quaternion)
-                        {
-                            var x = quaternion.X;
-                            var y = quaternion.Y;
-                            var z = quaternion.Z;
-                            var w = quaternion.W;
-                            
-                            ImGui.InputFloat("x###" + "PropertyQuaternionX", ref x);
-                            ImGui.InputFloat("y###" + "PropertyQuaternionY", ref y);
-                            ImGui.InputFloat("z###" + "PropertyQuaternionZ", ref z);
-                            ImGui.InputFloat("w###" + "PropertyQuaternionW", ref w);
-                            
-                            propertyValue = new Quaternion(x, y, z, w);
-                            property.SetValue(component, propertyValue);
-                        }
-                        else if (propertyValue is PrimitiveType type)
-                        {
-                            var intType = (int) type;
-                            ImGui.SliderInt("Type###PropertyPrimitiveType", ref intType, 0, 2, type.ToString());
-                            
-                            propertyValue = (PrimitiveType) intType;
-                            property.SetValue(component, propertyValue);
-                        }
-                        else if (propertyValue is Color color)
-                        {
-                            var vec4Color = color.ToVector4();
-                            var inColor = new global::System.Numerics.Vector4(vec4Color.X, vec4Color.Y, vec4Color.Z, vec4Color.W);
-
-                            ImGui.ColorEdit4("Color###PropertyColor", ref inColor);
-                            
-                            propertyValue = new Color(inColor.X, inColor.Y, inColor.Z, inColor.W);
-                            property.SetValue(component, propertyValue);
-                        }
-                        else if (propertyValue is float value)
-                        {
-                            var floatValue = value;
-                            
-                            ImGui.InputFloat("value###" + "PropertyFloatValue", ref floatValue);
-
-                            property.SetValue(component, floatValue);
-                        }
-                        else if (propertyValue is Model model)
-                        {
-                            ImGui.Text("Root: " + model.Root.Name);
-                            ImGui.Text("Hash: " + model.GetHashCode());
-                        }
-                        else if (propertyValue is bool boolean)
-                        {
-                            var boolValue = boolean;
-                            ImGui.Checkbox("###PropertyBooleanValue", ref boolValue);
-                            property.SetValue(component, boolValue);
-                        }
-                        else if (propertyValue is DPModel dpModel)
-                        {
-                            ImGui.Text("Name: " + dpModel.Name);
-                            ImGui.Text("Triangle Count: " + dpModel.PrimitiveCount);
-                            ImGui.Text("BoundingSphere: " + dpModel.BoundingSphere);
-                        }
-                        else if (propertyValue is TransformComponent transformComponent)
-                        {
-                            if (property.PropertyType == typeof(TransformComponent) && clipboard != null && clipboard.GetType() == typeof(TransformComponent) && component != clipboard)
+                            switch (propertyValue)
                             {
-                                if (ImGui.Button("Replace with clipboard"))
-                                    property.SetValue(component, clipboard);
+                                case Vector3 vector:
+                                {
+                                    var x = vector.X;
+                                    var y = vector.Y;
+                                    var z = vector.Z;
+                            
+                                    ImGui.InputFloat("x###" + "PropertyVector3X:" + property.Name + ":" + component.GetType().Name, ref x);
+                                    ImGui.InputFloat("y###" + "PropertyVector3Y:" + property.Name + ":" + component.GetType().Name, ref y);
+                                    ImGui.InputFloat("z###" + "PropertyVector3Z:" + property.Name + ":" + component.GetType().Name, ref z);
+                            
+                                    propertyValue = new Vector3(x, y, z);
+                                    property.SetValue(component, propertyValue);
+                                    break;
+                                }
+                                case Quaternion quaternion:
+                                {
+                                    var x = quaternion.X;
+                                    var y = quaternion.Y;
+                                    var z = quaternion.Z;
+                                    var w = quaternion.W;
+                            
+                                    ImGui.InputFloat("x###" + "PropertyQuaternionX:" + property.Name + ":" + component.GetType().Name, ref x);
+                                    ImGui.InputFloat("y###" + "PropertyQuaternionY:" + property.Name + ":" + component.GetType().Name, ref y);
+                                    ImGui.InputFloat("z###" + "PropertyQuaternionZ:" + property.Name + ":" + component.GetType().Name, ref z);
+                                    ImGui.InputFloat("w###" + "PropertyQuaternionW:" + property.Name + ":" + component.GetType().Name, ref w);
+                            
+                                    propertyValue = new Quaternion(x, y, z, w);
+                                    property.SetValue(component, propertyValue);
+                                    break;
+                                }
+                                case PrimitiveType type:
+                                {
+                                    var intType = (int) type;
+                                    ImGui.SliderInt("Type###PropertyPrimitiveType:" + property.Name + ":" + component.GetType().Name, ref intType, 0, 2, type.ToString());
+                            
+                                    propertyValue = (PrimitiveType) intType;
+                                    property.SetValue(component, propertyValue);
+                                    break;
+                                }
+                                case Color color:
+                                {
+                                    var vec4Color = color.ToVector4();
+                                    var inColor = new global::System.Numerics.Vector4(vec4Color.X, vec4Color.Y, vec4Color.Z, vec4Color.W);
+
+                                    ImGui.ColorEdit4("Color###PropertyColor:" + property.Name + ":" + component.GetType().Name, ref inColor);
+                            
+                                    propertyValue = new Color(inColor.X, inColor.Y, inColor.Z, inColor.W);
+                                    property.SetValue(component, propertyValue);
+                                    break;
+                                }
+                                case float value:
+                                {
+                                    var floatValue = value;
+                            
+                                    ImGui.InputFloat("value###" + "PropertyFloatValue:" + property.Name + ":" + component.GetType().Name, ref floatValue);
+
+                                    property.SetValue(component, floatValue);
+                                    break;
+                                }
+                                case Model model:
+                                    ImGui.Text("Root: " + model.Root.Name);
+                                    ImGui.Text("Hash: " + model.GetHashCode());
+                                    break;
+                                case bool boolean:
+                                {
+                                    var boolValue = boolean;
+                                    ImGui.Checkbox("###PropertyBooleanValue:" + property.Name + ":" + component.GetType().Name, ref boolValue);
+                                    property.SetValue(component, boolValue);
+                                    break;
+                                }
+                                case DPModel dpModel:
+                                    ImGui.Text("Name: " + dpModel.Name);
+                                    ImGui.Text("Triangle Count: " + dpModel.PrimitiveCount);
+                                    ImGui.Text("BoundingSphere: " + dpModel.BoundingSphere);
+                                    break;
+                                case TransformComponent transformComponent:
+                                {
+                                    if (property.PropertyType == typeof(TransformComponent) && clipboard != null && clipboard.GetType() == typeof(TransformComponent) && component != clipboard)
+                                    {
+                                        if (ImGui.Button("Replace with clipboard"))
+                                            property.SetValue(component, clipboard);
+                                    }
+                                    ImGui.Text("Position: " + transformComponent.Position);
+                                    ImGui.Text("Scale: " + transformComponent.Scale);
+                                    ImGui.Text("Rotation: " + transformComponent.Rotation);
+                                    break;
+                                }
+                                case null when property.PropertyType == typeof(TransformComponent) && clipboard != null && clipboard.GetType() == typeof(TransformComponent) && component != clipboard:
+                                {
+                                    if (ImGui.Button("Paste TransformComponent"))
+                                        property.SetValue(component, clipboard);
+                                    break;
+                                }
+                                case null:
+                                    ImGui.Text("None");
+                                    break;
                             }
-                            ImGui.Text("Position: " + transformComponent.Position);
-                            ImGui.Text("Scale: " + transformComponent.Scale);
-                            ImGui.Text("Rotation: " + transformComponent.Rotation);
-                        }
-                        else if (propertyValue == null)
-                        {
-                            if (property.PropertyType == typeof(TransformComponent) && clipboard != null && clipboard.GetType() == typeof(TransformComponent) && component != clipboard)
-                            {
-                                if (ImGui.Button("Paste TransformComponent"))
-                                    property.SetValue(component, clipboard);
-                            }
-                            else
-                                ImGui.Text("None");
                         }
                         else
                             ImGui.Text(propertyValue.ToString());
