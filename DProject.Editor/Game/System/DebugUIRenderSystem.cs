@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using DProject.Game;
 using DProject.Game.Component;
 using DProject.Type.Rendering;
 using ImGuiNET;
@@ -30,6 +29,8 @@ namespace DProject.Manager.System
 
         public static readonly Dictionary<int, string> EntityIdentifiers = new Dictionary<int, string>();
         private readonly IEnumerable<global::System.Type> _componentTypes;
+
+        private object _clipboard;
         
         public DebugUIRenderSystem(GraphicsDevice graphicsDevice, ShaderManager shaderManager) : base(Aspect.Exclude())
         {
@@ -80,8 +81,6 @@ namespace DProject.Manager.System
 
             ImGui.Text("Graphics Settings:");
             
-            ImGui.Separator();
-
             var graphicsSettingsEnableFxaa = Game1.GraphicsSettings.EnableFXAA;
             ImGui.Checkbox("FXAA", ref graphicsSettingsEnableFxaa);
             Game1.GraphicsSettings.EnableFXAA = graphicsSettingsEnableFxaa;
@@ -98,6 +97,11 @@ namespace DProject.Manager.System
             ImGui.Checkbox("Sky", ref graphicsSettingsEnableSky);
             Game1.GraphicsSettings.EnableSky = graphicsSettingsEnableSky;
             
+            if (_clipboard != null)
+            {
+                ImGui.Separator();
+                ImGui.Text("Clipboard: " + _clipboard.GetType().Name + ":" + _clipboard.GetHashCode());
+            }
 
             if (_showRenderBufferWindow)
             {
@@ -189,7 +193,7 @@ namespace DProject.Manager.System
                     var getGenericMethod = getMethod.MakeGenericMethod(componentType);
                     var entityGetComponent = (IComponent) getGenericMethod.Invoke(entity, null);
                     
-                    BuildComponentPropertiesList(entityGetComponent, entity);
+                    BuildComponentPropertiesList(entityGetComponent, entity, ref _clipboard);
                 }
             }
             
@@ -198,11 +202,23 @@ namespace DProject.Manager.System
             ImGui.End();
         }
 
-        private static void BuildComponentPropertiesList(IComponent component, Entity entity)
+        private static void BuildComponentPropertiesList(IComponent component, Entity entity, ref object clipboard)
         {
             var isAlive = true;
             if (component != null && ImGui.CollapsingHeader(component.GetType().Name, ref isAlive))
             {
+                if (ImGui.IsItemHovered())
+                {
+                    var io = ImGui.GetIO();
+                    
+                    if (io.KeyCtrl && ImGui.IsKeyDown(ImGui.GetKeyIndex(ImGuiKey.C)))
+                    {
+                        ImGui.BeginTooltip();
+                        ImGui.Text("Copied: " + component.GetHashCode());
+                        clipboard = component;
+                        ImGui.EndTooltip();
+                    }
+                }
                 foreach (var property in component.GetType().GetProperties())
                 {
                     var propertyValue = property.GetValue(component, null);
@@ -279,6 +295,27 @@ namespace DProject.Manager.System
                             ImGui.Text("Name: " + dpModel.Name);
                             ImGui.Text("Triangle Count: " + dpModel.PrimitiveCount);
                             ImGui.Text("BoundingSphere: " + dpModel.BoundingSphere);
+                        }
+                        else if (propertyValue is TransformComponent transformComponent)
+                        {
+                            if (property.PropertyType == typeof(TransformComponent) && clipboard != null && clipboard.GetType() == typeof(TransformComponent) && component != clipboard)
+                            {
+                                if (ImGui.Button("Replace with clipboard"))
+                                    property.SetValue(component, clipboard);
+                            }
+                            ImGui.Text("Position: " + transformComponent.Position);
+                            ImGui.Text("Scale: " + transformComponent.Scale);
+                            ImGui.Text("Rotation: " + transformComponent.Rotation);
+                        }
+                        else if (propertyValue == null)
+                        {
+                            if (property.PropertyType == typeof(TransformComponent) && clipboard != null && clipboard.GetType() == typeof(TransformComponent) && component != clipboard)
+                            {
+                                if (ImGui.Button("Paste TransformComponent"))
+                                    property.SetValue(component, clipboard);
+                            }
+                            else
+                                ImGui.Text("None");
                         }
                         else
                             ImGui.Text(propertyValue.ToString());

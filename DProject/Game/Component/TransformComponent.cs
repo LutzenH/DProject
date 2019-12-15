@@ -11,6 +11,8 @@ namespace DProject.Game.Component
         private Vector3 _scale;
         private Quaternion _rotation;
 
+        private TransformComponent _parent;
+
         private Matrix _worldMatrix;
 
         public TransformComponent()
@@ -18,6 +20,7 @@ namespace DProject.Game.Component
             _position = Vector3.Zero;
             _scale = Vector3.One;
             _rotation = Quaternion.Identity;
+            _parent = null;
             _worldMatrixIsDirty = true;
         }
 
@@ -57,7 +60,19 @@ namespace DProject.Game.Component
                     _worldMatrixIsDirty = false;
                 }
 
-                return _worldMatrix;
+                if (_parent == null)
+                    return _worldMatrix;
+                else
+                    return _worldMatrix * _parent.WorldMatrix;
+            }
+        }
+
+        public TransformComponent Parent {
+            get => _parent;
+            set
+            {
+                if (value != this)
+                    _parent = value;
             }
         }
 
