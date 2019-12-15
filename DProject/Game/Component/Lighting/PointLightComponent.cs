@@ -9,6 +9,8 @@ namespace DProject.Game.Component.Lighting
         private float _radius;
         private Vector3 _position;
         
+        private TransformComponent _parent;
+        
         private Matrix _worldMatrix;
 
         public PointLightComponent()
@@ -37,6 +39,13 @@ namespace DProject.Game.Component.Lighting
                 _worldMatrixIsDirty = true;
             }
         }
+
+        public Vector3 WorldPosition => Parent == null ? _position : _position + Parent.Position;
+
+        public TransformComponent Parent {
+            get => _parent;
+            set => _parent = value;
+        }
         
         public Matrix WorldMatrix {
             get
@@ -47,7 +56,10 @@ namespace DProject.Game.Component.Lighting
                     _worldMatrixIsDirty = false;
                 }
 
-                return _worldMatrix;
+                if (_parent == null)
+                    return _worldMatrix;
+                else
+                    return _worldMatrix * _parent.WorldMatrix;
             }
         }
     }

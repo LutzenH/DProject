@@ -60,11 +60,11 @@ namespace DProject.Manager.System.Lighting
 
                         _shaderManager.PointLightEffect.LightColor = light.Color.ToVector3();
                         _shaderManager.PointLightEffect.LightIntensity = light.Intensity;
-                        _shaderManager.PointLightEffect.LightPosition = light.Position;
+                        _shaderManager.PointLightEffect.LightPosition = light.WorldPosition;
                         _shaderManager.PointLightEffect.LightRadius = light.Radius;
                         _shaderManager.PointLightEffect.World = light.WorldMatrix;
 
-                        var cameraToCenter = Vector3.Distance(CameraSystem.ActiveLens.Position, light.Position);
+                        var cameraToCenter = Vector3.Distance(CameraSystem.ActiveLens.Position, light.WorldPosition);
                         _graphicsDevice.RasterizerState.CullMode = cameraToCenter <= light.Radius ? CullMode.CullClockwiseFace : CullMode.CullCounterClockwiseFace;
 
                         _graphicsDevice.Clear(ClearOptions.DepthBuffer, Color.White, 1, 0);
