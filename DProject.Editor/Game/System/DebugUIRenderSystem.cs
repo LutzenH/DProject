@@ -31,6 +31,10 @@ namespace DProject.Manager.System
         private readonly IEnumerable<global::System.Type> _componentTypes;
 
         private object _clipboard;
+
+        private const int MaxFrameRateValues = 100;
+        private float[] _frameRateValues = new float[MaxFrameRateValues];
+        private int _frameRateValuesIndex;
         
         public DebugUIRenderSystem(GraphicsDevice graphicsDevice, ShaderManager shaderManager) : base(Aspect.Exclude())
         {
@@ -75,7 +79,17 @@ namespace DProject.Manager.System
             if (ImGui.Button("Test Window")) _showTestWindow = !_showTestWindow;
             if (ImGui.Button("Render Buffers")) _showRenderBufferWindow = !_showRenderBufferWindow;
             if (ImGui.Button("Entity List")) _showEntityListWindow = !_showEntityListWindow;
-            ImGui.Text($"Application average {1000f / ImGui.GetIO().Framerate:F3} ms/frame ({ImGui.GetIO().Framerate:F1} FPS)");
+            
+            var frameRate = 1000f / ImGui.GetIO().Framerate;
+            _frameRateValues[_frameRateValuesIndex++ % MaxFrameRateValues] = frameRate;
+            ImGui.PlotHistogram("", 
+                ref _frameRateValues[0],
+                MaxFrameRateValues,
+                1,
+                $"framerate (ms/frame) - {ImGui.GetIO().Framerate:F1} FPS",
+                0f,
+                _frameRateValues.Average()*2,
+                new Num.Vector2(256, 64));
 
             ImGui.Separator();
 
@@ -97,6 +111,21 @@ namespace DProject.Manager.System
             ImGui.Checkbox("Sky", ref graphicsSettingsEnableSky);
             Game1.GraphicsSettings.EnableSky = graphicsSettingsEnableSky;
             
+            var graphicsSettingsEnableVSync = Game1.GraphicsSettings.EnableVSync;
+            ImGui.Checkbox("VSync", ref graphicsSettingsEnableVSync);
+            Game1.GraphicsSettings.EnableVSync = graphicsSettingsEnableVSync;
+            
+            var graphicsSettingsEnableMaxFps = Game1.GraphicsSettings.EnableMaxFps;
+            ImGui.Checkbox("Limit FPS", ref graphicsSettingsEnableMaxFps);
+            Game1.GraphicsSettings.EnableMaxFps = graphicsSettingsEnableMaxFps;
+
+            if (graphicsSettingsEnableMaxFps)
+            {
+                var graphicsSettingsMaxFps = Game1.GraphicsSettings.MaxFps;
+                ImGui.InputInt("Max FPS", ref graphicsSettingsMaxFps, 1);
+                Game1.GraphicsSettings.MaxFps = graphicsSettingsMaxFps;
+            }
+
             if (_clipboard != null)
             {
                 ImGui.Separator();

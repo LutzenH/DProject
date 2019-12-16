@@ -1,25 +1,59 @@
+using System;
 using DProject.Manager;
+using Microsoft.Xna.Framework;
 
 namespace DProject.Game
 {
     public class GraphicsSettings
     {
         private readonly ShaderManager _shaderManager;
+        private readonly GraphicsDeviceManager _graphicsDeviceManager;
+        private readonly Game1 _game;
         
-        private bool _enableFXAA;
         private bool _enableSSAO;
         private bool _enableLights;
-        private bool _enableSky;
-        
-        public GraphicsSettings(ShaderManager shaderManager)
+        private int _maxFps;
+        private bool _enableVSync;
+
+        public bool EnableFXAA { get; set; }
+        public bool EnableSky { get; set; }
+
+        public GraphicsSettings(Game1 game, GraphicsDeviceManager graphicsDeviceManager, ShaderManager shaderManager)
         {
+            _game = game;
+            _graphicsDeviceManager = graphicsDeviceManager;
             _shaderManager = shaderManager;
+
+            _enableSSAO = true;
+            _enableLights = true;
+            
+            EnableFXAA = true;
+            EnableSky = true;
+            EnableVSync = false;
+            EnableMaxFps = true;
+            MaxFps = 120;
         }
 
-        public bool EnableFXAA
+        public bool EnableVSync
         {
-            get => _enableFXAA;
-            set => _enableFXAA = value;
+            get => _graphicsDeviceManager.SynchronizeWithVerticalRetrace;
+            set => _graphicsDeviceManager.SynchronizeWithVerticalRetrace = value;
+        }
+        
+        public bool EnableMaxFps
+        {
+            get => _game.IsFixedTimeStep;
+            set => _game.IsFixedTimeStep = value;
+        }
+        
+        public int MaxFps
+        {
+            get => _maxFps;
+            set
+            {
+                _maxFps = value;
+                _game.TargetElapsedTime = TimeSpan.FromTicks(10000000L / MaxFps);
+            }
         }
         
         public bool EnableSSAO
@@ -48,12 +82,6 @@ namespace DProject.Game
             }
         }
         
-        public bool EnableSky
-        {
-            get => _enableSky;
-            set => _enableSky = value;
-        }
-
         public void UpdateCombineFinalEffectTechnique()
         {
             if (_enableLights && _enableSSAO)

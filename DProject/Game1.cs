@@ -11,16 +11,14 @@ namespace DProject
 {
     public class Game1 : Microsoft.Xna.Framework.Game
     {
-        public const int MaxFps = 120;
         public const string RootDirectory = "Content/";
         
         private readonly GraphicsDeviceManager _graphics;
         
         private GameWorld _worldBuilder;
-        private readonly ShaderManager _shaderManager;
-
-        public static GraphicsSettings GraphicsSettings;
         
+        private readonly ShaderManager _shaderManager;
+        public static GraphicsSettings GraphicsSettings;
         private SpriteBatch _spriteBatch;
 
         private static Color _backgroundColor;
@@ -49,13 +47,6 @@ namespace DProject
 
             _backgroundColor = Color.DarkGray;
 
-            //VSYNC
-            _graphics.SynchronizeWithVerticalRetrace = false;
-            
-            //Max FPS
-            IsFixedTimeStep = true;
-            TargetElapsedTime = TimeSpan.FromTicks(10000000L / MaxFps);
-
             Window.AllowUserResizing = true;
             Window.ClientSizeChanged += (sender, args) => SetScreenResolution(Window.ClientBounds.Width, Window.ClientBounds.Height);
             Window.ClientSizeChanged += (sender, args) => _shaderManager.CreateGBuffer(true);
@@ -63,7 +54,7 @@ namespace DProject
             //Mouse
             IsMouseVisible = true;
             
-            GraphicsSettings = new GraphicsSettings(_shaderManager);
+            GraphicsSettings = new GraphicsSettings(this, _graphics, _shaderManager);
         }
 
         protected override void Initialize()
