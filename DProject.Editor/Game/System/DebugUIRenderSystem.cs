@@ -19,6 +19,7 @@ namespace DProject.Manager.System
 
         private readonly ShaderManager _shaderManager;
         private readonly GraphicsDevice _graphicsDevice;
+        private readonly PhysicsSystem _physicsSystem;
      
         private readonly ImGuiRenderer _imGuiRenderer;
         private readonly IntPtr[] _imGuiTexture = { IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero };
@@ -33,13 +34,14 @@ namespace DProject.Manager.System
         private object _clipboard;
 
         private const int MaxFrameRateValues = 100;
-        private float[] _frameRateValues = new float[MaxFrameRateValues];
+        private readonly float[] _frameRateValues = new float[MaxFrameRateValues];
         private int _frameRateValuesIndex;
         
-        public DebugUIRenderSystem(GraphicsDevice graphicsDevice, ShaderManager shaderManager) : base(Aspect.Exclude())
+        public DebugUIRenderSystem(GraphicsDevice graphicsDevice, ShaderManager shaderManager, PhysicsSystem physicsSystem) : base(Aspect.Exclude())
         {
             _shaderManager = shaderManager;
             _graphicsDevice = graphicsDevice;
+            _physicsSystem = physicsSystem;
             
             _imGuiRenderer = new ImGuiRenderer(_graphicsDevice);
             _imGuiRenderer.RebuildFontAtlas();
@@ -125,6 +127,14 @@ namespace DProject.Manager.System
                 ImGui.InputInt("Max FPS", ref graphicsSettingsMaxFps, 1);
                 Game1.GraphicsSettings.MaxFps = graphicsSettingsMaxFps;
             }
+            
+            ImGui.Separator();
+            
+            ImGui.Text("Physics Settings:");
+
+            var physicsSystemEnableSimulation = _physicsSystem.EnableSimulation;
+            ImGui.Checkbox("Enabled", ref physicsSystemEnableSimulation);
+            _physicsSystem.EnableSimulation = physicsSystemEnableSimulation;
 
             if (_clipboard != null)
             {

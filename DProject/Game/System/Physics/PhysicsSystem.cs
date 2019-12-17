@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.CompilerServices;
+using System.Timers;
 using BepuPhysics;
 using BepuPhysics.Collidables;
 using BepuPhysics.CollisionDetection;
@@ -89,12 +90,29 @@ namespace DProject.Manager.System
 
         private readonly SimpleThreadDispatcher _threadDispatcher;
         
+        private readonly Timer _simulationStepTimer;
+        private const int SimulationTimeStepPerSecond = 60;
+
+        public bool EnableSimulation {
+            get => _simulationStepTimer.Enabled;
+            set => _simulationStepTimer.Enabled = value;
+        }
+
         public PhysicsSystem() : base(Aspect.One(typeof(PhysicsComponent), typeof(PhysicsBodyComponent)))
         {
             _bufferPool = new BufferPool();
             _simulation = Simulation.Create(_bufferPool, new SelfContainedSimulation.NarrowPhaseCallbacks(), new SelfContainedSimulation.PoseIntegratorCallbacks(new global::System.Numerics.Vector3(0, -10, 0)));
 
             _threadDispatcher = new SimpleThreadDispatcher(Environment.ProcessorCount);
+            
+            _simulationStepTimer = new Timer(1000f / SimulationTimeStepPerSecond);
+            _simulationStepTimer.Elapsed += OnSimulationTimeStep;
+            
+#if EDITOR
+            _simulationStepTimer.Enabled = false;
+#else
+            _simulationStepTimer.Enabled = true;
+#endif
         }
 
         public override void Initialize(IComponentMapperService mapperService)
@@ -138,7 +156,10 @@ namespace DProject.Manager.System
                     _activePhysicsMapper.Put(entity, new ActivePhysicsComponent() { Handle = componentHandle });   
                 }
             }
+        }
 
+        private void OnSimulationTimeStep(object source, ElapsedEventArgs e)
+        {
             _simulation.Timestep(0.01f, _threadDispatcher);
         }
 

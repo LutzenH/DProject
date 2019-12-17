@@ -42,7 +42,7 @@ namespace DProject.Manager.World
             AddSystem(new WaterRenderSystem(graphicsDevice, shaderManager));
             
 #if EDITOR
-            AddSystem(new DebugUIRenderSystem(graphicsDevice, shaderManager));            
+            AddSystem(new DebugUIRenderSystem(graphicsDevice, shaderManager, physicsSystem));
 #endif
 
             World = Build();
