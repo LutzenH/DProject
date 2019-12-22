@@ -1,27 +1,27 @@
 using System;
-using System.Linq;
+using DProject.Manager.System;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace DProject.Type.Rendering.Primitives
 {
-    public enum PrimitiveType { Sphere }
+    public enum PrimitiveType { Sphere, Cube, CompanionCube }
 
     public class Primitives
     {
         private GraphicsDevice _graphicsDevice;
         
-        private (VertexBuffer, IndexBuffer, int) _sphere;
+        private DPModel _sphere;
+        private DPModel _cube;
+        private DPModel _companionCube;
 
         public Primitives() { }
 
         public void LoadPrimitives(ContentManager contentManager)
         {
-            //Sphere
-            var sphereModel = (contentManager).Load<Model>("models/primitives/sphere");
-            _sphere.Item1 = sphereModel.Meshes.First().MeshParts.First().VertexBuffer;
-            _sphere.Item2 = sphereModel.Meshes.First().MeshParts.First().IndexBuffer;
-            _sphere.Item3 = sphereModel.Meshes.First().MeshParts.First().PrimitiveCount;
+            _sphere = ModelLoaderSystem.ConvertDProjectModelFormatToModel("models/primitives/sphere", _graphicsDevice);
+            _cube = ModelLoaderSystem.ConvertDProjectModelFormatToModel("models/primitives/cube", _graphicsDevice);
+            _companionCube = ModelLoaderSystem.ConvertDProjectModelFormatToModel("models/primitives/companion_cube", _graphicsDevice);
         }
 
         public void Initialize(GraphicsDevice graphicsDevice)
@@ -36,9 +36,19 @@ namespace DProject.Type.Rendering.Primitives
             switch (type)
             {
                 case PrimitiveType.Sphere:
-                    _graphicsDevice.SetVertexBuffer(_sphere.Item1);
-                    _graphicsDevice.Indices = _sphere.Item2;
-                    primitiveCount = _sphere.Item3;
+                    _graphicsDevice.SetVertexBuffer(_sphere.VertexBuffer);
+                    _graphicsDevice.Indices = _sphere.IndexBuffer;
+                    primitiveCount = _sphere.PrimitiveCount;
+                    break;
+                case PrimitiveType.Cube:
+                    _graphicsDevice.SetVertexBuffer(_cube.VertexBuffer);
+                    _graphicsDevice.Indices = _cube.IndexBuffer;
+                    primitiveCount = _cube.PrimitiveCount;
+                    break;
+                case PrimitiveType.CompanionCube:
+                    _graphicsDevice.SetVertexBuffer(_companionCube.VertexBuffer);
+                    _graphicsDevice.Indices = _companionCube.IndexBuffer;
+                    primitiveCount = _companionCube.PrimitiveCount;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(type), type, "The given PrimitiveType does not exist.");

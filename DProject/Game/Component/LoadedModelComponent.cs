@@ -1,9 +1,9 @@
-using Microsoft.Xna.Framework.Graphics;
+using DProject.Type.Rendering;
 
 namespace DProject.Game.Component
 {
-    public class LoadedModelComponent
+    public class LoadedModelComponent : IComponent
     {
-        public Model Model { get; set; }
+        public DPModel Model { get; set; }
     }
 }

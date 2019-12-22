@@ -1,7 +1,5 @@
 using DProject.Game.Component;
-using DProject.Manager.System.Terrain;
 using DProject.Type.Rendering;
-using DProject.Type.Rendering.Shaders;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended.Entities;

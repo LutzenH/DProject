@@ -1,4 +1,5 @@
 ﻿using System;
+using DProject.Game;
 using DProject.List;
 using DProject.Manager;
 using DProject.Manager.World;
@@ -10,16 +11,14 @@ namespace DProject
 {
     public class Game1 : Microsoft.Xna.Framework.Game
     {
-        public const int MaxFps = 120;
         public const string RootDirectory = "Content/";
         
-        private static bool _enableFXAA = true;
-
         private readonly GraphicsDeviceManager _graphics;
         
         private GameWorld _worldBuilder;
-        private readonly ShaderManager _shaderManager;
         
+        private readonly ShaderManager _shaderManager;
+        public static GraphicsSettings GraphicsSettings;
         private SpriteBatch _spriteBatch;
 
         private static Color _backgroundColor;
@@ -27,11 +26,6 @@ namespace DProject
         public static int ScreenResolutionX;
         public static int ScreenResolutionY;
 
-#if EDITOR
-        public static int WidgetOffsetX;
-        public static int WidgetOffsetY;
-#endif
-        
         private DateTime _last = DateTime.Now;
         private int _fps;
         private int _lastRecordedFps;
@@ -53,19 +47,14 @@ namespace DProject
 
             _backgroundColor = Color.DarkGray;
 
-            //VSYNC
-            _graphics.SynchronizeWithVerticalRetrace = false;
-            
-            //Max FPS
-            IsFixedTimeStep = true;
-            TargetElapsedTime = TimeSpan.FromTicks(10000000L / MaxFps);
-
             Window.AllowUserResizing = true;
             Window.ClientSizeChanged += (sender, args) => SetScreenResolution(Window.ClientBounds.Width, Window.ClientBounds.Height);
             Window.ClientSizeChanged += (sender, args) => _shaderManager.CreateGBuffer(true);
             
             //Mouse
             IsMouseVisible = true;
+            
+            GraphicsSettings = new GraphicsSettings(this, _graphics, _shaderManager);
         }
 
         protected override void Initialize()
@@ -87,6 +76,7 @@ namespace DProject
             Fonts.LoadFonts(Content);
             
             _shaderManager.LoadContent(Content);
+            GraphicsSettings.UpdateCombineFinalEffectTechnique();
             
             base.LoadContent();
         }
@@ -129,7 +119,7 @@ namespace DProject
                     SamplerState.LinearClamp,
                     DepthStencilState.Default,
                     null,
-                    _enableFXAA ? _shaderManager.FXAAEffect : null,
+                    GraphicsSettings.EnableFXAA ? _shaderManager.FXAAEffect : null,
                     Matrix.Identity);
 
                 _spriteBatch.Draw(_shaderManager.CombineFinal, GraphicsDevice.Viewport.Bounds, Color.White);
@@ -138,22 +128,6 @@ namespace DProject
             {
                 _spriteBatch.End();
             }
-            
-            try
-            {
-                _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, SamplerState.LinearClamp, DepthStencilState.Default, RasterizerState.CullCounterClockwise, null, Matrix.Identity);
-
-                _spriteBatch.Draw(_shaderManager.Color, new Rectangle(0, 0, 320, 180), Color.White);
-                _spriteBatch.Draw(_shaderManager.Depth, new Rectangle(0, 180, 320, 180), Color.White);
-                _spriteBatch.Draw(_shaderManager.Normal, new Rectangle(0, 360, 320, 180), Color.White);
-                _spriteBatch.Draw(_shaderManager.Lights, new Rectangle(0, 540, 320, 180), Color.White);
-                _spriteBatch.Draw(_shaderManager.CombineFinal, new Rectangle(0, 720, 320, 180), Color.White);
-            }
-            finally
-            {
-                _spriteBatch.End();
-            }
-            
             _fps++;
             base.Draw(gameTime);
         }
@@ -171,30 +145,15 @@ namespace DProject
             _graphics.PreferredBackBufferWidth = ScreenResolutionX;
             _graphics.PreferredBackBufferHeight = ScreenResolutionY;
         }
-
-#if EDITOR
-        public void SetWidgetOffset(int x, int y)
-        {
-            WidgetOffsetX = x;
-            WidgetOffsetY = y;
-        }
-#endif
+        
         public static Vector2 GetMousePosition()
         {
-#if EDITOR
-            return new Vector2(Mouse.GetState().X + WidgetOffsetX, Mouse.GetState().Y + WidgetOffsetY);
-#else
             return Mouse.GetState().Position.ToVector2();
-#endif
         }
 
         public static Point GetPointMousePosition()
         {
-#if EDITOR
-            return new Point(Mouse.GetState().X + WidgetOffsetX, Mouse.GetState().Y + WidgetOffsetY);
-#else
             return Mouse.GetState().Position;
-#endif
         }
 
         public int GetFps()

@@ -5,16 +5,18 @@
     <TargetFramework>net471</TargetFramework>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <AssemblyName>DProject</AssemblyName>
+    <MonoGamePlatform>DesktopGL</MonoGamePlatform>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-    <DefineConstants>TRACE;DEBUG;NETFRAMEWORK;NET471;EDITOR</DefineConstants>
     <OutputPath>..\bin\Debug\Editor</OutputPath>
+    <DefineConstants>TRACE;DEBUG;NETFRAMEWORK;NET471;EDITOR</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-    <DefineConstants>TRACE;RELEASE;NETFRAMEWORK;NET471;EDITOR</DefineConstants>
     <OutputPath>..\bin\Release\Editor</OutputPath>
+    <DefineConstants>TRACE;RELEASE;NETFRAMEWORK;NET471;EDITOR</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
@@ -29,18 +31,34 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="BitMiracle.LibTiff.NET" Version="2.4.633" />
-    <PackageReference Include="GtkSharp" Version="3.22.24.37" />
+    <PackageReference Include="ImGui.NET" Version="1.72.0" />
     <PackageReference Include="LibNoise" Version="0.2.0" />
     <PackageReference Include="MessagePack" Version="1.7.3.4" />
     <PackageReference Include="MonoGame.Content.Builder" Version="3.7.0.9" />
-    <PackageReference Include="MonoGame.Extended" Version="3.6.0-beta0001" />
-    <PackageReference Include="MonoGame.Extended.Entities" Version="3.6.0-beta0001" />
-    <PackageReference Include="MonoGame.Framework.Gtk" Version="3.8.0.4" />
+    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.6.0" />
   </ItemGroup>
 
   <ItemGroup>
+    <Reference Include="BepuPhysics, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\DProject.Dependencies\bepuphysics2\BepuPhysics\bin\Release\netstandard2.0\BepuPhysics.dll</HintPath>
+    </Reference>
+    <Reference Include="BepuUtilities, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\DProject.Dependencies\bepuphysics2\BepuPhysics\bin\Release\netstandard2.0\BepuUtilities.dll</HintPath>
+    </Reference>
+    <Reference Include="FNA, Version=19.11.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\DProject.Dependencies\FNA\bin\Release\FNA.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="MonoGame.Extended, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\DProject.Dependencies\MonoGame.Extended\Source\MonoGame.Extended.Entities\bin\Release\netstandard2.0\MonoGame.Extended.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoGame.Extended.Animations, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\DProject.Dependencies\MonoGame.Extended\Source\MonoGame.Extended.Entities\bin\Release\netstandard2.0\MonoGame.Extended.Animations.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoGame.Extended.Entities, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\DProject.Dependencies\MonoGame.Extended\Source\MonoGame.Extended.Entities\bin\Release\netstandard2.0\MonoGame.Extended.Entities.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Numerics.Vectors" />
   </ItemGroup>
 
 </Project>

@@ -1,6 +1,3 @@
-using System.IO;
-using System.Drawing;
-using System.Drawing.Imaging;
 using DProject.Game.Component;
 using DProject.Type.Rendering;
 using DProject.Type.Rendering.Primitives;
@@ -18,7 +15,6 @@ namespace DProject.Manager
 
         // GBuffer Effects
         private GBufferEffect _gBufferEffect;
-        private ClipMapTerrainEffect _clipMapTerrainEffect;
         private ClearGBufferEffect _clearGBufferEffect;
         private DirectionalLightEffect _directionalLightEffect;
         private PointLightEffect _pointLightEffect;
@@ -32,18 +28,25 @@ namespace DProject.Manager
         
         // FXAA Effect
         private FXAAEffect _fxaaEffect;
+        
+        // SSAO Effect
+        private SSAOEffect _ssaoEffect;
 
         // Render-targets (G-Buffer)
-        private readonly RenderTargetBinding[] _renderTargetBindings = new RenderTargetBinding[3];
+        private readonly RenderTargetBinding[] _renderTargetBindings = new RenderTargetBinding[4];
         
-        // Color + Specular Intensity
+        // Color
         public RenderTarget2D Color;
-        // Normal + Specular Power.
+        // Normal
         public RenderTarget2D Normal;
+        // Specular Intensity + Specular Power + Emission
+        public RenderTarget2D LightInfo;
         // Depth
         public RenderTarget2D Depth;
         // Lights
         public RenderTarget2D Lights;
+        // SSAO
+        public RenderTarget2D SSAO;
         // Final
         public RenderTarget2D CombineFinal;
         
@@ -82,6 +85,14 @@ namespace DProject.Manager
                 SurfaceFormat.Color,
                 DepthFormat.Depth24);
             
+            LightInfo = new RenderTarget2D(
+                _graphicsDevice,
+                _graphicsDevice.PresentationParameters.BackBufferWidth,
+                _graphicsDevice.PresentationParameters.BackBufferHeight,
+                false,
+                SurfaceFormat.Color,
+                DepthFormat.Depth24);
+            
             Depth = new RenderTarget2D(
                 _graphicsDevice,
                 _graphicsDevice.PresentationParameters.BackBufferWidth,
@@ -98,6 +109,14 @@ namespace DProject.Manager
                 SurfaceFormat.Color,
                 DepthFormat.Depth24);
             
+            SSAO = new RenderTarget2D(
+                _graphicsDevice,
+                _graphicsDevice.PresentationParameters.BackBufferWidth,
+                _graphicsDevice.PresentationParameters.BackBufferHeight,
+                false,
+                SurfaceFormat.Single,
+                DepthFormat.Depth24);
+            
             CombineFinal = new RenderTarget2D(
                 _graphicsDevice,
                 _graphicsDevice.PresentationParameters.BackBufferWidth,
@@ -109,6 +128,7 @@ namespace DProject.Manager
             _renderTargetBindings[0] = new RenderTargetBinding(Color);
             _renderTargetBindings[1] = new RenderTargetBinding(Normal);
             _renderTargetBindings[2] = new RenderTargetBinding(Depth);
+            _renderTargetBindings[3] = new RenderTargetBinding(LightInfo);
 
             if(updateShaders)
                 SetInitiateShaderInfo();
@@ -131,7 +151,6 @@ namespace DProject.Manager
 
         public void LoadContent(ContentManager content)
         {
-            _clipMapTerrainEffect = new ClipMapTerrainEffect(content.Load<Effect>("shaders/ClipMapTerrainShader"));
             _gBufferEffect = new GBufferEffect(content.Load<Effect>("shaders/gbuffer/RenderGBuffer"));
             _clearGBufferEffect = new ClearGBufferEffect(content.Load<Effect>("shaders/gbuffer/ClearGBuffer"));
             _directionalLightEffect = new DirectionalLightEffect(content.Load<Effect>("shaders/gbuffer/DirectionalLight"));
@@ -144,11 +163,9 @@ namespace DProject.Manager
             _skyEffect = new SkyEffect(content.Load<Effect>("shaders/SkyShader"));
             
             _fxaaEffect = new FXAAEffect(content.Load<Effect>("shaders/FXAAShader"));
-            
-            _clipMapTerrainEffect.Diffuse = ConvertToTexture(new Bitmap(Game1.RootDirectory + "textures/terrain/terrain-diffuse.png"), _graphicsDevice);
-            _clipMapTerrainEffect.Height = ConvertToTexture(new Bitmap(Game1.RootDirectory + "textures/terrain/terrain-height.png"), _graphicsDevice);
-            _clipMapTerrainEffect.Normal = ConvertToTexture(new Bitmap(Game1.RootDirectory + "textures/terrain/terrain-normal.png"), _graphicsDevice);
-            
+            _ssaoEffect = new SSAOEffect(content.Load<Effect>("shaders/SSAOShader"));
+            _ssaoEffect.Noise = content.Load<Texture2D>("shaders/noise");
+
             _primitives.LoadPrimitives(content);
             
             SetInitiateShaderInfo();
@@ -157,28 +174,33 @@ namespace DProject.Manager
         // TODO: This method is temporary until it will be replaces by a proper shader-information handler.
         public void SetContinuousShaderInfo(LensComponent lens, float relativeGameTime)
         {
-            _clipMapTerrainEffect.View = lens.View;
-            _clipMapTerrainEffect.Projection = lens.Projection;
-            
             _gBufferEffect.View = lens.View;
             _gBufferEffect.Projection = lens.Projection;
 
-            _directionalLightEffect.CameraPosition = lens.Position;
-            _directionalLightEffect.ColorMap = Color;
-            _directionalLightEffect.NormalMap = Normal;
-            _directionalLightEffect.DepthMap = Depth;
-            _directionalLightEffect.InvertViewProjection = Matrix.Invert(lens.View * lens.Projection);
-
-            _pointLightEffect.View = lens.View;
-            _pointLightEffect.Projection = lens.Projection;
-            _pointLightEffect.CameraPosition = lens.Position;
-            _pointLightEffect.InvertViewProjection = Matrix.Invert(lens.View * lens.Projection);
-            _pointLightEffect.ColorMap = Color;
-            _pointLightEffect.DepthMap = Depth;
-            _pointLightEffect.NormalMap = Normal;
-
             _combineFinalEffect.ColorMap = Color;
-            _combineFinalEffect.LightMap = Lights;
+
+            if (Game1.GraphicsSettings.EnableLights)
+            {
+                _directionalLightEffect.CameraPosition = lens.Position;
+                _directionalLightEffect.LightInfoMap = LightInfo;
+                _directionalLightEffect.NormalMap = Normal;
+                _directionalLightEffect.DepthMap = Depth;
+                _directionalLightEffect.InvertViewProjection = Matrix.Invert(lens.View * lens.Projection);
+
+                _pointLightEffect.View = lens.View;
+                _pointLightEffect.Projection = lens.Projection;
+                _pointLightEffect.CameraPosition = lens.Position;
+                _pointLightEffect.InvertViewProjection = Matrix.Invert(lens.View * lens.Projection);
+                _pointLightEffect.LightInfoMap = LightInfo;
+                _pointLightEffect.DepthMap = Depth;
+                _pointLightEffect.NormalMap = Normal;
+                
+                _combineFinalEffect.LightMap = Lights;
+                _combineFinalEffect.LightInfoMap = LightInfo;
+            }
+            
+            if(Game1.GraphicsSettings.EnableSSAO)
+                _combineFinalEffect.SSAOMap = SSAO;
 
             _waterEffect.RefractionBuffer = CombineFinal;
             _waterEffect.ReflectionBuffer = CombineFinal;
@@ -190,21 +212,19 @@ namespace DProject.Manager
             _waterEffect.FarClipPlane = lens.FarPlaneDistance;
             _waterEffect.CameraPosition = lens.Position;
 
-            _skyEffect.Depth = Depth;
+            if (Game1.GraphicsSettings.EnableSSAO)
+            {
+                _ssaoEffect.NormalMap = Normal;
+                _ssaoEffect.DepthMap = Depth;   
+            }
+
+            if(Game1.GraphicsSettings.EnableSky)
+                _skyEffect.Depth = Depth;
         }
         
         //TODO: This method is temporary until it will be replaces by a proper shader-information handler.
         public void SetInitiateShaderInfo()
         {
-            _gBufferEffect.SpecularIntensity = 0.8f;
-            _gBufferEffect.SpecularPower = 0.5f;
-            
-            _clipMapTerrainEffect.SpecularIntensity = 0.0f;
-            _clipMapTerrainEffect.SpecularPower = 0.0f;
-            _clipMapTerrainEffect.TextureDimension = new Vector2(4096f, 4096f);
-            _clipMapTerrainEffect.ClipMapOffset = new Vector2(2048f, -2048f);
-            _clipMapTerrainEffect.ClipMapScale = 1.0f;
-
             //Water
             _waterEffect.MaxWaterDepth = 50f;
             _waterEffect.DuDvTiling = 20.0f;
@@ -231,6 +251,12 @@ namespace DProject.Manager
             _fxaaEffect.EdgeThreshold = 0.166f;
             _fxaaEffect.EdgeThresholdMin = 0f;
             _fxaaEffect.CurrentTechnique = _fxaaEffect.Techniques["FXAA"];
+
+            _ssaoEffect.TotalStrength = 0.5f;
+            _ssaoEffect.Strength = 0.07f;
+            _ssaoEffect.Offset = 18.0f;
+            _ssaoEffect.Falloff = 0.25f;
+            _ssaoEffect.Rad = 0.003f;
         }
 
         #region Draw Primitives
@@ -251,8 +277,6 @@ namespace DProject.Manager
 
         public ClearGBufferEffect ClearBufferEffect => _clearGBufferEffect ?? throw new ContentLoadException("The ClearGBufferEffect shader has not been loaded yet.");
         
-        public ClipMapTerrainEffect ClipMapTerrainEffect => _clipMapTerrainEffect ?? throw new ContentLoadException("The ClipMapTerrainEffect shader has not been loaded yet.");
-        
         public GBufferEffect GBufferEffect => _gBufferEffect ?? throw new ContentLoadException("The GBufferEffect shader has not been loaded yet.");
         
         public DirectionalLightEffect DirectionalLightEffect => _directionalLightEffect ?? throw new ContentLoadException("The DirectionalLightEffect shader has not been loaded yet.");
@@ -270,25 +294,9 @@ namespace DProject.Manager
         public SkyEffect SkyEffect => _skyEffect ?? throw new ContentLoadException("The SkyboxEffect shader has not been loaded yet.");
         
         public FXAAEffect FXAAEffect => _fxaaEffect ?? throw new ContentLoadException("The FXAAEffect shader has not been loaded yet.");
-        
+
+        public SSAOEffect SSAOEffect => _ssaoEffect ?? throw new ContentLoadException("The SSAOEffect shader has not been loaded yet.");
+
         #endregion
-        
-        //TODO: Remove when ClipMapping is finished.
-        private static Texture2D ConvertToTexture(Bitmap bitmap, GraphicsDevice graphicsDevice)
-        {
-            if (bitmap == null)
-                return null;
-            
-            Texture2D texture2D;
-            
-            using (var memoryStream = new MemoryStream())
-            {
-                bitmap.Save(memoryStream, ImageFormat.Png);
-                memoryStream.Seek(0, SeekOrigin.Begin);
-                texture2D = Texture2D.FromStream(graphicsDevice, memoryStream);
-            }
-            
-            return texture2D;
-        }
     }
 } 

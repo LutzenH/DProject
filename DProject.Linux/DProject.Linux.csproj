@@ -6,6 +6,7 @@
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <AssemblyName>DProject</AssemblyName>
     <MonoGamePlatform>DesktopGL</MonoGamePlatform>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
@@ -33,9 +34,16 @@
     <PackageReference Include="LibNoise" Version="0.2.0" />
     <PackageReference Include="MessagePack" Version="1.7.3.4" />
     <PackageReference Include="MonoGame.Content.Builder" Version="3.7.0.9" />
+    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.6.0" />
   </ItemGroup>
 
   <ItemGroup>
+    <Reference Include="BepuPhysics, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\DProject.Dependencies\bepuphysics2\BepuPhysics\bin\Release\netstandard2.0\BepuPhysics.dll</HintPath>
+    </Reference>
+    <Reference Include="BepuUtilities, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\DProject.Dependencies\bepuphysics2\BepuPhysics\bin\Release\netstandard2.0\BepuUtilities.dll</HintPath>
+    </Reference>
     <Reference Include="FNA, Version=19.11.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\DProject.Dependencies\FNA\bin\Release\FNA.dll</HintPath>
     </Reference>
@@ -49,6 +57,7 @@
     <Reference Include="MonoGame.Extended.Entities, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\DProject.Dependencies\MonoGame.Extended\Source\MonoGame.Extended.Entities\bin\Release\netstandard2.0\MonoGame.Extended.Entities.dll</HintPath>
     </Reference>
+    <Reference Include="System.Numerics.Vectors" />
   </ItemGroup>
 
 </Project>

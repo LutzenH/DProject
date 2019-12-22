@@ -6,3 +6,6 @@
 	path = DProject.Dependencies/MonoGame.Extended
 	url = https://github.com/LutzenH/MonoGame.Extended.git
 	branch = FNA
+[submodule "DProject.Dependencies/bepuphysics2"]
+	path = DProject.Dependencies/bepuphysics2
+	url = https://github.com/LutzenH/bepuphysics2
