@@ -20,9 +20,6 @@
 #begin collections/props.json
 /copy:collections/props.json
 
-#begin collections/skies.json
-/copy:collections/skies.json
-
 #begin collections/textures.json
 /copy:collections/textures.json
 

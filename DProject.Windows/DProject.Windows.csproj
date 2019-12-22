@@ -5,6 +5,7 @@
     <TargetFramework>net471</TargetFramework>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <AssemblyName>DProject</AssemblyName>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
@@ -29,15 +30,21 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="LibNoise" Version="0.2.0" />
     <PackageReference Include="MessagePack" Version="1.7.3.4" />
     <PackageReference Include="MonoGame.Content.Builder" Version="3.7.0.9" />
     <PackageReference Include="MonoGame.Extended" Version="3.6.0-beta0001" />
     <PackageReference Include="MonoGame.Extended.Entities" Version="3.6.0-beta0001" />
     <PackageReference Include="MonoGame.Framework.WindowsDX" Version="3.7.1.189" />
+    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.6.0" />
   </ItemGroup>
 
   <ItemGroup>
+    <Reference Include="BepuPhysics, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\DProject.Dependencies\bepuphysics2\BepuPhysics\bin\Release\netstandard2.0\BepuPhysics.dll</HintPath>
+    </Reference>
+    <Reference Include="BepuUtilities, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\DProject.Dependencies\bepuphysics2\BepuPhysics\bin\Release\netstandard2.0\BepuUtilities.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
 
