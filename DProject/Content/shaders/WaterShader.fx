@@ -109,7 +109,7 @@ float4 MainPS(VertexShaderOutput input) : COLOR
 
     float3 viewVector = normalize(input.toCameraVector);
     float refractiveFactor = 1 - dot(viewVector, input.Normal);
-    refractiveFactor = pow(refractiveFactor, FresnelIntensity);
+    refractiveFactor = pow(abs(refractiveFactor), FresnelIntensity);
         
     float2 refractionndc = regularndc;
         

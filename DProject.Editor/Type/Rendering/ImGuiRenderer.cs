@@ -10,13 +10,11 @@ namespace DProject.Type.Rendering
 {
     public class ImGuiRenderer
     {
-        private Microsoft.Xna.Framework.Game _game;
-
         // Graphics
-        private GraphicsDevice _graphicsDevice;
+        private readonly GraphicsDevice _graphicsDevice;
 
         private BasicEffect _effect;
-        private RasterizerState _rasterizerState;
+        private readonly RasterizerState _rasterizerState;
 
         private byte[] _vertexData;
         private VertexBuffer _vertexBuffer;
@@ -27,7 +25,7 @@ namespace DProject.Type.Rendering
         private int _indexBufferSize;
 
         // Textures
-        private Dictionary<IntPtr, Texture2D> _loadedTextures;
+        private readonly Dictionary<IntPtr, Texture2D> _loadedTextures;
 
         private int _textureId;
         private IntPtr? _fontTextureId;
@@ -35,7 +33,7 @@ namespace DProject.Type.Rendering
         // Input
         private int _scrollWheelValue;
 
-        private List<int> _keys = new List<int>();
+        private readonly List<int> _keys = new List<int>();
 
         public ImGuiRenderer(GraphicsDevice graphicsDevice)
         {

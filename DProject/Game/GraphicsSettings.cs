@@ -13,7 +13,6 @@ namespace DProject.Game
         private bool _enableSSAO;
         private bool _enableLights;
         private int _maxFps;
-        private bool _enableVSync;
 
         public bool EnableFXAA { get; set; }
         public bool EnableSky { get; set; }
