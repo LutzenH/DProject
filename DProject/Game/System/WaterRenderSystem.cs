@@ -9,7 +9,6 @@ namespace DProject.Manager.System
 {
     public class WaterRenderSystem : EntityDrawSystem
     {
-        private readonly ShaderManager _shaderManager;
         private readonly GraphicsDevice _graphicsDevice;
         
         private ComponentMapper<TransformComponent> _transformMapper;
@@ -17,10 +16,9 @@ namespace DProject.Manager.System
 
         private readonly VertexBuffer _vertexBuffer;
 
-        public WaterRenderSystem(GraphicsDevice graphicsDevice, ShaderManager shaderManager) : base(Aspect.All(typeof(TransformComponent), typeof(WaterPlaneComponent)))
+        public WaterRenderSystem(GraphicsDevice graphicsDevice) : base(Aspect.All(typeof(TransformComponent), typeof(WaterPlaneComponent)))
         {
             _graphicsDevice = graphicsDevice;
-            _shaderManager = shaderManager;
             
             _vertexBuffer = new VertexBuffer(_graphicsDevice, typeof(VertexPositionTextureColorNormal), 6, BufferUsage.WriteOnly);
         }
@@ -40,7 +38,7 @@ namespace DProject.Manager.System
                 var transform = _transformMapper.Get(entity);
                 var waterPlane = _waterPlaneMapper.Get(entity);
 
-                var effect = _shaderManager.WaterEffect;
+                var effect = ShaderManager.Instance.WaterEffect;
                 effect.World = transform.WorldMatrix;
 
                 //TODO: This only needs to happen once and not every draw-call.

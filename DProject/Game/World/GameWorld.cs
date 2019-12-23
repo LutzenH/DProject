@@ -15,7 +15,7 @@ namespace DProject.Manager.World
 
         public MonoGame.Extended.Entities.World World { get; }
 
-        public GameWorld(ContentManager contentManager, ShaderManager shaderManager, GraphicsDevice graphicsDevice)
+        public GameWorld(Game1 game, ContentManager contentManager, GraphicsDevice graphicsDevice)
         {
             _entityFactory = new EntityFactory();
 
@@ -24,7 +24,7 @@ namespace DProject.Manager.World
 
             //Models
             AddSystem(new ModelLoaderSystem(graphicsDevice, contentManager));
-            AddSystem(new ModelRenderSystem(graphicsDevice, shaderManager));
+            AddSystem(new ModelRenderSystem(graphicsDevice));
 
             //Physics
             var physicsSystem = new PhysicsSystem();
@@ -33,16 +33,16 @@ namespace DProject.Manager.World
             AddSystem(new PhysicsMouseObjectDetectSystem(physicsSystem.GetSimulation()));
             
             //Primitives
-            AddSystem(new PrimitiveRenderSystem(graphicsDevice, shaderManager));
+            AddSystem(new PrimitiveRenderSystem(graphicsDevice));
             
             //Lighting
-            AddSystem(new LightingRenderSystem(graphicsDevice, shaderManager));
+            AddSystem(new LightingRenderSystem(graphicsDevice));
             
             //Water
-            AddSystem(new WaterRenderSystem(graphicsDevice, shaderManager));
+            AddSystem(new WaterRenderSystem(graphicsDevice));
             
 #if EDITOR
-            AddSystem(new DebugUIRenderSystem(graphicsDevice, shaderManager, physicsSystem));
+            AddSystem(new DebugUIRenderSystem(game, graphicsDevice, physicsSystem));
 #endif
 
             World = Build();

@@ -31,21 +31,21 @@ namespace DProject.Manager.System
             var angleX = 0f;
             var angleY = 0f;
 
-            var moveSpeed = (float) ((InputManager.IsInputDown(Input.CameraIncreasedSpeed) ? fly.Speed * 2 : fly.Speed) * gameTime.ElapsedGameTime.TotalSeconds);
+            var moveSpeed = (float) ((InputManager.Instance.IsInputDown(Input.CameraIncreasedSpeed) ? fly.Speed * 2 : fly.Speed) * gameTime.ElapsedGameTime.TotalSeconds);
         
             var translation = new Vector3(0,0,0);
             
-            if (InputManager.IsInputDown(Input.CameraMoveForward))
+            if (InputManager.Instance.IsInputDown(Input.CameraMoveForward))
                 translation += lens.Direction * moveSpeed;
-            if (InputManager.IsInputDown(Input.CameraMoveBackwards))
+            if (InputManager.Instance.IsInputDown(Input.CameraMoveBackwards))
                 translation -= lens.Direction * moveSpeed;
-            if (InputManager.IsInputDown(Input.CameraMoveLeft))
+            if (InputManager.Instance.IsInputDown(Input.CameraMoveLeft))
                 translation += Vector3.Cross(Vector3.Up, lens.Direction) * moveSpeed;
-            if (InputManager.IsInputDown(Input.CameraMoveRight))
+            if (InputManager.Instance.IsInputDown(Input.CameraMoveRight))
                 translation -= Vector3.Cross(Vector3.Up, lens.Direction) * moveSpeed;
-            if (InputManager.IsInputDown(Input.CameraMoveUp))
+            if (InputManager.Instance.IsInputDown(Input.CameraMoveUp))
                 translation += new Vector3(0, moveSpeed, 0);
-            if (InputManager.IsInputDown(Input.CameraMoveDown))
+            if (InputManager.Instance.IsInputDown(Input.CameraMoveDown))
                 translation -= new Vector3(0, moveSpeed, 0);
 
             if (!lens.CustomAspectRatio)
@@ -53,22 +53,22 @@ namespace DProject.Manager.System
                 
             lens.Position += translation;
 
-            if (InputManager.IsInputDown(Input.CameraFreeRotation))
+            if (InputManager.Instance.IsInputDown(Input.CameraFreeRotation))
             {
-                var mousePositionDifference = InputManager.CameraLookVector;
+                var mousePositionDifference = InputManager.Instance.CameraLookVector;
                 
                 angleX -= mousePositionDifference.X * moveSpeed * 3;
                 angleY += mousePositionDifference.Y * moveSpeed * 3;
             }
             else
             {
-                if (InputManager.IsInputDown(Input.CameraLookLeft))
+                if (InputManager.Instance.IsInputDown(Input.CameraLookLeft))
                     angleX -= moveSpeed * 6;
-                if (InputManager.IsInputDown(Input.CameraLookRight))
+                if (InputManager.Instance.IsInputDown(Input.CameraLookRight))
                     angleX += moveSpeed * 6;
-                if (InputManager.IsInputDown(Input.CameraLookUp))
+                if (InputManager.Instance.IsInputDown(Input.CameraLookUp))
                     angleY += moveSpeed * 6;
-                if (InputManager.IsInputDown(Input.CameraLookDown))
+                if (InputManager.Instance.IsInputDown(Input.CameraLookDown))
                     angleY -= moveSpeed * 6;
             }
 

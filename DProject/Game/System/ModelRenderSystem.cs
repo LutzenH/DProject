@@ -9,16 +9,14 @@ namespace DProject.Manager.System
 {
     public class ModelRenderSystem : EntityDrawSystem
     {
-        private readonly ShaderManager _shaderManager;
         private readonly GraphicsDevice _graphicsDevice;
         
         private ComponentMapper<LoadedModelComponent> _modelMapper;
         private ComponentMapper<TransformComponent> _transformMapper;
         
-        public ModelRenderSystem(GraphicsDevice graphicsDevice, ShaderManager shaderManager) : base(Aspect.All(typeof(LoadedModelComponent), typeof(TransformComponent)))
+        public ModelRenderSystem(GraphicsDevice graphicsDevice) : base(Aspect.All(typeof(LoadedModelComponent), typeof(TransformComponent)))
         {
             _graphicsDevice = graphicsDevice;
-            _shaderManager = shaderManager;
         }
         
         public override void Initialize(IComponentMapperService mapperService)
@@ -30,7 +28,7 @@ namespace DProject.Manager.System
         public override void Draw(GameTime gameTime)
         {
             //TODO: This probably shouldn't be done in the ModelRenderSystem
-            _shaderManager.SetContinuousShaderInfo(CameraSystem.ActiveLens, 0.5f);
+            ShaderManager.Instance.SetContinuousShaderInfo(CameraSystem.ActiveLens, 0.5f);
             
             foreach (var entity in ActiveEntities)
             {
@@ -41,8 +39,8 @@ namespace DProject.Manager.System
                 {
                     if (CameraSystem.ActiveLens.BoundingFrustum.Intersects(model.BoundingSphere.Transform(transform.WorldMatrix)))
                     {
-                        _shaderManager.GBufferEffect.World = transform.WorldMatrix;
-                        DrawMesh(_shaderManager.GBufferEffect, model, _graphicsDevice);
+                        ShaderManager.Instance.GBufferEffect.World = transform.WorldMatrix;
+                        DrawMesh(ShaderManager.Instance.GBufferEffect, model, _graphicsDevice);
                     }
                 }
             }

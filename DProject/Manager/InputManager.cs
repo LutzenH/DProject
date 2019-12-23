@@ -30,18 +30,22 @@ namespace DProject.Manager
         PickupPhysicsBody
     }
 
-    public class InputManager
+    public sealed class InputManager
     {
-        private static HashSet<Input> _input = new HashSet<Input>();
-        private static HashSet<Input> _previousInput;
+        private static InputManager _instance;
+        private InputManager() { }
+        public static InputManager Instance => _instance ?? (_instance = new InputManager());
+        
+        private HashSet<Input> _input = new HashSet<Input>();
+        private HashSet<Input> _previousInput;
 
-        private static MouseState _previousMouseState;
-        private static MouseState _currentMouseState;
+        private MouseState _previousMouseState;
+        private MouseState _currentMouseState;
 
         //Camera
-        public static Vector2 CameraLookVector;
-        
-        public static void Update()
+        public Vector2 CameraLookVector;
+
+        public void Update()
         {
             _previousMouseState = _currentMouseState;
             _currentMouseState = Mouse.GetState();
@@ -114,27 +118,27 @@ namespace DProject.Manager
             CameraLookVector = _previousMouseState.Position.ToVector2() - _currentMouseState.Position.ToVector2();
         }
 
-        public static bool IsInputDown(Input input)
+        public bool IsInputDown(Input input)
         {
             return _input.Contains(input);
         }
         
-        public static bool IsInputUp(Input input)
+        public bool IsInputUp(Input input)
         {
             return !_input.Contains(input);
         }
 
-        public static bool WasInputDown(Input input)
+        public bool WasInputDown(Input input)
         {
             return _previousInput.Contains(input);
         }
         
-        public static bool WasInputUp(Input input)
+        public bool WasInputUp(Input input)
         {
             return !_previousInput.Contains(input);
         }
 
-        public static bool IsInputPressed(Input input)
+        public bool IsInputPressed(Input input)
         {
             return IsInputUp(input) && WasInputDown(input);
         }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using DProject.Game;
 using DProject.Game.Component;
 using DProject.Type.Rendering;
 using ImGuiNET;
@@ -17,7 +18,7 @@ namespace DProject.Manager.System
     {
         public static int? SelectedEntity;
 
-        private readonly ShaderManager _shaderManager;
+        private readonly Game1 _game;
         private readonly GraphicsDevice _graphicsDevice;
         private readonly PhysicsSystem _physicsSystem;
      
@@ -37,11 +38,11 @@ namespace DProject.Manager.System
         private readonly float[] _frameRateValues = new float[MaxFrameRateValues];
         private int _frameRateValuesIndex;
         
-        public DebugUIRenderSystem(GraphicsDevice graphicsDevice, ShaderManager shaderManager, PhysicsSystem physicsSystem) : base(Aspect.Exclude())
+        public DebugUIRenderSystem(Game1 game, GraphicsDevice graphicsDevice, PhysicsSystem physicsSystem) : base(Aspect.Exclude())
         {
-            _shaderManager = shaderManager;
             _graphicsDevice = graphicsDevice;
             _physicsSystem = physicsSystem;
+            _game = game;
             
             _imGuiRenderer = new ImGuiRenderer(_graphicsDevice);
             _imGuiRenderer.RebuildFontAtlas();
@@ -52,12 +53,12 @@ namespace DProject.Manager.System
 
         public override void Draw(GameTime gameTime)
         {
-            _imGuiTexture[0] = _imGuiRenderer.BindTexture(_shaderManager.Color);
-            _imGuiTexture[1] = _imGuiRenderer.BindTexture(_shaderManager.Depth);
-            _imGuiTexture[2] = _imGuiRenderer.BindTexture(_shaderManager.LightInfo);
-            _imGuiTexture[3] = _imGuiRenderer.BindTexture(_shaderManager.Normal);
-            _imGuiTexture[4] = _imGuiRenderer.BindTexture(_shaderManager.Lights);
-            _imGuiTexture[5] = _imGuiRenderer.BindTexture(_shaderManager.SSAO);
+            _imGuiTexture[0] = _imGuiRenderer.BindTexture(ShaderManager.Instance.Color);
+            _imGuiTexture[1] = _imGuiRenderer.BindTexture(ShaderManager.Instance.Depth);
+            _imGuiTexture[2] = _imGuiRenderer.BindTexture(ShaderManager.Instance.LightInfo);
+            _imGuiTexture[3] = _imGuiRenderer.BindTexture(ShaderManager.Instance.Normal);
+            _imGuiTexture[4] = _imGuiRenderer.BindTexture(ShaderManager.Instance.Lights);
+            _imGuiTexture[5] = _imGuiRenderer.BindTexture(ShaderManager.Instance.SSAO);
 
             // Call BeforeLayout first to set things up
             _imGuiRenderer.BeforeLayout(gameTime);
@@ -97,36 +98,43 @@ namespace DProject.Manager.System
 
             ImGui.Text("Graphics Settings:");
             
-            var graphicsSettingsEnableFxaa = Game1.GraphicsSettings.EnableFXAA;
+            var graphicsSettingsEnableFxaa = GraphicsManager.Instance.EnableFXAA;
             ImGui.Checkbox("FXAA", ref graphicsSettingsEnableFxaa);
-            Game1.GraphicsSettings.EnableFXAA = graphicsSettingsEnableFxaa;
+            GraphicsManager.Instance.EnableFXAA = graphicsSettingsEnableFxaa;
 
-            var graphicsSettingsEnableSsao = Game1.GraphicsSettings.EnableSSAO;
+            var graphicsSettingsEnableSsao = GraphicsManager.Instance.EnableSSAO;
             ImGui.Checkbox("SSAO", ref graphicsSettingsEnableSsao);
-            Game1.GraphicsSettings.EnableSSAO = graphicsSettingsEnableSsao;
+            GraphicsManager.Instance.EnableSSAO = graphicsSettingsEnableSsao;
 
-            var graphicsSettingsEnableLights = Game1.GraphicsSettings.EnableLights;
+            var graphicsSettingsEnableLights = GraphicsManager.Instance.EnableLights;
             ImGui.Checkbox("Lights", ref graphicsSettingsEnableLights);
-            Game1.GraphicsSettings.EnableLights = graphicsSettingsEnableLights;
+            GraphicsManager.Instance.EnableLights = graphicsSettingsEnableLights;
 
-            var graphicsSettingsEnableSky = Game1.GraphicsSettings.EnableSky;
+            var graphicsSettingsEnableSky = GraphicsManager.Instance.EnableSky;
             ImGui.Checkbox("Sky", ref graphicsSettingsEnableSky);
-            Game1.GraphicsSettings.EnableSky = graphicsSettingsEnableSky;
+            GraphicsManager.Instance.EnableSky = graphicsSettingsEnableSky;
             
-            var graphicsSettingsEnableVSync = Game1.GraphicsSettings.EnableVSync;
+            var graphicsSettingsEnableVSync = GraphicsManager.Instance.EnableVSync;
             ImGui.Checkbox("VSync", ref graphicsSettingsEnableVSync);
-            Game1.GraphicsSettings.EnableVSync = graphicsSettingsEnableVSync;
+            GraphicsManager.Instance.EnableVSync = graphicsSettingsEnableVSync;
             
-            var graphicsSettingsEnableMaxFps = Game1.GraphicsSettings.EnableMaxFps;
+            var graphicsSettingsEnableFullscreen = GraphicsManager.Instance.EnableFullscreen;
+            ImGui.Checkbox("Fullscreen", ref graphicsSettingsEnableFullscreen);
+            GraphicsManager.Instance.EnableFullscreen = graphicsSettingsEnableFullscreen;
+            
+            var graphicsSettingsEnableMaxFps = GraphicsManager.Instance.EnableMaxFps;
             ImGui.Checkbox("Limit FPS", ref graphicsSettingsEnableMaxFps);
-            Game1.GraphicsSettings.EnableMaxFps = graphicsSettingsEnableMaxFps;
+            GraphicsManager.Instance.EnableMaxFps = graphicsSettingsEnableMaxFps;
 
             if (graphicsSettingsEnableMaxFps)
             {
-                var graphicsSettingsMaxFps = Game1.GraphicsSettings.MaxFps;
+                var graphicsSettingsMaxFps = GraphicsManager.Instance.MaxFps;
                 ImGui.InputInt("Max FPS", ref graphicsSettingsMaxFps, 1);
-                Game1.GraphicsSettings.MaxFps = graphicsSettingsMaxFps;
+                GraphicsManager.Instance.MaxFps = graphicsSettingsMaxFps;
             }
+
+            if(ImGui.Button("Apply"))
+                _game.UpdateGraphicsSettings();
             
             ImGui.Separator();
             
@@ -149,12 +157,12 @@ namespace DProject.Manager.System
                 
                 DisplayImageWithTooltip(_imGuiTexture[0], "Color", new Num.Vector2(300, 150));
                 DisplayImageWithTooltip(_imGuiTexture[1], "Depth", new Num.Vector2(300, 150));
-                if(Game1.GraphicsSettings.EnableLights)
+                if(GraphicsManager.Instance.EnableLights)
                     DisplayImageWithTooltip(_imGuiTexture[2], "Light Info", new Num.Vector2(300, 150));
                 DisplayImageWithTooltip(_imGuiTexture[3], "Normal", new Num.Vector2(300, 150));
-                if(Game1.GraphicsSettings.EnableLights)
+                if(GraphicsManager.Instance.EnableLights)
                     DisplayImageWithTooltip(_imGuiTexture[4], "Lights", new Num.Vector2(300, 150));
-                if(Game1.GraphicsSettings.EnableSSAO)
+                if(GraphicsManager.Instance.EnableSSAO)
                     DisplayImageWithTooltip(_imGuiTexture[5], "SSAO", new Num.Vector2(300, 150));
                 
                 ImGui.End();

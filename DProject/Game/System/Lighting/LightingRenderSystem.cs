@@ -11,15 +11,13 @@ namespace DProject.Manager.System.Lighting
     public class LightingRenderSystem : EntityDrawSystem
     {
         private GraphicsDevice _graphicsDevice;
-        private ShaderManager _shaderManager;
 
         private ComponentMapper<DirectionalLightComponent> _directionalLightMapper;
         private ComponentMapper<PointLightComponent> _pointLightMapper;
         
-        public LightingRenderSystem(GraphicsDevice graphicsDevice, ShaderManager shaderManager) : base(Aspect.One(typeof(DirectionalLightComponent), typeof(PointLightComponent)))
+        public LightingRenderSystem(GraphicsDevice graphicsDevice) : base(Aspect.One(typeof(DirectionalLightComponent), typeof(PointLightComponent)))
         {
             _graphicsDevice = graphicsDevice;
-            _shaderManager = shaderManager;
         }
 
         public override void Initialize(IComponentMapperService mapperService)
@@ -32,9 +30,9 @@ namespace DProject.Manager.System.Lighting
         {
             var previousCullMode = _graphicsDevice.RasterizerState.CullMode;
 
-            if (Game1.GraphicsSettings.EnableLights)
+            if (GraphicsManager.Instance.EnableLights)
             {
-                _graphicsDevice.SetRenderTarget(_shaderManager.Lights);
+                _graphicsDevice.SetRenderTarget(ShaderManager.Instance.Lights);
                 _graphicsDevice.Clear(Color.Transparent);
                 
                 _graphicsDevice.BlendState = BlendState.AlphaBlend;
@@ -48,46 +46,46 @@ namespace DProject.Manager.System.Lighting
                     {
                         var light = _directionalLightMapper.Get(entity);
 
-                        _shaderManager.DirectionalLightEffect.LightDirection = light.Direction;
-                        _shaderManager.DirectionalLightEffect.LightColor = light.Color.ToVector3();
+                        ShaderManager.Instance.DirectionalLightEffect.LightDirection = light.Direction;
+                        ShaderManager.Instance.DirectionalLightEffect.LightColor = light.Color.ToVector3();
                     
-                        _shaderManager.DrawFullscreenQuad(_shaderManager.DirectionalLightEffect);
+                        ShaderManager.Instance.DrawFullscreenQuad(ShaderManager.Instance.DirectionalLightEffect);
                     }
 
                     if (_pointLightMapper.Has(entity))
                     {
                         var light = _pointLightMapper.Get(entity);
 
-                        _shaderManager.PointLightEffect.LightColor = light.Color.ToVector3();
-                        _shaderManager.PointLightEffect.LightIntensity = light.Intensity;
-                        _shaderManager.PointLightEffect.LightPosition = light.WorldPosition;
-                        _shaderManager.PointLightEffect.LightRadius = light.Radius;
-                        _shaderManager.PointLightEffect.World = light.WorldMatrix;
+                        ShaderManager.Instance.PointLightEffect.LightColor = light.Color.ToVector3();
+                        ShaderManager.Instance.PointLightEffect.LightIntensity = light.Intensity;
+                        ShaderManager.Instance.PointLightEffect.LightPosition = light.WorldPosition;
+                        ShaderManager.Instance.PointLightEffect.LightRadius = light.Radius;
+                        ShaderManager.Instance.PointLightEffect.World = light.WorldMatrix;
 
                         var cameraToCenter = Vector3.Distance(CameraSystem.ActiveLens.Position, light.WorldPosition);
                         _graphicsDevice.RasterizerState.CullMode = cameraToCenter <= light.Radius ? CullMode.CullClockwiseFace : CullMode.CullCounterClockwiseFace;
 
                         _graphicsDevice.Clear(ClearOptions.DepthBuffer, Color.White, 1, 0);
-                        _shaderManager.DrawPrimitive(_shaderManager.PointLightEffect, PrimitiveType.Sphere);
+                        ShaderManager.Instance.DrawPrimitive(ShaderManager.Instance.PointLightEffect, PrimitiveType.Sphere);
                     }
                 }
             }
 
-            if (Game1.GraphicsSettings.EnableSSAO)
+            if (GraphicsManager.Instance.EnableSSAO)
             {
                 _graphicsDevice.RasterizerState.CullMode = previousCullMode;
-                _graphicsDevice.SetRenderTarget(_shaderManager.SSAO);
-                _shaderManager.DrawFullscreenQuad(_shaderManager.SSAOEffect);
+                _graphicsDevice.SetRenderTarget(ShaderManager.Instance.SSAO);
+                ShaderManager.Instance.DrawFullscreenQuad(ShaderManager.Instance.SSAOEffect);
                 _graphicsDevice.BlendState = BlendState.Opaque;   
             }
 
             _graphicsDevice.RasterizerState.CullMode = previousCullMode;
-            _graphicsDevice.SetRenderTarget(_shaderManager.CombineFinal);
+            _graphicsDevice.SetRenderTarget(ShaderManager.Instance.CombineFinal);
             _graphicsDevice.BlendState = BlendState.Opaque;
-            _shaderManager.DrawFullscreenQuad(_shaderManager.CombineFinalEffect);
+            ShaderManager.Instance.DrawFullscreenQuad(ShaderManager.Instance.CombineFinalEffect);
             
-            if (Game1.GraphicsSettings.EnableSky)
-                _shaderManager.DrawFullscreenQuad(_shaderManager.SkyEffect);
+            if (GraphicsManager.Instance.EnableSky)
+                ShaderManager.Instance.DrawFullscreenQuad(ShaderManager.Instance.SkyEffect);
         }
     }
 }

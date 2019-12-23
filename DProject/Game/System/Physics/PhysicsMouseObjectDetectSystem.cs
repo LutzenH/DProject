@@ -31,7 +31,7 @@ namespace DProject.Manager.System
         public override void Update(GameTime gameTime)
         {
 #if EDITOR
-            if (InputManager.IsInputPressed(Input.PickupPhysicsBody))
+            if (InputManager.Instance.IsInputPressed(Input.PickupPhysicsBody))
                 DebugUIRenderSystem.SelectedEntity = GetEntityAtMouse();
 #endif
         }

@@ -1,3 +1,4 @@
+using DProject.Game;
 using DProject.Game.Component;
 using DProject.Type.Rendering;
 using DProject.Type.Rendering.Primitives;
@@ -9,8 +10,15 @@ using PrimitiveType = DProject.Type.Rendering.Primitives.PrimitiveType;
 
 namespace DProject.Manager
 {
-    public class ShaderManager
+    public sealed class ShaderManager
     {
+        private static ShaderManager _instance;
+        private ShaderManager()
+        {
+            _primitives = new Primitives();
+        }
+        public static ShaderManager Instance => _instance ?? (_instance = new ShaderManager());
+
         private GraphicsDevice _graphicsDevice;
 
         // GBuffer Effects
@@ -52,11 +60,6 @@ namespace DProject.Manager
         
         private FullscreenQuad _fullscreenQuad;
         private Primitives _primitives;
-
-        public ShaderManager()
-        {
-            _primitives = new Primitives();
-        }
 
         public void Initialize(GraphicsDevice graphicsDevice)
         {
@@ -179,7 +182,7 @@ namespace DProject.Manager
 
             _combineFinalEffect.ColorMap = Color;
 
-            if (Game1.GraphicsSettings.EnableLights)
+            if (GraphicsManager.Instance.EnableLights)
             {
                 _directionalLightEffect.CameraPosition = lens.Position;
                 _directionalLightEffect.LightInfoMap = LightInfo;
@@ -199,7 +202,7 @@ namespace DProject.Manager
                 _combineFinalEffect.LightInfoMap = LightInfo;
             }
             
-            if(Game1.GraphicsSettings.EnableSSAO)
+            if(GraphicsManager.Instance.EnableSSAO)
                 _combineFinalEffect.SSAOMap = SSAO;
 
             _waterEffect.RefractionBuffer = CombineFinal;
@@ -212,13 +215,13 @@ namespace DProject.Manager
             _waterEffect.FarClipPlane = lens.FarPlaneDistance;
             _waterEffect.CameraPosition = lens.Position;
 
-            if (Game1.GraphicsSettings.EnableSSAO)
+            if (GraphicsManager.Instance.EnableSSAO)
             {
                 _ssaoEffect.NormalMap = Normal;
                 _ssaoEffect.DepthMap = Depth;   
             }
 
-            if(Game1.GraphicsSettings.EnableSky)
+            if(GraphicsManager.Instance.EnableSky)
                 _skyEffect.Depth = Depth;
         }
         
