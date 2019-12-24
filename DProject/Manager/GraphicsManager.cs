@@ -9,15 +9,20 @@ namespace DProject.Game
         private GraphicsManager()
         {
             EnableFXAA = false;
-            EnableSky = false;
+            EnableSky = true;
             EnableVSync = false;
             EnableFullscreen = false;
             EnableMaxFps = true;
             MaxFps = 120;
-            EnableSSAO = true;
-            EnableLights = true;
+            EnableSSAO = false;
+            EnableLights = false;
         }
-        public static GraphicsManager Instance => _instance ?? (_instance = new GraphicsManager());
+        
+        public static GraphicsManager Instance
+        {
+            get => _instance ?? (_instance = new GraphicsManager());
+            set => _instance = value;
+        }
 
         public bool EnableFXAA { get; set; }
         public bool EnableSky { get; set; }

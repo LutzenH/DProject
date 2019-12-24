@@ -17,7 +17,11 @@ namespace DProject.Manager
         {
             _primitives = new Primitives();
         }
-        public static ShaderManager Instance => _instance ?? (_instance = new ShaderManager());
+        public static ShaderManager Instance
+        {
+            get => _instance ?? (_instance = new ShaderManager());
+            set => _instance = value;
+        }
 
         private GraphicsDevice _graphicsDevice;
 

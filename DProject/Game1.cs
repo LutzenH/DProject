@@ -13,8 +13,7 @@ namespace DProject
         public const string RootDirectory = "Content/";
         
         public readonly GraphicsDeviceManager Graphics;
-        
-        private GameWorld _worldBuilder;
+        public GameWorld WorldBuilder;
         
         private SpriteBatch _spriteBatch;
         
@@ -33,7 +32,8 @@ namespace DProject
             
             ScreenResolutionX = (int) (GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width/1.5);
             ScreenResolutionY = (int) (GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height/1.5);
-            
+
+            Graphics.SynchronizeWithVerticalRetrace = false;
             Graphics.PreferredBackBufferWidth = ScreenResolutionX;
             Graphics.PreferredBackBufferHeight = ScreenResolutionY;
             Graphics.GraphicsProfile = GraphicsProfile.HiDef;
@@ -50,12 +50,14 @@ namespace DProject
         {
             Textures.Initialize(GraphicsDevice);
             
-            _worldBuilder = new GameWorld(this, Content, GraphicsDevice);
+            if(WorldBuilder == null)
+                WorldBuilder = new DefaultGameWorld(this, Content, GraphicsDevice);
+            
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             
             ShaderManager.Instance.Initialize(GraphicsDevice);
             
-            _worldBuilder.World.Initialize();
+            WorldBuilder.World.Initialize();
 
             base.Initialize();
         }
@@ -82,7 +84,7 @@ namespace DProject
                 _last = DateTime.Now;
             }
 
-            _worldBuilder.World.Update(gameTime);
+            WorldBuilder.World.Update(gameTime);
 
             base.Update(gameTime);
         }
@@ -94,7 +96,7 @@ namespace DProject
             ShaderManager.Instance.ClearGBuffer();
             GraphicsDevice.Clear(ClearOptions.DepthBuffer, Color.White, 1, 0);
             
-            _worldBuilder.World.Draw(gameTime);
+            WorldBuilder.World.Draw(gameTime);
             
             GraphicsDevice.SetRenderTarget(null);
             GraphicsDevice.Clear(ClearOptions.DepthBuffer, Color.White, 1, 0);

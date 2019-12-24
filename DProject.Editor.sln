@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DProject.Editor", "DProject.Editor\DProject.Editor.csproj", "{CA44782A-3E5D-48B6-B9C6-BD2F1805EC0D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DProject.Testing.Editor", "DProject.Testing\Editor\DProject.Testing.Editor.csproj", "{A3B155D9-32CD-4132-A664-498FCA273999}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{CA44782A-3E5D-48B6-B9C6-BD2F1805EC0D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CA44782A-3E5D-48B6-B9C6-BD2F1805EC0D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CA44782A-3E5D-48B6-B9C6-BD2F1805EC0D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A3B155D9-32CD-4132-A664-498FCA273999}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A3B155D9-32CD-4132-A664-498FCA273999}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A3B155D9-32CD-4132-A664-498FCA273999}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A3B155D9-32CD-4132-A664-498FCA273999}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

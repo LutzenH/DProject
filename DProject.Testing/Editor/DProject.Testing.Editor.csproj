@@ -1,0 +1,71 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+        <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+        <ProjectGuid>{A3B155D9-32CD-4132-A664-498FCA273999}</ProjectGuid>
+        <ProjectTypeGuids>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+        <OutputType>Library</OutputType>
+        <AppDesignerFolder>Properties</AppDesignerFolder>
+        <RootNamespace>DProject.Testing.Editor</RootNamespace>
+        <AssemblyName>DProject.Testing.Editor</AssemblyName>
+        <MonoGamePlatform>DesktopGL</MonoGamePlatform>
+        <TargetFramework>net471</TargetFramework>
+        <FileAlignment>512</FileAlignment>
+    </PropertyGroup>
+    
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+        <PlatformTarget>AnyCPU</PlatformTarget>
+        <DebugSymbols>true</DebugSymbols>
+        <DebugType>full</DebugType>
+        <Optimize>false</Optimize>
+        <OutputPath>bin\Debug\</OutputPath>
+        <DefineConstants>DEBUG;TRACE</DefineConstants>
+        <ErrorReport>prompt</ErrorReport>
+        <WarningLevel>4</WarningLevel>
+    </PropertyGroup>
+    
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+        <PlatformTarget>AnyCPU</PlatformTarget>
+        <DebugType>pdbonly</DebugType>
+        <Optimize>true</Optimize>
+        <OutputPath>bin\Release\</OutputPath>
+        <DefineConstants>TRACE</DefineConstants>
+        <ErrorReport>prompt</ErrorReport>
+        <WarningLevel>4</WarningLevel>
+    </PropertyGroup>
+    
+    <ItemGroup>
+      <ProjectReference Include="..\..\DProject.Editor\DProject.Editor.csproj">
+        <Project>{ca44782a-3e5d-48b6-b9c6-bd2f1805ec0d}</Project>
+        <Name>DProject.Editor</Name>
+      </ProjectReference>
+    </ItemGroup>
+    
+    <ItemGroup>
+      <Reference Include="FNA, Version=19.11.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\..\DProject.Dependencies\FNA\bin\Release\FNA.dll</HintPath>
+      </Reference>
+      <Reference Include="MonoGame.Extended.Entities, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\..\DProject.Dependencies\MonoGame.Extended\Source\MonoGame.Extended.Entities\bin\Release\netstandard2.0\MonoGame.Extended.Entities.dll</HintPath>
+      </Reference>
+      <Reference Include="System" />
+      <Reference Include="System.Core" />
+      <Reference Include="System.Data" />
+      <Reference Include="System.Xml" />
+    </ItemGroup>
+    
+    <ItemGroup>
+      <MonoGameContentReference Include="**\*.mgcb" />
+
+      <MonoGameContentReference Include="..\..\DProject\**\*.mgcb">
+        <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
+      </MonoGameContentReference>
+    </ItemGroup>
+    
+    <ItemGroup>
+      <PackageReference Include="MonoGame.Content.Builder" Version="3.7.0.9" />
+      <PackageReference Include="NUnit" Version="3.12.0" />
+    </ItemGroup>
+    
+</Project>

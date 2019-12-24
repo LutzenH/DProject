@@ -34,8 +34,12 @@ namespace DProject.Manager
     {
         private static InputManager _instance;
         private InputManager() { }
-        public static InputManager Instance => _instance ?? (_instance = new InputManager());
-        
+        public static InputManager Instance
+        {
+            get => _instance ?? (_instance = new InputManager());
+            set => _instance = value;
+        }
+
         private HashSet<Input> _input = new HashSet<Input>();
         private HashSet<Input> _previousInput;
 
