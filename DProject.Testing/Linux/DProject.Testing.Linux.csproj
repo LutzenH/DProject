@@ -1,14 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
+           
     <PropertyGroup>
         <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
         <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-        <ProjectGuid>{A3B155D9-32CD-4132-A664-498FCA273999}</ProjectGuid>
+        <ProjectGuid>{1CE66220-B737-4B1E-A047-7994920488D2}</ProjectGuid>
         <ProjectTypeGuids>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
         <OutputType>Library</OutputType>
         <AppDesignerFolder>Properties</AppDesignerFolder>
-        <RootNamespace>DProject.Testing.Editor</RootNamespace>
-        <AssemblyName>DProject.Testing.Editor</AssemblyName>
+        <RootNamespace>DProject.Testing.Linux</RootNamespace>
+        <AssemblyName>DProject.Testing.Linux</AssemblyName>
         <MonoGamePlatform>DesktopGL</MonoGamePlatform>
         <TargetFramework>net471</TargetFramework>
         <FileAlignment>512</FileAlignment>
@@ -19,7 +19,7 @@
         <DebugSymbols>true</DebugSymbols>
         <DebugType>full</DebugType>
         <Optimize>false</Optimize>
-        <OutputPath>..\..\bin\Debug\Testing\Editor\</OutputPath>
+        <OutputPath>..\..\bin\Debug\Testing\Linux\</OutputPath>
         <DefineConstants>DEBUG;TRACE</DefineConstants>
         <ErrorReport>prompt</ErrorReport>
         <WarningLevel>4</WarningLevel>
@@ -29,16 +29,16 @@
         <PlatformTarget>AnyCPU</PlatformTarget>
         <DebugType>pdbonly</DebugType>
         <Optimize>true</Optimize>
-        <OutputPath>..\..\bin\Release\Testing\Editor\</OutputPath>
+        <OutputPath>..\..\bin\Release\Testing\Linux\</OutputPath>
         <DefineConstants>TRACE</DefineConstants>
         <ErrorReport>prompt</ErrorReport>
         <WarningLevel>4</WarningLevel>
     </PropertyGroup>
     
     <ItemGroup>
-      <ProjectReference Include="..\..\DProject.Editor\DProject.Editor.csproj">
+      <ProjectReference Include="..\..\DProject.Linux\DProject.Linux.csproj">
         <Project>{ca44782a-3e5d-48b6-b9c6-bd2f1805ec0d}</Project>
-        <Name>DProject.Editor</Name>
+        <Name>DProject.Linux</Name>
       </ProjectReference>
     </ItemGroup>
     
@@ -70,5 +70,5 @@
       <PackageReference Include="MonoGame.Content.Builder" Version="3.7.0.9" />
       <PackageReference Include="NUnit" Version="2.6.4" />
     </ItemGroup>
-    
+
 </Project>

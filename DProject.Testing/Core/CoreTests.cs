@@ -10,13 +10,14 @@ using Microsoft.Xna.Framework;
 using MonoGame.Extended.Entities;
 using NUnit.Framework;
 
-namespace DProject.Testing.Editor
+namespace DProject.Testing.Core
 {
     /// <summary>
-    /// NUnit test class that contains all Editor Tests.
+    /// NUnit test class that contains all Core Tests.
+    /// (These tests need to pass on every platform)
     /// </summary>
     [TestFixture]
-    public class Tests
+    public abstract class CoreTests
     {
         /// <summary>
         /// Sets (possibly) used Singletons to null for keeping the tests as atomic as possible.

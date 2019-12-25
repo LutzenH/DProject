@@ -1,9 +1,4 @@
 .idea
 bin/
-DProject/Content/obj/
-DProject.Windows/Content/obj/
-DProject.Editor/obj/
-DProject.Linux/obj/
-DProject.Windows/obj/
-DProject.Testing/Editor/obj/
+obj/
 *.blend1
