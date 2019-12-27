@@ -80,8 +80,22 @@ namespace DProject.Manager
             CreateGBuffer(false);
         }
 
+        public void DisposeGBuffer()
+        {
+            Color?.Dispose();
+            Normal?.Dispose();
+            LightInfo?.Dispose();
+            Depth?.Dispose();
+            ShadowMap?.Dispose();
+            Lights?.Dispose();
+            SSAO?.Dispose();
+            CombineFinal?.Dispose();
+        }
+
         public void CreateGBuffer(bool updateShaders)
         {
+            DisposeGBuffer();
+            
             Color = new RenderTarget2D(
                 _graphicsDevice,
                 _graphicsDevice.PresentationParameters.BackBufferWidth,
