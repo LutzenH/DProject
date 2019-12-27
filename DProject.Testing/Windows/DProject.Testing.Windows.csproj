@@ -1,0 +1,78 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+			
+    <PropertyGroup>
+        <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+        <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+        <ProjectGuid>{C00CCC79-480E-4C7B-B71E-445C196B7854}</ProjectGuid>
+        <ProjectTypeGuids>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+        <OutputType>Library</OutputType>
+        <AppDesignerFolder>Properties</AppDesignerFolder>
+        <RootNamespace>DProject.Testing.Windows</RootNamespace>
+        <AssemblyName>DProject.Testing.Windows</AssemblyName>
+		<MonoGamePlatform>DesktopGL</MonoGamePlatform>
+        <TargetFramework>net471</TargetFramework>
+        <FileAlignment>512</FileAlignment>
+    </PropertyGroup>
+	
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+        <PlatformTarget>AnyCPU</PlatformTarget>
+        <DebugSymbols>true</DebugSymbols>
+        <DebugType>full</DebugType>
+        <Optimize>false</Optimize>
+        <OutputPath>..\..\bin\Debug\Testing\Windows\</OutputPath>
+        <DefineConstants>DEBUG;TRACE</DefineConstants>
+        <ErrorReport>prompt</ErrorReport>
+        <WarningLevel>4</WarningLevel>
+    </PropertyGroup>
+    
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+        <PlatformTarget>AnyCPU</PlatformTarget>
+        <DebugType>pdbonly</DebugType>
+        <Optimize>true</Optimize>
+        <OutputPath>..\..\bin\Release\Testing\Windows\</OutputPath>
+        <DefineConstants>TRACE</DefineConstants>
+        <ErrorReport>prompt</ErrorReport>
+        <WarningLevel>4</WarningLevel>
+    </PropertyGroup>
+	
+	<ItemGroup>
+      <ProjectReference Include="..\..\DProject.Windows\DProject.Windows.csproj">
+        <Project>{ca44782a-3e5d-48b6-b9c6-bd2f1805ec0d}</Project>
+        <Name>DProject.Windows</Name>
+      </ProjectReference>
+    </ItemGroup>
+	
+    <ItemGroup>
+      <MonoGameContentReference Include="**\*.mgcb" />
+
+      <MonoGameContentReference Include="..\..\DProject\**\*.mgcb">
+        <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
+      </MonoGameContentReference>
+      <Compile Include="..\Core\**\*.cs">
+        <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
+      </Compile>
+    </ItemGroup>
+    
+    <ItemGroup>
+      <PackageReference Include="MonoGame.Content.Builder" Version="3.7.0.9" />
+      <PackageReference Include="NUnit" Version="2.6.4" />
+      <PackageReference Include="System.Numerics.Vectors" Version="4.5.0" />
+      <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.7.0" />
+    </ItemGroup>
+    
+    <ItemGroup>
+      <Reference Include="FNA, Version=19.11.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\..\DProject.Dependencies\FNA\bin\Release\FNA.dll</HintPath>
+      </Reference>
+      <Reference Include="MonoGame.Extended, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\..\DProject.Dependencies\MonoGame.Extended\Source\MonoGame.Extended.Entities\bin\Release\netstandard2.0\MonoGame.Extended.dll</HintPath>
+      </Reference>
+      <Reference Include="MonoGame.Extended.Animations, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\..\DProject.Dependencies\MonoGame.Extended\Source\MonoGame.Extended.Entities\bin\Release\netstandard2.0\MonoGame.Extended.Animations.dll</HintPath>
+      </Reference>
+      <Reference Include="MonoGame.Extended.Entities, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\..\DProject.Dependencies\MonoGame.Extended\Source\MonoGame.Extended.Entities\bin\Release\netstandard2.0\MonoGame.Extended.Entities.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
+</Project>
