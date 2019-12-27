@@ -16,6 +16,8 @@ namespace DProject.Game
             MaxFps = 120;
             EnableSSAO = false;
             EnableLights = false;
+            EnableShadows = false;
+            ShadowMapResolution = 2048;
         }
         
         public static GraphicsManager Instance
@@ -32,6 +34,8 @@ namespace DProject.Game
         public int MaxFps { get; set; }
         public bool EnableSSAO { get; set; }
         public bool EnableLights { get; set; }
+        public bool EnableShadows { get; set; }
+        public int ShadowMapResolution { get; set; }
 
         public void UpdateGraphicsSettings(Game1 game)
         {
@@ -48,6 +52,11 @@ namespace DProject.Game
         private void UpdateCombineFinalEffectTechnique()
         {
             var sm = ShaderManager.Instance;
+
+            if (EnableShadows)
+                sm.GBufferEffect.CurrentTechnique = sm.GBufferEffect.Techniques["RenderGBuffer"];
+            else
+                sm.GBufferEffect.CurrentTechnique = sm.GBufferEffect.Techniques["RenderGBufferNoShadow"];
             
             if (EnableLights && EnableSSAO)
                 sm.CombineFinalEffect.CurrentTechnique = sm.CombineFinalEffect.Techniques["CombineFinal"];
@@ -57,6 +66,8 @@ namespace DProject.Game
                 sm.CombineFinalEffect.CurrentTechnique = sm.CombineFinalEffect.Techniques["CombineFinalNoSSAO"];
             else
                 sm.CombineFinalEffect.CurrentTechnique = sm.CombineFinalEffect.Techniques["CombineFinalNoLightsNoSSAO"];
+            
+            ShaderManager.Instance.CreateGBuffer(true);
         }
     }
 }

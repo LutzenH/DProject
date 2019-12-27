@@ -23,6 +23,7 @@ $if platform=DesktopGL
 /copy:shaders/gbuffer/CombineFinal
 /copy:shaders/SkyShader
 /copy:shaders/SSAOShader
+/copy:shaders/ShadowMapShader
 
 $endif
 
@@ -81,6 +82,12 @@ $if platform=Windows
 /processor:EffectProcessor
 /processorParam:DebugMode=Auto
 /build:shaders/SSAOShader.fx
+
+#begin shaders/ShadowMapShader.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:shaders/ShadowMapShader.fx
 
 $endif
 

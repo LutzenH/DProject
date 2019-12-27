@@ -37,6 +37,9 @@ namespace DProject.Manager
         
         // Skybox Effect
         private SkyEffect _skyEffect;
+
+        // Shadow Map Effect
+        private ShadowMapEffect _shadowMapEffect;
         
         // FXAA Effect
         private FXAAEffect _fxaaEffect;
@@ -55,6 +58,9 @@ namespace DProject.Manager
         public RenderTarget2D LightInfo;
         // Depth
         public RenderTarget2D Depth;
+        // Shadow Map
+        //TODO: Create a RenderTargetBinding instead that contains all shadow-casting lights.
+        public RenderTarget2D ShadowMap;
         // Lights
         public RenderTarget2D Lights;
         // SSAO
@@ -107,23 +113,42 @@ namespace DProject.Manager
                 false,
                 SurfaceFormat.Single,
                 DepthFormat.Depth24);
-            
-            Lights = new RenderTarget2D(
-                _graphicsDevice,
-                _graphicsDevice.PresentationParameters.BackBufferWidth,
-                _graphicsDevice.PresentationParameters.BackBufferHeight,
-                false,
-                SurfaceFormat.Color,
-                DepthFormat.Depth24);
-            
-            SSAO = new RenderTarget2D(
-                _graphicsDevice,
-                _graphicsDevice.PresentationParameters.BackBufferWidth,
-                _graphicsDevice.PresentationParameters.BackBufferHeight,
-                false,
-                SurfaceFormat.Single,
-                DepthFormat.Depth24);
-            
+
+            if (GraphicsManager.Instance.EnableShadows)
+            {
+                ShadowMap = new RenderTarget2D(
+                    _graphicsDevice,
+                    GraphicsManager.Instance.ShadowMapResolution,
+                    GraphicsManager.Instance.ShadowMapResolution,
+                    false,
+                    SurfaceFormat.Single,
+                    DepthFormat.Depth24,
+                    0,
+                    RenderTargetUsage.PlatformContents);
+            }
+
+            if (GraphicsManager.Instance.EnableLights)
+            {
+                Lights = new RenderTarget2D(
+                    _graphicsDevice,
+                    _graphicsDevice.PresentationParameters.BackBufferWidth,
+                    _graphicsDevice.PresentationParameters.BackBufferHeight,
+                    false,
+                    SurfaceFormat.Color,
+                    DepthFormat.Depth24);
+            }
+
+            if (GraphicsManager.Instance.EnableSSAO)
+            {
+                SSAO = new RenderTarget2D(
+                    _graphicsDevice,
+                    _graphicsDevice.PresentationParameters.BackBufferWidth,
+                    _graphicsDevice.PresentationParameters.BackBufferHeight,
+                    false,
+                    SurfaceFormat.Single,
+                    DepthFormat.Depth24);
+            }
+
             CombineFinal = new RenderTarget2D(
                 _graphicsDevice,
                 _graphicsDevice.PresentationParameters.BackBufferWidth,
@@ -168,6 +193,7 @@ namespace DProject.Manager
             _waterEffect.DuDvTexture = content.Load<Texture2D>("shaders/water_dudv");
             
             _skyEffect = new SkyEffect(content.Load<Effect>("shaders/SkyShader"));
+            _shadowMapEffect = new ShadowMapEffect(content.Load<Effect>("shaders/ShadowMapShader"));
             
             _fxaaEffect = new FXAAEffect(content.Load<Effect>("shaders/FXAAShader"));
             _ssaoEffect = new SSAOEffect(content.Load<Effect>("shaders/SSAOShader"));
@@ -186,6 +212,9 @@ namespace DProject.Manager
 
             _combineFinalEffect.ColorMap = Color;
 
+            if(GraphicsManager.Instance.EnableShadows)
+                _gBufferEffect.ShadowMap = ShadowMap;
+            
             if (GraphicsManager.Instance.EnableLights)
             {
                 _directionalLightEffect.CameraPosition = lens.Position;
@@ -232,6 +261,10 @@ namespace DProject.Manager
         //TODO: This method is temporary until it will be replaces by a proper shader-information handler.
         public void SetInitiateShaderInfo()
         {
+            _gBufferEffect.ShadowBias = 0.0005f;
+            _gBufferEffect.ShadowStrength = 0.5f;
+            _gBufferEffect.ShadowMapSize = GraphicsManager.Instance.ShadowMapResolution;
+            
             //Water
             _waterEffect.MaxWaterDepth = 50f;
             _waterEffect.DuDvTiling = 20.0f;
@@ -299,6 +332,8 @@ namespace DProject.Manager
         public WaterEffect WaterEffect => _waterEffect ?? throw new ContentLoadException("The WaterEffect shader has not been loaded yet.");
 
         public SkyEffect SkyEffect => _skyEffect ?? throw new ContentLoadException("The SkyboxEffect shader has not been loaded yet.");
+        
+        public ShadowMapEffect ShadowMapEffect => _shadowMapEffect ?? throw new ContentLoadException("The ShadowMapEffect shader has not been loaded yet.");
         
         public FXAAEffect FXAAEffect => _fxaaEffect ?? throw new ContentLoadException("The FXAAEffect shader has not been loaded yet.");
 

@@ -29,10 +29,7 @@ namespace DProject.Manager.World
             AddSystem(physicsSystem);
             AddSystem(new PhysicsSyncSystem(physicsSystem.GetSimulation()));
             AddSystem(new PhysicsMouseObjectDetectSystem(physicsSystem.GetSimulation()));
-            
-            //Primitives
-            AddSystem(new PrimitiveRenderSystem(graphicsDevice));
-            
+
             //Lighting
             AddSystem(new LightingRenderSystem(graphicsDevice));
             

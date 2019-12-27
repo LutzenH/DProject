@@ -23,7 +23,7 @@ namespace DProject.Manager.System
         private readonly PhysicsSystem _physicsSystem;
      
         private readonly ImGuiRenderer _imGuiRenderer;
-        private readonly IntPtr[] _imGuiTexture = { IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero };
+        private readonly IntPtr[] _imGuiTexture = { IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero };
 
         private bool _showTestWindow;
         private bool _showRenderBufferWindow;
@@ -58,7 +58,8 @@ namespace DProject.Manager.System
             _imGuiTexture[2] = _imGuiRenderer.BindTexture(ShaderManager.Instance.LightInfo);
             _imGuiTexture[3] = _imGuiRenderer.BindTexture(ShaderManager.Instance.Normal);
             _imGuiTexture[4] = _imGuiRenderer.BindTexture(ShaderManager.Instance.Lights);
-            _imGuiTexture[5] = _imGuiRenderer.BindTexture(ShaderManager.Instance.SSAO);
+            _imGuiTexture[5] = _imGuiRenderer.BindTexture(ShaderManager.Instance.ShadowMap);
+            _imGuiTexture[6] = _imGuiRenderer.BindTexture(ShaderManager.Instance.SSAO);
 
             // Call BeforeLayout first to set things up
             _imGuiRenderer.BeforeLayout(gameTime);
@@ -75,6 +76,7 @@ namespace DProject.Manager.System
             _imGuiRenderer.UnbindTexture(_imGuiTexture[3]);
             _imGuiRenderer.UnbindTexture(_imGuiTexture[4]);
             _imGuiRenderer.UnbindTexture(_imGuiTexture[5]);
+            _imGuiRenderer.UnbindTexture(_imGuiTexture[6]);
         }
 
         protected virtual void ImGuiLayout()
@@ -109,6 +111,17 @@ namespace DProject.Manager.System
             var graphicsSettingsEnableLights = GraphicsManager.Instance.EnableLights;
             ImGui.Checkbox("Lights", ref graphicsSettingsEnableLights);
             GraphicsManager.Instance.EnableLights = graphicsSettingsEnableLights;
+            
+            var graphicsSettingsEnableShadows = GraphicsManager.Instance.EnableShadows;
+            ImGui.Checkbox("Shadows", ref graphicsSettingsEnableShadows);
+            GraphicsManager.Instance.EnableShadows = graphicsSettingsEnableShadows;
+
+            if (graphicsSettingsEnableShadows)
+            {
+                var graphicsSettingsShadowMapResolution = GraphicsManager.Instance.ShadowMapResolution;
+                ImGui.InputInt("Resolution", ref graphicsSettingsShadowMapResolution, 1);
+                GraphicsManager.Instance.ShadowMapResolution = graphicsSettingsShadowMapResolution;
+            }
 
             var graphicsSettingsEnableSky = GraphicsManager.Instance.EnableSky;
             ImGui.Checkbox("Sky", ref graphicsSettingsEnableSky);
@@ -162,8 +175,10 @@ namespace DProject.Manager.System
                 DisplayImageWithTooltip(_imGuiTexture[3], "Normal", new Num.Vector2(300, 150));
                 if(GraphicsManager.Instance.EnableLights)
                     DisplayImageWithTooltip(_imGuiTexture[4], "Lights", new Num.Vector2(300, 150));
+                if(GraphicsManager.Instance.EnableShadows)
+                    DisplayImageWithTooltip(_imGuiTexture[5], "Shadows", new Num.Vector2(300, 300));
                 if(GraphicsManager.Instance.EnableSSAO)
-                    DisplayImageWithTooltip(_imGuiTexture[5], "SSAO", new Num.Vector2(300, 150));
+                    DisplayImageWithTooltip(_imGuiTexture[6], "SSAO", new Num.Vector2(300, 150));
                 
                 ImGui.End();
             }
@@ -409,7 +424,7 @@ namespace DProject.Manager.System
                 else if (regionX > size.X - regionSize)
                     regionX = size.X - regionSize;
                 
-                var regionY = (io.MousePos.Y - pos.Y + 156) - regionSize * 0.5f;
+                var regionY = (io.MousePos.Y - pos.Y + (size.Y + 6)) - regionSize * 0.5f;
                 if (regionY < 0.0f)
                     regionY = 0.0f;
                 else if (regionY > size.Y - regionSize)

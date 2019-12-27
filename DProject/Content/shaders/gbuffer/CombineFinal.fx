@@ -66,16 +66,16 @@ VertexShaderOutput VertexShaderFunction(VertexShaderInput input)
 
 float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
 {
-    float3 diffuseColor = tex2D(ColorSampler, input.TexCoord).rgb;
+    float4 diffuseColor = tex2D(ColorSampler, input.TexCoord);
     float4 light = tex2D(LightSampler, input.TexCoord);
     float emission = tex2D(LightInfoSampler, input.TexCoord).b;
     float ssao = tex2D(SSAOSampler, input.TexCoord);
 
-    float3 coloredEmission = diffuseColor * emission;
+    float3 coloredEmission = diffuseColor.rgb * emission;
     float3 diffuseLight = max(light.rgb, coloredEmission);
     float specularLight = light.a;
 
-    return float4((diffuseColor * diffuseLight + specularLight) * ssao, 1);
+    return float4((diffuseColor * diffuseLight + specularLight) * diffuseColor.a * ssao, 1);
 }
 
 technique CombineFinal
@@ -89,10 +89,10 @@ technique CombineFinal
 
 float4 PixelShaderFunctionNoLights(VertexShaderOutput input) : COLOR0
 {
-    float3 diffuseColor = tex2D(ColorSampler, input.TexCoord).rgb;
+    float4 diffuseColor = tex2D(ColorSampler, input.TexCoord);
     float ssao = tex2D(SSAOSampler, input.TexCoord);
 
-    return float4(diffuseColor * ssao, 1);
+    return float4(diffuseColor.rgb * diffuseColor.a * ssao, 1);
 }
 
 technique CombineFinalNoLights
@@ -106,15 +106,15 @@ technique CombineFinalNoLights
 
 float4 PixelShaderFunctionNoSSAO(VertexShaderOutput input) : COLOR0
 {
-    float3 diffuseColor = tex2D(ColorSampler, input.TexCoord).rgb;
+    float4 diffuseColor = tex2D(ColorSampler, input.TexCoord);
     float4 light = tex2D(LightSampler, input.TexCoord);
     float emission = tex2D(LightInfoSampler, input.TexCoord).b;
 
-    float3 coloredEmission = diffuseColor * emission;
+    float3 coloredEmission = diffuseColor.rgb * emission;
     float3 diffuseLight = max(light.rgb, coloredEmission);
     float specularLight = light.a;
 
-    return float4((diffuseColor * diffuseLight + specularLight), 1);
+    return float4((diffuseColor.rgb * diffuseLight + specularLight) * diffuseColor.a, 1);
 }
 
 technique CombineFinalNoSSAO
@@ -128,9 +128,9 @@ technique CombineFinalNoSSAO
 
 float4 PixelShaderFunctionNoLightsNoSSAO(VertexShaderOutput input) : COLOR0
 {
-    float3 diffuseColor = tex2D(ColorSampler, input.TexCoord).rgb;
+    float4 diffuseColor = tex2D(ColorSampler, input.TexCoord);
 
-    return float4(diffuseColor, 1);
+    return float4(diffuseColor.rgb * diffuseColor.a, 1);
 }
 
 technique CombineFinalNoLightsNoSSAO

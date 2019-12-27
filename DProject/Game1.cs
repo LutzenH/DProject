@@ -91,11 +91,6 @@ namespace DProject
 
         protected override void Draw(GameTime gameTime)
         {
-            ShaderManager.Instance.SetGBuffer();
-            
-            ShaderManager.Instance.ClearGBuffer();
-            GraphicsDevice.Clear(ClearOptions.DepthBuffer, Color.White, 1, 0);
-            
             WorldBuilder.World.Draw(gameTime);
             
             GraphicsDevice.SetRenderTarget(null);

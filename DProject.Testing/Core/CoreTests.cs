@@ -52,7 +52,8 @@ namespace DProject.Testing.Core
                 GraphicsManager.Instance.MaxFps = 120;
                 GraphicsManager.Instance.EnableSSAO = false;
                 GraphicsManager.Instance.EnableLights = false;
-                
+                GraphicsManager.Instance.EnableShadows = false;
+
                 game.UpdateGraphicsSettings();
             };
 
@@ -89,17 +90,22 @@ namespace DProject.Testing.Core
                         break;
                     case 4:
                         GraphicsManager.Instance.EnableSky = false;
+                        GraphicsManager.Instance.EnableShadows = true;
+                        break;
+                    case 5:
+                        GraphicsManager.Instance.EnableShadows = false;
                         GraphicsManager.Instance.EnableFullscreen = true;
                         game.UpdateGraphicsSettings();
                         break;
-                    case 5:
+                    case 6:
                         GraphicsManager.Instance.EnableFXAA = true;
                         GraphicsManager.Instance.EnableSky = true;
                         GraphicsManager.Instance.EnableSSAO = true;
                         GraphicsManager.Instance.EnableLights = true;
+                        GraphicsManager.Instance.EnableShadows = true;
                         game.UpdateGraphicsSettings();
                         break;
-                    case 6:
+                    case 7:
                         GraphicsManager.Instance.EnableVSync = true;
                         GraphicsManager.Instance.EnableFullscreen = false;
                         game.UpdateGraphicsSettings();
@@ -113,14 +119,10 @@ namespace DProject.Testing.Core
             };
 
             game.Run();
-
-            Console.WriteLine("\n--- Statistics ---\n");
-
+            
             Console.WriteLine("Lowest FPS: " + fpsList.Min());
             Console.WriteLine("Average FPS: " + fpsList.Average());
             Console.WriteLine("Highest FPS: " + fpsList.Max());
-
-            Console.WriteLine("\n------------------\n");
         }
 
         /// <summary>
