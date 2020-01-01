@@ -35,6 +35,8 @@ namespace DProject.Manager.World
             
             //Water
             AddSystem(new WaterRenderSystem(graphicsDevice));
+
+            AddSystem(new FinalRenderSystem(graphicsDevice));
             
 #if EDITOR
             AddSystem(new DebugUIRenderSystem(game, graphicsDevice, physicsSystem));

@@ -53,8 +53,6 @@ namespace DProject
             if(WorldBuilder == null)
                 WorldBuilder = new DefaultGameWorld(this, Content, GraphicsDevice);
             
-            _spriteBatch = new SpriteBatch(GraphicsDevice);
-            
             ShaderManager.Instance.Initialize(GraphicsDevice);
             
             WorldBuilder.World.Initialize();
@@ -92,27 +90,6 @@ namespace DProject
         protected override void Draw(GameTime gameTime)
         {
             WorldBuilder.World.Draw(gameTime);
-            
-            GraphicsDevice.SetRenderTarget(null);
-            GraphicsDevice.Clear(ClearOptions.DepthBuffer, Color.White, 1, 0);
-            
-            try
-            {
-                _spriteBatch.Begin(
-                    SpriteSortMode.Deferred,
-                    BlendState.Opaque,
-                    SamplerState.LinearClamp,
-                    DepthStencilState.Default,
-                    null,
-                    GraphicsManager.Instance.EnableFXAA ? ShaderManager.Instance.FXAAEffect : null,
-                    Matrix.Identity);
-
-                _spriteBatch.Draw(ShaderManager.Instance.CombineFinal, GraphicsDevice.Viewport.Bounds, Color.White);
-            }
-            finally
-            {
-                _spriteBatch.End();
-            }
             _fps++;
             base.Draw(gameTime);
         }

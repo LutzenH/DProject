@@ -53,6 +53,8 @@ namespace DProject.Manager.System
 
         public override void Draw(GameTime gameTime)
         {
+            _graphicsDevice.Clear(ClearOptions.DepthBuffer, Color.White, 1, 0);
+            
             _imGuiTexture[0] = _imGuiRenderer.BindTexture(ShaderManager.Instance.Color);
             _imGuiTexture[1] = _imGuiRenderer.BindTexture(ShaderManager.Instance.Depth);
             _imGuiTexture[2] = _imGuiRenderer.BindTexture(ShaderManager.Instance.LightInfo);

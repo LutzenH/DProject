@@ -239,6 +239,11 @@ namespace DProject.Type.Rendering
             var lastViewport = _graphicsDevice.Viewport;
             var lastScissorBox = _graphicsDevice.ScissorRectangle;
 
+            var previousBlendFactor = _graphicsDevice.BlendFactor;
+            var previousBlendState = _graphicsDevice.BlendState;
+            var previousRasterizerState = _graphicsDevice.RasterizerState;
+            var previousDepthStencilState = _graphicsDevice.DepthStencilState;
+
             _graphicsDevice.BlendFactor = Color.White;
             _graphicsDevice.BlendState = BlendState.NonPremultiplied;
             _graphicsDevice.RasterizerState = _rasterizerState;
@@ -257,6 +262,10 @@ namespace DProject.Type.Rendering
             // Restore modified state
             _graphicsDevice.Viewport = lastViewport;
             _graphicsDevice.ScissorRectangle = lastScissorBox;
+            _graphicsDevice.BlendFactor = previousBlendFactor;
+            _graphicsDevice.BlendState = previousBlendState;
+            _graphicsDevice.RasterizerState = previousRasterizerState;
+            _graphicsDevice.DepthStencilState = previousDepthStencilState;
         }
 
         private unsafe void UpdateBuffers(ImDrawDataPtr drawData)
