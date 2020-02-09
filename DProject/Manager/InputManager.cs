@@ -119,7 +119,8 @@ namespace DProject.Manager
             if (_currentMouseState.RightButton == ButtonState.Pressed)
                 _input.Add(Input.PickupPhysicsBody);
 
-            CameraLookVector = _previousMouseState.Position.ToVector2() - _currentMouseState.Position.ToVector2();
+            CameraLookVector = new Vector2(_previousMouseState.X, _previousMouseState.Y)
+                               - new Vector2(_currentMouseState.X, _currentMouseState.Y);
         }
 
         public bool IsInputDown(Input input)

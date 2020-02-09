@@ -128,7 +128,7 @@ namespace DProject.Manager.System
             {
                 pass.Apply();
                 //TODO: Maybe use vertex-offsets to loading a model, so a smaller amount of vertex-buffers have to be used.
-                graphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, model.PrimitiveCount);
+                graphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, model.VertexBuffer.VertexCount, 0, model.PrimitiveCount);
             }
         }
     }

@@ -39,7 +39,7 @@ namespace DProject.Type.Rendering
             foreach (var pass in effect.CurrentTechnique.Passes)
             {
                 pass.Apply();
-                _graphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0,  2);
+                _graphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0,  4, 0, 2);
             }
         }
     }

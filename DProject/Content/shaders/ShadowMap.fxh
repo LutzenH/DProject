@@ -13,8 +13,8 @@ sampler2D shadowSampler = sampler_state
     MinFilter = Point;
     MagFilter = Point;
     MipFilter = Point;
-    AddressU = Border;
-    AddressV = Border;
+    AddressU = CLAMP;
+    AddressV = CLAMP;
 };
 
 float CalculateShadow(float4 worldPosition)

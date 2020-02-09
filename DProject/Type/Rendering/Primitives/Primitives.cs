@@ -32,6 +32,7 @@ namespace DProject.Type.Rendering.Primitives
         public void Draw(Effect effect, PrimitiveType type)
         {
             int primitiveCount;
+            int vertexCount;
             
             switch (type)
             {
@@ -39,16 +40,19 @@ namespace DProject.Type.Rendering.Primitives
                     _graphicsDevice.SetVertexBuffer(_sphere.VertexBuffer);
                     _graphicsDevice.Indices = _sphere.IndexBuffer;
                     primitiveCount = _sphere.PrimitiveCount;
+                    vertexCount = _sphere.VertexBuffer.VertexCount;
                     break;
                 case PrimitiveType.Cube:
                     _graphicsDevice.SetVertexBuffer(_cube.VertexBuffer);
                     _graphicsDevice.Indices = _cube.IndexBuffer;
                     primitiveCount = _cube.PrimitiveCount;
+                    vertexCount = _cube.VertexBuffer.VertexCount;
                     break;
                 case PrimitiveType.CompanionCube:
                     _graphicsDevice.SetVertexBuffer(_companionCube.VertexBuffer);
                     _graphicsDevice.Indices = _companionCube.IndexBuffer;
                     primitiveCount = _companionCube.PrimitiveCount;
+                    vertexCount = _companionCube.VertexBuffer.VertexCount;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(type), type, "The given PrimitiveType does not exist.");
@@ -57,7 +61,7 @@ namespace DProject.Type.Rendering.Primitives
             foreach (var pass in effect.CurrentTechnique.Passes)
             {
                 pass.Apply();
-                _graphicsDevice.DrawIndexedPrimitives(Microsoft.Xna.Framework.Graphics.PrimitiveType.TriangleList, 0, 0,  primitiveCount);
+                _graphicsDevice.DrawIndexedPrimitives(Microsoft.Xna.Framework.Graphics.PrimitiveType.TriangleList, 0, 0,  vertexCount, 0, primitiveCount);
             }
         }
     }
