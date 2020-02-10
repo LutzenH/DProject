@@ -17,7 +17,7 @@ cd DProject/Content/shaders/
 cd ../../../
 echo -e '\n--- Building DProject.Linux ---\n'
 msbuild DProject.Linux.sln -property:Configuration=Release
-wget https://www.dropbox.com/s/k0xhs820rmfc6k7/fnalibs.tar.bz2
+wget https://www.dropbox.com/s/25nsu414fztq0ot/fnalibs.tar.bz2
 tar -jxvf fnalibs.tar.bz2 -C bin/Release/Linux lib64/ --strip-components 1
 tar -jxvf fnalibs.tar.bz2 -C bin/Release/Testing/Linux/net471 lib64/ --strip-components 1
 rm fnalibs.tar.bz2

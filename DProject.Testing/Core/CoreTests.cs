@@ -138,9 +138,9 @@ namespace DProject.Testing.Core
 
             Entity previousProp = null;
             
-            game.WorldBuilder = new GameWorld(game, game.Content, game.GraphicsDevice);
             game.InitializeInjection = () =>
             {
+                game.WorldBuilder = new GameWorld(game, game.Content, game.GraphicsDevice);
                 game.WorldBuilder.EntityFactory.CreateFlyCamera(new Vector3(0, 0, 3));
             };
 

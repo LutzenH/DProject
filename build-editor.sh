@@ -17,7 +17,7 @@ cd DProject/Content/shaders/
 cd ../../../
 echo -e '\n--- Building DProject.Editor ---\n'
 msbuild DProject.Editor.sln -property:Configuration=Release
-wget https://www.dropbox.com/s/k0xhs820rmfc6k7/fnalibs.tar.bz2
+wget https://www.dropbox.com/s/25nsu414fztq0ot/fnalibs.tar.bz2
 tar -jxvf fnalibs.tar.bz2 -C bin/Release/Editor lib64/ --strip-components 1
 tar -jxvf fnalibs.tar.bz2 -C bin/Release/Testing/Editor/net471 lib64/ --strip-components 1
 rm fnalibs.tar.bz2
