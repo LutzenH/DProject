@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using DProject.Game.Component;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -17,6 +19,7 @@ namespace DProject.Type.Rendering
         private readonly int _height;
 
         private float _zoom;
+        private int _usableGridSize;
         private int _gridSize;
 
         public float Zoom
@@ -30,15 +33,8 @@ namespace DProject.Type.Rendering
                     _zoom = 1.2f;
                 else
                     _zoom = value;
-
-                var projectionValue = MaxMapRadius * _zoom;
                 
-                _basicEffect.Projection = Matrix.CreateOrthographicOffCenter(
-                    -projectionValue,
-                    projectionValue,
-                    projectionValue,
-                    -projectionValue,
-                    0, 1);
+                UpdateProjection();
             }
 }
 
@@ -59,6 +55,32 @@ namespace DProject.Type.Rendering
             }
         }
 
+        private Matrix _viewMatrix;
+        private Matrix _scaleMatrix;
+        private Matrix _projectionMatrix;
+
+        private Vector2 _offset;
+        public Vector2 Offset
+        {
+            get => _offset;
+            set
+            {
+                _offset = value;
+                UpdateProjection();
+            }
+        }
+
+        private ViewportDirection _direction;
+        public ViewportDirection Direction
+        {
+            get => _direction;
+            set
+            {
+                _direction = value;
+                UpdateMatrices();
+            }
+        }
+
         public ViewportRenderer(int width, int height)
         {
             _width = width;
@@ -66,6 +88,8 @@ namespace DProject.Type.Rendering
 
             _zoom = 1;
             _gridSize = 64;
+            Offset = new Vector2(0, 0);
+            Direction = ViewportDirection.Front;
         }
 
         public void Initialize(GraphicsDevice graphicsDevice)
@@ -78,12 +102,7 @@ namespace DProject.Type.Rendering
                 LightingEnabled = false,
                 VertexColorEnabled = true,
                 TextureEnabled = false,
-                Projection = Matrix.CreateOrthographicOffCenter(
-                    -MaxMapRadius,
-                    MaxMapRadius,
-                    MaxMapRadius,
-                    -MaxMapRadius,
-                    0, 1)
+                Projection = _projectionMatrix
             };
 
             _viewport = new RenderTarget2D(graphicsDevice, _width, _height, false, SurfaceFormat.Color, DepthFormat.None);
@@ -96,6 +115,10 @@ namespace DProject.Type.Rendering
 
             var grid = GetGrid(_gridSize, _zoom);
             
+            _basicEffect.World = Matrix.Identity;
+            _basicEffect.View = Matrix.Identity;
+            _basicEffect.Projection = _projectionMatrix;
+
             foreach (var pass in _basicEffect.CurrentTechnique.Passes)
             {
                 pass.Apply();
@@ -113,44 +136,136 @@ namespace DProject.Type.Rendering
             return _viewport;
         }
 
-        //TODO: Only draw lines that are within the given zoom level.
         private VertexPositionColor[] GetGrid(int gridSize, float zoom)
         {
+            var topLeftPosition = _offset - new Vector2(zoom * MaxMapRadius);
+            var bottomRightPosition = _offset + new Vector2(zoom * MaxMapRadius);
+            
             var relativeSize = gridSize / zoom;
-            var usableGridSize = gridSize;
+            _usableGridSize = gridSize;
 
             while (relativeSize <= 128)
             {
-                usableGridSize *= 2;
+                _usableGridSize *= 2;
                 relativeSize *= 2;
             }
 
             var list = new List<VertexPositionColor>();
             
-            for (var x = -MaxMapRadius; x <= MaxMapRadius; x += usableGridSize)
+            for (var x = -MaxMapRadius; x <= MaxMapRadius; x += _usableGridSize)
             {
-                var color = new Color(50, 50, 50);
+                if (x < topLeftPosition.X || x > bottomRightPosition.X)
+                    continue;
 
-                if (x % (usableGridSize*8) == 0)
-                    color = new Color(100, 100, 100);
-                
-                if (x == 0)
-                    color = new Color(50, 100, 100);
+                var color = CalculateLineColor(x, _usableGridSize);
 
                 list.Add(new VertexPositionColor(new Vector3(x, -MaxMapRadius, 0), color));
                 list.Add(new VertexPositionColor(new Vector3(x, MaxMapRadius, 0), color));
+            }
+            
+            for (var y = -MaxMapRadius; y <= MaxMapRadius; y += _usableGridSize)
+            {
+                if (y < topLeftPosition.Y || y > bottomRightPosition.Y)
+                    continue;
                 
-                list.Add(new VertexPositionColor(new Vector3(-MaxMapRadius, x, 0), color));
-                list.Add(new VertexPositionColor(new Vector3(MaxMapRadius,x, 0), color));
+                var color = CalculateLineColor(y, _usableGridSize);
+                
+                list.Add(new VertexPositionColor(new Vector3(-MaxMapRadius, y, 0), color));
+                list.Add(new VertexPositionColor(new Vector3(MaxMapRadius,y, 0), color));
             }
             
             return list.ToArray();
         }
 
-        public Vector2 GetMousePosition(Vector2 relativeMousePositionWithinViewport)
+        private void UpdateMatrices()
+        {
+            var directionMatrix = Matrix.Identity;
+
+            switch (_direction)
+            {
+                case ViewportDirection.Top:
+                    directionMatrix = Matrix.CreateFromYawPitchRoll(0, -MathHelper.Pi/2, 0);
+                    _scaleMatrix = Matrix.CreateScale(1, 1f, 0f);
+                    break;
+                case ViewportDirection.Left:
+                    directionMatrix = Matrix.CreateFromYawPitchRoll(MathHelper.Pi/2, 0, MathHelper.Pi);
+                    _scaleMatrix = Matrix.CreateScale(1, 1, 0f);
+                    break;
+                case ViewportDirection.Front:
+                    directionMatrix = Matrix.CreateFromYawPitchRoll(0, MathHelper.Pi, 0);
+                    _scaleMatrix = Matrix.CreateScale(1, 1, 0f);
+                    break;
+            }
+
+            _viewMatrix = directionMatrix * _scaleMatrix;
+        }
+
+        private static Color CalculateLineColor(int linePosition, int gridSize)
+        {
+            if (linePosition == 0)
+                return new Color(50, 100, 100);
+            
+            if (linePosition % (gridSize*8) == 0)
+                return new Color(100, 100, 100);
+
+            return new Color(50, 50, 50);
+        }
+
+        private void UpdateProjection()
+        {
+            var projectionValue = MaxMapRadius * _zoom;
+                
+            _projectionMatrix = Matrix.CreateOrthographicOffCenter(
+                -projectionValue + _offset.X,
+                projectionValue + _offset.X,
+                projectionValue + _offset.Y,
+                -projectionValue + _offset.Y,
+                0, 1);
+        }
+
+        public Vector3 GetMousePosition(Vector2 relativeMousePositionWithinViewport)
         {
             var mousePosition = relativeMousePositionWithinViewport - new Vector2(0.5f, 0.5f);
-            return mousePosition * _zoom * (MaxMapRadius * 2);
+            var relativeWorldPosition = mousePosition * _zoom * (MaxMapRadius * 2) + _offset;
+            
+            switch (_direction)
+            {
+                case ViewportDirection.Top:
+                    return new Vector3(relativeWorldPosition.X, 0, relativeWorldPosition.Y);
+                case ViewportDirection.Front:
+                    return new Vector3(relativeWorldPosition.X, -relativeWorldPosition.Y, 0);
+                case ViewportDirection.Left:
+                    return new Vector3(0, -relativeWorldPosition.Y,  relativeWorldPosition.X);
+            }
+
+            return Vector3.Zero;
         }
+
+        public void DrawMesh(DPModel model, TransformComponent transform)
+        {
+            _graphicsDevice.SetVertexBuffer(model.VertexBuffer);
+            _graphicsDevice.Indices = model.IndexBuffer;
+
+            _basicEffect.World = transform.WorldMatrix;
+            _basicEffect.View = _viewMatrix;
+
+            foreach (var pass in _basicEffect.CurrentTechnique.Passes)
+            {
+                pass.Apply();
+                _graphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, model.VertexBuffer.VertexCount, 0, model.PrimitiveCount);
+            }
+        }
+
+        public int GetUsableGridSize()
+        {
+            return _usableGridSize;
+        }
+    }
+    
+    public enum ViewportDirection
+    {
+        Top,
+        Front,
+        Left
     }
 }

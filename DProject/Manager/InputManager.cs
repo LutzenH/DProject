@@ -35,6 +35,10 @@ namespace DProject.Manager
         ViewportZoomOut,
         ViewportIncreaseGridSize,
         ViewportDecreaseGridSize,
+        ViewportMoveRight,
+        ViewportMoveLeft,
+        ViewportMoveUp,
+        ViewportMoveDown,
 #endif
     }
 
@@ -93,18 +97,20 @@ namespace DProject.Manager
                     case Keys.LeftShift:
                         _input.Add(Input.CameraIncreasedSpeed);
                         break;
+#if EDITOR
                     case Keys.Up:
-                        _input.Add(Input.CameraLookUp);
+                        _input.Add(Input.ViewportMoveUp);
                         break;
                     case Keys.Down:
-                        _input.Add(Input.CameraLookDown);
+                        _input.Add(Input.ViewportMoveDown);
                         break;
                     case Keys.Left:
-                        _input.Add(Input.CameraLookLeft);
+                        _input.Add(Input.ViewportMoveLeft);
                         break;
                     case Keys.Right:
-                        _input.Add(Input.CameraLookRight);
+                        _input.Add(Input.ViewportMoveRight);
                         break;
+#endif
                     case Keys.Tab:
                         _input.Add(Input.DebugShowWireFrame);
                         break;

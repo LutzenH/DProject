@@ -65,7 +65,8 @@ namespace DProject
             Fonts.LoadFonts(Content);
             
             ShaderManager.Instance.LoadContent(Content);
-            
+            UpdateGraphicsSettings();
+
             base.LoadContent();
         }
 

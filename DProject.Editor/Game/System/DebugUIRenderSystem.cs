@@ -50,6 +50,7 @@ namespace DProject.Manager.System
             _game = game;
             
             _imGuiRenderer = new ImGuiRenderer(_graphicsDevice);
+            ImGui.GetIO().ConfigWindowsMoveFromTitleBarOnly = true;
             _imGuiRenderer.RebuildFontAtlas();
             
             _componentTypes = typeof(IComponent).Assembly.GetTypes().Where(
@@ -472,8 +473,12 @@ namespace DProject.Manager.System
 
             for (var i = 0; i < viewportTexturePointer.Length; i++)
             {
-                var dimension = new Num.Vector2(_viewportRenderSystem.GetViewports()[i].Width,
-                                                _viewportRenderSystem.GetViewports()[i].Height);
+                var viewport = _viewportRenderSystem.GetViewports()[i];
+                var dimension = new Num.Vector2(viewport.Width, viewport.Height);
+                
+                var intDirection = (int) viewport.Direction;
+                ImGui.SliderInt("Direction###PropertyDirection:", ref intDirection, 0, 2, viewport.Direction.ToString());
+                viewport.Direction = (ViewportDirection) intDirection;
                 
                 ImGui.Image(viewportTexturePointer[i], dimension, Num.Vector2.Zero, Num.Vector2.One, Num.Vector4.One, Num.Vector4.Zero);
 
@@ -487,21 +492,26 @@ namespace DProject.Manager.System
                 if (ImGui.IsItemHovered())
                 {
                     if (InputManager.Instance.IsInputDown(Input.ViewportZoomIn))
-                        _viewportRenderSystem.GetViewports()[i].Zoom *= 1.1f;
+                        viewport.Zoom *= 1.1f;
                     else if(InputManager.Instance.IsInputDown(Input.ViewportZoomOut))
-                        _viewportRenderSystem.GetViewports()[i].Zoom /= 1.1f;
+                        viewport.Zoom /= 1.1f;
 
                     if (InputManager.Instance.IsInputPressed(Input.ViewportIncreaseGridSize))
-                        _viewportRenderSystem.GetViewports()[i].GridSize *= 2;
+                        viewport.GridSize *= 2;
                     else if (InputManager.Instance.IsInputPressed(Input.ViewportDecreaseGridSize))
-                        _viewportRenderSystem.GetViewports()[i].GridSize /= 2;
-                }
+                        viewport.GridSize /= 2;
 
-                ImGui.Separator();
+                    if (InputManager.Instance.IsInputPressed(Input.ViewportMoveRight))
+                        viewport.Offset += new Vector2(viewport.GetUsableGridSize(), 0);
+                    if (InputManager.Instance.IsInputPressed(Input.ViewportMoveLeft))
+                        viewport.Offset -= new Vector2(viewport.GetUsableGridSize(), 0);
+                    if (InputManager.Instance.IsInputPressed(Input.ViewportMoveUp))
+                        viewport.Offset -= new Vector2(0, viewport.GetUsableGridSize());
+                    if (InputManager.Instance.IsInputPressed(Input.ViewportMoveDown))
+                        viewport.Offset += new Vector2(0, viewport.GetUsableGridSize());
+                }
                 
-                ImGui.Text("Zoom: " + _viewportRenderSystem.GetViewports()[i].Zoom);
-                ImGui.Text("Grid Size: " + _viewportRenderSystem.GetViewports()[i].GridSize);
-                ImGui.Text("World Mouse Position: " + _viewportRenderSystem.GetViewports()[i].GetMousePosition(relativeMousePosition));
+                ImGui.Text("Position: " + viewport.GetMousePosition(relativeMousePosition) + ", Grid Size: " + viewport.GridSize);
             }
 
             ImGui.End();
