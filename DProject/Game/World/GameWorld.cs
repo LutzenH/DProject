@@ -36,10 +36,15 @@ namespace DProject.Manager.World
             //Water
             AddSystem(new WaterRenderSystem(graphicsDevice));
 
+#if EDITOR
+            var viewportRenderSystem = new ViewportRenderSystem(graphicsDevice);
+            AddSystem(viewportRenderSystem);
+#endif
+            
             AddSystem(new FinalRenderSystem(graphicsDevice));
             
 #if EDITOR
-            AddSystem(new DebugUIRenderSystem(game, graphicsDevice, physicsSystem));
+            AddSystem(new DebugUIRenderSystem(game, graphicsDevice, physicsSystem, viewportRenderSystem));
 #endif
 
             World = Build();

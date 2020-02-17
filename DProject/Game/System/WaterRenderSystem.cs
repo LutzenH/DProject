@@ -31,6 +31,7 @@ namespace DProject.Manager.System
 
         public override void Draw(GameTime gameTime)
         {
+            _graphicsDevice.SetRenderTarget(null);
             _graphicsDevice.Clear(ClearOptions.DepthBuffer, Color.White, 1, 0);
 
             foreach (var entity in ActiveEntities)

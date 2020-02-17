@@ -27,7 +27,15 @@ namespace DProject.Manager
         //Debug World
         DebugIncreaseViewDistance,
         DebugDecreaseViewDistance,
-        PickupPhysicsBody
+        PickupPhysicsBody,
+        
+#if EDITOR
+        //Editor
+        ViewportZoomIn,
+        ViewportZoomOut,
+        ViewportIncreaseGridSize,
+        ViewportDecreaseGridSize,
+#endif
     }
 
     public sealed class InputManager
@@ -59,6 +67,7 @@ namespace DProject.Manager
             
             var pressedKeys = Keyboard.GetState().GetPressedKeys();
 
+            //TODO: Replace this case-machine with something a little more efficient and scalable.
             foreach (var key in pressedKeys)
             {
                 switch (key)
@@ -107,9 +116,16 @@ namespace DProject.Manager
                         break;
                     case Keys.OemPlus:
                         _input.Add(Input.DebugIncreaseViewDistance);
+#if EDITOR
+                        _input.Add(Input.ViewportIncreaseGridSize);
+#endif
                         break;
                     case Keys.OemMinus:
                         _input.Add(Input.DebugDecreaseViewDistance);
+#if EDITOR
+                        _input.Add(Input.ViewportDecreaseGridSize);
+#endif
+
                         break;
                 }
             }
@@ -118,7 +134,14 @@ namespace DProject.Manager
                 _input.Add(Input.CameraFreeRotation);
             if (_currentMouseState.RightButton == ButtonState.Pressed)
                 _input.Add(Input.PickupPhysicsBody);
-
+            
+#if EDITOR
+            if (_currentMouseState.ScrollWheelValue > _previousMouseState.ScrollWheelValue)
+                _input.Add(Input.ViewportZoomOut);
+            if (_currentMouseState.ScrollWheelValue < _previousMouseState.ScrollWheelValue)
+                _input.Add(Input.ViewportZoomIn);
+#endif
+            
             CameraLookVector = new Vector2(_previousMouseState.X, _previousMouseState.Y)
                                - new Vector2(_currentMouseState.X, _currentMouseState.Y);
         }

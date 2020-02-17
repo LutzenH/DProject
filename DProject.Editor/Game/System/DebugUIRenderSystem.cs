@@ -21,13 +21,17 @@ namespace DProject.Manager.System
         private readonly Game1 _game;
         private readonly GraphicsDevice _graphicsDevice;
         private readonly PhysicsSystem _physicsSystem;
+        private readonly ViewportRenderSystem _viewportRenderSystem;
      
         private readonly ImGuiRenderer _imGuiRenderer;
         private readonly IntPtr[] _imGuiTexture = { IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero };
 
+        private readonly IntPtr[] _viewPortTextures = {IntPtr.Zero };
+        
         private bool _showTestWindow;
         private bool _showRenderBufferWindow;
         private bool _showEntityListWindow;
+        private bool _showViewportWindow;
 
         public static readonly Dictionary<int, string> EntityIdentifiers = new Dictionary<int, string>();
         private readonly IEnumerable<global::System.Type> _componentTypes;
@@ -38,10 +42,11 @@ namespace DProject.Manager.System
         private readonly float[] _frameRateValues = new float[MaxFrameRateValues];
         private int _frameRateValuesIndex;
         
-        public DebugUIRenderSystem(Game1 game, GraphicsDevice graphicsDevice, PhysicsSystem physicsSystem) : base(Aspect.Exclude())
+        public DebugUIRenderSystem(Game1 game, GraphicsDevice graphicsDevice, PhysicsSystem physicsSystem, ViewportRenderSystem viewportRenderSystem) : base(Aspect.Exclude())
         {
             _graphicsDevice = graphicsDevice;
             _physicsSystem = physicsSystem;
+            _viewportRenderSystem = viewportRenderSystem;
             _game = game;
             
             _imGuiRenderer = new ImGuiRenderer(_graphicsDevice);
@@ -53,6 +58,7 @@ namespace DProject.Manager.System
 
         public override void Draw(GameTime gameTime)
         {
+            _graphicsDevice.SetRenderTarget(null);
             _graphicsDevice.Clear(ClearOptions.DepthBuffer, Color.White, 1, 0);
             
             _imGuiTexture[0] = _imGuiRenderer.BindTexture(ShaderManager.Instance.Color);
@@ -63,6 +69,8 @@ namespace DProject.Manager.System
             _imGuiTexture[5] = _imGuiRenderer.BindTexture(ShaderManager.Instance.ShadowMap);
             _imGuiTexture[6] = _imGuiRenderer.BindTexture(ShaderManager.Instance.SSAO);
 
+            _viewPortTextures[0] = _imGuiRenderer.BindTexture(_viewportRenderSystem.GetViewports()[0].GetViewport());
+            
             // Call BeforeLayout first to set things up
             _imGuiRenderer.BeforeLayout(gameTime);
             
@@ -79,6 +87,8 @@ namespace DProject.Manager.System
             _imGuiRenderer.UnbindTexture(_imGuiTexture[4]);
             _imGuiRenderer.UnbindTexture(_imGuiTexture[5]);
             _imGuiRenderer.UnbindTexture(_imGuiTexture[6]);
+            
+            _imGuiRenderer.UnbindTexture(_viewPortTextures[0]);
         }
 
         protected virtual void ImGuiLayout()
@@ -86,6 +96,7 @@ namespace DProject.Manager.System
             if (ImGui.Button("Test Window")) _showTestWindow = !_showTestWindow;
             if (ImGui.Button("Render Buffers")) _showRenderBufferWindow = !_showRenderBufferWindow;
             if (ImGui.Button("Entity List")) _showEntityListWindow = !_showEntityListWindow;
+            if (ImGui.Button("Viewport")) _showViewportWindow = !_showViewportWindow;
             
             var frameRate = 1000f / ImGui.GetIO().Framerate;
             _frameRateValues[_frameRateValuesIndex++ % MaxFrameRateValues] = frameRate;
@@ -230,6 +241,11 @@ namespace DProject.Manager.System
                 ImGui.EndChild();
 
                 ImGui.End();
+            }
+
+            if (_showViewportWindow)
+            {
+                BuildViewportWindow(_viewPortTextures);
             }
         }
 
@@ -447,6 +463,50 @@ namespace DProject.Manager.System
             }
         }
 
+        private void BuildViewportWindow(IntPtr[] viewportTexturePointer)
+        {
+            var io = ImGui.GetIO();
+
+            ImGui.SetNextWindowSize(new Num.Vector2(200, 100), ImGuiCond.FirstUseEver);
+            ImGui.Begin("Viewport", ref _showViewportWindow);
+
+            for (var i = 0; i < viewportTexturePointer.Length; i++)
+            {
+                var dimension = new Num.Vector2(_viewportRenderSystem.GetViewports()[i].Width,
+                                                _viewportRenderSystem.GetViewports()[i].Height);
+                
+                ImGui.Image(viewportTexturePointer[i], dimension, Num.Vector2.Zero, Num.Vector2.One, Num.Vector4.One, Num.Vector4.Zero);
+
+                var mousePosition = io.MousePos;
+                var cursorPosition = ImGui.GetCursorScreenPos();
+
+                var relativeMousePosition = new Vector2(
+                    (mousePosition.X - cursorPosition.X) / dimension.X,
+                    (mousePosition.Y - cursorPosition.Y + dimension.Y) / dimension.Y);
+                
+                if (ImGui.IsItemHovered())
+                {
+                    if (InputManager.Instance.IsInputDown(Input.ViewportZoomIn))
+                        _viewportRenderSystem.GetViewports()[i].Zoom *= 1.1f;
+                    else if(InputManager.Instance.IsInputDown(Input.ViewportZoomOut))
+                        _viewportRenderSystem.GetViewports()[i].Zoom /= 1.1f;
+
+                    if (InputManager.Instance.IsInputPressed(Input.ViewportIncreaseGridSize))
+                        _viewportRenderSystem.GetViewports()[i].GridSize *= 2;
+                    else if (InputManager.Instance.IsInputPressed(Input.ViewportDecreaseGridSize))
+                        _viewportRenderSystem.GetViewports()[i].GridSize /= 2;
+                }
+
+                ImGui.Separator();
+                
+                ImGui.Text("Zoom: " + _viewportRenderSystem.GetViewports()[i].Zoom);
+                ImGui.Text("Grid Size: " + _viewportRenderSystem.GetViewports()[i].GridSize);
+                ImGui.Text("World Mouse Position: " + _viewportRenderSystem.GetViewports()[i].GetMousePosition(relativeMousePosition));
+            }
+
+            ImGui.End();
+        }
+        
         public override void Initialize(IComponentMapperService mapperService) { }
     }
 }
