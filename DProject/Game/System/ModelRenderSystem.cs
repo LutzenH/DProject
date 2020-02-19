@@ -1,11 +1,12 @@
-using System;
 using DProject.Game;
 using DProject.Game.Component;
 using DProject.Type.Rendering;
+using DProject.Type.Rendering.Primitives;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended.Entities;
 using MonoGame.Extended.Entities.Systems;
+using PrimitiveType = Microsoft.Xna.Framework.Graphics.PrimitiveType;
 
 namespace DProject.Manager.System
 {
@@ -56,32 +57,7 @@ namespace DProject.Manager.System
 
                 _graphicsDevice.SetRenderTarget(ShaderManager.Instance.ShadowMap);
                 _graphicsDevice.Clear(Color.White);
-                foreach (var entity in ActiveEntities)
-                {
-                    if (_modelMapper.Has(entity))
-                    {
-                        var model = _modelMapper.Get(entity).Model;
-                        var transform = _transformMapper.Get(entity);
-
-                        if (model.VertexBuffer != null && model.IndexBuffer != null & model.PrimitiveCount != 0)
-                        {
-                            if (boundingFrustum.Intersects(model.BoundingSphere.Transform(transform.WorldMatrix)))
-                            {
-                                ShaderManager.Instance.ShadowMapEffect.World = transform.WorldMatrix;
-
-                                DrawMesh(ShaderManager.Instance.ShadowMapEffect, model, _graphicsDevice);
-                            }
-                        }
-                    }
-                    else if (_primitiveMapper.Has(entity))
-                    {
-                        var primitive = _primitiveMapper.Get(entity);
-                        var transform = _transformMapper.Get(entity);
-                    
-                        ShaderManager.Instance.ShadowMapEffect.World = transform.WorldMatrix;
-                        ShaderManager.Instance.DrawPrimitive(ShaderManager.Instance.ShadowMapEffect, primitive.Type);
-                    }
-                }
+                DrawAllModels(ShaderManager.Instance.ShadowMapEffect);
             }
 
             // Deferred GBuffer
@@ -91,32 +67,7 @@ namespace DProject.Manager.System
             
             //TODO: This probably shouldn't be done in the ModelRenderSystem
             ShaderManager.Instance.SetContinuousShaderInfo(CameraSystem.ActiveLens, 0.5f);
-
-            foreach (var entity in ActiveEntities)
-            {
-                if (_modelMapper.Has(entity))
-                {
-                    var model = _modelMapper.Get(entity).Model;
-                    var transform = _transformMapper.Get(entity);
-
-                    if (model.VertexBuffer != null && model.IndexBuffer != null & model.PrimitiveCount != 0)
-                    {
-                        if (CameraSystem.ActiveLens.BoundingFrustum.Intersects(model.BoundingSphere.Transform(transform.WorldMatrix)))
-                        {
-                            ShaderManager.Instance.GBufferEffect.World = transform.WorldMatrix;
-                            DrawMesh(ShaderManager.Instance.GBufferEffect, model, _graphicsDevice);
-                        }
-                    }
-                }
-                else if (_primitiveMapper.Has(entity))
-                {
-                    var primitive = _primitiveMapper.Get(entity);
-                    var transform = _transformMapper.Get(entity);
-                
-                    ShaderManager.Instance.GBufferEffect.World = transform.WorldMatrix;
-                    ShaderManager.Instance.DrawPrimitive(ShaderManager.Instance.GBufferEffect, primitive.Type);
-                }
-            }
+            DrawAllModels(ShaderManager.Instance.GBufferEffect);
         }
 
         private static void DrawMesh(Effect effect, DPModel model, GraphicsDevice graphicsDevice)
@@ -129,6 +80,37 @@ namespace DProject.Manager.System
                 pass.Apply();
                 //TODO: Maybe use vertex-offsets to loading a model, so a smaller amount of vertex-buffers have to be used.
                 graphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, model.VertexBuffer.VertexCount, 0, model.PrimitiveCount);
+            }
+        }
+
+        private void DrawAllModels(IEffectMatrices effect)
+        {
+            foreach (var entity in ActiveEntities)
+            {
+                if (_modelMapper.Has(entity))
+                {
+                    var model = _modelMapper.Get(entity).Model;
+                    var transform = _transformMapper.Get(entity);
+
+                    if (model.VertexBuffer != null && model.IndexBuffer != null & model.PrimitiveCount != 0)
+                    {
+                        var sphere = BoundingSphere.CreateFromBoundingBox(model.BoundingBox);
+
+                        if (CameraSystem.ActiveLens.BoundingFrustum.Intersects(sphere.Transform(transform.WorldMatrix)))
+                        {
+                            effect.World = transform.WorldMatrix;
+                            DrawMesh((Effect) effect, model, _graphicsDevice);
+                        }
+                    }
+                }
+                else if (_primitiveMapper.Has(entity))
+                {
+                    var primitive = _primitiveMapper.Get(entity);
+                    var transform = _transformMapper.Get(entity);
+                    
+                    effect.World = transform.WorldMatrix;
+                    Primitives.Instance.Draw((Effect) effect, primitive.Type);
+                }
             }
         }
     }

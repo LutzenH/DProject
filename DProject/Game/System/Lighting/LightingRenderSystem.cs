@@ -1,5 +1,6 @@
 using DProject.Game;
 using DProject.Game.Component.Lighting;
+using DProject.Type.Rendering.Primitives;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended.Entities;
@@ -66,7 +67,7 @@ namespace DProject.Manager.System.Lighting
                         _graphicsDevice.RasterizerState.CullMode = cameraToCenter <= light.Radius ? CullMode.CullClockwiseFace : CullMode.CullCounterClockwiseFace;
 
                         _graphicsDevice.Clear(ClearOptions.DepthBuffer, Color.White, 1, 0);
-                        ShaderManager.Instance.DrawPrimitive(ShaderManager.Instance.PointLightEffect, PrimitiveType.Sphere);
+                        Primitives.Instance.Draw(ShaderManager.Instance.PointLightEffect, PrimitiveType.Sphere);
                     }
                 }
             }

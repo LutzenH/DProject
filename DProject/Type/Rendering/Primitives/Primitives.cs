@@ -9,14 +9,22 @@ namespace DProject.Type.Rendering.Primitives
 
     public class Primitives
     {
+        private static Primitives _instance;
+        
         private GraphicsDevice _graphicsDevice;
         
         private DPModel _sphere;
         private DPModel _cube;
         private DPModel _companionCube;
 
-        public Primitives() { }
-
+        private Primitives() { }
+        
+        public static Primitives Instance
+        {
+            get => _instance ?? (_instance = new Primitives());
+            set => _instance = value;
+        }
+        
         public void LoadPrimitives(ContentManager contentManager)
         {
             _sphere = ModelLoaderSystem.ConvertDProjectModelFormatToModel("models/primitives/sphere", _graphicsDevice);
@@ -62,6 +70,21 @@ namespace DProject.Type.Rendering.Primitives
             {
                 pass.Apply();
                 _graphicsDevice.DrawIndexedPrimitives(Microsoft.Xna.Framework.Graphics.PrimitiveType.TriangleList, 0, 0,  vertexCount, 0, primitiveCount);
+            }
+        }
+
+        public DPModel GetPrimitiveModel(PrimitiveType type)
+        {
+            switch (type)
+            {
+                case PrimitiveType.Sphere:
+                    return _sphere;
+                case PrimitiveType.Cube:
+                    return _cube;
+                case PrimitiveType.CompanionCube:
+                    return _companionCube;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
             }
         }
     }

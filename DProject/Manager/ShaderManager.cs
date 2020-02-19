@@ -13,10 +13,8 @@ namespace DProject.Manager
     public sealed class ShaderManager
     {
         private static ShaderManager _instance;
-        private ShaderManager()
-        {
-            _primitives = new Primitives();
-        }
+        private ShaderManager() { }
+        
         public static ShaderManager Instance
         {
             get => _instance ?? (_instance = new ShaderManager());
@@ -69,13 +67,11 @@ namespace DProject.Manager
         public RenderTarget2D CombineFinal;
         
         private FullscreenQuad _fullscreenQuad;
-        private Primitives _primitives;
 
         public void Initialize(GraphicsDevice graphicsDevice)
         {
             _graphicsDevice = graphicsDevice;
             _fullscreenQuad = new FullscreenQuad(graphicsDevice);
-            _primitives.Initialize(graphicsDevice);
             
             CreateGBuffer(false);
         }
@@ -212,8 +208,6 @@ namespace DProject.Manager
             _fxaaEffect = new FXAAEffect(content.Load<Effect>("shaders/FXAAShader"));
             _ssaoEffect = new SSAOEffect(content.Load<Effect>("shaders/SSAOShader"));
             _ssaoEffect.Noise = content.Load<Texture2D>("shaders/noise");
-
-            _primitives.LoadPrimitives(content);
             
             SetInitiateShaderInfo();
         }
@@ -320,11 +314,6 @@ namespace DProject.Manager
             _fullscreenQuad.Draw(effect);
         }
 
-        public void DrawPrimitive(Effect effect, PrimitiveType type)
-        {
-            _primitives.Draw(effect, type);
-        }
-        
         #endregion
 
         #region GBuffer Effects

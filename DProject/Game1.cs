@@ -3,6 +3,7 @@ using DProject.Game;
 using DProject.List;
 using DProject.Manager;
 using DProject.Manager.World;
+using DProject.Type.Rendering.Primitives;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -54,6 +55,7 @@ namespace DProject
                 WorldBuilder = new DefaultGameWorld(this, Content, GraphicsDevice);
             
             ShaderManager.Instance.Initialize(GraphicsDevice);
+            Primitives.Instance.Initialize(GraphicsDevice);
             
             WorldBuilder.World.Initialize();
 
@@ -65,6 +67,7 @@ namespace DProject
             Fonts.LoadFonts(Content);
             
             ShaderManager.Instance.LoadContent(Content);
+            Primitives.Instance.LoadPrimitives(Content);
             UpdateGraphicsSettings();
 
             base.LoadContent();

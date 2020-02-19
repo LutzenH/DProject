@@ -9,15 +9,15 @@ namespace DProject.Type.Rendering
         public readonly VertexBuffer VertexBuffer;
         public readonly IndexBuffer IndexBuffer;
         public readonly int PrimitiveCount;
-        public readonly BoundingSphere BoundingSphere;
+        public readonly BoundingBox BoundingBox;
         
-        public DPModel(string name, VertexBuffer vertexBuffer, IndexBuffer indexBuffer, int primitiveCount, BoundingSphere boundingSphere)
+        public DPModel(string name, VertexBuffer vertexBuffer, IndexBuffer indexBuffer, int primitiveCount, BoundingBox boundingBox)
         {
             Name = name;
             VertexBuffer = vertexBuffer;
             IndexBuffer = indexBuffer;
             PrimitiveCount = primitiveCount;
-            BoundingSphere = boundingSphere;
+            BoundingBox = boundingBox;
         }
     }
 }

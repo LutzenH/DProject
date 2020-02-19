@@ -8,6 +8,8 @@ namespace DProject.Type.Rendering
 {
     public class ViewportRenderer
     {
+        private static Color _selectedColor = Color.Red;
+
         private const int MaxMapRadius = 4096;
         
         private GraphicsDevice _graphicsDevice;
@@ -15,8 +17,8 @@ namespace DProject.Type.Rendering
         private BasicEffect _basicEffect;
         private RenderTarget2D _viewport;
 
-        private readonly int _width;
-        private readonly int _height;
+        private int _width;
+        private int _height;
 
         private float _zoom;
         private int _usableGridSize;
@@ -38,8 +40,33 @@ namespace DProject.Type.Rendering
             }
 }
 
-        public int Width => _width;
-        public int Height => _height;
+        public int Width
+        {
+            get => _width;
+            set
+            {
+                if (value == _width)
+                    return;
+
+                _width = value;
+                RebuildRenderTarget(_graphicsDevice);
+                UpdateProjection();
+            }
+        }
+
+        public int Height
+        {
+            get => _height;
+            set
+            {
+                if (value == _height)
+                    return;
+
+                _height = value;
+                RebuildRenderTarget(_graphicsDevice);
+                UpdateProjection();
+            }
+        }
 
         public int GridSize
         {
@@ -105,7 +132,7 @@ namespace DProject.Type.Rendering
                 Projection = _projectionMatrix
             };
 
-            _viewport = new RenderTarget2D(graphicsDevice, _width, _height, false, SurfaceFormat.Color, DepthFormat.None);
+            RebuildRenderTarget(graphicsDevice);
         }
 
         public void Draw(GameTime gameTime)
@@ -241,6 +268,17 @@ namespace DProject.Type.Rendering
             return Vector3.Zero;
         }
 
+        public void DrawMesh(DPModel model, TransformComponent transform, Color color)
+        {
+            _basicEffect.DiffuseColor = color.ToVector3();
+            _basicEffect.VertexColorEnabled = false;
+            
+            DrawMesh(model, transform);
+            
+            _basicEffect.DiffuseColor = Vector3.One;
+            _basicEffect.VertexColorEnabled = true;
+        }
+        
         public void DrawMesh(DPModel model, TransformComponent transform)
         {
             _graphicsDevice.SetVertexBuffer(model.VertexBuffer);
@@ -256,9 +294,114 @@ namespace DProject.Type.Rendering
             }
         }
 
+        public void DrawBoundingBox(TransformComponent transform, BoundingBox boundingBox, Color color)
+        {
+            _basicEffect.World = transform.WorldMatrix;
+            _basicEffect.View = _viewMatrix;
+
+            var box = new[]
+            {
+                new VertexPositionColor(new Vector3(boundingBox.Min.X, boundingBox.Max.Y, boundingBox.Max.Z), color),
+                new VertexPositionColor(new Vector3(boundingBox.Max.X, boundingBox.Max.Y, boundingBox.Max.Z), color),
+                
+                new VertexPositionColor(new Vector3(boundingBox.Min.X, boundingBox.Max.Y, boundingBox.Max.Z), color),
+                new VertexPositionColor(new Vector3(boundingBox.Min.X, boundingBox.Min.Y, boundingBox.Max.Z), color),
+                
+                new VertexPositionColor(new Vector3(boundingBox.Min.X, boundingBox.Min.Y, boundingBox.Max.Z), color),
+                new VertexPositionColor(new Vector3(boundingBox.Max.X, boundingBox.Min.Y, boundingBox.Max.Z), color),
+
+                new VertexPositionColor(new Vector3(boundingBox.Max.X, boundingBox.Min.Y, boundingBox.Max.Z), color),
+                new VertexPositionColor(new Vector3(boundingBox.Max.X, boundingBox.Max.Y, boundingBox.Max.Z), color),
+                
+                new VertexPositionColor(new Vector3(boundingBox.Min.X, boundingBox.Max.Y, boundingBox.Min.Z), color),
+                new VertexPositionColor(new Vector3(boundingBox.Max.X, boundingBox.Max.Y, boundingBox.Min.Z), color),
+                
+                new VertexPositionColor(new Vector3(boundingBox.Min.X, boundingBox.Max.Y, boundingBox.Min.Z), color),
+                new VertexPositionColor(new Vector3(boundingBox.Min.X, boundingBox.Min.Y, boundingBox.Min.Z), color),
+                
+                new VertexPositionColor(new Vector3(boundingBox.Min.X, boundingBox.Min.Y, boundingBox.Min.Z), color),
+                new VertexPositionColor(new Vector3(boundingBox.Max.X, boundingBox.Min.Y, boundingBox.Min.Z), color),
+
+                new VertexPositionColor(new Vector3(boundingBox.Max.X, boundingBox.Min.Y, boundingBox.Min.Z), color),
+                new VertexPositionColor(new Vector3(boundingBox.Max.X, boundingBox.Max.Y, boundingBox.Min.Z), color),
+                
+                new VertexPositionColor(new Vector3(boundingBox.Min.X, boundingBox.Max.Y, boundingBox.Max.Z), color),
+                new VertexPositionColor(new Vector3(boundingBox.Min.X, boundingBox.Max.Y, boundingBox.Min.Z), color),
+                
+                new VertexPositionColor(new Vector3(boundingBox.Max.X, boundingBox.Max.Y, boundingBox.Max.Z), color),
+                new VertexPositionColor(new Vector3(boundingBox.Max.X, boundingBox.Max.Y, boundingBox.Min.Z), color),
+                
+                new VertexPositionColor(new Vector3(boundingBox.Min.X, boundingBox.Min.Y, boundingBox.Max.Z), color),
+                new VertexPositionColor(new Vector3(boundingBox.Min.X, boundingBox.Min.Y, boundingBox.Min.Z), color),
+
+                new VertexPositionColor(new Vector3(boundingBox.Max.X, boundingBox.Min.Y, boundingBox.Max.Z), color),
+                new VertexPositionColor(new Vector3(boundingBox.Max.X, boundingBox.Min.Y, boundingBox.Min.Z), color),
+            };
+
+            foreach (var pass in _basicEffect.CurrentTechnique.Passes)
+            {
+                pass.Apply();
+                _graphicsDevice.DrawUserPrimitives(PrimitiveType.LineList, box, 0, box.Length/2);
+            }
+        }
+
+        public void DrawBoundingBox(TransformComponent transform, BoundingBox boundingBox)
+        {
+            DrawBoundingBox(transform, boundingBox, _selectedColor);
+        }
+
+        public void DrawOriginMarker(Vector3 location, float zoom)
+        {
+            _basicEffect.World = Matrix.CreateTranslation(location);
+            var lineLength = zoom * 64;
+            
+            var lines = new[]
+            {
+                new Vector3(-lineLength, lineLength, lineLength),
+                new Vector3(lineLength, -lineLength, -lineLength),
+                
+                new Vector3(lineLength, lineLength, lineLength),
+                new Vector3(-lineLength, -lineLength, -lineLength),
+                
+                new Vector3(-lineLength, -lineLength, lineLength),
+                new Vector3(lineLength, lineLength, -lineLength),
+                
+                new Vector3(lineLength, -lineLength, lineLength),
+                new Vector3(-lineLength, lineLength, -lineLength)
+            };
+            
+            var centerMarker = new[]
+            {
+                new VertexPositionColor(lines[0], _selectedColor),
+                new VertexPositionColor(lines[1], _selectedColor),
+                
+                new VertexPositionColor(lines[2], _selectedColor),
+                new VertexPositionColor(lines[3], _selectedColor),
+                
+                new VertexPositionColor(lines[4], _selectedColor),
+                new VertexPositionColor(lines[5], _selectedColor),
+                
+                new VertexPositionColor(lines[6], _selectedColor),
+                new VertexPositionColor(lines[7], _selectedColor)
+            };
+            
+            foreach (var pass in _basicEffect.CurrentTechnique.Passes)
+            {
+                pass.Apply();
+                _graphicsDevice.DrawUserPrimitives(PrimitiveType.LineList, centerMarker, 0, centerMarker.Length/2);
+            }
+            
+        }
+
         public int GetUsableGridSize()
         {
             return _usableGridSize;
+        }
+
+        private void RebuildRenderTarget(GraphicsDevice graphicsDevice)
+        {
+            _viewport?.Dispose();
+            _viewport = new RenderTarget2D(graphicsDevice, _width, _height, false, SurfaceFormat.Color, DepthFormat.None);
         }
     }
     

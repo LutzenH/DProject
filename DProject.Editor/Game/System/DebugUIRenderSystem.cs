@@ -26,7 +26,7 @@ namespace DProject.Manager.System
         private readonly ImGuiRenderer _imGuiRenderer;
         private readonly IntPtr[] _imGuiTexture = { IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero };
 
-        private readonly IntPtr[] _viewPortTextures = {IntPtr.Zero };
+        private IntPtr[] _viewPortTextures = { };
         
         private bool _showTestWindow;
         private bool _showRenderBufferWindow;
@@ -70,8 +70,12 @@ namespace DProject.Manager.System
             _imGuiTexture[5] = _imGuiRenderer.BindTexture(ShaderManager.Instance.ShadowMap);
             _imGuiTexture[6] = _imGuiRenderer.BindTexture(ShaderManager.Instance.SSAO);
 
-            _viewPortTextures[0] = _imGuiRenderer.BindTexture(_viewportRenderSystem.GetViewports()[0].GetViewport());
-            
+            var viewports = _viewportRenderSystem.GetViewports();
+            _viewPortTextures = new IntPtr[viewports.Length];
+
+            for (var i = 0; i < viewports.Length; i++)
+                _viewPortTextures[i] = _imGuiRenderer.BindTexture(viewports[i].GetViewport());
+
             // Call BeforeLayout first to set things up
             _imGuiRenderer.BeforeLayout(gameTime);
             
@@ -88,8 +92,9 @@ namespace DProject.Manager.System
             _imGuiRenderer.UnbindTexture(_imGuiTexture[4]);
             _imGuiRenderer.UnbindTexture(_imGuiTexture[5]);
             _imGuiRenderer.UnbindTexture(_imGuiTexture[6]);
-            
-            _imGuiRenderer.UnbindTexture(_viewPortTextures[0]);
+
+            for (var i = 0; i < viewports.Length; i++)
+                _imGuiRenderer.UnbindTexture(_viewPortTextures[i]);
         }
 
         protected virtual void ImGuiLayout()
@@ -245,9 +250,7 @@ namespace DProject.Manager.System
             }
 
             if (_showViewportWindow)
-            {
                 BuildViewportWindow(_viewPortTextures);
-            }
         }
 
         private void BuildComponentListWindow(int selectedEntity)
@@ -383,7 +386,7 @@ namespace DProject.Manager.System
                                 case DPModel dpModel:
                                     ImGui.Text("Name: " + dpModel.Name);
                                     ImGui.Text("Triangle Count: " + dpModel.PrimitiveCount);
-                                    ImGui.Text("BoundingSphere: " + dpModel.BoundingSphere);
+                                    ImGui.Text("BoundingBox: " + dpModel.BoundingBox);
                                     break;
                                 case TransformComponent transformComponent:
                                 {
@@ -468,12 +471,16 @@ namespace DProject.Manager.System
         {
             var io = ImGui.GetIO();
 
-            ImGui.SetNextWindowSize(new Num.Vector2(200, 100), ImGuiCond.FirstUseEver);
-            ImGui.Begin("Viewport", ref _showViewportWindow);
-
             for (var i = 0; i < viewportTexturePointer.Length; i++)
             {
+                ImGui.SetNextWindowSize(new Num.Vector2(200, 200), ImGuiCond.FirstUseEver);
+                ImGui.Begin("Viewport " + i, ref _showViewportWindow);
+                
                 var viewport = _viewportRenderSystem.GetViewports()[i];
+
+                viewport.Width = (int) ImGui.GetWindowWidth();
+                viewport.Height = (int) ImGui.GetWindowWidth();
+                
                 var dimension = new Num.Vector2(viewport.Width, viewport.Height);
                 
                 var intDirection = (int) viewport.Direction;
@@ -512,9 +519,8 @@ namespace DProject.Manager.System
                 }
                 
                 ImGui.Text("Position: " + viewport.GetMousePosition(relativeMousePosition) + ", Grid Size: " + viewport.GridSize);
+                ImGui.End();
             }
-
-            ImGui.End();
         }
         
         public override void Initialize(IComponentMapperService mapperService) { }

@@ -162,7 +162,7 @@ namespace DProject.Manager.System
             binaryReader.Close();
             fileStream.Close();
             
-            var model = new DPModel(objectName, vertexBuffer, indexBuffer, (int)indexCount/3, BoundingSphere.CreateFromPoints(pointList));
+            var model = new DPModel(objectName, vertexBuffer, indexBuffer, (int)indexCount/3, BoundingBox.CreateFromPoints(pointList));
             
             return model;
         }
