@@ -4,16 +4,11 @@ namespace DProject.Game.Component
 {
     public class ModelComponent : IComponent
     {
-        public string ModelPath { get; set; }
+        public int Hash { get; set; }
 
-        public ModelComponent(string path)
+        public ModelComponent(int hash)
         {
-            ModelPath = path;
-        }
-
-        public ModelComponent(ushort id)
-        {
-            ModelPath = Props.PropList[id].AssetPath;
+            Hash = hash;
         }
     }
 }

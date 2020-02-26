@@ -126,15 +126,14 @@ namespace DProject.Testing.Core
         }
 
         /// <summary>
-        /// Loops over every model mentioned in 'Content/collections/props.json',
+        /// Loops over every model in 'Content/models/**',
         /// to check if any of them are invalid.
         /// </summary>
         [Test]
         public void ModelLoaderSystem_loadAllModelsOneByOne()
         {
             var game = new TestGame();
-            var propList = Props.PropList;
-            var propIndex = (ushort) (propList.Count - 1);
+            var modelList = Models.ModelList.GetEnumerator();
 
             Entity previousProp = null;
             
@@ -151,13 +150,14 @@ namespace DProject.Testing.Core
                 if (previousProp != null) 
                     previousProp.Destroy();
                 
-                if(propIndex < propList.Count)
-                    previousProp = game.WorldBuilder.EntityFactory.CreateProp(new Vector3(0, 0, 0), propIndex--);
+                if (modelList.MoveNext())
+                    previousProp = game.WorldBuilder.EntityFactory.CreateProp(new Vector3(0, 0, 0), modelList.Current.Value.AssetPath);
                 else
                     game.Exit();
             };
             
             game.Run();
+            modelList.Dispose();
         }
     }
 

@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using DProject.Game.Component;
+using DProject.List;
 using DProject.Type.Rendering;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -18,14 +20,14 @@ namespace DProject.Manager.System
         private ComponentMapper<ModelComponent> _modelMapper;
         private ComponentMapper<LoadedModelComponent> _loadedModelMapper;
 
-        private readonly Dictionary<string, DPModel> _loadedModels;
+        private readonly Dictionary<int, DPModel> _loadedModels;
         
         public ModelLoaderSystem(GraphicsDevice graphicsDevice, ContentManager contentManager) : base(Aspect.All(typeof(ModelComponent)))
         {
             _contentManager = contentManager;
             _graphicsDevice = graphicsDevice;
             
-            _loadedModels = new Dictionary<string, DPModel>();
+            _loadedModels = new Dictionary<int, DPModel>();
         }
 
         public override void Initialize(IComponentMapperService mapperService)
@@ -39,14 +41,21 @@ namespace DProject.Manager.System
             foreach (var entity in ActiveEntities)
             {
                 var modelComponent = _modelMapper.Get(entity);
-
+                
                 DPModel model;
-                if (_loadedModels.ContainsKey(modelComponent.ModelPath))
-                    model = _loadedModels[modelComponent.ModelPath];
+                if (_loadedModels.ContainsKey(modelComponent.Hash))
+                    model = _loadedModels[modelComponent.Hash];
                 else
                 {
-                    model = ConvertDProjectModelFormatToModel(modelComponent.ModelPath, _graphicsDevice);
-                    _loadedModels.Add(modelComponent.ModelPath, model);
+                    if (!Models.ModelList.ContainsKey(modelComponent.Hash))
+                    {
+                        Console.Error.WriteLine("Failed to find model with hash: " + modelComponent.Hash);
+                        _modelMapper.Delete(entity);
+                        continue;
+                    }
+
+                    model = ConvertDProjectModelFormatToModel(Models.ModelList[modelComponent.Hash].AssetPath, _graphicsDevice);
+                    _loadedModels.Add(modelComponent.Hash, model);
                 }
                 
                 var loadedModelComponent = new LoadedModelComponent()

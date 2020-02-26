@@ -20,11 +20,11 @@ namespace DProject.Manager.World
 
             //Entities
             EntityFactory.CreateFlyCamera(new Vector3(0, 0, 0));
-            EntityFactory.CreateProp(new Vector3(0, 0, 0), 10);
-            EntityFactory.CreateProp(new Vector3(-2, 0, 0), 9);
-            EntityFactory.CreateProp(new Vector3(-4, 0, 0), 8);
-            EntityFactory.CreateProp(new Vector3(-6, 0, 0), 7);
-            EntityFactory.CreateProp(new Vector3(-8, 0, 0), 6);
+            EntityFactory.CreateProp(new Vector3(0, 0, 0), "models/ports/shelves_empty");
+            EntityFactory.CreateProp(new Vector3(-2, 0, 0), "models/ports/barrelstack");
+            EntityFactory.CreateProp(new Vector3(-4, 0, 0), "models/ports/seat");
+            EntityFactory.CreateProp(new Vector3(-6, 0, 0), "models/ports/stool");
+            EntityFactory.CreateProp(new Vector3(-8, 0, 0), "models/ports/boat");
 
             EntityFactory.CreatePhysicsProp(new Vector3(0f, 10f, 0f), Vector3.One, "models/primitives/companion_cube");
 

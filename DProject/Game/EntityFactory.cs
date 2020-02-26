@@ -162,7 +162,7 @@ namespace DProject.Game
         
         #endregion
 
-        public Entity CreateProp(Vector3 position, ushort id)
+        public Entity CreateProp(Vector3 position, int hash)
         {
             var entity = CreateEntity("Prop");
             
@@ -170,22 +170,14 @@ namespace DProject.Game
             {
                 Position = position
             });
-            entity.Attach(new ModelComponent(id));
+            entity.Attach(new ModelComponent(hash));
 
             return entity;
         }
         
         public Entity CreateProp(Vector3 position, string path)
         {
-            var entity = CreateEntity("Prop");
-            
-            entity.Attach(new TransformComponent()
-            {
-                Position = position
-            });
-            entity.Attach(new ModelComponent(path));
-
-            return entity;
+            return CreateProp(position, path.GetHashCode());
         }
         
         public Entity CreatePhysicsProp(Vector3 position, Vector3 boundingBoxScale, string path)
@@ -197,7 +189,7 @@ namespace DProject.Game
                 Position = position
             });
             
-            entity.Attach(new ModelComponent(path));
+            entity.Attach(new ModelComponent(path.GetHashCode()));
             
             entity.Attach(new PhysicsBodyComponent()
             {

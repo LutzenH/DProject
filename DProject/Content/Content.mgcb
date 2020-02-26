@@ -10,12 +10,6 @@
 
 #---------------------------------- Content ---------------------------------#
 
-#begin collections/colors.json
-/copy:collections/colors.json
-
-#begin collections/props.json
-/copy:collections/props.json
-
 #begin collections/textures.json
 /copy:collections/textures.json
 
